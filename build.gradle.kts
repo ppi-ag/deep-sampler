@@ -7,19 +7,22 @@
  */
 
 plugins {
-    // Apply the java-library plugin to add support for Java Library
     `java-library`
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    apply(plugin = "java-library")
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
 }
 
 dependencies {
