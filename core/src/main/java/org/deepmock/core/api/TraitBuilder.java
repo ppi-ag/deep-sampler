@@ -6,5 +6,7 @@ public class TraitBuilder<T> {
     }
 
     public void doing(T property) {
+
+
     }
 }
