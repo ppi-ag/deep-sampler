@@ -1,15 +1,14 @@
 package org.deepmock.core.model;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 public class Behavior {
 
-    private JoinPoint joinPoint;
+    private final JoinPoint joinPoint;
 
     private List<ParameterMatcher> parameter;
 
-    private Supplier<Object> returnValueSupplier;
+    private ReturnValueSupplier returnValueSupplier;
 
     public Behavior(JoinPoint joinPoint) {
         this.joinPoint = joinPoint;
@@ -17,10 +16,6 @@ public class Behavior {
 
     public JoinPoint getJoinPoint() {
         return joinPoint;
-    }
-
-    public void setJoinPoint(JoinPoint joinPoint) {
-        this.joinPoint = joinPoint;
     }
 
     public List<ParameterMatcher> getParameter() {
@@ -31,11 +26,11 @@ public class Behavior {
         this.parameter = parameter;
     }
 
-    public Supplier<Object> getReturnValueSupplier() {
+    public ReturnValueSupplier getReturnValueSupplier() {
         return returnValueSupplier;
     }
 
-    public void setReturnValueSupplier(Supplier<Object> returnValueSupplier) {
+    public void setReturnValueSupplier(ReturnValueSupplier returnValueSupplier) {
         this.returnValueSupplier = returnValueSupplier;
     }
 }

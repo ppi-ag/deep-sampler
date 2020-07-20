@@ -1,6 +1,7 @@
 package org.deepmock.core.model;
 
-public interface ParameterMatcher {
+import java.io.Serializable;
 
+public interface ParameterMatcher extends Serializable {
     boolean matches(Object parameter);
 }

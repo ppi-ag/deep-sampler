@@ -2,7 +2,9 @@ package org.deepmock.core.model;
 
 import org.deepmock.core.error.InvalidConfigException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BehaviorRepository {
@@ -41,4 +43,7 @@ public class BehaviorRepository {
         return currentBehavior.get();
     }
 
+    public List<Behavior> getCurrentExecutionBehaviors() {
+        return new ArrayList<>(traits.get().values());
+    }
 }
