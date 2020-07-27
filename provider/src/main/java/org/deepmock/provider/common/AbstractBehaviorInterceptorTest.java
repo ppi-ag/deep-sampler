@@ -34,6 +34,9 @@ public abstract class AbstractBehaviorInterceptorTest {
     public void singleArgumentValueMatchesAndBehaviorIsChanged() {
         Behaviors.clear();
 
+        //WHEN UNCHANGED
+        assertEquals(VALUE_A, testObject.shouldChangeItsBehavior(VALUE_A));
+
         // GIVEN WHEN
         TestObject changedTestObject = Behaviors.of(TestObject.class);
         Personality.hasTrait(changedTestObject.shouldChangeItsBehavior(VALUE_B)).returning(VALUE_A);
@@ -69,6 +72,9 @@ public abstract class AbstractBehaviorInterceptorTest {
     @Test
     public void methodWithNoParameterShouldChangeItsBehavior() {
         Behaviors.clear();
+
+        //WHEN UNCHANGED
+        assertEquals(-1, testObject.shouldChangeItsBehavior());
 
         // GIVEN WHEN
         TestObject changedTestObject = Behaviors.of(TestObject.class);
