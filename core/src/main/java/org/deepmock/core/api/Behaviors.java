@@ -2,6 +2,7 @@ package org.deepmock.core.api;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
+import org.deepmock.core.error.BaseException;
 import org.deepmock.core.error.InvalidConfigException;
 import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorRepository;
@@ -9,12 +10,18 @@ import org.deepmock.core.model.JoinPoint;
 import org.deepmock.core.model.ParameterMatcher;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Behaviors {
+
+    public static void clear() {
+        BehaviorRepository.getInstance().clear();
+    }
 
     public static <T> T of(Class<T> cls) {
         Enhancer enhancer = new Enhancer();
@@ -42,12 +49,15 @@ public class Behaviors {
         if (parameterValue instanceof ParameterMatcher) {
             return (ParameterMatcher) parameterValue;
         } else {
-            return Matchers.specific(parameterValue);
+            return Matchers.equalTo(parameterValue);
         }
     }
 
     private static Object createEmptyProxy(Class<?> cls) {
-        if (cls.isPrimitive()) {
+        if (cls.isAssignableFrom(String.class)) {
+            // String is not a primitive but it cannot not be treated as Object either since it is a final class
+            return "";
+        } if (cls.isPrimitive()) {
             return createEmptyPrimitive(cls);
         } else if (cls.isArray()) {
             return createEmptyArray(cls);
@@ -60,12 +70,44 @@ public class Behaviors {
     }
 
     private static Object createEmptyObjectProxy(Class<?> cls) {
+        if (Modifier.isFinal(cls.getModifiers())) {
+            throw new BaseException("The final class %s cannot change its behavior.");
+        }
+
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(cls);
         enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
             return proxy.invokeSuper(obj, args);
         });
-        return enhancer.create();
+
+        if (hasDefaultConstructor(cls)) {
+            return enhancer.create();
+        } else {
+            Constructor constructor = cls.getConstructors()[0];
+            Class[] parameterTypes = constructor.getParameterTypes();
+            Object[] parameterValues = createProxyValuesFor(parameterTypes);
+
+            return enhancer.create(parameterTypes, parameterValues);
+        }
+    }
+
+    private static boolean hasDefaultConstructor(Class<?> cls) {
+        try {
+            cls.getConstructor();
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
+
+    private static Object[] createProxyValuesFor(Class[] types) {
+        Object[] proxyValues = new Object[types.length];
+
+        for (int i = 0; i < types.length; i++) {
+            proxyValues[i] = createEmptyProxy(types[i]);
+        }
+
+        return proxyValues;
     }
 
     private static Object createEmptyPrimitive(Class<?> cls) {
@@ -82,6 +124,7 @@ public class Behaviors {
         } else if (cls.isAssignableFrom(char.class)) {
             return Character.valueOf('0');
         }
+
         throw new InvalidConfigException("The unknown primitve '" + cls + "' appeared");
     }
 
