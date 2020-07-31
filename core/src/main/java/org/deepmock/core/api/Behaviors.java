@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
 
 public class Behaviors {
 
+    public static void clear() {
+        BehaviorRepository.getInstance().clear();
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T of(Class<T> cls) {
 
@@ -55,27 +59,16 @@ public class Behaviors {
     }
 
     private static Object createEmptyProxy(Class<?> cls) {
-        if (cls.isAssignableFrom(String.class)) {
-            // String is not a primitive but it cannot not be treated as Object either since it is a final class
-            return "";
-        } if (cls.isPrimitive()) {
+        if (cls.isPrimitive()) {
             return createEmptyPrimitive(cls);
         } else if (cls.isArray()) {
             return createEmptyArray(cls);
         }
-        return createEmptyObjectProxy(cls);
+        return null;
     }
 
     private static Object createEmptyArray(Class<?> cls) {
         return Array.newInstance(cls, 0);
-    }
-
-    private static Object createEmptyObjectProxy(Class<?> cls) {
-        if (Modifier.isFinal(cls.getModifiers())) {
-            throw new BaseException("The final class %s cannot change its behavior.");
-        }
-
-        return null;
     }
 
     @SuppressWarnings("UnnecessaryBoxing")
