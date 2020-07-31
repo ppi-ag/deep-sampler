@@ -24,6 +24,10 @@ subprojects {
 
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
     }
+
+    tasks.named<Test>("test") {
+        useJUnitPlatform()
+    }
 }
 
 java {
@@ -39,7 +43,6 @@ dependencies {
 }
 
 
-val test by tasks.getting(Test::class) {
-    // Use junit platform for unit tests
+tasks.named<Test>("test") {
     useJUnitPlatform()
 }
