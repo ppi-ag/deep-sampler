@@ -1,33 +1,34 @@
 package org.deepmock.core.api;
 
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
+import javassist.util.proxy.ProxyFactory;
+import javassist.util.proxy.ProxyObject;
 import org.deepmock.core.error.BaseException;
 import org.deepmock.core.error.InvalidConfigException;
 import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorRepository;
 import org.deepmock.core.model.JoinPoint;
 import org.deepmock.core.model.ParameterMatcher;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
+import org.objenesis.instantiator.ObjectInstantiator;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Behaviors {
 
-    public static void clear() {
-        BehaviorRepository.getInstance().clear();
-    }
-
+    @SuppressWarnings("unchecked")
     public static <T> T of(Class<T> cls) {
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(cls);
 
-        enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.setSuperclass(cls);
+        Class<?> proxyClass = proxyFactory.createClass();
+        Objenesis objenesis = new ObjenesisStd();
+        ObjectInstantiator<?> instantiatorOf = objenesis.getInstantiatorOf(proxyClass);
+        ProxyObject proxyObject = (ProxyObject) instantiatorOf.newInstance();
+        proxyObject.setHandler((self, method, proceed, args) -> {
             JoinPoint joinPoint = new JoinPoint(cls, method);
             Behavior behavior = new Behavior(joinPoint);
 
@@ -42,7 +43,7 @@ public class Behaviors {
             return createEmptyProxy(method.getReturnType());
         });
 
-        return (T) enhancer.create();
+        return (T) proxyObject;
     }
 
     private static ParameterMatcher toMatcher(Object parameterValue) {
@@ -74,42 +75,10 @@ public class Behaviors {
             throw new BaseException("The final class %s cannot change its behavior.");
         }
 
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(cls);
-        enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
-            return proxy.invokeSuper(obj, args);
-        });
-
-        if (hasDefaultConstructor(cls)) {
-            return enhancer.create();
-        } else {
-            Constructor constructor = cls.getConstructors()[0];
-            Class[] parameterTypes = constructor.getParameterTypes();
-            Object[] parameterValues = createProxyValuesFor(parameterTypes);
-
-            return enhancer.create(parameterTypes, parameterValues);
-        }
+        return null;
     }
 
-    private static boolean hasDefaultConstructor(Class<?> cls) {
-        try {
-            cls.getConstructor();
-            return true;
-        } catch (NoSuchMethodException e) {
-            return false;
-        }
-    }
-
-    private static Object[] createProxyValuesFor(Class[] types) {
-        Object[] proxyValues = new Object[types.length];
-
-        for (int i = 0; i < types.length; i++) {
-            proxyValues[i] = createEmptyProxy(types[i]);
-        }
-
-        return proxyValues;
-    }
-
+    @SuppressWarnings("UnnecessaryBoxing")
     private static Object createEmptyPrimitive(Class<?> cls) {
         if (cls.isAssignableFrom(int.class)) {
             return Integer.valueOf(0);

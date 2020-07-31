@@ -1,13 +1,12 @@
 package org.deepmock.core.api;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorRepository;
 import org.deepmock.core.model.ParameterMatcher;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -70,7 +69,6 @@ public class BehaviorsTest {
         }
     }
 
-
     public static class Bean {
         private String someString;
         private int someInt;
@@ -81,13 +79,17 @@ public class BehaviorsTest {
         }
 
         @Override
-        public boolean equals(Object other) {
-            return EqualsBuilder.reflectionEquals(this, other);
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Bean bean = (Bean) o;
+            return someInt == bean.someInt &&
+                    Objects.equals(someString, bean.someString);
         }
 
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this);
+            return Objects.hash(someString, someInt);
         }
     }
 }
