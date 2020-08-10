@@ -1,8 +1,9 @@
 rootProject.name = "deepmock"
 
-include ("core",
-	"core-spring",
-	"core-api",
+include ("provider",
+	"provider-spring",
+	"provider-guice",
+	"core",
 	"persistence",
 	"persistence-json",
 	"persistence-api",
