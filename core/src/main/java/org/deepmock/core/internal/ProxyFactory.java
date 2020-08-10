@@ -33,43 +33,4 @@ public class ProxyFactory {
         return (T) proxyObject;
     }
 
-    private static ParameterMatcher toMatcher(Object parameterValue) {
-        if (parameterValue instanceof ParameterMatcher) {
-            return (ParameterMatcher) parameterValue;
-        } else {
-            return Matchers.equalTo(parameterValue);
-        }
-    }
-
-    private static Object createEmptyProxy(Class<?> cls) {
-        if (cls.isPrimitive()) {
-            return createEmptyPrimitive(cls);
-        } else if (cls.isArray()) {
-            return createEmptyArray(cls);
-        }
-        return null;
-    }
-
-    private static Object createEmptyArray(Class<?> cls) {
-        return Array.newInstance(cls, 0);
-    }
-
-    @SuppressWarnings("UnnecessaryBoxing")
-    private static Object createEmptyPrimitive(Class<?> cls) {
-        if (cls.isAssignableFrom(int.class)) {
-            return Integer.valueOf(0);
-        } else if (cls.isAssignableFrom(double.class)) {
-            return Double.valueOf(0.0);
-        } else if (cls.isAssignableFrom(float.class)) {
-            return Float.valueOf(0.0f);
-        } else if (cls.isAssignableFrom(short.class)) {
-            return Short.valueOf((short) 0);
-        } else if (cls.isAssignableFrom(byte.class)) {
-            return Byte.valueOf((byte) 0);
-        } else if (cls.isAssignableFrom(char.class)) {
-            return Character.valueOf('0');
-        }
-
-        throw new InvalidConfigException("The unknown primitve '" + cls + "' appeared");
-    }
 }
