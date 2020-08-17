@@ -1,4 +1,4 @@
-package org.deepmock.provider.guice;
+package org.deepmock.provider.standalone;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -9,7 +9,7 @@ import org.deepmock.core.model.ParameterMatcher;
 
 import java.util.List;
 
-public class BehaviorInterceptor implements MethodInterceptor {
+public class GuiceBehaviorInterceptor implements MethodInterceptor {
 
 
     @Override
