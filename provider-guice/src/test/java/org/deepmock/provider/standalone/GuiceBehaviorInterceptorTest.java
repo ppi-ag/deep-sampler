@@ -1,4 +1,4 @@
-package org.deepmock.provider.guice;
+package org.deepmock.provider.standalone;
 
 import com.google.inject.Guice;
 import org.deepmock.core.api.Behaviors;
@@ -10,7 +10,7 @@ import javax.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BehaviorInterceptorTest extends AbstractBehaviorInterceptorTest {
+public class GuiceBehaviorInterceptorTest extends AbstractBehaviorInterceptorTest {
 
     public static final String VALUE_FROM_OUTER_CLASS = " additional stuff to ensure that this method has not been changed";
 
@@ -18,7 +18,7 @@ public class BehaviorInterceptorTest extends AbstractBehaviorInterceptorTest {
     private TestObjectOwner testObjectOwner;
 
 
-    public BehaviorInterceptorTest() {
+    public GuiceBehaviorInterceptorTest() {
         Guice.createInjector(new DeepMockModule()).injectMembers(this);
     }
 
