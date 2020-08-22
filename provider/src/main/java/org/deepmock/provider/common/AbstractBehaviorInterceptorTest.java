@@ -2,9 +2,12 @@ package org.deepmock.provider.common;
 
 import org.deepmock.core.api.Behaviors;
 import org.deepmock.core.api.Personality;
+import org.deepmock.core.error.VerifyException;
+import org.deepmock.core.internal.FixedQuantity;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * This Testclass must be be used to test all aop-provider in order to ensure that all provider support the same
@@ -99,6 +102,75 @@ public abstract class AbstractBehaviorInterceptorTest {
         assertEquals(BEAN_B, testObject.shouldChangeItsBehavior(BEAN_A));
     }
 
+    @Test
+    public void verifyMethodNotCalled() {
+        Behaviors.clear();
+
+        // CHANGE
+        TestObject changedTestObject = Behaviors.of(TestObject.class);
+        Personality.hasTrait(changedTestObject.shouldChangeItsBehavior(BEAN_A)).returning(BEAN_B);
+
+        // CALL
+        testObject.shouldChangeItsBehavior(BEAN_B);
+
+        //THEN
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(0)).shouldChangeItsBehavior(BEAN_A);
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(0)).shouldChangeItsBehavior();
+    }
+
+    @Test
+    public void verifyMethodCalledOnce() {
+        Behaviors.clear();
+
+        // CHANGE
+        TestObject changedTestObject = Behaviors.of(TestObject.class);
+        Personality.hasTrait(changedTestObject.shouldChangeItsBehavior(BEAN_A)).returning(BEAN_B);
+
+        // CALL
+        testObject.shouldChangeItsBehavior(BEAN_A);
+
+        //THEN
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(1)).shouldChangeItsBehavior(BEAN_A);
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(0)).shouldChangeItsBehavior(BEAN_B);
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(0)).shouldChangeItsBehavior();
+    }
+
+    @Test
+    public void verifyMethodCalledMultipleAndMixed() {
+        Behaviors.clear();
+
+        // CHANGE
+        TestObject changedTestObject = Behaviors.of(TestObject.class);
+        Personality.hasTrait(changedTestObject.shouldChangeItsBehavior(BEAN_B)).returning(BEAN_B);
+        Personality.hasTrait(changedTestObject.shouldChangeItsBehavior()).returning(1);
+
+        // CALL
+        testObject.shouldChangeItsBehavior(BEAN_B);
+        testObject.shouldChangeItsBehavior(BEAN_B);
+        testObject.shouldChangeItsBehavior();
+
+        //THEN
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(0)).shouldChangeItsBehavior(BEAN_A);
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(2)).shouldChangeItsBehavior(BEAN_B);
+        Personality.verifyTrait(TestObject.class, new FixedQuantity(1)).shouldChangeItsBehavior();
+    }
+
+    @Test
+    public void verifyMethodWrongNumber() {
+        Behaviors.clear();
+
+        // CHANGE
+        TestObject changedTestObject = Behaviors.of(TestObject.class);
+        Personality.hasTrait(changedTestObject.shouldChangeItsBehavior(BEAN_A)).returning(BEAN_B);
+
+        // CALL
+        testObject.shouldChangeItsBehavior();
+        testObject.shouldChangeItsBehavior();
+
+        //THEN
+        assertThrows(VerifyException.class, () -> Personality.verifyTrait(TestObject.class, new FixedQuantity(1))
+                .shouldChangeItsBehavior());
+    }
 
     public static class TestObject {
         public String shouldChangeItsBehavior(String param) {

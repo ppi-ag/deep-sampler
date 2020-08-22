@@ -25,7 +25,7 @@ public class BehaviorRepositoryTest {
         JoinPoint foundJoinPoint = createJoinPoint(TestObject.class);
 
         // THEN
-        Behavior expectedBehavior = BehaviorRepository.getInstance().find(foundJoinPoint);
+        Behavior expectedBehavior = BehaviorRepository.getInstance().find(foundJoinPoint, "Argument");
         assertNotNull(expectedBehavior);
     }
 
@@ -44,7 +44,7 @@ public class BehaviorRepositoryTest {
         JoinPoint foundJoinPoint = createJoinPoint(TestSubObject.class);
 
         // THEN
-        Behavior expectedBehavior = BehaviorRepository.getInstance().find(foundJoinPoint);
+        Behavior expectedBehavior = BehaviorRepository.getInstance().find(foundJoinPoint, "Argument");
         assertNotNull(expectedBehavior);
     }
 

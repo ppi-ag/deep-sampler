@@ -7,11 +7,8 @@ public class ExecutionInformation {
 
     private final Map<Behavior, BehaviorExecutionInformation> behaviorExecutionInformationMap = new HashMap<>();
 
-    public BehaviorExecutionInformation getInformationByBehavior(Behavior behavior) {
-        return behaviorExecutionInformationMap.get(behavior);
+    public BehaviorExecutionInformation getOrCreateByBehavior(Behavior behavior) {
+        return behaviorExecutionInformationMap.computeIfAbsent(behavior, b -> new BehaviorExecutionInformation(0));
     }
 
-    public void addInformationToBehavior(Behavior behavior, BehaviorExecutionInformation information) {
-        behaviorExecutionInformationMap.put(behavior, information);
-    }
 }
