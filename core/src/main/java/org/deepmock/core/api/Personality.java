@@ -1,5 +1,7 @@
 package org.deepmock.core.api;
 
+import org.deepmock.core.internal.ProxyFactory;
+import org.deepmock.core.internal.handler.VerifyBehaviorHandler;
 import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorRepository;
 
@@ -18,6 +20,7 @@ public class Personality {
     }
 
     public static <T> T verifyTrait(Class<T> cls, Quantity quantity) {
-        return null;
+        return ProxyFactory.createProxy(cls, new VerifyBehaviorHandler(quantity, cls));
     }
+
 }

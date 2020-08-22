@@ -1,12 +1,13 @@
 package org.deepmock.core.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Behavior {
 
     private final JoinPoint joinPoint;
 
-    private List<ParameterMatcher> parameter;
+    private List<ParameterMatcher> parameter = new ArrayList<>();
 
     private ReturnValueSupplier returnValueSupplier;
 

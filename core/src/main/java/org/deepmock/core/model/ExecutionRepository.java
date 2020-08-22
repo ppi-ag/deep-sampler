@@ -1,0 +1,22 @@
+package org.deepmock.core.model;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class ExecutionRepository {
+    private final ThreadLocal<Map<Class<?>, ExecutionInformation>> executionInformation = ThreadLocal.withInitial(() -> new HashMap<>());
+
+    private static ExecutionRepository myInstance;
+
+    public static synchronized ExecutionRepository getInstance() {
+        if (myInstance == null) {
+            myInstance = new ExecutionRepository();
+        }
+
+        return myInstance;
+    }
+
+    public ExecutionInformation getOrCreate(Class<?> cls) {
+        return executionInformation.get().computeIfAbsent(cls, k -> new ExecutionInformation());
+    }
+}

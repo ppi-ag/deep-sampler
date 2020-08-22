@@ -2,6 +2,7 @@ rootProject.name = "deepmock"
 
 include ("provider",
 	"provider-spring",
+	"provider-guice",
 	"core",
 	"persistence",
 	"persistence-json",
