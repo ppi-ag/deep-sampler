@@ -4,9 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExecutionRepository {
-    private static final ThreadLocal<Map<Class<?>, ExecutionInformation>> executionInformation = ThreadLocal.withInitial(() -> new HashMap<>());
+    private final ThreadLocal<Map<Class<?>, ExecutionInformation>> executionInformation = ThreadLocal.withInitial(() -> new HashMap<>());
 
-    public ExecutionInformation getExecutionInformation(Class<?> cls) {
-        return executionInformation.get().get(cls);
+    private static ExecutionRepository myInstance;
+
+    public static synchronized ExecutionRepository getInstance() {
+        if (myInstance == null) {
+            myInstance = new ExecutionRepository();
+        }
+
+        return myInstance;
+    }
+
+    public ExecutionInformation getOrCreate(Class<?> cls) {
+        return executionInformation.get().computeIfAbsent(cls, k -> new ExecutionInformation());
     }
 }

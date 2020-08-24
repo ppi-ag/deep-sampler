@@ -28,4 +28,12 @@ public class JoinPoint {
     public void setMethod(Method method) {
         this.method = method;
     }
+
+    @Override
+    public String toString() {
+        return "JoinPoint{" +
+                "target=" + target +
+                ", method=" + method +
+                '}';
+    }
 }

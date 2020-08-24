@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 public class ProxyFactory {
     @SuppressWarnings("unchecked")
     public static <T> T createProxy(Class<T> cls, MethodHandler proxyBehavior) {
-
         javassist.util.proxy.ProxyFactory proxyFactory = new javassist.util.proxy.ProxyFactory();
         proxyFactory.setSuperclass(cls);
         Class<?> proxyClass = proxyFactory.createClass();

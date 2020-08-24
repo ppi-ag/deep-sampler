@@ -33,15 +33,16 @@ public class BehaviorRepository {
     }
 
 
-    public Behavior find(JoinPoint wantedJoinPoint) {
+    public Behavior find(JoinPoint wantedJoinPoint, Object... args) {
         List<Behavior> behaviors = traits.get();
 
         for (Behavior behavior : behaviors) {
             JoinPoint joinPoint = behavior.getJoinPoint();
             boolean classMatches = joinPoint.getTarget().isAssignableFrom(wantedJoinPoint.getTarget());
             boolean methodMatches = joinPoint.getMethod().equals(wantedJoinPoint.getMethod());
+            boolean argumentsMatches = argumentsMatch(behavior, args);
 
-            if (classMatches && methodMatches) {
+            if (classMatches && methodMatches && argumentsMatches) {
                 return behavior;
             }
         }
@@ -49,6 +50,21 @@ public class BehaviorRepository {
         return null;
     }
 
+    private boolean argumentsMatch(Behavior behavior, Object[] arguments) {
+        List<ParameterMatcher> parameterMatchers = behavior.getParameter();
+
+        if (parameterMatchers.size() != arguments.length) {
+            return false;
+        }
+
+        for (int i = 0; i < arguments.length; i++) {
+            if (!parameterMatchers.get(0).matches(arguments[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private void setCurrentBehavior(Behavior behavior) {
         currentBehavior.set(behavior);
