@@ -8,5 +8,5 @@ import java.util.Map;
 
 public interface SourceManager {
     void record(Map<Class<?>, ExecutionInformation> executionInformation);
-    void load();
+    List<Behavior> load();
 }

@@ -24,7 +24,7 @@ public class JsonSourceManager implements SourceManager {
     }
 
     @Override
-    public void load() {
-
+    public List<Behavior> load() {
+        return jsonLoader.load();
     }
 }

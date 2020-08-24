@@ -1,16 +1,22 @@
 package org.deepmock.persistence.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.deepmock.core.model.Behavior;
+import org.deepmock.core.model.BehaviorExecutionInformation;
 import org.deepmock.core.model.ExecutionInformation;
+import org.deepmock.core.model.MethodCall;
+import org.deepmock.persistence.json.error.JsonPersistenceException;
+import org.deepmock.persistence.json.model.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-public class JsonRecorder {
+public class JsonRecorder extends AbstractJsonOperator {
     private final Path path;
 
     public JsonRecorder(Path path) {
@@ -18,21 +24,54 @@ public class JsonRecorder {
     }
 
     public void record(Map<Class<?>, ExecutionInformation> executionInformationMap) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            objectMapper.writeValue(path.toFile(), toPersistentModel(executionInformationMap));
+            // CREATE PARENT DIR IF NECESSARY
+            Path parentPath = path.getParent();
+            if (!Files.exists(parentPath)) {
+                Files.createDirectories(parentPath);
+            }
+
+            createObjectMapper().writeValue(Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
+                    toPersistentModel(executionInformationMap));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new JsonPersistenceException("It was not possible to serialize/write to json.", e);
         }
     }
 
     private JsonPersonalityModel toPersistentModel(Map<Class<?>, ExecutionInformation> executionInformationMap) {
-        return new JsonPersonalityModel(UUID.randomUUID().toString(), behaviors.stream()
-                .map(bhv -> toPersistentBehavior(bhv))
-                .collect(Collectors.toList()));
+        Map<JsonPersistentJoinPoint, JsonPersistentActualBehavior> jointPointBehaviorMap = toJoinPointBehaviorMap(executionInformationMap);
+
+        return new JsonPersonalityModel(UUID.randomUUID().toString(), jointPointBehaviorMap);
     }
 
-    private JsonPersistentBehavior toPersistentBehavior(Behavior bhv) {
-        return new JsonPersistentBehavior();
+    private Map<JsonPersistentJoinPoint, JsonPersistentActualBehavior> toJoinPointBehaviorMap(Map<Class<?>, ExecutionInformation> executionInformationMap) {
+        Map<JsonPersistentJoinPoint, JsonPersistentActualBehavior> joinPointJsonPersistentActualBehaviorMap = new HashMap<>();
+
+        for (Map.Entry<Class<?>, ExecutionInformation> informationEntry : executionInformationMap.entrySet()) {
+            ExecutionInformation information = informationEntry.getValue();
+            Map<Behavior, BehaviorExecutionInformation> behaviorBehaviorExecutionInformationMap = information.getAll();
+
+            for (Map.Entry<Behavior, BehaviorExecutionInformation> behaviorExecutionInformationEntry : behaviorBehaviorExecutionInformationMap.entrySet()) {
+                addToPersistentMap(joinPointJsonPersistentActualBehaviorMap, behaviorExecutionInformationEntry);
+            }
+        }
+        return joinPointJsonPersistentActualBehaviorMap;
     }
+
+    private void addToPersistentMap(Map<JsonPersistentJoinPoint, JsonPersistentActualBehavior> joinPointJsonPersistentActualBehaviorMap,
+                                    Map.Entry<Behavior, BehaviorExecutionInformation> behaviorExecutionInformationEntry) {
+        Behavior behavior = behaviorExecutionInformationEntry.getKey();
+        BehaviorExecutionInformation behaviorExecutionInformation = behaviorExecutionInformationEntry.getValue();
+
+        List<MethodCall> calls = behaviorExecutionInformation.getMethodCalls();
+
+        JsonPersistentJoinPoint persistentJoinPoint = new JsonPersistentJoinPoint(behavior.getBehaviorId());
+        JsonPersistentActualBehavior jsonPersistentActualBehavior = new JsonPersistentActualBehavior();
+
+        for (MethodCall call : calls) {
+            jsonPersistentActualBehavior.addCall(new JsonPersistentParameter(call.getArgs()), new JsonPersistentReturnValue(call.getReturnValue()));
+        }
+        joinPointJsonPersistentActualBehaviorMap.put(persistentJoinPoint, jsonPersistentActualBehavior);
+    }
+
 }

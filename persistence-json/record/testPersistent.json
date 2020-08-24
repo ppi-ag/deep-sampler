@@ -1,0 +1,25 @@
+{
+  "id" : "94193934-6810-4353-95d7-395ab1efe2ce",
+  "joinPointBehaviorMap" : [ "java.util.HashMap", {
+    "TestMethodForRecord" : {
+      "callMap" : [ "java.util.ArrayList", [ {
+        "parameter" : {
+          "args" : [ "java.util.Collections$UnmodifiableRandomAccessList", [ "Args1" ] ]
+        },
+        "returnValue" : {
+          "returnValue" : "ABC"
+        }
+      }, {
+        "parameter" : {
+          "args" : [ "java.util.Collections$UnmodifiableRandomAccessList", [ "Args1" ] ]
+        },
+        "returnValue" : {
+          "returnValue" : [ "org.deepmock.persistence.JsonRecorderTest$Bean", {
+            "valueOne" : "ABC",
+            "valueTwo" : "ABC"
+          } ]
+        }
+      } ] ]
+    }
+  } ]
+}

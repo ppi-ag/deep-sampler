@@ -13,7 +13,7 @@ public class BehaviorExecutionInformation {
         this.timesInvoked = timesInvoked;
     }
 
-    public List<MethodCall> getMethodCallList() {
+    public List<MethodCall> getMethodCalls() {
         return Collections.unmodifiableList(methodCallList);
     }
 

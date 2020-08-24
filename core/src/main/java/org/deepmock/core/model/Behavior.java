@@ -8,6 +8,7 @@ public class Behavior {
     private final JoinPoint joinPoint;
     private List<ParameterMatcher> parameter = new ArrayList<>();
     private ReturnValueSupplier returnValueSupplier;
+    private String behaviorId;
 
     public Behavior(JoinPoint joinPoint) {
         this.joinPoint = joinPoint;
@@ -19,6 +20,14 @@ public class Behavior {
 
     public List<ParameterMatcher> getParameter() {
         return parameter;
+    }
+
+    public void setBehaviorId(String behaviorId) {
+        this.behaviorId = behaviorId;
+    }
+
+    public String getBehaviorId() {
+        return behaviorId;
     }
 
     public void setParameter(List<ParameterMatcher> parameter) {

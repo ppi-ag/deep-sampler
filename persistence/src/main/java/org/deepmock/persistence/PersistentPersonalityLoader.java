@@ -1,6 +1,8 @@
 package org.deepmock.persistence;
 
+import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorRepository;
+import org.deepmock.core.model.ExecutionRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +21,17 @@ public class PersistentPersonalityLoader {
 
     public void record() {
         for (SourceManager sourceManager: sourceManagerList) {
-            sourceManager.record(BehaviorRepository.getInstance().getCurrentExecutionBehaviors());
-        }
-    }
-
-    public void update() {
-        for (SourceManager sourceManager: sourceManagerList) {
-            sourceManager.update(BehaviorRepository.getInstance().getCurrentExecutionBehaviors());
+            sourceManager.record(ExecutionRepository.getInstance().getAll());
         }
     }
 
     public void load() {
         for (SourceManager sourceManager: sourceManagerList) {
-            sourceManager.load(BehaviorRepository.getInstance().getCurrentExecutionBehaviors());
+            List<Behavior> behaviors = sourceManager.load();
+
+            for (Behavior behavior : behaviors) {
+                BehaviorRepository.getInstance().add(behavior);
+            }
         }
     }
 
