@@ -4,6 +4,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.deepmock.core.internal.api.ExecutionManager;
 import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorRepository;
 import org.deepmock.core.model.JoinPoint;
@@ -30,7 +31,9 @@ public class SpringBehaviorInterceptor implements BehaviorInterceptor {
     public Object aroundMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         Behavior behavior = findBehavior(joinPoint);
 
-        if (behavior != null && argumentsMatch(behavior, joinPoint.getArgs())) {
+        if (behavior != null) {
+            ExecutionManager.notify(behavior);
+
             return behavior.getReturnValueSupplier().supply();
         } else {
             return joinPoint.proceed();
@@ -48,7 +51,7 @@ public class SpringBehaviorInterceptor implements BehaviorInterceptor {
 
         JoinPoint joinPoint = new JoinPoint(interceptedObject.getClass(), signature.getMethod());
 
-        return BehaviorRepository.getInstance().find(joinPoint);
+        return BehaviorRepository.getInstance().find(joinPoint, proceedingJoinPoint.getArgs());
     }
 
 

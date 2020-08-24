@@ -14,9 +14,9 @@ public abstract class TestServiceContainer {
      * Delegates a call to {@link TestService}
      * @return
      */
-    public String doSomeThingWithTestObject() {
-        String valueFromTestObject = getTestService().shouldChangeItsBehavior(BehaviorInterceptorTest.VALUE_C);
-        return valueFromTestObject + SUFFIX_FROM_SERVICE_CONTAINER;
+    public String doSomeThingWithTestObjectService() {
+        String valueFromTestService = getTestService().shouldChangeItsBehavior(BehaviorInterceptorTest.VALUE_C);
+        return valueFromTestService + SUFFIX_FROM_SERVICE_CONTAINER;
     }
 
 }
