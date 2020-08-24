@@ -1,23 +1,25 @@
 package org.deepmock.persistence.json;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class JsonPersonalityModel {
 
     private String id;
-    private List<JsonPersistentBehavior> behaviorList;
+    private Map<JsonPersistentJoinPoint, JsonPersistentActualBehavior> joinPointBehaviorMap = new HashMap<>();
 
-    public JsonPersonalityModel(String id, List<JsonPersistentBehavior> behaviorList) {
+    public JsonPersonalityModel(String id, Map<JsonPersistentJoinPoint, JsonPersistentActualBehavior> joinPointBehaviorMap) {
         this.id = id;
-        this.behaviorList = behaviorList;
+        this.joinPointBehaviorMap = new HashMap<>(joinPointBehaviorMap);
     }
 
     public String getId() {
         return id;
     }
 
-    public List<JsonPersistentBehavior> getBehaviorList() {
-        return Collections.unmodifiableList(behaviorList);
+    public Map<JsonPersistentJoinPoint, JsonPersistentActualBehavior> getJoinPointBehaviorMap() {
+        return Collections.unmodifiableMap(joinPointBehaviorMap);
     }
 }

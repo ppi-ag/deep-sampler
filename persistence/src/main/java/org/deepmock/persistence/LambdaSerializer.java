@@ -1,7 +1,5 @@
 package org.deepmock.persistence;
 
-import org.deepmock.core.model.ParameterMatcher;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;

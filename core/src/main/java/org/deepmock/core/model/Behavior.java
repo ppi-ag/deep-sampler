@@ -6,9 +6,7 @@ import java.util.List;
 public class Behavior {
 
     private final JoinPoint joinPoint;
-
     private List<ParameterMatcher> parameter = new ArrayList<>();
-
     private ReturnValueSupplier returnValueSupplier;
 
     public Behavior(JoinPoint joinPoint) {

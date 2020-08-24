@@ -1,15 +1,21 @@
 package org.deepmock.core.internal.api;
 
-import org.deepmock.core.model.Behavior;
-import org.deepmock.core.model.ExecutionInformation;
-import org.deepmock.core.model.ExecutionRepository;
+import org.deepmock.core.model.*;
 
 public class ExecutionManager {
 
     public static void notify(Behavior behavior) {
-        ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(behavior.getJoinPoint().getTarget()
-        );
-        executionInformation.getOrCreateByBehavior(behavior).increaseTimesInvoked();
+        getBehaviorInformation(behavior).increaseTimesInvoked();
+    }
+
+    public static void log(Behavior behavior, MethodCall actualMethodCall) {
+        getBehaviorInformation(behavior).addMethodCall(actualMethodCall);
+    }
+
+    private static BehaviorExecutionInformation getBehaviorInformation(Behavior behavior) {
+        ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(behavior.getJoinPoint().getTarget());
+
+        return executionInformation.getOrCreateByBehavior(behavior);
     }
 
 }

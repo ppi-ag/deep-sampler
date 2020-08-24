@@ -1,11 +1,12 @@
 package org.deepmock.persistence;
 
 import org.deepmock.core.model.Behavior;
+import org.deepmock.core.model.ExecutionInformation;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SourceManager {
-    void record(List<Behavior> behaviors);
-    void update(List<Behavior> behaviors);
-    void load(List<Behavior> behaviors);
+    void record(Map<Class<?>, ExecutionInformation> executionInformation);
+    void load();
 }

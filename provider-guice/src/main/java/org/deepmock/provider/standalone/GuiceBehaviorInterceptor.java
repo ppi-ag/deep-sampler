@@ -5,10 +5,9 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.deepmock.core.internal.api.ExecutionManager;
 import org.deepmock.core.model.*;
 
-import java.util.List;
+import java.util.Arrays;
 
 public class GuiceBehaviorInterceptor implements MethodInterceptor {
-
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -17,10 +16,20 @@ public class GuiceBehaviorInterceptor implements MethodInterceptor {
         if (behavior != null) {
             ExecutionManager.notify(behavior);
 
-            return behavior.getReturnValueSupplier().supply();
-        } else {
-            return invocation.proceed();
+            ReturnValueSupplier returnValueSupplier = behavior.getReturnValueSupplier();
+
+            if (returnValueSupplier != null) {
+                return behavior.getReturnValueSupplier().supply();
+            } else {
+                // no returnValueSupplier -> we have to log the invocations for recordings
+                Object returnValue = invocation.proceed();
+                ExecutionManager.log(behavior, new MethodCall(Arrays.asList(invocation.getArguments()),
+                        returnValue));
+                return returnValue;
+            }
         }
+
+        return invocation.proceed();
     }
 
     private Behavior findBehavior(MethodInvocation invocation) {
