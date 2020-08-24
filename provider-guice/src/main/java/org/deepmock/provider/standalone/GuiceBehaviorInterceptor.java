@@ -7,6 +7,8 @@ import org.deepmock.core.model.BehaviorRepository;
 import org.deepmock.core.model.JoinPoint;
 import org.deepmock.core.model.ParameterMatcher;
 import org.deepmock.provider.common.BehaviorInterceptor;
+import org.deepmock.core.internal.api.ExecutionManager;
+import org.deepmock.core.model.*;
 
 import java.util.List;
 
@@ -17,7 +19,9 @@ public class GuiceBehaviorInterceptor implements BehaviorInterceptor, MethodInte
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Behavior behavior = findBehavior(invocation);
 
-        if (behavior != null && argumentsMatch(behavior, invocation.getArguments())) {
+        if (behavior != null) {
+            ExecutionManager.notify(behavior);
+
             return behavior.getReturnValueSupplier().supply();
         } else {
             return invocation.proceed();
@@ -26,8 +30,6 @@ public class GuiceBehaviorInterceptor implements BehaviorInterceptor, MethodInte
 
     private Behavior findBehavior(MethodInvocation invocation) {
         JoinPoint joinPoint = new JoinPoint(invocation.getThis().getClass(), invocation.getMethod());
-        return BehaviorRepository.getInstance().find(joinPoint);
+        return BehaviorRepository.getInstance().find(joinPoint, invocation.getArguments());
     }
-
-
 }

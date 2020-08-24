@@ -9,7 +9,7 @@ public class FixedQuantity extends Quantity {
         this.fixedQuantity = i;
     }
 
-    public int getFixedQuantity() {
+    public int getTimes() {
         return fixedQuantity;
     }
 }
