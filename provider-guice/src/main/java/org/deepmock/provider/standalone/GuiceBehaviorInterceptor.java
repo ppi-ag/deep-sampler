@@ -6,10 +6,11 @@ import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorRepository;
 import org.deepmock.core.model.JoinPoint;
 import org.deepmock.core.model.ParameterMatcher;
+import org.deepmock.provider.common.BehaviorInterceptor;
 
 import java.util.List;
 
-public class GuiceBehaviorInterceptor implements MethodInterceptor {
+public class GuiceBehaviorInterceptor implements BehaviorInterceptor, MethodInterceptor {
 
 
     @Override
@@ -28,19 +29,5 @@ public class GuiceBehaviorInterceptor implements MethodInterceptor {
         return BehaviorRepository.getInstance().find(joinPoint);
     }
 
-    private boolean argumentsMatch(Behavior behavior, Object[] arguments) {
-        List<ParameterMatcher> parameterMatchers = behavior.getParameter();
 
-        if (parameterMatchers.size() != arguments.length) {
-            return false;
-        }
-
-        for (int i = 0; i < arguments.length; i++) {
-            if (!parameterMatchers.get(0).matches(arguments[i])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }
