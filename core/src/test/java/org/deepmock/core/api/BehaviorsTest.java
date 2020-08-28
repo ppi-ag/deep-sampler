@@ -36,6 +36,11 @@ public class BehaviorsTest {
         TestObject testObjectBehavior = Behaviors.of(TestObject.class);
         Personality.hasTrait(testObjectBehavior.doSomeThing(PARAMETER_VALUE)).returning("New Behavior");
 
+        TestObject testObjectSampler = Sample.prepare(TestObject.class);
+        Sample.of(testObjectSampler.doSomeThing(PARAMETER_VALUE)).is("New Sample");
+        Sample.of(testObjectSampler.doSomeThing(PARAMETER_VALUE)).isCalled(42);
+        Sample.of(testObjectSampler.doSomeThing(PARAMETER_VALUE)).does(() -> System.out.println("Stange sample behavior"));
+
         //THEN
         Behavior currentBehavior = BehaviorRepository.getInstance().getCurrentBehavior();
         List<ParameterMatcher> parameter = currentBehavior.getParameter();
