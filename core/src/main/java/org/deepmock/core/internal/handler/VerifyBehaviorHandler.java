@@ -17,21 +17,21 @@ public class VerifyBehaviorHandler extends ReturningBehaviorHandler {
 
     @Override
     public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) {
-        JoinPoint joinPoint = new JoinPoint(cls, thisMethod);
-        Behavior behavior = BehaviorRepository.getInstance().find(joinPoint, args);
+        SampledMethod sampledMethod = new SampledMethod(cls, thisMethod);
+        SampleDefinition behavior = SampleRepository.getInstance().find(sampledMethod, args);
 
         if (behavior != null) {
             ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
-            BehaviorExecutionInformation behaviorExecutionInformation = executionInformation.getOrCreateByBehavior(behavior);
+            SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(behavior);
 
             int expected = quantity.getTimes();
-            int actual = behaviorExecutionInformation.getTimesInvoked();
+            int actual = sampleExecutionInformation.getTimesInvoked();
 
             if (expected != actual) {
-                throw new VerifyException(behavior.getJoinPoint(), expected, actual);
+                throw new VerifyException(behavior.getSampledMethod(), expected, actual);
             }
         } else if (quantity.getTimes() != 0) {
-            throw new VerifyException(joinPoint, quantity.getTimes(), 0);
+            throw new VerifyException(sampledMethod, quantity.getTimes(), 0);
         }
         return createEmptyProxy(thisMethod.getReturnType());
     }

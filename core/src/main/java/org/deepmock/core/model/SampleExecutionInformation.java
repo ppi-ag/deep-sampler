@@ -1,10 +1,10 @@
 package org.deepmock.core.model;
 
-public class BehaviorExecutionInformation {
+public class SampleExecutionInformation {
 
     private int timesInvoked = 0;
 
-    public BehaviorExecutionInformation(int timesInvoked) {
+    public SampleExecutionInformation(int timesInvoked) {
         this.timesInvoked = timesInvoked;
     }
 

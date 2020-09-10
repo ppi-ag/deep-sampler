@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import(DeepMockSpringConfig.class)
+@Import(DeepSamplerSpringConfig.class)
 public class TestSpringConfig {
 
     @Bean
@@ -17,7 +17,7 @@ public class TestSpringConfig {
 
     @Bean
     @Autowired
-    public SpringyfiedTestServiceContainer testObjectOwner(TestService testService) {
+    public SpringyfiedTestServiceContainer testServiceContainer(TestService testService) {
         return new SpringyfiedTestServiceContainer(testService);
     }
 

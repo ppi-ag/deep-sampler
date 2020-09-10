@@ -5,10 +5,10 @@ import java.util.Map;
 
 public class ExecutionInformation {
 
-    private final Map<Behavior, BehaviorExecutionInformation> behaviorExecutionInformationMap = new HashMap<>();
+    private final Map<SampleDefinition, SampleExecutionInformation> behaviorExecutionInformationMap = new HashMap<>();
 
-    public BehaviorExecutionInformation getOrCreateByBehavior(Behavior behavior) {
-        return behaviorExecutionInformationMap.computeIfAbsent(behavior, b -> new BehaviorExecutionInformation(0));
+    public SampleExecutionInformation getOrCreateBySample(SampleDefinition behavior) {
+        return behaviorExecutionInformationMap.computeIfAbsent(behavior, b -> new SampleExecutionInformation(0));
     }
 
 }

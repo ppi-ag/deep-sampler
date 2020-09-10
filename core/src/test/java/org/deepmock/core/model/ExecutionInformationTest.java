@@ -7,15 +7,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExecutionInformationTest {
 
     @Test
-    void testGetOrCreateByBehavior() throws NoSuchMethodException {
+    void testGetOrCreateBySample() throws NoSuchMethodException {
         // GIVEN
         ExecutionInformation executionInformation = new ExecutionInformation();
-        Behavior behavior = new Behavior(new JoinPoint(getClass(), getClass().getMethod("toString")));
+        SampleDefinition sampleDefinition = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("toString")));
 
         // WHEN
-        BehaviorExecutionInformation behaviorExecutionInformation = executionInformation.getOrCreateByBehavior(behavior);
+        SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
 
         // THEN
-        assertTrue(behaviorExecutionInformation == executionInformation.getOrCreateByBehavior(behavior));
+        assertTrue(sampleExecutionInformation == executionInformation.getOrCreateBySample(sampleDefinition));
     }
 }

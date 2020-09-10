@@ -6,43 +6,33 @@ package org.deepmock.provider.common;
 public class TestService {
 
     /**
-     * This method returns a primitve parameter if the method is not mocked.
-     * This Method is intended to be used in positive tests.
+     * This method returns a primitve parameter if the method is not sampled.
+     * This Method is intended to be used in positive and negative tests.
      *
      * @param param The parameter that will be returned unchanged
      * @return the unchanged parameter value
      */
-    public String shouldChangeItsBehavior(String param) {
+    public String echoParameter(String param) {
         return param;
     }
 
-    /**
-     * This method returns a primitive parameter if the method is not mocked.
-     * This Method is intended to be used in negative tests.
-     *
-     * @param param The parameter that will be returned unchanged
-     * @return the unchanged parameter value
-     */
-    public String shouldNotChangeItsBehavior(String param) {
-        return param;
-    }
 
     /**
-     * A method that will always return -1 if it is not mocked
+     * A method that will always return -1 if it is not sampled
      * @return always -1
      */
-    public int shouldChangeItsBehavior() {
+    public int getMinusOne() {
         return -1;
     }
 
     /**
-     * This method returns a non primitve parameter if the method is not mocked.
-     * This Method is intended to be used in positive tests.
+     * This method returns a non primitive parameter if the method is not mocked.
+     * This Method is intended to be used in positive and negative tests.
      *
      * @param someObject The parameter that will be returned unchanged
      * @return the unchanged parameter value
      */
-    public TestBean shouldChangeItsBehavior(TestBean someObject) {
+    public TestBean echoParameter(TestBean someObject) {
         return someObject;
     }
 }

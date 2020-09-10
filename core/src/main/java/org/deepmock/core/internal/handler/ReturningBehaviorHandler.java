@@ -3,8 +3,8 @@ package org.deepmock.core.internal.handler;
 import javassist.util.proxy.MethodHandler;
 import org.deepmock.core.api.Matchers;
 import org.deepmock.core.error.InvalidConfigException;
-import org.deepmock.core.model.Behavior;
-import org.deepmock.core.model.JoinPoint;
+import org.deepmock.core.model.SampleDefinition;
+import org.deepmock.core.model.SampledMethod;
 import org.deepmock.core.model.ParameterMatcher;
 
 import java.lang.reflect.Array;
@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public abstract class ReturningBehaviorHandler implements MethodHandler {
 
-    protected Behavior createBehavior(Class<?> cls, Method method, Object[] args) {
-        JoinPoint joinPoint = new JoinPoint(cls, method);
-        Behavior behavior = new Behavior(joinPoint);
+    protected SampleDefinition createBehavior(Class<?> cls, Method method, Object[] args) {
+        SampledMethod sampledMethod = new SampledMethod(cls, method);
+        SampleDefinition behavior = new SampleDefinition(sampledMethod);
 
         List<ParameterMatcher> parameterMatchers = Arrays.stream(args)
                 .map(this::toMatcher)

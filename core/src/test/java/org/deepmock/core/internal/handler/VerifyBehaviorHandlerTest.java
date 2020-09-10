@@ -3,9 +3,9 @@ package org.deepmock.core.internal.handler;
 import org.deepmock.core.error.VerifyException;
 import org.deepmock.core.internal.FixedQuantity;
 import org.deepmock.core.internal.api.ExecutionManager;
-import org.deepmock.core.model.Behavior;
-import org.deepmock.core.model.BehaviorRepository;
-import org.deepmock.core.model.JoinPoint;
+import org.deepmock.core.model.SampleDefinition;
+import org.deepmock.core.model.SampleRepository;
+import org.deepmock.core.model.SampledMethod;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -20,8 +20,8 @@ class VerifyBehaviorHandlerTest {
         VerifyBehaviorHandler verifyBehaviorHandler = new VerifyBehaviorHandler(new FixedQuantity(1), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
-        Behavior behaviorTest = new Behavior(new JoinPoint(proxyTest.getClass(), simMethod));
-        BehaviorRepository.getInstance().add(behaviorTest);
+        SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
+        SampleRepository.getInstance().add(behaviorTest);
         ExecutionManager.notify(behaviorTest);
 
         // WHEN
@@ -35,8 +35,8 @@ class VerifyBehaviorHandlerTest {
         VerifyBehaviorHandler verifyBehaviorHandler = new VerifyBehaviorHandler(new FixedQuantity(2), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
-        Behavior behaviorTest = new Behavior(new JoinPoint(proxyTest.getClass(), simMethod));
-        BehaviorRepository.getInstance().add(behaviorTest);
+        SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
+        SampleRepository.getInstance().add(behaviorTest);
         ExecutionManager.notify(behaviorTest);
 
         // WHEN

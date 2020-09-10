@@ -9,10 +9,10 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @Configuration
 @EnableAspectJAutoProxy
-public class DeepMockSpringConfig {
+public class DeepSamplerSpringConfig {
 
     @Bean
-    public SpringBehaviorInterceptor springBehaviorInterceptor() {
-        return new SpringBehaviorInterceptor();
+    public SpringSamplerInterceptor springSamplerInterceptor() {
+        return new SpringSamplerInterceptor();
     }
 }

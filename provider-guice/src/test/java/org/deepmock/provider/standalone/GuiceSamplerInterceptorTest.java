@@ -1,14 +1,14 @@
 package org.deepmock.provider.standalone;
 
 import com.google.inject.Guice;
-import org.deepmock.provider.common.BehaviorInterceptorTest;
+import org.deepmock.provider.common.SamplerInterceptorTest;
 import org.deepmock.provider.common.TestService;
 import org.deepmock.provider.common.TestServiceContainer;
 
 import javax.inject.Inject;
 
 
-public class GuiceBehaviorInterceptorTest extends BehaviorInterceptorTest {
+public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
 
     public static final String VALUE_FROM_OUTER_CLASS = " additional stuff to ensure that this method has not been changed";
 
@@ -19,8 +19,8 @@ public class GuiceBehaviorInterceptorTest extends BehaviorInterceptorTest {
     private TestService testService;
 
 
-    public GuiceBehaviorInterceptorTest() {
-        Guice.createInjector(new DeepMockModule()).injectMembers(this);
+    public GuiceSamplerInterceptorTest() {
+        Guice.createInjector(new DeepSamplerModule()).injectMembers(this);
     }
 
     @Override

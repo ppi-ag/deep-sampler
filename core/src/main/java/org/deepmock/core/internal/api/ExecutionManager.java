@@ -1,15 +1,15 @@
 package org.deepmock.core.internal.api;
 
-import org.deepmock.core.model.Behavior;
+import org.deepmock.core.model.SampleDefinition;
 import org.deepmock.core.model.ExecutionInformation;
 import org.deepmock.core.model.ExecutionRepository;
 
 public class ExecutionManager {
 
-    public static void notify(Behavior behavior) {
-        ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(behavior.getJoinPoint().getTarget()
+    public static void notify(SampleDefinition behavior) {
+        ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(behavior.getSampledMethod().getTarget()
         );
-        executionInformation.getOrCreateByBehavior(behavior).increaseTimesInvoked();
+        executionInformation.getOrCreateBySample(behavior).increaseTimesInvoked();
     }
 
 }

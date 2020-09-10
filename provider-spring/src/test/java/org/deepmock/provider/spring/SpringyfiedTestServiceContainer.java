@@ -5,7 +5,7 @@ import org.deepmock.provider.common.TestServiceContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A simple Bean that serves as a container for another autowired Bean, in order to test mocking in deeper object trees
+ * A simple Bean that serves as a container for another autowired Bean, in order to test sampling in deeper object trees
  */
 public class SpringyfiedTestServiceContainer extends TestServiceContainer {
 
