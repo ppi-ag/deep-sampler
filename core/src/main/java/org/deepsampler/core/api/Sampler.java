@@ -2,7 +2,7 @@ package org.deepsampler.core.api;
 
 import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.internal.ProxyFactory;
-import org.deepsampler.core.internal.handler.RecordBehaviorHandler;
+import org.deepsampler.core.internal.aophandler.RecordSampleHandler;
 import org.deepsampler.core.model.SampleRepository;
 
 public class Sampler {
@@ -13,7 +13,7 @@ public class Sampler {
 
     @SuppressWarnings("unchecked")
     public static <T> T prepare(Class<T> cls) {
-        return ProxyFactory.createProxy(cls, new RecordBehaviorHandler(cls));
+        return ProxyFactory.createProxy(cls, new RecordSampleHandler(cls));
     }
 
     public static Quantity times(int i) {

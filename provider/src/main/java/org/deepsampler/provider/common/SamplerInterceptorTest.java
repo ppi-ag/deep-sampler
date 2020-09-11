@@ -6,6 +6,7 @@ import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.internal.FixedQuantity;
 import org.junit.jupiter.api.Test;
 
+import static org.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -48,6 +49,25 @@ public abstract class SamplerInterceptorTest {
 
         // GIVEN WHEN
         TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
+
+        //THEN
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+    }
+
+
+    @Test
+    public void multipleSamplerAreHandledDistinct() {
+        Sampler.clear();
+
+        //WHEN UNCHANGED
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+
+        // GIVEN WHEN
+        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        // testBeanSampler is not used, it is here to check if the sequence of preparing has any impact on Sample.of(). That should not happen.
+        TestBean testBeanSampler = Sampler.prepare((TestBean.class));
+
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
         //THEN
@@ -136,8 +156,8 @@ public abstract class SamplerInterceptorTest {
         getTestService().echoParameter(TEST_BEAN_B);
 
         //THEN
-        Sample.verifyTrait(TestService.class, new FixedQuantity(0)).echoParameter(TEST_BEAN_A);
-        Sample.verifyTrait(TestService.class, new FixedQuantity(0)).getMinusOne();
+        Sample.verifyCallQuantity(TestService.class, NEVER).echoParameter(TEST_BEAN_A);
+        Sample.verifyCallQuantity(TestService.class, NEVER).getMinusOne();
     }
 
     @Test
@@ -152,9 +172,9 @@ public abstract class SamplerInterceptorTest {
         getTestService().echoParameter(TEST_BEAN_A);
 
         //THEN
-        Sample.verifyTrait(TestService.class, new FixedQuantity(1)).echoParameter(TEST_BEAN_A);
-        Sample.verifyTrait(TestService.class, new FixedQuantity(0)).echoParameter(TEST_BEAN_B);
-        Sample.verifyTrait(TestService.class, new FixedQuantity(0)).getMinusOne();
+        Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_A);
+        Sample.verifyCallQuantity(TestService.class, NEVER).echoParameter(TEST_BEAN_B);
+        Sample.verifyCallQuantity(TestService.class, NEVER).getMinusOne();
     }
 
     @Test
@@ -172,9 +192,9 @@ public abstract class SamplerInterceptorTest {
         getTestService().getMinusOne();
 
         //THEN
-        Sample.verifyTrait(TestService.class, new FixedQuantity(0)).echoParameter(TEST_BEAN_A);
-        Sample.verifyTrait(TestService.class, new FixedQuantity(2)).echoParameter(TEST_BEAN_B);
-        Sample.verifyTrait(TestService.class, new FixedQuantity(1)).getMinusOne();
+        Sample.verifyCallQuantity(TestService.class, NEVER).echoParameter(TEST_BEAN_A);
+        Sample.verifyCallQuantity(TestService.class, TWICE).echoParameter(TEST_BEAN_B);
+        Sample.verifyCallQuantity(TestService.class, ONCE).getMinusOne();
     }
 
     @Test
@@ -190,7 +210,7 @@ public abstract class SamplerInterceptorTest {
         getTestService().getMinusOne();
 
         //THEN
-        assertThrows(VerifyException.class, () -> Sample.verifyTrait(TestService.class, new FixedQuantity(1))
+        assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1))
                 .getMinusOne());
     }
 

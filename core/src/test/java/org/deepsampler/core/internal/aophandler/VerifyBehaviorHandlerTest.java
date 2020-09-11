@@ -1,4 +1,4 @@
-package org.deepsampler.core.internal.handler;
+package org.deepsampler.core.internal.aophandler;
 
 import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.internal.FixedQuantity;
@@ -17,7 +17,7 @@ class VerifyBehaviorHandlerTest {
     @Test
     void testInvokeBehaviorPresentAndVerifyCorrect() throws NoSuchMethodException {
         // GIVEN
-        VerifyBehaviorHandler verifyBehaviorHandler = new VerifyBehaviorHandler(new FixedQuantity(1), ProxyTest.class);
+        VerifySampleHandler verifyBehaviorHandler = new VerifySampleHandler(new FixedQuantity(1), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
         SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
@@ -32,7 +32,7 @@ class VerifyBehaviorHandlerTest {
     @Test
     void testInvokeBehaviorPresentAndVerifyNotCorrect() throws NoSuchMethodException {
         // GIVEN
-        VerifyBehaviorHandler verifyBehaviorHandler = new VerifyBehaviorHandler(new FixedQuantity(2), ProxyTest.class);
+        VerifySampleHandler verifyBehaviorHandler = new VerifySampleHandler(new FixedQuantity(2), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
         SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
@@ -47,7 +47,7 @@ class VerifyBehaviorHandlerTest {
     @Test
     void testInvokeBehaviorNotPresentPresent() throws NoSuchMethodException {
         // GIVEN
-        VerifyBehaviorHandler verifyBehaviorHandler = new VerifyBehaviorHandler(new FixedQuantity(2), ProxyTest.class);
+        VerifySampleHandler verifyBehaviorHandler = new VerifySampleHandler(new FixedQuantity(2), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
 

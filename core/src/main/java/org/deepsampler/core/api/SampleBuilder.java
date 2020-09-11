@@ -13,8 +13,8 @@ public class SampleBuilder<T> {
         this.sampleDefinition = sampleDefinition;
     }
 
-    public void is(T property) {
-        sampleDefinition.setReturnValueSupplier(() -> property);
+    public void is(T sampleReturnValue) {
+        sampleDefinition.setReturnValueSupplier(() -> sampleReturnValue);
     }
 
     public void doing(ReturnValueSupplier propertySupplier) {

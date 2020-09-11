@@ -1,4 +1,4 @@
-package org.deepsampler.core.internal.handler;
+package org.deepsampler.core.internal.aophandler;
 
 import javassist.util.proxy.MethodHandler;
 import org.deepsampler.core.api.Matchers;
@@ -13,18 +13,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class ReturningBehaviorHandler implements MethodHandler {
+public abstract class ReturningSampleHandler implements MethodHandler {
 
-    protected SampleDefinition createBehavior(Class<?> cls, Method method, Object[] args) {
+    protected SampleDefinition createSampleDefinition(Class<?> cls, Method method, Object[] args) {
         SampledMethod sampledMethod = new SampledMethod(cls, method);
-        SampleDefinition behavior = new SampleDefinition(sampledMethod);
+        SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
 
         List<ParameterMatcher> parameterMatchers = Arrays.stream(args)
                 .map(this::toMatcher)
                 .collect(Collectors.toList());
 
-        behavior.setParameter(parameterMatchers);
-        return behavior;
+        sampleDefinition.setParameter(parameterMatchers);
+        return sampleDefinition;
     }
 
     private ParameterMatcher toMatcher(Object parameterValue) {

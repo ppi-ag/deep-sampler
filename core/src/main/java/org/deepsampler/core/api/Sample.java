@@ -1,7 +1,7 @@
 package org.deepsampler.core.api;
 
 import org.deepsampler.core.internal.ProxyFactory;
-import org.deepsampler.core.internal.handler.VerifyBehaviorHandler;
+import org.deepsampler.core.internal.aophandler.VerifySampleHandler;
 import org.deepsampler.core.model.SampleRepository;
 
 /**
@@ -37,8 +37,8 @@ public class Sample {
                 SampleRepository.getInstance().getCurrentSampleDefinition());
     }
 
-    public static <T> T verifyTrait(Class<T> cls, Quantity quantity) {
-        return ProxyFactory.createProxy(cls, new VerifyBehaviorHandler(quantity, cls));
+    public static <T> T verifyCallQuantity(Class<T> cls, Quantity quantity) {
+        return ProxyFactory.createProxy(cls, new VerifySampleHandler(quantity, cls));
     }
 
 }

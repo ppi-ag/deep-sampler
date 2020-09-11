@@ -6,10 +6,9 @@ import org.deepsampler.core.model.ExecutionRepository;
 
 public class ExecutionManager {
 
-    public static void notify(SampleDefinition behavior) {
-        ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(behavior.getSampledMethod().getTarget()
-        );
-        executionInformation.getOrCreateBySample(behavior).increaseTimesInvoked();
+    public static void notify(SampleDefinition sampleDefinition) {
+        ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(sampleDefinition.getSampledMethod().getTarget());
+        executionInformation.getOrCreateBySample(sampleDefinition).increaseTimesInvoked();
     }
 
 }
