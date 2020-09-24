@@ -8,6 +8,7 @@
 
 plugins {
     `java-library`
+    jacoco
 }
 
 allprojects {
@@ -16,8 +17,14 @@ allprojects {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.5"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
 subprojects {
     apply(plugin = "java-library")
+    apply(plugin = "jacoco")
     dependencies {
         testImplementation("org.mockito:mockito-core:3.3.3")
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
@@ -45,4 +52,43 @@ dependencies {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = false
+        csv.isEnabled = false
+        html.destination = file("${buildDir}/jacocoHtml")
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.5".toBigDecimal()
+            }
+        }
+
+        rule {
+            enabled = false
+            element = "CLASS"
+            includes = listOf("org.gradle.*")
+
+            limit {
+                counter = "LINE"
+                value = "TOTALCOUNT"
+                maximum = "0.3".toBigDecimal()
+            }
+        }
+    }
 }
