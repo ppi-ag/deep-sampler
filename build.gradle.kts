@@ -33,6 +33,7 @@ subprojects {
     }
 
     tasks.named<Test>("test") {
+        finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
         useJUnitPlatform()
     }
 }
@@ -49,12 +50,13 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
 }
 
-
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
 }
 
 tasks.jacocoTestReport {
+    dependsOn(tasks.named<Test>("test"))
     reports {
         xml.isEnabled = false
         csv.isEnabled = false
@@ -62,16 +64,8 @@ tasks.jacocoTestReport {
     }
 }
 
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-}
-
 tasks.jacocoTestCoverageVerification {
-    dependsOn(tasks.test)
+    dependsOn(tasks.named<Test>("test"))
     violationRules {
         rule {
             limit {
