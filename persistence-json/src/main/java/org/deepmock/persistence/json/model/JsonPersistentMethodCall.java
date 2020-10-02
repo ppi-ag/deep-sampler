@@ -1,6 +1,8 @@
 package org.deepmock.persistence.json.model;
 
-public class JsonPersistentMethodCall {
+import org.deepmock.persistence.model.PersistentMethodCall;
+
+public class JsonPersistentMethodCall implements PersistentMethodCall {
     private JsonPersistentParameter parameter;
     private JsonPersistentReturnValue returnValue;
 
@@ -13,11 +15,13 @@ public class JsonPersistentMethodCall {
         this.returnValue = jsonPersistentReturnValue;
     }
 
-    public JsonPersistentParameter getJsonPersistentParameter() {
+    @Override
+    public JsonPersistentParameter getPersistentParameter() {
         return parameter;
     }
 
-    public JsonPersistentReturnValue getJsonPersistentReturnValue() {
+    @Override
+    public JsonPersistentReturnValue getPersistentReturnValue() {
         return returnValue;
     }
 

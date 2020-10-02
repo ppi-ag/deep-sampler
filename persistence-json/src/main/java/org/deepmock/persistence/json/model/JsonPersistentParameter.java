@@ -1,23 +1,27 @@
 package org.deepmock.persistence.json.model;
 
+import org.deepmock.persistence.bean.Bean;
+import org.deepmock.persistence.model.PersistentParameter;
+
 import java.util.List;
 
-public class JsonPersistentParameter {
-    private List<Object> args;
+public class JsonPersistentParameter implements PersistentParameter {
+    private List<Bean> args;
 
     public JsonPersistentParameter() {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentParameter(List<Object> args) {
+    public JsonPersistentParameter(List<Bean> args) {
         this.args = args;
     }
 
-    public List<Object> getArgs() {
+    @Override
+    public List<Bean> getParameter() {
         return args;
     }
 
-    public void setArgs(List<Object> args) {
+    public void setParameter(List<Bean> args) {
         this.args = args;
     }
 }

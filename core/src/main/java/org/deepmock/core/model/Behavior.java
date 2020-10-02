@@ -5,12 +5,16 @@ import java.util.List;
 
 public class Behavior {
 
-    private final JoinPoint joinPoint;
+    private JoinPoint joinPoint;
     private List<ParameterMatcher> parameter = new ArrayList<>();
     private ReturnValueSupplier returnValueSupplier;
     private String behaviorId;
 
     public Behavior(JoinPoint joinPoint) {
+        this.joinPoint = joinPoint;
+    }
+
+    public void setJoinPoint(JoinPoint joinPoint) {
         this.joinPoint = joinPoint;
     }
 

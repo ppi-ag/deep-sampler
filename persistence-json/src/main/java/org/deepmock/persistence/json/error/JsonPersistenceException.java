@@ -1,8 +1,8 @@
 package org.deepmock.persistence.json.error;
 
-import org.deepmock.core.error.BaseException;
+import org.deepmock.persistence.error.PersistenceException;
 
-public class JsonPersistenceException extends BaseException {
+public class JsonPersistenceException extends PersistenceException {
 
     public JsonPersistenceException(String message, Object... args) {
         super(message, args);

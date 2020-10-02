@@ -2,10 +2,9 @@ package org.deepmock.persistence.json;
 
 import org.deepmock.core.model.ExecutionInformation;
 import org.deepmock.persistence.SourceManager;
-import org.deepmock.core.model.Behavior;
+import org.deepmock.persistence.model.PersistentModel;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 
 public class JsonSourceManager implements SourceManager {
@@ -24,7 +23,7 @@ public class JsonSourceManager implements SourceManager {
     }
 
     @Override
-    public List<Behavior> load() {
+    public PersistentModel load() {
         return jsonLoader.load();
     }
 }

@@ -1,21 +1,25 @@
 package org.deepmock.persistence.json.model;
 
-public class JsonPersistentReturnValue {
-    private Object returnValue;
+import org.deepmock.persistence.bean.Bean;
+import org.deepmock.persistence.model.PersistentReturnValue;
+
+public class JsonPersistentReturnValue implements PersistentReturnValue {
+    private Bean returnValue;
 
     public JsonPersistentReturnValue() {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentReturnValue(Object returnValue) {
+    public JsonPersistentReturnValue(Bean returnValue) {
         this.returnValue = returnValue;
     }
 
-    public Object getReturnValue() {
+    @Override
+    public Bean getReturnValue() {
         return returnValue;
     }
 
-    public void setReturnValue(Object returnValue) {
+    public void setReturnValue(Bean returnValue) {
         this.returnValue = returnValue;
     }
 }

@@ -1,8 +1,13 @@
 package org.deepmock.persistence.json.model;
 
-import java.util.*;
+import org.deepmock.persistence.model.PersistentActualBehavior;
+import org.deepmock.persistence.model.PersistentMethodCall;
 
-public class JsonPersistentActualBehavior {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class JsonPersistentActualBehavior implements PersistentActualBehavior {
     private final List<JsonPersistentMethodCall> callMap = new ArrayList<>();
 
     public JsonPersistentActualBehavior() {
@@ -13,7 +18,8 @@ public class JsonPersistentActualBehavior {
         callMap.add(new JsonPersistentMethodCall(jsonPersistentParameter, jsonPersistentReturnValue));
     }
 
-    public List<JsonPersistentMethodCall> getAllCalls() {
+    @Override
+    public List<PersistentMethodCall> getAllCalls() {
         return Collections.unmodifiableList(callMap);
     }
 

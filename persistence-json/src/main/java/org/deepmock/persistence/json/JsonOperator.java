@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
-public class AbstractJsonOperator {
+public abstract class JsonOperator {
 
     protected ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();

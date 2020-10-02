@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,6 +24,23 @@ public class JsonRecorderTest {
         Behavior behavior = new Behavior(new JoinPoint(getClass(), getClass().getMethod("testRecord")));
         behavior.setBehaviorId("TestMethodForRecord");
         ExecutionManager.log(behavior, new MethodCall("ABC", "Args1"));
+        ExecutionManager.log(behavior, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
+
+        // WHEN
+        new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll());
+
+        // THEN
+        assertTrue(Files.exists(path));
+        Files.delete(path);
+    }
+
+    @Test
+    public void testRecordLocalDateTime() throws Exception {
+        // GIVEN
+        Path path = Paths.get("./record/testTimeTemp.json");
+        Behavior behavior = new Behavior(new JoinPoint(getClass(), getClass().getMethod("testRecord")));
+        behavior.setBehaviorId("TestMethodForRecord");
+        ExecutionManager.log(behavior, new MethodCall("ABC", LocalDateTime.now()));
         ExecutionManager.log(behavior, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
 
         // WHEN

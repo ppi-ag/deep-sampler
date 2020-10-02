@@ -4,6 +4,8 @@ import org.deepmock.core.model.Behavior;
 import org.deepmock.core.model.BehaviorExecutionInformation;
 import org.deepmock.core.model.ExecutionInformation;
 import org.deepmock.core.model.MethodCall;
+import org.deepmock.persistence.bean.Bean;
+import org.deepmock.persistence.bean.BeanFactory;
 import org.deepmock.persistence.json.error.JsonPersistenceException;
 import org.deepmock.persistence.json.model.*;
 
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class JsonRecorder extends AbstractJsonOperator {
+public class JsonRecorder extends JsonOperator {
     private final Path path;
 
     public JsonRecorder(Path path) {
@@ -69,7 +71,10 @@ public class JsonRecorder extends AbstractJsonOperator {
         JsonPersistentActualBehavior jsonPersistentActualBehavior = new JsonPersistentActualBehavior();
 
         for (MethodCall call : calls) {
-            jsonPersistentActualBehavior.addCall(new JsonPersistentParameter(call.getArgs()), new JsonPersistentReturnValue(call.getReturnValue()));
+            List<Bean> argsAsBeans = BeanFactory.toBean(call.getArgs());
+            Bean returnValueBean = BeanFactory.toBean(call.getReturnValue());
+            jsonPersistentActualBehavior.addCall(new JsonPersistentParameter(argsAsBeans),
+                    new JsonPersistentReturnValue(returnValueBean));
         }
         joinPointJsonPersistentActualBehaviorMap.put(persistentJoinPoint, jsonPersistentActualBehavior);
     }
