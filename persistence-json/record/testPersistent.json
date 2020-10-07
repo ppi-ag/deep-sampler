@@ -8,7 +8,7 @@
             "values" : [ "java.util.HashMap", {
               "0$hashIsZero" : false,
               "0$coder" : [ "java.lang.Byte", 0 ],
-              "0$value" : [ "org.deepsampler.persistence.bean.Bean", {
+              "0$value" : [ "org.deepsampler.persistence.bean.PersistentBean", {
                 "values" : [ "java.util.HashMap", { } ]
               } ],
               "0$hash" : 0
@@ -20,7 +20,7 @@
             "values" : [ "java.util.HashMap", {
               "0$hashIsZero" : false,
               "0$coder" : [ "java.lang.Byte", 0 ],
-              "0$value" : [ "org.deepsampler.persistence.bean.Bean", {
+              "0$value" : [ "org.deepsampler.persistence.bean.PersistentBean", {
                 "values" : [ "java.util.HashMap", { } ]
               } ],
               "0$hash" : 0
@@ -33,7 +33,7 @@
             "values" : [ "java.util.HashMap", {
               "0$hashIsZero" : false,
               "0$coder" : [ "java.lang.Byte", 0 ],
-              "0$value" : [ "org.deepsampler.persistence.bean.Bean", {
+              "0$value" : [ "org.deepsampler.persistence.bean.PersistentBean", {
                 "values" : [ "java.util.HashMap", { } ]
               } ],
               "0$hash" : 0
@@ -55,14 +55,14 @@
         "parameter" : {
           "args" : [ "java.util.ArrayList", [ {
             "values" : [ "java.util.HashMap", {
-              "0$date" : [ "org.deepsampler.persistence.bean.Bean", {
+              "0$date" : [ "org.deepsampler.persistence.bean.PersistentBean", {
                 "values" : [ "java.util.HashMap", {
                   "0$month" : [ "java.lang.Short", 9 ],
                   "0$year" : 2020,
                   "0$day" : [ "java.lang.Short", 25 ]
                 } ]
               } ],
-              "0$time" : [ "org.deepsampler.persistence.bean.Bean", {
+              "0$time" : [ "org.deepsampler.persistence.bean.PersistentBean", {
                 "values" : [ "java.util.HashMap", {
                   "0$minute" : [ "java.lang.Byte", 47 ],
                   "0$second" : [ "java.lang.Byte", 14 ],
@@ -78,7 +78,7 @@
             "values" : [ "java.util.HashMap", {
               "0$hashIsZero" : false,
               "0$coder" : [ "java.lang.Byte", 0 ],
-              "0$value" : [ "org.deepsampler.persistence.bean.Bean", {
+              "0$value" : [ "org.deepsampler.persistence.bean.PersistentBean", {
                 "values" : [ "java.util.HashMap", { } ]
               } ],
               "0$hash" : 0
@@ -91,7 +91,7 @@
             "values" : [ "java.util.HashMap", {
               "0$hashIsZero" : false,
               "0$coder" : [ "java.lang.Byte", 0 ],
-              "0$value" : [ "org.deepsampler.persistence.bean.Bean", {
+              "0$value" : [ "org.deepsampler.persistence.bean.PersistentBean", {
                 "values" : [ "java.util.HashMap", { } ]
               } ],
               "0$hash" : 0

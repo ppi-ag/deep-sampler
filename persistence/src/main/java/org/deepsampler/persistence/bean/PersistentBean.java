@@ -4,14 +4,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Bean {
+public class PersistentBean {
     private Map<String, Object> values;
 
-    public Bean() {
+    public PersistentBean() {
         values = new HashMap<>();
     }
 
-    public Bean(Map<String, Object> values) {
+    public PersistentBean(Map<String, Object> values) {
         this.values = new HashMap<>(values);
     }
 

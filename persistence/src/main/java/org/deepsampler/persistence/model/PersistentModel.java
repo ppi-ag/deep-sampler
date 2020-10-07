@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface PersistentModel {
     String getId();
-    Map<PersistentJoinPoint, PersistentActualSample> getJoinPointBehaviorMap();
+    Map<PersistentSampleMethod, PersistentActualSample> getJoinPointBehaviorMap();
 }

@@ -1,10 +1,10 @@
 package org.deepsampler.persistence;
 
-import org.deepsampler.persistence.bean.Bean;
-import org.deepsampler.persistence.bean.BeanFactory;
+import org.deepsampler.persistence.bean.PersistentBean;
+import org.deepsampler.persistence.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.error.PersistenceException;
 import org.deepsampler.persistence.model.PersistentActualSample;
-import org.deepsampler.persistence.model.PersistentJoinPoint;
+import org.deepsampler.persistence.model.PersistentSampleMethod;
 import org.deepsampler.persistence.model.PersistentMethodCall;
 import org.deepsampler.persistence.model.PersistentModel;
 import org.deepsampler.core.api.Matchers;
@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class PersistentPersonalityLoader {
+public class PersistentSampleLoader {
     private final List<SourceManager> sourceManagerList = new ArrayList<>();
 
-    public PersistentPersonalityLoader(SourceManager sourceManager) {
+    public PersistentSampleLoader(SourceManager sourceManager) {
         addSourceProvider(sourceManager);
     }
 
-    public PersistentPersonalityLoader source(SourceManager sourceManager) {
+    public PersistentSampleLoader source(SourceManager sourceManager) {
         addSourceProvider(sourceManager);
         return this;
     }
@@ -50,15 +50,15 @@ public class PersistentPersonalityLoader {
     private List<SampleDefinition> toBehaviors(PersistentModel model, Map<String, SampledMethod> idToJp) {
         List<SampleDefinition> behaviors = new ArrayList<>();
 
-        for (Map.Entry<PersistentJoinPoint, PersistentActualSample> joinPointBehaviorEntry : model.getJoinPointBehaviorMap().entrySet()) {
-            PersistentJoinPoint persistentJoinPoint = joinPointBehaviorEntry.getKey();
+        for (Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getJoinPointBehaviorMap().entrySet()) {
+            PersistentSampleMethod persistentSampleMethod = joinPointBehaviorEntry.getKey();
             PersistentActualSample persistentActualSample = joinPointBehaviorEntry.getValue();
-            SampledMethod matchingJointPoint = idToJp.get(persistentJoinPoint.getJoinPointId());
+            SampledMethod matchingJointPoint = idToJp.get(persistentSampleMethod.getJoinPointId());
 
             // When there is no matching JointPoint, the persistentJoinPointEntity will be discarded
             if (matchingJointPoint != null) {
                 for (PersistentMethodCall call : persistentActualSample.getAllCalls()) {
-                    SampleDefinition behavior = mapToBehavior(matchingJointPoint, persistentJoinPoint, call);
+                    SampleDefinition behavior = mapToBehavior(matchingJointPoint, persistentSampleMethod, call);
                     behaviors.add(behavior);
                 }
             }
@@ -66,13 +66,13 @@ public class PersistentPersonalityLoader {
         return behaviors;
     }
 
-    private SampleDefinition mapToBehavior(SampledMethod matchingJointPoint, PersistentJoinPoint persistentJoinPoint,
+    private SampleDefinition mapToBehavior(SampledMethod matchingJointPoint, PersistentSampleMethod persistentSampleMethod,
                                    PersistentMethodCall call) {
-        List<Bean> parameter = call.getPersistentParameter().getParameter();
-        Bean returnValue = call.getPersistentReturnValue().getReturnValue();
+        List<PersistentBean> parameter = call.getPersistentParameter().getParameter();
+        PersistentBean returnValue = call.getPersistentReturnValue().getReturnValue();
         Class<?>[] parameters = matchingJointPoint.getMethod().getParameterTypes();
         Class<?> returnType = matchingJointPoint.getMethod().getReturnType();
-        String joinPointId = persistentJoinPoint.getJoinPointId();
+        String joinPointId = persistentSampleMethod.getJoinPointId();
 
         SampleDefinition behavior = new SampleDefinition(matchingJointPoint);
         behavior.setBehaviorId(joinPointId);
@@ -81,23 +81,23 @@ public class PersistentPersonalityLoader {
         return behavior;
     }
 
-    private List<Object> toRealValue(String id, Class<?>[] parameters, List<Bean> parameterBeans) {
+    private List<Object> toRealValue(String id, Class<?>[] parameters, List<PersistentBean> parameterPersistentBeans) {
         List<Object> params = new ArrayList<>();
 
-        if (parameters.length != parameterBeans.size()) {
+        if (parameters.length != parameterPersistentBeans.size()) {
             throw new PersistenceException("The number of parameters from the method of %s does " +
-                    "not match the number of persistent parameters (%s:%s)!", id, parameters, parameterBeans);
+                    "not match the number of persistent parameters (%s:%s)!", id, parameters, parameterPersistentBeans);
         }
-        for (int i = 0; i < parameterBeans.size(); ++i) {
+        for (int i = 0; i < parameterPersistentBeans.size(); ++i) {
             Class<?> parameter = parameters[i];
-            Bean bean = parameterBeans.get(i);
-            params.add(toRealValue(parameter, bean));
+            PersistentBean persistentBean = parameterPersistentBeans.get(i);
+            params.add(toRealValue(parameter, persistentBean));
         }
         return params;
     }
 
-    private Object toRealValue(Class<?> type, Bean bean) {
-        return BeanFactory.ofBean(bean, type);
+    private Object toRealValue(Class<?> type, PersistentBean persistentBean) {
+        return PersistentBeanFactory.ofBean(persistentBean, type);
     }
 
     private List<ParameterMatcher> toMatcher(List<Object> params) {

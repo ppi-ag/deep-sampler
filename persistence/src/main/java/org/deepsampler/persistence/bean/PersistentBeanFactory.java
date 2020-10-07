@@ -12,17 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BeanFactory {
+public class PersistentBeanFactory {
 
-    public static <T> T[] ofBean(Bean[] bean, Class<T> cls) {
-        T[] instances = (T[]) Array.newInstance(cls, bean.length);
-        for (int i = 0; i < bean.length; ++i) {
-            instances[i] = ofBean(bean[i], cls);
+    public static <T> T[] ofBean(PersistentBean[] persistentBean, Class<T> cls) {
+        T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
+        for (int i = 0; i < persistentBean.length; ++i) {
+            instances[i] = ofBean(persistentBean[i], cls);
         }
         return instances;
     }
 
-    public static <T> T ofBean(Bean bean, Class<T> cls) {
+    public static <T> T ofBean(PersistentBean persistentBean, Class<T> cls) {
         T instance = instantiate(cls);
 
         Map<Field, String> fields = getAllFields(cls);
@@ -31,16 +31,16 @@ public class BeanFactory {
             Field field = entry.getKey();
             String key = entry.getValue();
 
-            transferFromBean(bean, instance, field, key);
+            transferFromBean(persistentBean, instance, field, key);
         }
         return instance;
     }
 
-    private static <T> void transferFromBean(Bean bean, T instance, Field field, String key) {
-        Object lookedUpValueInBean = bean.getValue(key);
+    private static <T> void transferFromBean(PersistentBean persistentBean, T instance, Field field, String key) {
+        Object lookedUpValueInBean = persistentBean.getValue(key);
         if (lookedUpValueInBean != null) {
-            if (lookedUpValueInBean instanceof Bean) {
-                lookedUpValueInBean = ofBean((Bean) lookedUpValueInBean, field.getDeclaringClass());
+            if (lookedUpValueInBean instanceof PersistentBean) {
+                lookedUpValueInBean = ofBean((PersistentBean) lookedUpValueInBean, field.getDeclaringClass());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -52,7 +52,7 @@ public class BeanFactory {
         return instantiatorOf.newInstance();
     }
 
-    public static Bean toBean(Object obj) {
+    public static PersistentBean toBean(Object obj) {
 
         Map<Field, String> fieldStringMap = getAllFields(obj.getClass());
 
@@ -69,7 +69,7 @@ public class BeanFactory {
             valuesForBean.put(keyForField, fieldValue);
         }
 
-        return new Bean(valuesForBean);
+        return new PersistentBean(valuesForBean);
     }
 
     private static void setValue(Object obj, Field field, Object value) {
@@ -133,18 +133,18 @@ public class BeanFactory {
         return fields;
     }
 
-    public static List<Bean> toBean(List<Object> objectList) {
+    public static List<PersistentBean> toBean(List<Object> objectList) {
         return objectList.stream()
                 .map(obj -> toBean(obj))
                 .collect(Collectors.toList());
     }
 
-    public static Bean[] toBean(Object[] objects) {
-        Bean[] beans = new Bean[objects.length];
+    public static PersistentBean[] toBean(Object[] objects) {
+        PersistentBean[] persistentBeans = new PersistentBean[objects.length];
         for (int i = 0; i < objects.length; ++i) {
-            beans[i] = toBean(objects[i]);
+            persistentBeans[i] = toBean(objects[i]);
         }
-        return beans;
+        return persistentBeans;
     }
 
 }

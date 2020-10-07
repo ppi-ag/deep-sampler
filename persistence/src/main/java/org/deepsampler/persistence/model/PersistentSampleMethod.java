@@ -1,5 +1,5 @@
 package org.deepsampler.persistence.model;
 
-public interface PersistentJoinPoint {
+public interface PersistentSampleMethod {
     String getJoinPointId();
 }

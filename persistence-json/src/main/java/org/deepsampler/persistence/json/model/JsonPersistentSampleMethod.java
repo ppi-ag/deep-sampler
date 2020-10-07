@@ -1,10 +1,10 @@
 package org.deepsampler.persistence.json.model;
 
-import org.deepsampler.persistence.model.PersistentJoinPoint;
+import org.deepsampler.persistence.model.PersistentSampleMethod;
 
 import java.util.Objects;
 
-public class JsonPersistentSampleMethod implements PersistentJoinPoint {
+public class JsonPersistentSampleMethod implements PersistentSampleMethod {
     private String joinPointId;
 
     public JsonPersistentSampleMethod() {

@@ -1,7 +1,7 @@
 package org.deepsampler.persistence.json;
 
 import org.deepsampler.persistence.json.error.JsonPersistenceException;
-import org.deepsampler.persistence.json.model.JsonPersonalityModel;
+import org.deepsampler.persistence.json.model.JsonSampleModel;
 import org.deepsampler.persistence.model.PersistentModel;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class JsonLoader extends JsonOperator {
 
     public PersistentModel load() {
         try {
-            return createObjectMapper().readValue(Files.newBufferedReader(path), JsonPersonalityModel.class);
+            return createObjectMapper().readValue(Files.newBufferedReader(path), JsonSampleModel.class);
         } catch (IOException e) {
             throw new JsonPersistenceException("It was not possible to deserialize/read the file", e);
         }
