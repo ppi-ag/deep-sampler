@@ -5,10 +5,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.deepsampler.core.internal.api.ExecutionManager;
-import org.deepsampler.core.model.SampleDefinition;
-import org.deepsampler.core.model.SampleRepository;
-import org.deepsampler.core.model.SampledMethod;
+import org.deepsampler.core.model.*;
 import org.deepsampler.provider.common.SamplerInterceptor;
+
+import java.util.Arrays;
 
 /**
  * A {@link SamplerInterceptor} for SpringApplications.
@@ -31,10 +31,20 @@ public class SpringSamplerInterceptor implements SamplerInterceptor {
         if (sampleDefinition != null) {
             ExecutionManager.notify(sampleDefinition);
 
-            return sampleDefinition.getReturnValueSupplier().supply();
-        } else {
-            return joinPoint.proceed();
+            ReturnValueSupplier returnValueSupplier = sampleDefinition.getReturnValueSupplier();
+
+            if (returnValueSupplier != null) {
+                return sampleDefinition.getReturnValueSupplier().supply();
+            } else {
+                // no returnValueSupplier -> we have to log the invocations for recordings
+                Object returnValue = joinPoint.proceed();
+                ExecutionManager.log(sampleDefinition, new MethodCall(Arrays.asList(joinPoint.getArgs()),
+                        returnValue));
+                return returnValue;
+            }
         }
+
+        return joinPoint.proceed();
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.deepsampler.core.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,10 @@ public class ExecutionRepository {
         }
 
         return myInstance;
+    }
+
+    public Map<Class<?>, ExecutionInformation> getAll() {
+        return Collections.unmodifiableMap(executionInformation.get());
     }
 
     public ExecutionInformation getOrCreate(Class<?> cls) {

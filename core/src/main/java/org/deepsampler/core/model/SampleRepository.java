@@ -5,8 +5,6 @@ import org.deepsampler.core.error.InvalidConfigException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.swing.UIManager.get;
-
 public class SampleRepository {
 
     private ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(() -> new ArrayList<>());
@@ -68,6 +66,10 @@ public class SampleRepository {
 
     public SampleDefinition getCurrentSampleDefinition() {
         return currentSample.get();
+    }
+
+    public List<SampleDefinition> getSamples() {
+        return samples.get();
     }
 
     public void clear() {

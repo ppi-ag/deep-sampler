@@ -2,11 +2,11 @@ package org.deepsampler.provider.standalone;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.deepsampler.core.model.SampleDefinition;
-import org.deepsampler.core.model.SampleRepository;
-import org.deepsampler.core.model.SampledMethod;
-import org.deepsampler.provider.common.SamplerInterceptor;
 import org.deepsampler.core.internal.api.ExecutionManager;
+import org.deepsampler.core.model.*;
+import org.deepsampler.provider.common.SamplerInterceptor;
+
+import java.util.Arrays;
 
 public class GuiceSamplerInterceptor implements SamplerInterceptor, MethodInterceptor {
 
@@ -18,10 +18,21 @@ public class GuiceSamplerInterceptor implements SamplerInterceptor, MethodInterc
         if (sampleDefinition != null) {
             ExecutionManager.notify(sampleDefinition);
 
-            return sampleDefinition.getReturnValueSupplier().supply();
-        } else {
-            return invocation.proceed();
+            ReturnValueSupplier returnValueSupplier = sampleDefinition.getReturnValueSupplier();
+
+            if (returnValueSupplier != null) {
+                return sampleDefinition.getReturnValueSupplier().supply();
+            } else {
+                // no returnValueSupplier -> we have to log the invocations for recordings
+                Object returnValue = invocation.proceed();
+                ExecutionManager.log(sampleDefinition, new MethodCall(Arrays.asList(invocation.getArguments()),
+                        returnValue));
+                return returnValue;
+            }
         }
+
+        return invocation.proceed();
+
     }
 
     private SampleDefinition findSampleDefinition(MethodInvocation invocation) {

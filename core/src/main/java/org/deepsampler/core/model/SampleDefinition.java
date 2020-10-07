@@ -8,8 +8,8 @@ public class SampleDefinition {
     private final SampledMethod sampledMethod;
 
     private List<ParameterMatcher> parameter = new ArrayList<>();
-
     private ReturnValueSupplier returnValueSupplier;
+    private String behaviorId;
 
     public SampleDefinition(SampledMethod sampledMethod) {
         this.sampledMethod = sampledMethod;
@@ -21,6 +21,14 @@ public class SampleDefinition {
 
     public List<ParameterMatcher> getParameter() {
         return parameter;
+    }
+
+    public void setBehaviorId(String behaviorId) {
+        this.behaviorId = behaviorId;
+    }
+
+    public String getSampleId() {
+        return behaviorId;
     }
 
     public void setParameter(List<ParameterMatcher> parameter) {

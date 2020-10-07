@@ -1,0 +1,63 @@
+{
+  "id" : "33ab1678-760e-42ff-a0da-aca465e6dd5b",
+  "joinPointBehaviorMap" : [ "java.util.HashMap", {
+    "TestMethodForRecord" : {
+      "callMap" : [ "java.util.ArrayList", [ {
+        "parameter" : {
+          "args" : [ "java.util.ArrayList", [ {
+            "values" : [ "java.util.HashMap", {
+              "0$date" : [ "org.deepsampler.persistence.bean.Bean", {
+                "values" : [ "java.util.HashMap", {
+                  "0$month" : [ "java.lang.Short", 9 ],
+                  "0$year" : 2020,
+                  "0$day" : [ "java.lang.Short", 25 ]
+                } ]
+              } ],
+              "0$time" : [ "org.deepsampler.persistence.bean.Bean", {
+                "values" : [ "java.util.HashMap", {
+                  "0$minute" : [ "java.lang.Byte", 47 ],
+                  "0$second" : [ "java.lang.Byte", 14 ],
+                  "0$hour" : [ "java.lang.Byte", 21 ],
+                  "0$nano" : 480887300
+                } ]
+              } ]
+            } ]
+          } ] ]
+        },
+        "returnValue" : {
+          "returnValue" : {
+            "values" : [ "java.util.HashMap", {
+              "0$hashIsZero" : false,
+              "0$coder" : [ "java.lang.Byte", 0 ],
+              "0$value" : [ "org.deepsampler.persistence.bean.Bean", {
+                "values" : [ "java.util.HashMap", { } ]
+              } ],
+              "0$hash" : 0
+            } ]
+          }
+        }
+      }, {
+        "parameter" : {
+          "args" : [ "java.util.ArrayList", [ {
+            "values" : [ "java.util.HashMap", {
+              "0$hashIsZero" : false,
+              "0$coder" : [ "java.lang.Byte", 0 ],
+              "0$value" : [ "org.deepsampler.persistence.bean.Bean", {
+                "values" : [ "java.util.HashMap", { } ]
+              } ],
+              "0$hash" : 0
+            } ]
+          } ] ]
+        },
+        "returnValue" : {
+          "returnValue" : {
+            "values" : [ "java.util.HashMap", {
+              "0$valueTwo" : "ABC",
+              "0$valueOne" : "ABC"
+            } ]
+          }
+        }
+      } ] ]
+    }
+  } ]
+}
