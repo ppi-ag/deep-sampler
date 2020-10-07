@@ -1,14 +1,20 @@
 package org.deepsampler.core.internal.api;
 
-import org.deepsampler.core.model.SampleDefinition;
-import org.deepsampler.core.model.ExecutionInformation;
-import org.deepsampler.core.model.ExecutionRepository;
+import org.deepsampler.core.model.*;
 
 public class ExecutionManager {
 
     public static void notify(SampleDefinition sampleDefinition) {
+        getSampleInformation(sampleDefinition).increaseTimesInvoked();
+    }
+    public static void log(SampleDefinition sampleDefinition, MethodCall actualMethodCall) {
+        getSampleInformation(sampleDefinition).addMethodCall(actualMethodCall);
+    }
+
+    private static SampleExecutionInformation getSampleInformation(SampleDefinition sampleDefinition) {
         ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(sampleDefinition.getSampledMethod().getTarget());
-        executionInformation.getOrCreateBySample(sampleDefinition).increaseTimesInvoked();
+
+        return executionInformation.getOrCreateBySample(sampleDefinition);
     }
 
 }

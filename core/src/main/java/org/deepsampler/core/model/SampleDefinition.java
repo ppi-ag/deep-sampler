@@ -27,7 +27,7 @@ public class SampleDefinition {
         this.behaviorId = behaviorId;
     }
 
-    public String getBehaviorId() {
+    public String getSampleId() {
         return behaviorId;
     }
 

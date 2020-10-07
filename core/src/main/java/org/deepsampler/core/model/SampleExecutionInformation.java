@@ -1,5 +1,9 @@
 package org.deepsampler.core.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class SampleExecutionInformation {
 
     private int timesInvoked = 0;
