@@ -75,4 +75,8 @@ public class SampleRepository {
     public void clear() {
         samples.get().clear();
     }
+
+    public boolean isEmpty() {
+         return samples.get() == null || samples.get().isEmpty();
+    }
 }
