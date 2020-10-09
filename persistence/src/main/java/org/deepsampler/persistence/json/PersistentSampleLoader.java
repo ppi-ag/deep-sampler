@@ -4,7 +4,10 @@ import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.model.*;
 import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.json.error.PersistenceException;
-import org.deepsampler.persistence.json.model.*;
+import org.deepsampler.persistence.json.model.PersistentActualSample;
+import org.deepsampler.persistence.json.model.PersistentMethodCall;
+import org.deepsampler.persistence.json.model.PersistentModel;
+import org.deepsampler.persistence.json.model.PersistentSampleMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,8 @@ public class PersistentSampleLoader {
 
             List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
 
+            SampleRepository.getInstance().clear();
+
             for (SampleDefinition sample : filteredMappedSample) {
                 SampleRepository.getInstance().add(sample);
             }
@@ -49,12 +54,12 @@ public class PersistentSampleLoader {
         for (Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getSampleMethodToSampleMap().entrySet()) {
             PersistentSampleMethod persistentSampleMethod = joinPointBehaviorEntry.getKey();
             PersistentActualSample persistentActualSample = joinPointBehaviorEntry.getValue();
-            SampledMethod matchingJointPoint = idToJp.get(persistentSampleMethod.getSampleMethodId());
+            SampledMethod matchingSample = idToJp.get(persistentSampleMethod.getSampleMethodId());
 
             // When there is no matching JointPoint, the persistentJoinPointEntity will be discarded
-            if (matchingJointPoint != null) {
+            if (matchingSample != null) {
                 for (PersistentMethodCall call : persistentActualSample.getAllCalls()) {
-                    SampleDefinition behavior = mapToSample(matchingJointPoint, persistentSampleMethod, call);
+                    SampleDefinition behavior = mapToSample(matchingSample, persistentSampleMethod, call);
                     samples.add(behavior);
                 }
             }

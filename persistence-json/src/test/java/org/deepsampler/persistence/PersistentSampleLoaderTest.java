@@ -10,12 +10,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PersistentSampleLoaderTest {
 
     @Test
-    public void testSimpleApiLoadWithJson() throws Exception {
+    public void testSimpleApiRecord() throws Exception {
         // GIVEN
         SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
         Path path = Paths.get("./record/testApiSay.json");
@@ -43,6 +44,21 @@ public class PersistentSampleLoaderTest {
                 "  }\n" +
                 "}"));
         Files.delete(path);
+    }
+
+    @Test
+    public void testSimpleLoad() throws Exception {
+        // GIVEN
+        SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
+        SampleRepository.getInstance().add(saySample);
+
+        // WHEN
+        PersistentSample.source(new JsonSourceManager("./record/testApiSayPersistent.json"))
+                .load();
+
+        // THEN
+        assertEquals(1, SampleRepository.getInstance().getSamples().size());
+        assertEquals("HELLO AGAIN", SampleRepository.getInstance().getSamples().get(0).getReturnValueSupplier().supply());
     }
 
     @AfterEach
