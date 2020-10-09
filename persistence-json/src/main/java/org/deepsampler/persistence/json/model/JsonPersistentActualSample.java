@@ -1,13 +1,14 @@
 package org.deepsampler.persistence.json.model;
 
-import org.deepsampler.persistence.model.PersistentActualSample;
-import org.deepsampler.persistence.model.PersistentMethodCall;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class JsonPersistentActualSample implements PersistentActualSample {
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
     private final List<JsonPersistentMethodCall> callMap = new ArrayList<>();
 
     public JsonPersistentActualSample() {

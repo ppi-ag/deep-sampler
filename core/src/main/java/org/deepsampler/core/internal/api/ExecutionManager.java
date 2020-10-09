@@ -7,7 +7,8 @@ public class ExecutionManager {
     public static void notify(SampleDefinition sampleDefinition) {
         getSampleInformation(sampleDefinition).increaseTimesInvoked();
     }
-    public static void log(SampleDefinition sampleDefinition, MethodCall actualMethodCall) {
+
+    public static void record(SampleDefinition sampleDefinition, MethodCall actualMethodCall) {
         getSampleInformation(sampleDefinition).addMethodCall(actualMethodCall);
     }
 

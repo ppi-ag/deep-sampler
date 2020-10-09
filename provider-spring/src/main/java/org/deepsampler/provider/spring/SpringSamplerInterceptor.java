@@ -38,7 +38,7 @@ public class SpringSamplerInterceptor implements SamplerInterceptor {
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 Object returnValue = joinPoint.proceed();
-                ExecutionManager.log(sampleDefinition, new MethodCall(Arrays.asList(joinPoint.getArgs()),
+                ExecutionManager.record(sampleDefinition, new MethodCall(Arrays.asList(joinPoint.getArgs()),
                         returnValue));
                 return returnValue;
             }

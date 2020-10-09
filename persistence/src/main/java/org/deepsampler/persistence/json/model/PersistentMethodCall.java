@@ -1,4 +1,4 @@
-package org.deepsampler.persistence.model;
+package org.deepsampler.persistence.json.model;
 
 public interface PersistentMethodCall {
     PersistentParameter getPersistentParameter();

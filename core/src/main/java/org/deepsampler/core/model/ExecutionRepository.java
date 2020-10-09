@@ -24,4 +24,8 @@ public class ExecutionRepository {
     public ExecutionInformation getOrCreate(Class<?> cls) {
         return executionInformation.get().computeIfAbsent(cls, k -> new ExecutionInformation());
     }
+
+    public void clear() {
+        executionInformation.get().clear();
+    }
 }

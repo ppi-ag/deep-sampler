@@ -4,8 +4,7 @@ import org.deepsampler.core.model.ExecutionInformation;
 import org.deepsampler.core.model.MethodCall;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleExecutionInformation;
-import org.deepsampler.persistence.bean.Bean;
-import org.deepsampler.persistence.bean.BeanFactory;
+import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.json.error.JsonPersistenceException;
 import org.deepsampler.persistence.json.model.*;
 
@@ -40,10 +39,10 @@ public class JsonRecorder extends JsonOperator {
         }
     }
 
-    private JsonPersonalityModel toPersistentModel(Map<Class<?>, ExecutionInformation> executionInformationMap) {
+    private JsonSampleModel toPersistentModel(Map<Class<?>, ExecutionInformation> executionInformationMap) {
         Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodToSample = toSampleMethodSampleMap(executionInformationMap);
 
-        return new JsonPersonalityModel(UUID.randomUUID().toString(), sampleMethodToSample);
+        return new JsonSampleModel(UUID.randomUUID().toString(), sampleMethodToSample);
     }
 
     private Map<JsonPersistentSampleMethod, JsonPersistentActualSample> toSampleMethodSampleMap(Map<Class<?>, ExecutionInformation> executionInformationMap) {
@@ -71,10 +70,10 @@ public class JsonRecorder extends JsonOperator {
         JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
         for (MethodCall call : calls) {
-            List<Bean> argsAsBeans = BeanFactory.toBean(call.getArgs());
-            Bean returnValueBean = BeanFactory.toBean(call.getReturnValue());
-            jsonPersistentActualSample.addCall(new JsonPersistentParameter(argsAsBeans),
-                    new JsonPersistentReturnValue(returnValueBean));
+            List<Object> argsAsPersistentBeans = PersistentBeanFactory.toBeanIfNecessary(call.getArgs());
+            Object returnValuePersistentBean = PersistentBeanFactory.toBeanIfNecessary(call.getReturnValue());
+            jsonPersistentActualSample.addCall(new JsonPersistentParameter(argsAsPersistentBeans),
+                    new JsonPersistentReturnValue(returnValuePersistentBean));
         }
         sampleMethodJsonPersistentActualSampleMap.put(persistentSampleMethod, jsonPersistentActualSample);
     }

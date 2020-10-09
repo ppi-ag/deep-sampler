@@ -1,25 +1,22 @@
 package org.deepsampler.persistence.json.model;
 
-import org.deepsampler.persistence.bean.Bean;
-import org.deepsampler.persistence.model.PersistentReturnValue;
-
 public class JsonPersistentReturnValue implements PersistentReturnValue {
-    private Bean returnValue;
+    private Object returnValue;
 
     public JsonPersistentReturnValue() {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentReturnValue(Bean returnValue) {
+    public JsonPersistentReturnValue(Object returnValue) {
         this.returnValue = returnValue;
     }
 
     @Override
-    public Bean getReturnValue() {
+    public Object getReturnValue() {
         return returnValue;
     }
 
-    public void setReturnValue(Bean returnValue) {
+    public void setReturnValue(Object returnValue) {
         this.returnValue = returnValue;
     }
 }

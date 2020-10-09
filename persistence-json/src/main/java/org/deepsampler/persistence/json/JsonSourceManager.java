@@ -1,16 +1,20 @@
 package org.deepsampler.persistence.json;
 
-import org.deepsampler.persistence.SourceManager;
-import org.deepsampler.persistence.model.PersistentModel;
+import org.deepsampler.persistence.json.model.PersistentModel;
 import org.deepsampler.core.model.ExecutionInformation;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public class JsonSourceManager implements SourceManager {
 
-    private JsonRecorder jsonRecorder;
-    private JsonLoader jsonLoader;
+    private final JsonRecorder jsonRecorder;
+    private final JsonLoader jsonLoader;
+
+    public JsonSourceManager(String pathAsStr) {
+        this(Paths.get(pathAsStr));
+    }
 
     public JsonSourceManager(Path path) {
         this.jsonLoader = new JsonLoader(path);

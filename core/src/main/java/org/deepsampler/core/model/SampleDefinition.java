@@ -2,17 +2,24 @@ package org.deepsampler.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SampleDefinition {
+    private static final AtomicLong ONGOING_NUMBER = new AtomicLong();
 
     private final SampledMethod sampledMethod;
 
     private List<ParameterMatcher> parameter = new ArrayList<>();
     private ReturnValueSupplier returnValueSupplier;
-    private String behaviorId;
+    private String sampleId;
 
     public SampleDefinition(SampledMethod sampledMethod) {
         this.sampledMethod = sampledMethod;
+        this.sampleId = buildSampleId(sampledMethod);
+    }
+
+    private String buildSampleId(SampledMethod sampledMethod) {
+        return sampledMethod.getMethod().toGenericString();
     }
 
     public SampledMethod getSampledMethod() {
@@ -23,12 +30,12 @@ public class SampleDefinition {
         return parameter;
     }
 
-    public void setBehaviorId(String behaviorId) {
-        this.behaviorId = behaviorId;
+    public void setSampleId(String sampleId) {
+        this.sampleId = sampleId;
     }
 
     public String getSampleId() {
-        return behaviorId;
+        return sampleId;
     }
 
     public void setParameter(List<ParameterMatcher> parameter) {
