@@ -1,8 +1,6 @@
 package org.deepsampler.persistence.json.model;
 
-import org.deepsampler.persistence.model.PersistentActualSample;
-import org.deepsampler.persistence.model.PersistentSampleMethod;
-import org.deepsampler.persistence.model.PersistentModel;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +9,8 @@ import java.util.Map;
 public class JsonSampleModel implements PersistentModel {
 
     private String id;
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
     private Map<JsonPersistentSampleMethod, JsonPersistentActualSample> joinPointBehaviorMap = new HashMap<>();
 
     public JsonSampleModel() {
@@ -28,7 +28,7 @@ public class JsonSampleModel implements PersistentModel {
     }
 
     @Override
-    public Map<PersistentSampleMethod, PersistentActualSample> getJoinPointBehaviorMap() {
+    public Map<PersistentSampleMethod, PersistentActualSample> getSampleMethodToSampleMap() {
         return Collections.unmodifiableMap(joinPointBehaviorMap);
     }
 }

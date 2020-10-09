@@ -25,7 +25,7 @@ public class GuiceSamplerInterceptor implements SamplerInterceptor, MethodInterc
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 Object returnValue = invocation.proceed();
-                ExecutionManager.log(sampleDefinition, new MethodCall(Arrays.asList(invocation.getArguments()),
+                ExecutionManager.record(sampleDefinition, new MethodCall(Arrays.asList(invocation.getArguments()),
                         returnValue));
                 return returnValue;
             }

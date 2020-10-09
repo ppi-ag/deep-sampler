@@ -1,11 +1,8 @@
-package org.deepsampler.persistence;
+package org.deepsampler.persistence.json;
 
-import org.deepsampler.persistence.json.JsonRecorder;
 import org.deepsampler.core.internal.api.ExecutionManager;
-import org.deepsampler.core.model.ExecutionRepository;
-import org.deepsampler.core.model.MethodCall;
-import org.deepsampler.core.model.SampleDefinition;
-import org.deepsampler.core.model.SampledMethod;
+import org.deepsampler.core.model.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -21,10 +18,10 @@ public class JsonRecorderTest {
     public void testRecord() throws Exception {
         // GIVEN
         Path path = Paths.get("./record/testTemp.json");
-        SampleDefinition behavior = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
-        behavior.setBehaviorId("TestMethodForRecord");
-        ExecutionManager.log(behavior, new MethodCall("ABC", "Args1"));
-        ExecutionManager.log(behavior, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
+        SampleDefinition sample = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
+        sample.setSampleId("TestMethodForRecord");
+        ExecutionManager.record(sample, new MethodCall("ABC", "Args1"));
+        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
 
         // WHEN
         new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll());
@@ -38,10 +35,10 @@ public class JsonRecorderTest {
     public void testRecordLocalDateTime() throws Exception {
         // GIVEN
         Path path = Paths.get("./record/testTimeTemp.json");
-        SampleDefinition behavior = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
-        behavior.setBehaviorId("TestMethodForRecord");
-        ExecutionManager.log(behavior, new MethodCall("ABC", LocalDateTime.now()));
-        ExecutionManager.log(behavior, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
+        SampleDefinition sample = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
+        sample.setSampleId("TestMethodForRecord");
+        ExecutionManager.record(sample, new MethodCall("ABC", LocalDateTime.now()));
+        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
 
         // WHEN
         new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll());
@@ -49,6 +46,12 @@ public class JsonRecorderTest {
         // THEN
         assertTrue(Files.exists(path));
         Files.delete(path);
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        ExecutionRepository.getInstance().clear();
+        SampleRepository.getInstance().clear();
     }
 
     private static class Bean {

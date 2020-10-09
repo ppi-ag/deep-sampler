@@ -1,5 +1,6 @@
-package org.deepsampler.persistence.bean;
+package org.deepsampler.persistence.json.bean;
 
+import org.deepsampler.persistence.json.model.PersistentBean;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
@@ -14,12 +15,21 @@ import java.util.stream.Collectors;
 
 public class PersistentBeanFactory {
 
+    @SuppressWarnings("unchecked")
     public static <T> T[] ofBean(PersistentBean[] persistentBean, Class<T> cls) {
         T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
         for (int i = 0; i < persistentBean.length; ++i) {
             instances[i] = ofBean(persistentBean[i], cls);
         }
         return instances;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T ofBeanIfNecessary(Object beanObj, Class<T> cls) {
+        if (beanObj instanceof PersistentBean) {
+            return ofBean((PersistentBean) beanObj, cls);
+        }
+        return (T) beanObj;
     }
 
     public static <T> T ofBean(PersistentBean persistentBean, Class<T> cls) {
@@ -39,8 +49,8 @@ public class PersistentBeanFactory {
     private static <T> void transferFromBean(PersistentBean persistentBean, T instance, Field field, String key) {
         Object lookedUpValueInBean = persistentBean.getValue(key);
         if (lookedUpValueInBean != null) {
-            if (lookedUpValueInBean instanceof PersistentBean) {
-                lookedUpValueInBean = ofBean((PersistentBean) lookedUpValueInBean, field.getDeclaringClass());
+            if (lookedUpValueInBean instanceof DefaultPersistentBean) {
+                lookedUpValueInBean = ofBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -59,17 +69,20 @@ public class PersistentBeanFactory {
         Map<String, Object> valuesForBean = new HashMap<>();
         for (Map.Entry<Field, String> entry : fieldStringMap.entrySet()) {
             String keyForField = entry.getValue();
-            Object fieldValue = retrieveValue(obj, entry.getKey());
+            Field field = entry.getKey();
+            Object fieldValue = retrieveValue(obj, field);
 
-            if (isObjectArray(fieldValue)) {
-                fieldValue = toBean((Object[]) fieldValue);
-            } else if (!isPrimitive(fieldValue)) {
-                fieldValue = toBean(fieldValue);
+            if (fieldValue != null) {
+                if (isObjectArray(field.getType())) {
+                    fieldValue = toBean((Object[]) fieldValue);
+                } else if (!isPrimitive(field.getType()) && !field.getType().isArray()) {
+                    fieldValue = toBean(fieldValue);
+                }
             }
             valuesForBean.put(keyForField, fieldValue);
         }
 
-        return new PersistentBean(valuesForBean);
+        return new DefaultPersistentBean(valuesForBean);
     }
 
     private static void setValue(Object obj, Field field, Object value) {
@@ -92,29 +105,29 @@ public class PersistentBeanFactory {
         return fieldValue;
     }
 
-    private static boolean isObjectArray(Object fieldValue) {
-        return fieldValue.getClass().isArray() && !(fieldValue instanceof int[]
-                || fieldValue instanceof Integer[]
-                || fieldValue instanceof boolean[]
-                || fieldValue instanceof Boolean[]
-                || fieldValue instanceof byte[]
-                || fieldValue instanceof Byte[]
-                || fieldValue instanceof short[]
-                || fieldValue instanceof Short[]
-                || fieldValue instanceof long[]
-                || fieldValue instanceof Long[]
-                || fieldValue instanceof char[]
-                || fieldValue instanceof String[]);
+    private static boolean isObjectArray(Class<?> cls) {
+        return cls.isArray() && !(cls == int[].class
+                || cls == Integer[].class
+                || cls == boolean[].class
+                || cls == Boolean[].class
+                || cls == byte[].class
+                || cls == Byte[].class
+                || cls == short[].class
+                || cls == Short[].class
+                || cls == long[].class
+                || cls == Long[].class
+                || cls == char[].class
+                || cls == String[].class);
     }
 
-    private static boolean isPrimitive(Object fieldValue) {
-        return fieldValue.getClass().isPrimitive()
-                || fieldValue instanceof Integer
-                || fieldValue instanceof Boolean
-                || fieldValue instanceof Byte
-                || fieldValue instanceof Short
-                || fieldValue instanceof Long
-                || fieldValue instanceof String;
+    private static boolean isPrimitive(Class<?> cls) {
+        return cls.isPrimitive()
+                || cls == Integer.class
+                || cls == Boolean.class
+                || cls == Byte.class
+                || cls == Short.class
+                || cls == Long.class
+                || cls == String.class;
     }
 
     private static Map<Field, String> getAllFields(Class<?> cls) {
@@ -133,14 +146,22 @@ public class PersistentBeanFactory {
         return fields;
     }
 
-    public static List<PersistentBean> toBean(List<Object> objectList) {
+    public static Object toBeanIfNecessary(Object obj) {
+        return transformationNotNecessary(obj) ? obj : toBean(obj);
+    }
+
+    private static boolean transformationNotNecessary(Object obj) {
+        return isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray());
+    }
+
+    public static List<Object> toBeanIfNecessary(List<Object> objectList) {
         return objectList.stream()
-                .map(obj -> toBean(obj))
+                .map(PersistentBeanFactory::toBeanIfNecessary)
                 .collect(Collectors.toList());
     }
 
     public static PersistentBean[] toBean(Object[] objects) {
-        PersistentBean[] persistentBeans = new PersistentBean[objects.length];
+        PersistentBean[] persistentBeans = new DefaultPersistentBean[objects.length];
         for (int i = 0; i < objects.length; ++i) {
             persistentBeans[i] = toBean(objects[i]);
         }

@@ -1,17 +1,20 @@
-package org.deepsampler.persistence.bean;
+package org.deepsampler.persistence.json.bean;
+
+import org.deepsampler.persistence.json.model.PersistentBean;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PersistentBean {
+public class DefaultPersistentBean implements PersistentBean {
+
     private Map<String, Object> values;
 
-    public PersistentBean() {
+    public DefaultPersistentBean() {
         values = new HashMap<>();
     }
 
-    public PersistentBean(Map<String, Object> values) {
+    public DefaultPersistentBean(Map<String, Object> values) {
         this.values = new HashMap<>(values);
     }
 

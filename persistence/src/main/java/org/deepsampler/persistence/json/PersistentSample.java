@@ -1,4 +1,4 @@
-package org.deepsampler.persistence;
+package org.deepsampler.persistence.json;
 
 public class PersistentSample {
 

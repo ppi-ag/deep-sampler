@@ -4,8 +4,7 @@ import org.deepsampler.core.model.ExecutionInformation;
 import org.deepsampler.core.model.MethodCall;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleExecutionInformation;
-import org.deepsampler.persistence.bean.PersistentBean;
-import org.deepsampler.persistence.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.json.error.JsonPersistenceException;
 import org.deepsampler.persistence.json.model.*;
 
@@ -71,8 +70,8 @@ public class JsonRecorder extends JsonOperator {
         JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
         for (MethodCall call : calls) {
-            List<PersistentBean> argsAsPersistentBeans = PersistentBeanFactory.toBean(call.getArgs());
-            PersistentBean returnValuePersistentBean = PersistentBeanFactory.toBean(call.getReturnValue());
+            List<Object> argsAsPersistentBeans = PersistentBeanFactory.toBeanIfNecessary(call.getArgs());
+            Object returnValuePersistentBean = PersistentBeanFactory.toBeanIfNecessary(call.getReturnValue());
             jsonPersistentActualSample.addCall(new JsonPersistentParameter(argsAsPersistentBeans),
                     new JsonPersistentReturnValue(returnValuePersistentBean));
         }

@@ -13,6 +13,11 @@ public class SampleBuilder<T> {
         this.sampleDefinition = sampleDefinition;
     }
 
+    public SampleBuilder id(String id) {
+        sampleDefinition.setSampleId(id);
+        return this;
+    }
+
     public void is(T sampleReturnValue) {
         sampleDefinition.setReturnValueSupplier(() -> sampleReturnValue);
     }

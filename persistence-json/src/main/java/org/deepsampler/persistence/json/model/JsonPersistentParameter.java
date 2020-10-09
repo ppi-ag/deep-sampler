@@ -1,27 +1,26 @@
 package org.deepsampler.persistence.json.model;
 
-import org.deepsampler.persistence.bean.PersistentBean;
-import org.deepsampler.persistence.model.PersistentParameter;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class JsonPersistentParameter implements PersistentParameter {
-    private List<PersistentBean> args;
+
+    private List<Object> args;
 
     public JsonPersistentParameter() {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentParameter(List<PersistentBean> args) {
-        this.args = args;
+    public JsonPersistentParameter(List<Object> args) {
+        setParameter(args);
     }
 
     @Override
-    public List<PersistentBean> getParameter() {
+    public List<Object> getParameter() {
         return args;
     }
 
-    public void setParameter(List<PersistentBean> args) {
-        this.args = args;
+    public void setParameter(List<Object> args) {
+        this.args = new ArrayList<>(args);
     }
 }

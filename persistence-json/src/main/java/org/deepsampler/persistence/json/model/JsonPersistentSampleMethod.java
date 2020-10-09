@@ -1,28 +1,26 @@
 package org.deepsampler.persistence.json.model;
 
-import org.deepsampler.persistence.model.PersistentSampleMethod;
-
 import java.util.Objects;
 
 public class JsonPersistentSampleMethod implements PersistentSampleMethod {
-    private String joinPointId;
+    private String sampleMethodId;
 
     public JsonPersistentSampleMethod() {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentSampleMethod(String joinPointId) {
-        this.joinPointId = joinPointId;
+    public JsonPersistentSampleMethod(String sampleMethodId) {
+        this.sampleMethodId = sampleMethodId;
     }
 
     @Override
-    public String getJoinPointId() {
-        return joinPointId;
+    public String getSampleMethodId() {
+        return sampleMethodId;
     }
 
     @Override
     public String toString() {
-        return joinPointId;
+        return sampleMethodId;
     }
 
     @Override
@@ -30,11 +28,11 @@ public class JsonPersistentSampleMethod implements PersistentSampleMethod {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         JsonPersistentSampleMethod that = (JsonPersistentSampleMethod) o;
-        return Objects.equals(joinPointId, that.joinPointId);
+        return Objects.equals(sampleMethodId, that.sampleMethodId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(joinPointId);
+        return Objects.hash(sampleMethodId);
     }
 }

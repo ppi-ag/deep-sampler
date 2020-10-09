@@ -1,14 +1,10 @@
-package org.deepsampler.persistence;
+package org.deepsampler.persistence.json;
 
-import org.deepsampler.persistence.bean.PersistentBean;
-import org.deepsampler.persistence.bean.PersistentBeanFactory;
-import org.deepsampler.persistence.error.PersistenceException;
-import org.deepsampler.persistence.model.PersistentActualSample;
-import org.deepsampler.persistence.model.PersistentSampleMethod;
-import org.deepsampler.persistence.model.PersistentMethodCall;
-import org.deepsampler.persistence.model.PersistentModel;
 import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.model.*;
+import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.json.error.PersistenceException;
+import org.deepsampler.persistence.json.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,53 +31,53 @@ public class PersistentSampleLoader {
 
     public void load() {
         for (SourceManager sourceManager: sourceManagerList) {
-            Map<String, SampledMethod> definedBehaviors = SampleRepository.getInstance().getSamples().stream()
+            Map<String, SampledMethod> definedSamples = SampleRepository.getInstance().getSamples().stream()
                     .collect(Collectors.toMap(SampleDefinition::getSampleId, SampleDefinition::getSampledMethod));
             PersistentModel persistentModel = sourceManager.load();
 
-            List<SampleDefinition> filteredMappedBehaviors = toBehaviors(persistentModel, definedBehaviors);
+            List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
 
-            for (SampleDefinition behavior : filteredMappedBehaviors) {
-                SampleRepository.getInstance().add(behavior);
+            for (SampleDefinition sample : filteredMappedSample) {
+                SampleRepository.getInstance().add(sample);
             }
         }
     }
 
-    private List<SampleDefinition> toBehaviors(PersistentModel model, Map<String, SampledMethod> idToJp) {
-        List<SampleDefinition> behaviors = new ArrayList<>();
+    private List<SampleDefinition> toSample(PersistentModel model, Map<String, SampledMethod> idToJp) {
+        List<SampleDefinition> samples = new ArrayList<>();
 
-        for (Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getJoinPointBehaviorMap().entrySet()) {
+        for (Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getSampleMethodToSampleMap().entrySet()) {
             PersistentSampleMethod persistentSampleMethod = joinPointBehaviorEntry.getKey();
             PersistentActualSample persistentActualSample = joinPointBehaviorEntry.getValue();
-            SampledMethod matchingJointPoint = idToJp.get(persistentSampleMethod.getJoinPointId());
+            SampledMethod matchingJointPoint = idToJp.get(persistentSampleMethod.getSampleMethodId());
 
             // When there is no matching JointPoint, the persistentJoinPointEntity will be discarded
             if (matchingJointPoint != null) {
                 for (PersistentMethodCall call : persistentActualSample.getAllCalls()) {
-                    SampleDefinition behavior = mapToBehavior(matchingJointPoint, persistentSampleMethod, call);
-                    behaviors.add(behavior);
+                    SampleDefinition behavior = mapToSample(matchingJointPoint, persistentSampleMethod, call);
+                    samples.add(behavior);
                 }
             }
         }
-        return behaviors;
+        return samples;
     }
 
-    private SampleDefinition mapToBehavior(SampledMethod matchingJointPoint, PersistentSampleMethod persistentSampleMethod,
-                                   PersistentMethodCall call) {
-        List<PersistentBean> parameter = call.getPersistentParameter().getParameter();
-        PersistentBean returnValue = call.getPersistentReturnValue().getReturnValue();
+    private SampleDefinition mapToSample(SampledMethod matchingJointPoint, PersistentSampleMethod persistentSampleMethod,
+                                         PersistentMethodCall call) {
+        List<Object> parameter = call.getPersistentParameter().getParameter();
+        Object returnValue = call.getPersistentReturnValue().getReturnValue();
         Class<?>[] parameters = matchingJointPoint.getMethod().getParameterTypes();
         Class<?> returnType = matchingJointPoint.getMethod().getReturnType();
-        String joinPointId = persistentSampleMethod.getJoinPointId();
+        String joinPointId = persistentSampleMethod.getSampleMethodId();
 
-        SampleDefinition behavior = new SampleDefinition(matchingJointPoint);
-        behavior.setBehaviorId(joinPointId);
-        behavior.setParameter(toMatcher(toRealValue(joinPointId, parameters, parameter)));
-        behavior.setReturnValueSupplier(() -> toRealValue(returnType, returnValue));
-        return behavior;
+        SampleDefinition sample = new SampleDefinition(matchingJointPoint);
+        sample.setSampleId(joinPointId);
+        sample.setParameter(toMatcher(toRealValue(joinPointId, parameters, parameter)));
+        sample.setReturnValueSupplier(() -> toRealValue(returnType, returnValue));
+        return sample;
     }
 
-    private List<Object> toRealValue(String id, Class<?>[] parameters, List<PersistentBean> parameterPersistentBeans) {
+    private List<Object> toRealValue(String id, Class<?>[] parameters, List<Object> parameterPersistentBeans) {
         List<Object> params = new ArrayList<>();
 
         if (parameters.length != parameterPersistentBeans.size()) {
@@ -90,14 +86,14 @@ public class PersistentSampleLoader {
         }
         for (int i = 0; i < parameterPersistentBeans.size(); ++i) {
             Class<?> parameter = parameters[i];
-            PersistentBean persistentBean = parameterPersistentBeans.get(i);
+            Object persistentBean = parameterPersistentBeans.get(i);
             params.add(toRealValue(parameter, persistentBean));
         }
         return params;
     }
 
-    private Object toRealValue(Class<?> type, PersistentBean persistentBean) {
-        return PersistentBeanFactory.ofBean(persistentBean, type);
+    private Object toRealValue(Class<?> type, Object persistentBean) {
+        return PersistentBeanFactory.ofBeanIfNecessary(persistentBean, type);
     }
 
     private List<ParameterMatcher> toMatcher(List<Object> params) {
