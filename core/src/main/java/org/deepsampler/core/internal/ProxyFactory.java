@@ -20,8 +20,7 @@ public class ProxyFactory {
         return (T) proxyObject;
     }
 
-    public static boolean isProxyClass(Class<?> proxyClass) {
-        return javassist.util.proxy.ProxyFactory.isProxyClass(proxyClass);
+    public static boolean isProxyClass(Class<?> aClass) {
+        return javassist.util.proxy.ProxyFactory.isProxyClass(aClass);
     }
-
 }
