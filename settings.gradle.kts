@@ -7,5 +7,6 @@ include ("provider",
 	"persistence",
 	"persistence-json",
 	"persistence-api",
+	"junit",
 	"junit4",
 	"junit5")
