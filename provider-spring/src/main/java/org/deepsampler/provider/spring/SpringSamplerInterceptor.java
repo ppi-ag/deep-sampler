@@ -6,15 +6,14 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.deepsampler.core.internal.api.ExecutionManager;
 import org.deepsampler.core.model.*;
-import org.deepsampler.provider.common.SamplerInterceptor;
 
 import java.util.Arrays;
 
 /**
- * A {@link SamplerInterceptor} for SpringApplications.
+ * A SamplerInterceptor for SpringApplications.
  */
 @Aspect
-public class SpringSamplerInterceptor implements SamplerInterceptor {
+public class SpringSamplerInterceptor {
 
 
     /**

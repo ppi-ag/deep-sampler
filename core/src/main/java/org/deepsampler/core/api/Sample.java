@@ -37,6 +37,10 @@ public class Sample {
                 SampleRepository.getInstance().getCurrentSampleDefinition());
     }
 
+    public static <T> T forVerification(T sampler) {
+        return sampler;
+    }
+
     public static <T> T verifyCallQuantity(Class<T> cls, Quantity quantity) {
         return ProxyFactory.createProxy(cls, new VerifySampleHandler(quantity, cls));
     }
