@@ -4,11 +4,10 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.deepsampler.core.internal.api.ExecutionManager;
 import org.deepsampler.core.model.*;
-import org.deepsampler.provider.common.SamplerInterceptor;
 
 import java.util.Arrays;
 
-public class GuiceSamplerInterceptor implements SamplerInterceptor, MethodInterceptor {
+public class GuiceSamplerInterceptor implements MethodInterceptor {
 
 
     @Override

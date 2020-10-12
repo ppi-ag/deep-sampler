@@ -35,4 +35,13 @@ public class TestService {
     public TestBean echoParameter(TestBean someObject) {
         return someObject;
     }
+
+    /**
+     * This method is needed to test whether calls of void methods can be verified or not.
+     *
+     * @param someInt
+     */
+    public void noReturnValue(int someInt) {
+        // There is nothing to do here, we are only interested in the method call itself.
+    };
 }

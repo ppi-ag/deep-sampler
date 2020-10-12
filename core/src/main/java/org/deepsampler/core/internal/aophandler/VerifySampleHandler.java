@@ -32,7 +32,7 @@ public class VerifySampleHandler extends ReturningSampleHandler {
                 throw new VerifyException(sampleDefinition.getSampledMethod(), expected, actual);
             }
         } else if (quantity.getTimes() != 0) {
-            throw new VerifyException(sampledMethod, quantity.getTimes(), 0);
+            throw new VerifyException(sampledMethod, args, quantity.getTimes(), 0);
         }
         return createEmptyProxy(thisMethod.getReturnType());
     }

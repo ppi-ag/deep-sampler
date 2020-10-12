@@ -20,11 +20,11 @@ public abstract class SamplerInterceptorTest {
     public static final String VALUE_B = "Value B";
     public static final String VALUE_C = "Value C";
     public static final int INT_VALUE = 42;
-    private static final TestBean TEST_BEAN_A = new TestBean("OneString", 42);
-    private static final TestBean TEST_BEAN_B = new TestBean("AnotherString", 24);
+    private static final TestBean TEST_BEAN_A = new TestBean();
+    private static final TestBean TEST_BEAN_B = new TestBean();
 
     /**
-     * The {@link TestService} is a Service that is used to test method interception by a {@link SamplerInterceptor}. Since this class must be
+     * The {@link TestService} is a Service that is used to test method interception by a SamplerInterceptor. Since this class must be
      * instantiated by the concrete Dependency Injection Framework, the creation of this instance must be done by the concrete TestCase.
      *
      * @return An instance of {@link TestService} that has been created in a way that enables method interception by a particular AOP-framework (i.e. Spring).
@@ -212,6 +212,57 @@ public abstract class SamplerInterceptorTest {
         //THEN
         assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1))
                 .getMinusOne());
+    }
+
+    @Test
+    public void verifyMethodCalledWithoutSample() {
+        Sampler.clear();
+
+        // CHANGE
+        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_B));
+        Sample.of(testServiceSampler.getMinusOne());
+
+        // CALL
+        getTestService().echoParameter(TEST_BEAN_B);
+        getTestService().echoParameter(TEST_BEAN_B);
+        getTestService().getMinusOne();
+
+        //THEN
+        Sample.verifyCallQuantity(TestService.class, NEVER).echoParameter(TEST_BEAN_A);
+        Sample.verifyCallQuantity(TestService.class, TWICE).echoParameter(TEST_BEAN_B);
+        Sample.verifyCallQuantity(TestService.class, ONCE).getMinusOne();
+    }
+
+    @Test
+    public void verifyVoidMethod() {
+        Sampler.clear();
+
+        // CHANGE
+        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.forVerification(testServiceSampler).noReturnValue(1);
+
+        //CALL
+        getTestService().noReturnValue(1);
+
+        //THEN
+        Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(1);
+    }
+
+
+    @Test
+    public void verifyVoidMethodWithWrongParameter() {
+        Sampler.clear();
+
+        // CHANGE
+        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.forVerification(testServiceSampler).noReturnValue(1);
+
+        //CALL
+        getTestService().noReturnValue(1);
+
+        //THEN
+        assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2));
     }
 
 }
