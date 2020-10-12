@@ -1,6 +1,7 @@
 package org.deepsampler.junit5;
 
 import org.deepsampler.core.api.Sampler;
+import org.deepsampler.junit.TestReflectionUtils;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
@@ -9,13 +10,23 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+
+/**
+ * As a convenient alternative, Samplers may be prepared by annotating properties in test classes with {@link org.deepsampler.junit.PrepareSampler} instead of using
+ * {@link org.deepsampler.core.api.Sampler#prepare(Class)}. In Junit5 the annotation is interpreted by this JUnit Extension.
+ *
+ * The Extension also clears Samplers that might have been created by preceding tests before a new test method is started.
+ * This would otherwise have to be done by calling {@link Sampler#clear()} manually in each test.
+ *
+ * The Extension is enabled by annotation a test class with {@code @ExtendWith(DeepSamplerExtension.class)}
+ */
 public class DeepSamplerExtension implements TestInstancePostProcessor, BeforeEachCallback {
 
     @Override
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
-        getDeclaredAndInheritedFields(testInstance.getClass()).stream()//
-            .filter(this::shouldBeSampled)//
-            .forEach(field -> assignNewSamplerToField(testInstance, field));
+        TestReflectionUtils.getDeclaredAndInheritedFields(testInstance.getClass())//
+            .filter(TestReflectionUtils::shouldBeSampled)//
+            .forEach(field -> TestReflectionUtils.assignNewSamplerToField(testInstance, field));
     }
 
     @Override
@@ -23,29 +34,7 @@ public class DeepSamplerExtension implements TestInstancePostProcessor, BeforeEa
         Sampler.clear();
     }
 
-    private List<Field> getDeclaredAndInheritedFields(Class<?> clazz) {
-        List<Field> declaredFields = Arrays.asList(clazz.getDeclaredFields());
 
-        if (!Object.class.equals(clazz.getSuperclass())) {
-            declaredFields.addAll(getDeclaredAndInheritedFields(clazz.getSuperclass()));
-        }
-
-        return declaredFields;
-    }
-
-    private boolean shouldBeSampled(Field field) {
-        return field.getAnnotation(PrepareSampler.class) != null;
-    }
-
-    private void assignNewSamplerToField(Object testInstance, Field field) {
-        Object sampler = Sampler.prepare(field.getType());
-        try {
-            field.setAccessible(true);
-            field.set(testInstance, sampler);
-        } catch (IllegalAccessException e) {
-            throw new JUnitPreparationException("No access to property %s#%s", e, testInstance.getClass().getName(), field.getName());
-        }
-    }
 
 
 }
