@@ -9,6 +9,7 @@ import org.deepsampler.core.model.ParameterMatcher;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
                 .collect(Collectors.toList());
 
         sampleDefinition.setParameter(parameterMatchers);
+        sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));
         return sampleDefinition;
     }
 
