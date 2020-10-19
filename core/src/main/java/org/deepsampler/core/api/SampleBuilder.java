@@ -3,6 +3,7 @@ package org.deepsampler.core.api;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.ReturnValueSupplier;
 
+
 public class SampleBuilder<T> {
 
     private final T returningProxy;
