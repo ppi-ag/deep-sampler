@@ -1,4 +1,4 @@
-package org.deepsampler.provider.standalone;
+package org.deepsampler.provider.guice;
 
 import org.deepsampler.provider.common.TestServiceContainer;
 import org.deepsampler.provider.common.TestService;

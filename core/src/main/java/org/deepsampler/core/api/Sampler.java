@@ -16,8 +16,5 @@ public class Sampler {
         return ProxyFactory.createProxy(cls, new RecordSampleHandler(cls));
     }
 
-    public static Quantity times(int i) {
-        return new FixedQuantity(i);
-    }
 
 }

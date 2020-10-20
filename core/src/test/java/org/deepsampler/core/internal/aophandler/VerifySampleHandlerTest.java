@@ -12,12 +12,12 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class VerifyBehaviorHandlerTest {
+class VerifySampleHandlerTest {
 
     @Test
-    void testInvokeBehaviorPresentAndVerifyCorrect() throws NoSuchMethodException {
+    void testInvokeSamplePresentAndVerifyCorrect() throws NoSuchMethodException {
         // GIVEN
-        VerifySampleHandler verifyBehaviorHandler = new VerifySampleHandler(new FixedQuantity(1), ProxyTest.class);
+        VerifySampleHandler verifySampleHandler = new VerifySampleHandler(new FixedQuantity(1), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
         SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
@@ -26,34 +26,34 @@ class VerifyBehaviorHandlerTest {
 
         // WHEN
         // THEN
-        assertDoesNotThrow(() -> verifyBehaviorHandler.invoke(proxyTest, simMethod, null, new Object[0]));
+        assertDoesNotThrow(() -> verifySampleHandler.invoke(proxyTest, simMethod, null, new Object[0]));
     }
 
     @Test
-    void testInvokeBehaviorPresentAndVerifyNotCorrect() throws NoSuchMethodException {
+    void testInvokeSamplePresentAndVerifyNotCorrect() throws NoSuchMethodException {
         // GIVEN
-        VerifySampleHandler verifyBehaviorHandler = new VerifySampleHandler(new FixedQuantity(2), ProxyTest.class);
+        VerifySampleHandler verifySampleHandler = new VerifySampleHandler(new FixedQuantity(2), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
-        SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
-        SampleRepository.getInstance().add(behaviorTest);
-        ExecutionManager.notify(behaviorTest);
+        SampleDefinition sampleDefinition = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
+        SampleRepository.getInstance().add(sampleDefinition);
+        ExecutionManager.notify(sampleDefinition);
 
         // WHEN
         // THEN
-        assertThrows(VerifyException.class, () -> verifyBehaviorHandler.invoke(proxyTest, simMethod, null, new Object[0]));
+        assertThrows(VerifyException.class, () -> verifySampleHandler.invoke(proxyTest, simMethod, null, new Object[0]));
     }
 
     @Test
-    void testInvokeBehaviorNotPresentPresent() throws NoSuchMethodException {
+    void testInvokeSampleNotPresentPresent() throws NoSuchMethodException {
         // GIVEN
-        VerifySampleHandler verifyBehaviorHandler = new VerifySampleHandler(new FixedQuantity(2), ProxyTest.class);
+        VerifySampleHandler verifySampleHandler = new VerifySampleHandler(new FixedQuantity(2), ProxyTest.class);
         ProxyTest proxyTest = new ProxyTest();
         Method simMethod = proxyTest.getClass().getMethod("test");
 
         // WHEN
         // THEN
-        assertThrows(VerifyException.class, () -> verifyBehaviorHandler.invoke(proxyTest, simMethod, null, new Object[0]));
+        assertThrows(VerifyException.class, () -> verifySampleHandler.invoke(proxyTest, simMethod, null, new Object[0]));
     }
 
     private static class ProxyTest {

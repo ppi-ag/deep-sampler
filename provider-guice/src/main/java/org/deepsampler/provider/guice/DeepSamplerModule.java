@@ -1,4 +1,4 @@
-package org.deepsampler.provider.standalone;
+package org.deepsampler.provider.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;

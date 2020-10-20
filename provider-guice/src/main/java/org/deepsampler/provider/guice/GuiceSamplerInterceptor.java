@@ -1,4 +1,4 @@
-package org.deepsampler.provider.standalone;
+package org.deepsampler.provider.guice;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;

@@ -6,7 +6,4 @@ public class InvalidConfigException extends BaseException {
         super(message, args);
     }
 
-    public InvalidConfigException(String message, Throwable cause, Object... args) {
-        super(message, cause, args);
-    }
 }
