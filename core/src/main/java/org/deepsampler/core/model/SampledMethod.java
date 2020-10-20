@@ -8,7 +8,7 @@ public class SampledMethod {
 
     private Method method;
 
-    public SampledMethod(Class<?> target, Method method) {
+    public SampledMethod(final Class<?> target, final Method method) {
         this.target = target;
         this.method = method;
     }
@@ -17,7 +17,7 @@ public class SampledMethod {
         return target;
     }
 
-    public void setTarget(Class<?> target) {
+    public void setTarget(final Class<?> target) {
         this.target = target;
     }
 
@@ -25,7 +25,7 @@ public class SampledMethod {
         return method;
     }
 
-    public void setMethod(Method method) {
+    public void setMethod(final Method method) {
         this.method = method;
     }
 

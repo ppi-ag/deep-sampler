@@ -7,7 +7,7 @@ import org.deepsampler.core.model.SampleRepository;
 /**
  * This is the starting point for the definition of Samples in test classes.
  *
- * A "Sample" is is an exemplary return value or or an exemplary behavior of a method that fulfills a prerequisite of a particular test case. When the tested methods are not able
+ * A "Sample" is an exemplary return value or an exemplary behavior of a method that fulfills a prerequisite of a particular test case. When the tested methods are not able
  * to reproduce the Sample by their own means (i.e. due to changes in the underlying database, or passing of time, etc.), the methods can be coerced to reproduce the Sample using
  * this API.
  *
@@ -32,16 +32,16 @@ public class Sample {
      * @return A {@link SampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */
-    public static <T> SampleBuilder<T> of(T sampledMethodCall) {
+    public static <T> SampleBuilder<T> of(final T sampledMethodCall) {
         return new SampleBuilder<>(sampledMethodCall,
                 SampleRepository.getInstance().getCurrentSampleDefinition());
     }
 
-    public static <T> T forVerification(T sampler) {
+    public static <T> T forVerification(final T sampler) {
         return sampler;
     }
 
-    public static <T> T verifyCallQuantity(Class<T> cls, Quantity quantity) {
+    public static <T> T verifyCallQuantity(final Class<T> cls, final Quantity quantity) {
         return ProxyFactory.createProxy(cls, new VerifySampleHandler(quantity, cls));
     }
 

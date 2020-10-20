@@ -10,23 +10,23 @@ public class VerifySampleHandler extends ReturningSampleHandler {
     private final Quantity quantity;
     private final Class<?> cls;
 
-    public VerifySampleHandler(Quantity quantity, Class<?> cls) {
+    public VerifySampleHandler(final Quantity quantity, final Class<?> cls) {
         this.quantity = quantity;
         this.cls = cls;
     }
 
 
     @Override
-    public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) {
-        SampledMethod sampledMethod = new SampledMethod(cls, thisMethod);
-        SampleDefinition sampleDefinition = SampleRepository.getInstance().find(sampledMethod, args);
+    public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) {
+        final SampledMethod sampledMethod = new SampledMethod(cls, thisMethod);
+        final SampleDefinition sampleDefinition = SampleRepository.getInstance().find(sampledMethod, args);
 
         if (sampleDefinition != null) {
-            ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
-            SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
+            final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
+            final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
 
-            int expected = quantity.getTimes();
-            int actual = sampleExecutionInformation.getTimesInvoked();
+            final int expected = quantity.getTimes();
+            final int actual = sampleExecutionInformation.getTimesInvoked();
 
             if (expected != actual) {
                 throw new VerifyException(sampleDefinition.getSampledMethod(), expected, actual);

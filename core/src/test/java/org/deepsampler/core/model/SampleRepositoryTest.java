@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +27,6 @@ public class SampleRepositoryTest {
         // GIVEN
         final SampleDefinition registeredSampleDefinition = createSampleDefinition(
                 createSampledMethod(TestObject.class, "someMethod"),
-                TestObject.class,
                 Arrays.asList(parameter -> parameter.equals("Argument")),
                 "ReturnValue"
         );
@@ -36,7 +36,8 @@ public class SampleRepositoryTest {
         final SampledMethod foundSampledMethod = createSampledMethod(TestObject.class, "someMethod");
 
         // THEN
-        final SampleDefinition expectedSampleDefinition = SampleRepository.getInstance().find(foundSampledMethod, "Argument");
+        final SampleDefinition expectedSampleDefinition =
+                SampleRepository.getInstance().find(foundSampledMethod, "Argument");
         assertNotNull(expectedSampleDefinition);
     }
 
@@ -45,7 +46,6 @@ public class SampleRepositoryTest {
         // GIVEN
         final SampleDefinition registeredSampleDefinition = createSampleDefinition(
                 createSampledMethod(TestObject.class, "someMethod"),
-                TestObject.class,
                 Arrays.asList(parameter -> parameter.equals("Argument")),
                 "ReturnValue"
         );
@@ -55,7 +55,8 @@ public class SampleRepositoryTest {
         final SampledMethod foundSampledMethod = createSampledMethod(TestSubObject.class, "someMethod");
 
         // THEN
-        final SampleDefinition expectedSampleDefinition = SampleRepository.getInstance().find(foundSampledMethod, "Argument");
+        final SampleDefinition expectedSampleDefinition =
+                SampleRepository.getInstance().find(foundSampledMethod, "Argument");
         assertNotNull(expectedSampleDefinition);
     }
 
@@ -69,7 +70,6 @@ public class SampleRepositoryTest {
     public void sampleIsNotFoundByMethod() throws NoSuchMethodException {
         final SampleDefinition sampleDefinition = createSampleDefinition(
                 createSampledMethod(TestObject.class, "someMethod"),
-                TestObject.class,
                 Arrays.asList(parameter -> parameter.equals("Argument")),
                 "ReturnValue"
         );
@@ -88,7 +88,6 @@ public class SampleRepositoryTest {
     public void sampleIsNotFoundByDifferentArgs() throws NoSuchMethodException {
         final SampleDefinition sampleDefinition = createSampleDefinition(
                 createSampledMethod(TestObject.class, "someMethod"),
-                TestObject.class,
                 Arrays.asList(parameter -> parameter.equals("Argument")),
                 "ReturnValue"
         );
@@ -107,13 +106,11 @@ public class SampleRepositoryTest {
     public void duplicatedSampleInSamplesThrowsDSDException() throws NoSuchMethodException {
         final SampleDefinition sampleDefinition = createSampleDefinition(
                 createSampledMethod(TestObject.class, "firstMethod"),
-                TestObject.class,
                 Arrays.asList(parameter -> parameter.equals("Argument")),
                 "ReturnValue"
         );
         final SampleDefinition newCurrentSampleDefinition = createSampleDefinition(
                 createSampledMethod(TestObject.class, "secondMethod"),
-                TestObject.class,
                 Arrays.asList(parameter -> parameter.equals("Other Argument")),
                 "Other ReturnValue"
         );
@@ -121,7 +118,8 @@ public class SampleRepositoryTest {
         SampleRepository.getInstance().add(sampleDefinition);
         SampleRepository.getInstance().add(newCurrentSampleDefinition);
 
-        assertThrows(DuplicateSampleDefinitionException.class, () ->  SampleRepository.getInstance().add(sampleDefinition));
+        assertThrows(DuplicateSampleDefinitionException.class,
+                () ->  SampleRepository.getInstance().add(sampleDefinition));
     }
 
     /**
@@ -134,17 +132,40 @@ public class SampleRepositoryTest {
     public void duplicatedCurrentSampleThrowsDSDException() throws NoSuchMethodException {
         final SampleDefinition sampleDefinition = createSampleDefinition(
                 createSampledMethod(TestObject.class, "firstMethod"),
-                TestObject.class,
                 Arrays.asList(parameter -> parameter.equals("Argument")),
                 "ReturnValue"
         );
         SampleRepository.getInstance().add(sampleDefinition);
 
-        assertThrows(DuplicateSampleDefinitionException.class, () ->  SampleRepository.getInstance().add(sampleDefinition));
+        assertThrows(DuplicateSampleDefinitionException.class,
+                () ->  SampleRepository.getInstance().add(sampleDefinition));
     }
 
-    private SampleDefinition createSampleDefinition(final SampledMethod sampledMethod, final Class clazz,
-                                                    final List<ParameterMatcher> parameter, final Object returnValue) throws NoSuchMethodException {
+    @Test
+    public void getSamplesFromSampleRepository() throws NoSuchMethodException {
+        final List<SampleDefinition> expectedSampleList = new ArrayList<>();
+        final SampleDefinition sampleDefinition = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Arrays.asList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+        SampleRepository.getInstance().add(sampleDefinition);
+        expectedSampleList.add(sampleDefinition);
+
+        assertArrayEquals(expectedSampleList.toArray(), SampleRepository.getInstance().getSamples().toArray());
+    }
+
+    @Test
+    public void samplesListIsNotNullOrIsEmpty() {
+        assertNotNull(SampleRepository.getInstance().getSamples());
+        assertEquals(new ArrayList<SampleDefinition>().isEmpty(), SampleRepository.getInstance().isEmpty());
+    }
+
+    private SampleDefinition createSampleDefinition(
+            final SampledMethod sampledMethod,
+            final List<ParameterMatcher> parameter,
+            final Object returnValue) throws NoSuchMethodException {
+
         final SampledMethod registeredSampledMethod = sampledMethod;
         final List<ParameterMatcher> registeredParameter = parameter;
 
@@ -154,13 +175,16 @@ public class SampleRepositoryTest {
         return registeredSampleDefinition;
     }
 
-    private SampledMethod createSampledMethod(final Class<?> sampledClass, final String name) throws NoSuchMethodException {
+    private SampledMethod createSampledMethod(
+            final Class<?> sampledClass,
+            final String name) throws NoSuchMethodException {
+
         final Method sampledMethod = sampledClass.getMethod(name, String.class);
         return new SampledMethod(sampledClass, sampledMethod);
     }
 
     private static class TestObject {
-        public String someMethod(String parameter) {
+        public String someMethod(final String parameter) {
             return parameter;
         }
         public String firstMethod(final String parameter) {

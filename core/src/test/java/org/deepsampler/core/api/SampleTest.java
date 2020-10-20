@@ -1,14 +1,16 @@
 package org.deepsampler.core.api;
 
+import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
-import org.deepsampler.core.model.ParameterMatcher;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SampleTest {
 
@@ -17,14 +19,19 @@ public class SampleTest {
     private static final Bean BEAN_A_COPY = new Bean("a", 1);
     private static final Bean BEAN_B = new Bean("b", 2);
 
+    @BeforeEach
+    public void cleanUp() {
+        Sampler.clear();
+    }
+
     @Test
     public void testSampleDefinitionWithoutParam() {
         // GIVEN WHEN
-        Quantity quantitySampler = Sampler.prepare(Quantity.class);
+        final Quantity quantitySampler = Sampler.prepare(Quantity.class);
         Sample.of(quantitySampler.getTimes()).is(4);
 
         // THEN
-        SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         assertEquals(Quantity.class, currentSampleDefinition.getSampledMethod().getTarget());
         assertTrue(currentSampleDefinition.getParameter().isEmpty());
         assertEquals(4, currentSampleDefinition.getReturnValueSupplier().supply());
@@ -33,12 +40,12 @@ public class SampleTest {
     @Test
     public void testSampleDefinitionWithPrimitiveParam() {
         //GIVEN WHEN
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)).is("New Sample");
 
         //THEN
-        SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
 
         assertEquals(parameter.size(), 1);
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
@@ -47,12 +54,12 @@ public class SampleTest {
     @Test
     public void testSampleDefinitionWithBeanParam() {
         //GIVEN WHEN
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(BEAN_A)).is(BEAN_B);
 
         //THEN
-        SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
 
         assertEquals(parameter.size(), 1);
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
@@ -60,29 +67,29 @@ public class SampleTest {
 
     public static class TestService {
 
-        public String echoParameter(String someParameter) {
+        public String echoParameter(final String someParameter) {
             return someParameter;
         }
 
-        public Bean echoParameter(Bean bean) {
+        public Bean echoParameter(final Bean bean) {
             return bean;
         }
     }
 
     public static class Bean {
-        private String someString;
-        private int someInt;
+        private final String someString;
+        private final int someInt;
 
-        public Bean(String someString, int someInt) {
+        public Bean(final String someString, final int someInt) {
             this.someString = someString;
             this.someInt = someInt;
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Bean bean = (Bean) o;
+            final Bean bean = (Bean) o;
             return someInt == bean.someInt &&
                     Objects.equals(someString, bean.someString);
         }

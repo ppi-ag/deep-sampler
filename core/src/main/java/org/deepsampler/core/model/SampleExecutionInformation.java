@@ -7,9 +7,9 @@ import java.util.List;
 public class SampleExecutionInformation {
 
     private int timesInvoked = 0;
-    private List<MethodCall> methodCallList = new ArrayList<>();
+    private final List<MethodCall> methodCallList = new ArrayList<>();
 
-    public SampleExecutionInformation(int timesInvoked) {
+    public SampleExecutionInformation(final int timesInvoked) {
         this.timesInvoked = timesInvoked;
     }
 
@@ -17,7 +17,7 @@ public class SampleExecutionInformation {
         return Collections.unmodifiableList(methodCallList);
     }
 
-    public void addMethodCall(MethodCall call) {
+    public void addMethodCall(final MethodCall call) {
         this.methodCallList.add(call);
     }
 

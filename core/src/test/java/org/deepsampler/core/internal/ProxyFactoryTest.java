@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProxyFactoryTest {
 
@@ -14,16 +14,16 @@ class ProxyFactoryTest {
     void testCreateProxy() {
         // GIVEN
         final AtomicInteger counter = new AtomicInteger();
-        MethodHandler methodHandler = new MethodHandler() {
+        final MethodHandler methodHandler = new MethodHandler() {
             @Override
-            public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
+            public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) throws Throwable {
                 counter.incrementAndGet();
                 return null;
             }
         };
 
         // WHEN
-        ProxyTest proxyTest = ProxyFactory.createProxy(ProxyTest.class, methodHandler);
+        final ProxyTest proxyTest = ProxyFactory.createProxy(ProxyTest.class, methodHandler);
         proxyTest.test();
         proxyTest.test();
 

@@ -8,19 +8,19 @@ import org.objenesis.instantiator.ObjectInstantiator;
 
 public class ProxyFactory {
     @SuppressWarnings("unchecked")
-    public static <T> T createProxy(Class<T> cls, MethodHandler proxyBehavior) {
-        javassist.util.proxy.ProxyFactory proxyFactory = new javassist.util.proxy.ProxyFactory();
+    public static <T> T createProxy(final Class<T> cls, final MethodHandler proxyBehavior) {
+        final javassist.util.proxy.ProxyFactory proxyFactory = new javassist.util.proxy.ProxyFactory();
         proxyFactory.setSuperclass(cls);
-        Class<?> proxyClass = proxyFactory.createClass();
-        Objenesis objenesis = new ObjenesisStd();
-        ObjectInstantiator<?> instantiatorOf = objenesis.getInstantiatorOf(proxyClass);
-        ProxyObject proxyObject = (ProxyObject) instantiatorOf.newInstance();
+        final Class<?> proxyClass = proxyFactory.createClass();
+        final Objenesis objenesis = new ObjenesisStd();
+        final ObjectInstantiator<?> instantiatorOf = objenesis.getInstantiatorOf(proxyClass);
+        final ProxyObject proxyObject = (ProxyObject) instantiatorOf.newInstance();
         proxyObject.setHandler(proxyBehavior);
 
         return (T) proxyObject;
     }
 
-    public static boolean isProxyClass(Class<?> aClass) {
+    public static boolean isProxyClass(final Class<?> aClass) {
         return javassist.util.proxy.ProxyFactory.isProxyClass(aClass);
     }
 }

@@ -10,13 +10,13 @@ public class FixedQuantity extends Quantity {
 
     private final int fixedQuantity;
 
-    public FixedQuantity(int i) {
+    public FixedQuantity(final int i) {
         this.fixedQuantity = i;
     }
 
+    @Override
     public int getTimes() {
         return fixedQuantity;
     }
-
 
 }
