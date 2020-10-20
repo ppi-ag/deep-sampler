@@ -14,7 +14,7 @@ public class JUnitPreparationException extends BaseException {
      * @param cause The original Exception
      * @param args If message contains arguments (like %s for Strings) the values of these arguments are taken from this args[]
      */
-    public JUnitPreparationException(String message, Throwable cause, Object... args) {
+    public JUnitPreparationException(final String message, final Throwable cause, final Object... args) {
         super(message, cause, args);
     }
 

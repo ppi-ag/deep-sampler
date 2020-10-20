@@ -4,7 +4,6 @@ import org.deepsampler.core.api.Sampler;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -18,8 +17,8 @@ public class TestReflectionUtils {
      * @param clazz The clazz of which the properties are needed.
      * @return A Stream containing the found Fields.
      */
-    public static Stream<Field> getDeclaredAndInheritedFields(Class<?> clazz) {
-        Stream<Field> declaredFields = Arrays.stream(clazz.getDeclaredFields());
+    public static Stream<Field> getDeclaredAndInheritedFields(final Class<?> clazz) {
+        final Stream<Field> declaredFields = Arrays.stream(clazz.getDeclaredFields());
 
         if (!Object.class.equals(clazz.getSuperclass())) {
             return Stream.concat(declaredFields, getDeclaredAndInheritedFields(clazz.getSuperclass()));
@@ -34,7 +33,7 @@ public class TestReflectionUtils {
      * @param field The field that is suspected to be annotated with {@link PrepareSampler}.
      * @return <code>true</code> if field is annotated with {@link PrepareSampler}
      */
-    public static boolean shouldBeSampled(Field field) {
+    public static boolean shouldBeSampled(final Field field) {
         return field.getAnnotation(PrepareSampler.class) != null;
     }
 
@@ -44,12 +43,12 @@ public class TestReflectionUtils {
      * @param testInstance the object in which the sampler should be injected.
      * @param field the field that should be populated with a new Sampler.
      */
-    public static void assignNewSamplerToField(Object testInstance, Field field) {
-        Object sampler = Sampler.prepare(field.getType());
+    public static void assignNewSamplerToField(final Object testInstance, final Field field) {
+        final Object sampler = Sampler.prepare(field.getType());
         try {
             field.setAccessible(true);
             field.set(testInstance, sampler);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             throw new JUnitPreparationException("No access to property %s#%s", e, testInstance.getClass().getName(), field.getName());
         }
     }

@@ -6,10 +6,6 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-
 
 /**
  * As a convenient alternative, Samplers may be prepared by annotating properties in test classes with {@link org.deepsampler.junit.PrepareSampler} instead of using
@@ -23,14 +19,14 @@ import java.util.List;
 public class DeepSamplerExtension implements TestInstancePostProcessor, BeforeEachCallback {
 
     @Override
-    public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
+    public void postProcessTestInstance(final Object testInstance, final ExtensionContext context) throws Exception {
         TestReflectionUtils.getDeclaredAndInheritedFields(testInstance.getClass())//
             .filter(TestReflectionUtils::shouldBeSampled)//
             .forEach(field -> TestReflectionUtils.assignNewSamplerToField(testInstance, field));
     }
 
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeEach(final ExtensionContext context) throws Exception {
         Sampler.clear();
     }
 

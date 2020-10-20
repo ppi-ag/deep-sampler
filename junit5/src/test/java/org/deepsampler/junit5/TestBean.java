@@ -8,7 +8,7 @@ public class TestBean {
     private String someString;
     private int someInt;
 
-    public TestBean(String someString, int someInt) {
+    public TestBean(final String someString, final int someInt) {
         this.someString = someString;
         this.someInt = someInt;
     }
@@ -17,7 +17,7 @@ public class TestBean {
         return someString;
     }
 
-    public void setSomeString(String someString) {
+    public void setSomeString(final String someString) {
         this.someString = someString;
     }
 
@@ -25,7 +25,7 @@ public class TestBean {
         return someInt;
     }
 
-    public void setSomeInt(int someInt) {
+    public void setSomeInt(final int someInt) {
         this.someInt = someInt;
     }
 }
