@@ -12,7 +12,7 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SampleTest {
+class SampleTest {
 
     public static final String PARAMETER_VALUE = "Blubb";
     private static final Bean BEAN_A = new Bean("a", 1);
@@ -25,7 +25,7 @@ public class SampleTest {
     }
 
     @Test
-    public void testSampleDefinitionWithoutParam() {
+    void testSampleDefinitionWithoutParam() {
         // GIVEN WHEN
         final Quantity quantitySampler = Sampler.prepare(Quantity.class);
         Sample.of(quantitySampler.getTimes()).is(4);
@@ -39,7 +39,7 @@ public class SampleTest {
     }
 
     @Test
-    public void testSampleDefinitionWithPrimitiveParam() {
+    void testSampleDefinitionWithPrimitiveParam() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)).is("New Sample");
@@ -53,7 +53,7 @@ public class SampleTest {
     }
 
     @Test
-    public void testSampleDefinitionWithBeanParam() {
+    void testSampleDefinitionWithBeanParam() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(BEAN_A)).is(BEAN_B);
