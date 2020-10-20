@@ -1,5 +1,6 @@
 package org.deepsampler.core.api;
 
+import org.deepsampler.core.error.NotASamplerException;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
@@ -9,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SampleTest {
 
@@ -32,6 +32,7 @@ public class SampleTest {
 
         // THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+
         assertEquals(Quantity.class, currentSampleDefinition.getSampledMethod().getTarget());
         assertTrue(currentSampleDefinition.getParameter().isEmpty());
         assertEquals(4, currentSampleDefinition.getReturnValueSupplier().supply());
@@ -63,6 +64,17 @@ public class SampleTest {
 
         assertEquals(parameter.size(), 1);
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
+    }
+
+    @Test
+    void samplerForVerificationIsChecked() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.forVerification(testServiceSampler);
+
+        // THEN
+        assertThrows(NotASamplerException.class, () -> Sample.forVerification("I'm not a Sampler."));
+        assertThrows(NullPointerException.class, () -> Sample.forVerification(null));
     }
 
     public static class TestService {
