@@ -6,24 +6,19 @@ import org.deepsampler.core.model.SampleDefinition;
 
 public class SampleBuilder<T> {
 
-    private final T returningProxy;
     private final SampleDefinition sampleDefinition;
 
-    public SampleBuilder(final T returningProxy, final SampleDefinition sampleDefinition) {
-        this.returningProxy = returningProxy;
-        this.sampleDefinition = sampleDefinition;
-    }
 
-    public SampleBuilder id(final String id) {
-        sampleDefinition.setSampleId(id);
-        return this;
+    @SuppressWarnings("unused")
+    public SampleBuilder(final T returningProxy, final SampleDefinition sampleDefinition) {
+        this.sampleDefinition = sampleDefinition;
     }
 
     public void is(final T sampleReturnValue) {
         sampleDefinition.setReturnValueSupplier(() -> sampleReturnValue);
     }
 
-    public void doing(final ReturnValueSupplier propertySupplier) {
+    public void is(final ReturnValueSupplier propertySupplier) {
         sampleDefinition.setReturnValueSupplier(propertySupplier);
     }
 

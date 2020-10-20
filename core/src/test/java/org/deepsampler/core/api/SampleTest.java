@@ -1,6 +1,7 @@
 package org.deepsampler.core.api;
 
 import org.deepsampler.core.error.NotASamplerException;
+import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
@@ -67,6 +68,20 @@ class SampleTest {
     }
 
     @Test
+    void testSampleDefinitionWithLambda() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(BEAN_A)).is(() -> BEAN_B);
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+
+        assertEquals(1, parameter.size());
+        assertTrue(parameter.get(0).matches(BEAN_A_COPY));
+    }
+
+    @Test
     void samplerForVerificationIsChecked() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
@@ -76,6 +91,7 @@ class SampleTest {
         assertThrows(NotASamplerException.class, () -> Sample.forVerification("I'm not a Sampler."));
         assertThrows(NullPointerException.class, () -> Sample.forVerification(null));
     }
+
 
     public static class TestService {
 
