@@ -31,5 +31,4 @@ public class SpringSamplerInterceptorTest extends SamplerInterceptorTest {
         return testServiceContainer;
     }
 
-
 }

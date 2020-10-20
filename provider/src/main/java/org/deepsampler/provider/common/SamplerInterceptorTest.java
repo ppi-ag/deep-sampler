@@ -1,9 +1,10 @@
 package org.deepsampler.provider.common;
 
-import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.api.Sample;
+import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.internal.FixedQuantity;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.deepsampler.core.internal.FixedQuantity.*;
@@ -39,16 +40,18 @@ public abstract class SamplerInterceptorTest {
      */
     public abstract TestServiceContainer getTestServiceContainer();
 
+    @BeforeEach
+    public void cleanUp() {
+        Sampler.clear();
+    }
 
     @Test
     public void singleArgumentValueMatchesAndSampleIsChanged() {
-        Sampler.clear();
-
         //WHEN UNCHANGED
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
 
         // GIVEN WHEN
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
         //THEN
@@ -58,15 +61,13 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void multipleSamplerAreHandledDistinct() {
-        Sampler.clear();
-
         //WHEN UNCHANGED
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
 
         // GIVEN WHEN
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         // testBeanSampler is not used, it is here to check if the sequence of preparing has any impact on Sample.of(). That should not happen.
-        TestBean testBeanSampler = Sampler.prepare((TestBean.class));
+        final TestBean testBeanSampler = Sampler.prepare((TestBean.class));
 
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
@@ -76,10 +77,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void singleArgumentValueDoesNotMatchAndSampleIsNotChanged() {
-        Sampler.clear();
-
         // GIVEN WHEN
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
         //THEN
@@ -88,10 +87,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void methodHasNoSampleAndIsNotChanged() {
-        Sampler.clear();
-
         // GIVEN WHEN
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
         //THEN
@@ -100,13 +97,11 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void methodWithNoParameterShouldChangeItsBehavior() {
-        Sampler.clear();
-
         //WHEN UNCHANGED
         assertEquals(-1, getTestService().getMinusOne());
 
         // GIVEN WHEN
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.getMinusOne()).is(INT_VALUE);
 
         //THEN
@@ -115,13 +110,11 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void singleBeanArgumentValueMatchesAndSampleIsChanged() {
-        Sampler.clear();
-
         // WHEN UNCHANGED
         assertEquals(TEST_BEAN_A, getTestService().echoParameter(TEST_BEAN_A));
 
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
 
         //THEN
@@ -130,14 +123,13 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void deepObjectSampleIsChanged() {
-        Sampler.clear();
-        TestServiceContainer testServiceContainer = getTestServiceContainer();
+        final TestServiceContainer testServiceContainer = getTestServiceContainer();
 
         // WHEN UNCHANGED
         assertEquals(VALUE_C + TestServiceContainer.SUFFIX_FROM_SERVICE_CONTAINER, testServiceContainer.augmentValueFromTestService());
 
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(VALUE_C)).is(VALUE_B);
 
         //THEN
@@ -146,10 +138,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void verifyMethodNotCalled() {
-        Sampler.clear();
-
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
 
         // CALL
@@ -162,10 +152,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void verifyMethodCalledOnce() {
-        Sampler.clear();
-
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
 
         // CALL
@@ -179,10 +167,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void verifyMethodCalledMultipleAndMixed() {
-        Sampler.clear();
-
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(TEST_BEAN_B)).is(TEST_BEAN_B);
         Sample.of(testServiceSampler.getMinusOne()).is(1);
 
@@ -199,10 +185,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void verifyMethodWrongNumber() {
-        Sampler.clear();
-
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
 
         // CALL
@@ -216,10 +200,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void verifyMethodCalledWithoutSample() {
-        Sampler.clear();
-
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(TEST_BEAN_B));
         Sample.of(testServiceSampler.getMinusOne());
 
@@ -236,10 +218,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void verifyVoidMethod() {
-        Sampler.clear();
-
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.forVerification(testServiceSampler).noReturnValue(1);
 
         //CALL
@@ -252,10 +232,8 @@ public abstract class SamplerInterceptorTest {
 
     @Test
     public void verifyVoidMethodWithWrongParameter() {
-        Sampler.clear();
-
         // CHANGE
-        TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.forVerification(testServiceSampler).noReturnValue(1);
 
         //CALL
