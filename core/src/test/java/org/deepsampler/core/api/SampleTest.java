@@ -48,7 +48,7 @@ class SampleTest {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
 
-        assertEquals(parameter.size(), 1);
+        assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
     }
 
@@ -62,7 +62,7 @@ class SampleTest {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
 
-        assertEquals(parameter.size(), 1);
+        assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
     }
 
