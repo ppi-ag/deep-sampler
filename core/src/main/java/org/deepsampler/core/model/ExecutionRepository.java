@@ -26,7 +26,7 @@ public class ExecutionRepository {
         return Collections.unmodifiableMap(executionInformation.get());
     }
 
-    public ExecutionInformation getOrCreate(Class<?> cls) {
+    public ExecutionInformation getOrCreate(final Class<?> cls) {
         return executionInformation.get().computeIfAbsent(cls, k -> new ExecutionInformation());
     }
 

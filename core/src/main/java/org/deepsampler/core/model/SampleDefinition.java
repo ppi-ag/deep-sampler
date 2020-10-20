@@ -21,12 +21,12 @@ public class SampleDefinition {
     private ReturnValueSupplier returnValueSupplier;
     private String sampleId;
 
-    public SampleDefinition(SampledMethod sampledMethod) {
+    public SampleDefinition(final SampledMethod sampledMethod) {
         this.sampledMethod = sampledMethod;
         this.sampleId = buildSampleId(sampledMethod);
     }
 
-    private String buildSampleId(SampledMethod sampledMethod) {
+    private String buildSampleId(final SampledMethod sampledMethod) {
         return sampledMethod.getMethod().toGenericString();
     }
 
@@ -38,7 +38,7 @@ public class SampleDefinition {
         return parameter;
     }
 
-    public void setSampleId(String sampleId) {
+    public void setSampleId(final String sampleId) {
         this.sampleId = sampleId;
     }
 
@@ -46,7 +46,7 @@ public class SampleDefinition {
         return sampleId;
     }
 
-    public void setParameter(List<ParameterMatcher> parameter) {
+    public void setParameter(final List<ParameterMatcher> parameter) {
         this.parameter = parameter;
     }
 
@@ -54,7 +54,7 @@ public class SampleDefinition {
         return returnValueSupplier;
     }
 
-    public void setReturnValueSupplier(ReturnValueSupplier returnValueSupplier) {
+    public void setReturnValueSupplier(final ReturnValueSupplier returnValueSupplier) {
         this.returnValueSupplier = returnValueSupplier;
     }
 

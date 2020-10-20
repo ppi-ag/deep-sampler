@@ -2,11 +2,11 @@ package org.deepsampler.core.error;
 
 public class BaseException extends RuntimeException {
 
-    public BaseException(String message, Object... args) {
+    public BaseException(final String message, final Object... args) {
         super(String.format(message, args));
     }
 
-    public BaseException(String message, Throwable cause, Object... args) {
+    public BaseException(final String message, final Throwable cause, final Object... args) {
         super(String.format(message, args), cause);
     }
 }

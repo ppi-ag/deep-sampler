@@ -2,7 +2,7 @@ package org.deepsampler.core.error;
 
 public class InvalidConfigException extends BaseException {
 
-    public InvalidConfigException(String message, Object... args) {
+    public InvalidConfigException(final String message, final Object... args) {
         super(message, args);
     }
 

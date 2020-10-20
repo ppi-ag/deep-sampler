@@ -1,6 +1,5 @@
 package org.deepsampler.core.api;
 
-import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.internal.ProxyFactory;
 import org.deepsampler.core.internal.aophandler.RecordSampleHandler;
 import org.deepsampler.core.model.SampleRepository;
@@ -12,9 +11,8 @@ public class Sampler {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T prepare(Class<T> cls) {
+    public static <T> T prepare(final Class<T> cls) {
         return ProxyFactory.createProxy(cls, new RecordSampleHandler(cls));
     }
-
 
 }
