@@ -14,7 +14,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 public abstract class JsonOperator {
 
     protected ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        final ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
@@ -27,7 +27,7 @@ public abstract class JsonOperator {
     private static class CustomTypeResolverBuilder extends ObjectMapper.DefaultTypeResolverBuilder {
         private static final String TYPE = "@type";
 
-        public CustomTypeResolverBuilder(ObjectMapper.DefaultTyping t, PolymorphicTypeValidator ptv) {
+        public CustomTypeResolverBuilder(final ObjectMapper.DefaultTyping t, final PolymorphicTypeValidator ptv) {
             super(t, ptv);
 
             init(JsonTypeInfo.Id.CLASS, null);
@@ -36,7 +36,7 @@ public abstract class JsonOperator {
         }
 
         @Override
-        public boolean useForType(JavaType t) {
+        public boolean useForType(final JavaType t) {
             return !t.isContainerType() && super.useForType(t);
         }
     }

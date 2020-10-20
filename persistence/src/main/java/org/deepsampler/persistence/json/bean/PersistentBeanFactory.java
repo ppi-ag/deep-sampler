@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 public class PersistentBeanFactory {
 
     @SuppressWarnings("unchecked")
-    public static <T> T[] ofBean(PersistentBean[] persistentBean, Class<T> cls) {
-        T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
+    public static <T> T[] ofBean(final PersistentBean[] persistentBean, final Class<T> cls) {
+        final T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
         for (int i = 0; i < persistentBean.length; ++i) {
             instances[i] = ofBean(persistentBean[i], cls);
         }
@@ -25,28 +25,28 @@ public class PersistentBeanFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T ofBeanIfNecessary(Object beanObj, Class<T> cls) {
+    public static <T> T ofBeanIfNecessary(final Object beanObj, final Class<T> cls) {
         if (beanObj instanceof PersistentBean) {
             return ofBean((PersistentBean) beanObj, cls);
         }
         return (T) beanObj;
     }
 
-    public static <T> T ofBean(PersistentBean persistentBean, Class<T> cls) {
-        T instance = instantiate(cls);
+    public static <T> T ofBean(final PersistentBean persistentBean, final Class<T> cls) {
+        final T instance = instantiate(cls);
 
-        Map<Field, String> fields = getAllFields(cls);
+        final Map<Field, String> fields = getAllFields(cls);
 
-        for (Map.Entry<Field, String> entry : fields.entrySet()) {
-            Field field = entry.getKey();
-            String key = entry.getValue();
+        for (final Map.Entry<Field, String> entry : fields.entrySet()) {
+            final Field field = entry.getKey();
+            final String key = entry.getValue();
 
             transferFromBean(persistentBean, instance, field, key);
         }
         return instance;
     }
 
-    private static <T> void transferFromBean(PersistentBean persistentBean, T instance, Field field, String key) {
+    private static <T> void transferFromBean(final PersistentBean persistentBean, final T instance, final Field field, final String key) {
         Object lookedUpValueInBean = persistentBean.getValue(key);
         if (lookedUpValueInBean != null) {
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
@@ -56,20 +56,20 @@ public class PersistentBeanFactory {
         }
     }
 
-    private static <T> T instantiate(Class<T> cls) {
-        Objenesis objenesis = new ObjenesisStd();
-        ObjectInstantiator<T> instantiatorOf = objenesis.getInstantiatorOf(cls);
+    private static <T> T instantiate(final Class<T> cls) {
+        final Objenesis objenesis = new ObjenesisStd();
+        final ObjectInstantiator<T> instantiatorOf = objenesis.getInstantiatorOf(cls);
         return instantiatorOf.newInstance();
     }
 
-    public static PersistentBean toBean(Object obj) {
+    public static PersistentBean toBean(final Object obj) {
 
-        Map<Field, String> fieldStringMap = getAllFields(obj.getClass());
+        final Map<Field, String> fieldStringMap = getAllFields(obj.getClass());
 
-        Map<String, Object> valuesForBean = new HashMap<>();
-        for (Map.Entry<Field, String> entry : fieldStringMap.entrySet()) {
-            String keyForField = entry.getValue();
-            Field field = entry.getKey();
+        final Map<String, Object> valuesForBean = new HashMap<>();
+        for (final Map.Entry<Field, String> entry : fieldStringMap.entrySet()) {
+            final String keyForField = entry.getValue();
+            final Field field = entry.getKey();
             Object fieldValue = retrieveValue(obj, field);
 
             if (fieldValue != null) {
@@ -85,27 +85,27 @@ public class PersistentBeanFactory {
         return new DefaultPersistentBean(valuesForBean);
     }
 
-    private static void setValue(Object obj, Field field, Object value) {
+    private static void setValue(final Object obj, final Field field, final Object value) {
         try {
             field.setAccessible(true);
             field.set(obj, value);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private static Object retrieveValue(Object obj, Field field) {
-        Object fieldValue;
+    private static Object retrieveValue(final Object obj, final Field field) {
+        final Object fieldValue;
         try {
             field.setAccessible(true);
             fieldValue = field.get(obj);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }
         return fieldValue;
     }
 
-    private static boolean isObjectArray(Class<?> cls) {
+    private static boolean isObjectArray(final Class<?> cls) {
         return cls.isArray() && !(cls == int[].class
                 || cls == Integer[].class
                 || cls == boolean[].class
@@ -120,7 +120,7 @@ public class PersistentBeanFactory {
                 || cls == String[].class);
     }
 
-    private static boolean isPrimitive(Class<?> cls) {
+    private static boolean isPrimitive(final Class<?> cls) {
         return cls.isPrimitive()
                 || cls == Integer.class
                 || cls == Boolean.class
@@ -130,12 +130,12 @@ public class PersistentBeanFactory {
                 || cls == String.class;
     }
 
-    private static Map<Field, String> getAllFields(Class<?> cls) {
-        Map<Field, String> fields = new HashMap<>();
+    private static Map<Field, String> getAllFields(final Class<?> cls) {
+        final Map<Field, String> fields = new HashMap<>();
         Class<?> currentCls = cls;
         int depth = 0;
         while (currentCls != null) {
-            for (Field field : currentCls.getDeclaredFields()) {
+            for (final Field field : currentCls.getDeclaredFields()) {
                 if (!field.isSynthetic() && !Modifier.isStatic(field.getModifiers())) {
                     fields.put(field, String.format("%s$%s", depth, field.getName()));
                 }
@@ -146,22 +146,22 @@ public class PersistentBeanFactory {
         return fields;
     }
 
-    public static Object toBeanIfNecessary(Object obj) {
+    public static Object toBeanIfNecessary(final Object obj) {
         return transformationNotNecessary(obj) ? obj : toBean(obj);
     }
 
-    private static boolean transformationNotNecessary(Object obj) {
+    private static boolean transformationNotNecessary(final Object obj) {
         return isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray());
     }
 
-    public static List<Object> toBeanIfNecessary(List<Object> objectList) {
+    public static List<Object> toBeanIfNecessary(final List<Object> objectList) {
         return objectList.stream()
                 .map(PersistentBeanFactory::toBeanIfNecessary)
                 .collect(Collectors.toList());
     }
 
-    public static PersistentBean[] toBean(Object[] objects) {
-        PersistentBean[] persistentBeans = new DefaultPersistentBean[objects.length];
+    public static PersistentBean[] toBean(final Object[] objects) {
+        final PersistentBean[] persistentBeans = new DefaultPersistentBean[objects.length];
         for (int i = 0; i < objects.length; ++i) {
             persistentBeans[i] = toBean(objects[i]);
         }

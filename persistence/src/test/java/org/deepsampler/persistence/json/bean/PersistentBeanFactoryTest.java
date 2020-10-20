@@ -13,15 +13,15 @@ class PersistentBeanFactoryTest {
     @Test
     void ofBeanSimple() {
         // GIVEN
-        String keyOne = "0$abc";
-        String keyTwo = "0$def";
-        Map<String, Object> values = new HashMap<>();
+        final String keyOne = "0$abc";
+        final String keyTwo = "0$def";
+        final Map<String, Object> values = new HashMap<>();
         values.put(keyOne, "ME AND ALL");
         values.put(keyTwo, "ME AND MORE");
-        DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        SimpleTestBean testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBean.class);
+        final SimpleTestBean testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBean.class);
 
         // THEN
         assertEquals("ME AND ALL", testBean.abc);
@@ -31,19 +31,19 @@ class PersistentBeanFactoryTest {
     @Test
     void ofBeanWithSuperclass() {
         // GIVEN
-        String keySuperclassOne = "1$abc";
-        String keySuperclassTwo = "1$def";
-        String keyOne = "0$abc";
-        String keyTwo = "0$yxc";
-        Map<String, Object> values = new HashMap<>();
+        final String keySuperclassOne = "1$abc";
+        final String keySuperclassTwo = "1$def";
+        final String keyOne = "0$abc";
+        final String keyTwo = "0$yxc";
+        final Map<String, Object> values = new HashMap<>();
         values.put(keySuperclassOne, "ME AND ALL in SUPERCLASS");
         values.put(keySuperclassTwo, "ME AND MORE in SUPERCLASS");
         values.put(keyOne, "ME AND ALL");
         values.put(keyTwo, "ME AND MORE");
-        DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        TestBeanWithSuperclass testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, TestBeanWithSuperclass.class);
+        final TestBeanWithSuperclass testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, TestBeanWithSuperclass.class);
 
         // THEN
         assertEquals("ME AND ALL in SUPERCLASS", testBean.getAbcSuperClass());
@@ -55,19 +55,19 @@ class PersistentBeanFactoryTest {
     @Test
     void testOfBeanArray() {
         // GIVEN
-        String keyOne = "0$abc";
-        String keyTwo = "0$def";
-        Map<String, Object> values = new HashMap<>();
+        final String keyOne = "0$abc";
+        final String keyTwo = "0$def";
+        final Map<String, Object> values = new HashMap<>();
         values.put(keyOne, "ME AND ALL");
         values.put(keyTwo, "ME AND MORE");
-        Map<String, Object> values2 = new HashMap<>();
+        final Map<String, Object> values2 = new HashMap<>();
         values2.put(keyOne, "ME AND ALL2");
         values2.put(keyTwo, "ME AND MORE2");
-        DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
-        DefaultPersistentBean defaultPersistentBean2 = new DefaultPersistentBean(values2);
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+        final DefaultPersistentBean defaultPersistentBean2 = new DefaultPersistentBean(values2);
 
         // WHEN
-        SimpleTestBean[] testBean = PersistentBeanFactory.ofBean(new DefaultPersistentBean[] {defaultPersistentBean, defaultPersistentBean2}, SimpleTestBean.class);
+        final SimpleTestBean[] testBean = PersistentBeanFactory.ofBean(new DefaultPersistentBean[] {defaultPersistentBean, defaultPersistentBean2}, SimpleTestBean.class);
 
         // THEN
         assertEquals("ME AND ALL", testBean[0].abc);
@@ -79,18 +79,18 @@ class PersistentBeanFactoryTest {
     @Test
     void testOfBeanInBean() {
         // GIVEN
-        Map<String, Object> values = new HashMap<>();
+        final Map<String, Object> values = new HashMap<>();
         values.put("0$str", "a string");
-        DefaultPersistentBean defaultPersistentBeanInBean = new DefaultPersistentBean(values);
-        String keyOne = "0$beanInBean";
-        String keyTwo = "0$str";
-        Map<String, Object> values2 = new HashMap<>();
+        final DefaultPersistentBean defaultPersistentBeanInBean = new DefaultPersistentBean(values);
+        final String keyOne = "0$beanInBean";
+        final String keyTwo = "0$str";
+        final Map<String, Object> values2 = new HashMap<>();
         values2.put(keyOne, defaultPersistentBeanInBean);
         values2.put(keyTwo, "ME AND MORE");
-        DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values2);
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values2);
 
         // WHEN
-        SimpleTestBeanRec testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanRec.class);
+        final SimpleTestBeanRec testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanRec.class);
 
         // THEN
         assertEquals("ME AND MORE", testBean.str);
@@ -101,13 +101,13 @@ class PersistentBeanFactoryTest {
     @Test
     void testOfBeanPrimitive() {
         // GIVEN
-        Map<String, Object> values = new HashMap<>();
+        final Map<String, Object> values = new HashMap<>();
         values.put("0$simpleInt", 2);
         values.put("0$longArray", new long[] {12, 32, 45});
-        DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        SimpleTestBeanWithPrimitive testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
+        final SimpleTestBeanWithPrimitive testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
 
         // THEN
         assertEquals(2, testBean.simpleInt);
@@ -117,12 +117,12 @@ class PersistentBeanFactoryTest {
     @Test
     void toBean() {
         // GIVEN
-        SimpleTestBean testBean = new SimpleTestBean();
+        final SimpleTestBean testBean = new SimpleTestBean();
         testBean.abc = "123";
         testBean.def = "456";
 
         // WHEN
-        PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
 
         // THEN
         assertEquals("123", bean.getValue("0$abc"));
@@ -132,13 +132,13 @@ class PersistentBeanFactoryTest {
     @Test
     void toBeanRecursive() {
         // GIVEN
-        SimpleTestBeanRec testBean = new SimpleTestBeanRec();
+        final SimpleTestBeanRec testBean = new SimpleTestBeanRec();
         testBean.beanInBean = new SimpleTestBeanRec();
         testBean.beanInBean.str = "REC";
         testBean.str = "ABC";
 
         // WHEN
-        PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
 
         // THEN
         assertEquals("ABC", bean.getValue("0$str"));
@@ -148,12 +148,12 @@ class PersistentBeanFactoryTest {
     @Test
     void toBeanPrimitive() {
         // GIVEN
-        SimpleTestBeanWithPrimitive testBean = new SimpleTestBeanWithPrimitive();
+        final SimpleTestBeanWithPrimitive testBean = new SimpleTestBeanWithPrimitive();
         testBean.simpleInt = 2;
         testBean.longArray = new long[] {21};
 
         // WHEN
-        PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
 
         // THEN
         assertEquals(2, bean.getValue("0$simpleInt"));
@@ -163,14 +163,14 @@ class PersistentBeanFactoryTest {
     @Test
     void toBeanWithSuperclass() {
         // GIVEN
-        TestBeanWithSuperclass testBean = new TestBeanWithSuperclass();
+        final TestBeanWithSuperclass testBean = new TestBeanWithSuperclass();
         testBean.abc = "abc";
         testBean.def = "def";
         testBean.yxc = "yxc";
         testBean.setAbcSuperClass("SUPER");
 
         // WHEN
-        PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
 
         // THEN
         assertEquals("abc", bean.getValue("0$abc"));
@@ -202,7 +202,7 @@ class PersistentBeanFactoryTest {
             return super.abc;
         }
 
-        public void setAbcSuperClass(String abc) {
+        public void setAbcSuperClass(final String abc) {
             super.abc = abc;
         }
     }
