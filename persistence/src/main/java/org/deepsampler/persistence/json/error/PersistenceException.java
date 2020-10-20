@@ -4,11 +4,11 @@ import org.deepsampler.core.error.BaseException;
 
 public class PersistenceException extends BaseException {
 
-    public PersistenceException(String message, Object... args) {
+    public PersistenceException(final String message, final Object... args) {
         super(message, args);
     }
 
-    public PersistenceException(String message, Throwable cause, Object... args) {
+    public PersistenceException(final String message, final Throwable cause, final Object... args) {
         super(message, cause, args);
     }
 }

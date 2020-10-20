@@ -11,7 +11,7 @@ public class JsonPersistentParameter implements PersistentParameter {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentParameter(List<Object> args) {
+    public JsonPersistentParameter(final List<Object> args) {
         setParameter(args);
     }
 
@@ -20,7 +20,7 @@ public class JsonPersistentParameter implements PersistentParameter {
         return args;
     }
 
-    public void setParameter(List<Object> args) {
+    public void setParameter(final List<Object> args) {
         this.args = new ArrayList<>(args);
     }
 }

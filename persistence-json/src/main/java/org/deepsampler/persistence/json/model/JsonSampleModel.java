@@ -17,7 +17,7 @@ public class JsonSampleModel implements PersistentModel {
         //DEFAULT CONS FOR JSON SER/DER
     }
 
-    public JsonSampleModel(String id, Map<JsonPersistentSampleMethod, JsonPersistentActualSample> joinPointBehaviorMap) {
+    public JsonSampleModel(final String id, final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> joinPointBehaviorMap) {
         this.id = id;
         this.joinPointBehaviorMap = new HashMap<>(joinPointBehaviorMap);
     }

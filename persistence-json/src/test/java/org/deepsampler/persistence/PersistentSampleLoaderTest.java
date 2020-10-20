@@ -18,8 +18,8 @@ public class PersistentSampleLoaderTest {
     @Test
     public void testSimpleApiRecord() throws Exception {
         // GIVEN
-        SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
-        Path path = Paths.get("./record/testApiSay.json");
+        final SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
+        final Path path = Paths.get("./record/testApiSay.json");
 
         SampleRepository.getInstance().add(saySample);
         ExecutionRepository.getInstance().getOrCreate(InnerBean.class).getOrCreateBySample(saySample).addMethodCall(new MethodCall("HELLO AGAIN"));
@@ -49,7 +49,7 @@ public class PersistentSampleLoaderTest {
     @Test
     public void testSimpleLoad() throws Exception {
         // GIVEN
-        SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
+        final SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
         SampleRepository.getInstance().add(saySample);
 
         // WHEN

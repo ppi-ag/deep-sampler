@@ -15,7 +15,7 @@ public class JsonPersistentActualSample implements PersistentActualSample {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public void addCall(JsonPersistentParameter jsonPersistentParameter, JsonPersistentReturnValue jsonPersistentReturnValue) {
+    public void addCall(final JsonPersistentParameter jsonPersistentParameter, final JsonPersistentReturnValue jsonPersistentReturnValue) {
         callMap.add(new JsonPersistentMethodCall(jsonPersistentParameter, jsonPersistentReturnValue));
     }
 

@@ -9,7 +9,7 @@ public class JsonPersistentSampleMethod implements PersistentSampleMethod {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentSampleMethod(String sampleMethodId) {
+    public JsonPersistentSampleMethod(final String sampleMethodId) {
         this.sampleMethodId = sampleMethodId;
     }
 
@@ -24,10 +24,10 @@ public class JsonPersistentSampleMethod implements PersistentSampleMethod {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        JsonPersistentSampleMethod that = (JsonPersistentSampleMethod) o;
+        final JsonPersistentSampleMethod that = (JsonPersistentSampleMethod) o;
         return Objects.equals(sampleMethodId, that.sampleMethodId);
     }
 

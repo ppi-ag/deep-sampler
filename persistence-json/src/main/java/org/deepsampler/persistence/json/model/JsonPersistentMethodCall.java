@@ -8,7 +8,7 @@ public class JsonPersistentMethodCall implements PersistentMethodCall {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentMethodCall(JsonPersistentParameter jsonPersistentParameter, JsonPersistentReturnValue jsonPersistentReturnValue) {
+    public JsonPersistentMethodCall(final JsonPersistentParameter jsonPersistentParameter, final JsonPersistentReturnValue jsonPersistentReturnValue) {
         this.parameter = jsonPersistentParameter;
         this.returnValue = jsonPersistentReturnValue;
     }
@@ -23,11 +23,11 @@ public class JsonPersistentMethodCall implements PersistentMethodCall {
         return returnValue;
     }
 
-    public void setReturnValue(JsonPersistentReturnValue returnValue) {
+    public void setReturnValue(final JsonPersistentReturnValue returnValue) {
         this.returnValue = returnValue;
     }
 
-    public void setParameter(JsonPersistentParameter parameter) {
+    public void setParameter(final JsonPersistentParameter parameter) {
         this.parameter = parameter;
     }
 }
