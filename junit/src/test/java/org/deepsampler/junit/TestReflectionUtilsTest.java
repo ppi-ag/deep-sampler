@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestReflectionUtilsTest {
+class TestReflectionUtilsTest {
 
     @Test
-    public void declaredAndInheritedFieldsAreFound() {
+    void declaredAndInheritedFieldsAreFound() {
         // DO
         Stream<Field> declaredAndInheritedFieldStream = TestReflectionUtils.getDeclaredAndInheritedFields(SubTestBean.class);
 
@@ -30,13 +30,13 @@ public class TestReflectionUtilsTest {
     }
 
     @Test
-    public void preparationAnnotationIsDetected() throws NoSuchFieldException {
+    void preparationAnnotationIsDetected() throws NoSuchFieldException {
         Field field = TestBean.class.getDeclaredField("testBeanSampler");
         assertTrue(TestReflectionUtils.shouldBeSampled(field));
     }
 
     @Test
-    public void aSamplerCanBeCreatedAndAssignedToAField() throws NoSuchFieldException {
+    void aSamplerCanBeCreatedAndAssignedToAField() throws NoSuchFieldException {
         // WITH
         Field field = TestBean.class.getDeclaredField("testBeanSampler");
         TestBean bean = new TestBean();
@@ -54,16 +54,18 @@ public class TestReflectionUtilsTest {
         return left.getName().compareTo(right.getName());
     }
 
+    @SuppressWarnings("unused")
     private static class TestBean {
 
         @PrepareSampler
         private TestBean testBeanSampler;
 
-        private String aRandomStringField = "SomeRandomString";
+        private final String aRandomStringField = "SomeRandomString";
     }
 
+    @SuppressWarnings("unused")
     private static class SubTestBean extends TestReflectionUtilsTest.TestBean {
-        private int aRandomIntField = 42;
+        private final int aRandomIntField = 42;
     }
 
 }
