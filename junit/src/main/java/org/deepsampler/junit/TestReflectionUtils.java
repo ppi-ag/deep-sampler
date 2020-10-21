@@ -11,6 +11,10 @@ import java.util.stream.Stream;
  */
 public class TestReflectionUtils {
 
+    private TestReflectionUtils() {
+        // Private constructor since this utility class is not intended to be instantiated.
+    }
+
     /**
      * Finds all properties of clazz including inherited properties.
      *
@@ -43,6 +47,7 @@ public class TestReflectionUtils {
      * @param testInstance the object in which the sampler should be injected.
      * @param field the field that should be populated with a new Sampler.
      */
+    @SuppressWarnings("java:S3011") // Ignore warnings regarding field access via reflection
     public static void assignNewSamplerToField(final Object testInstance, final Field field) {
         final Object sampler = Sampler.prepare(field.getType());
         try {
