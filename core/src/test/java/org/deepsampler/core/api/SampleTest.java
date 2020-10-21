@@ -98,6 +98,34 @@ class SampleTest {
     }
 
     @Test
+    void testSampleDefinitionWithPrimitiveReturnValues() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+
+        Sample.of(testServiceSampler.getInt()).is(1);
+        assertEquals(1, getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getFloat()).is(1.0f);
+        assertEquals(1.0f, getCurrentReturnValueSupplier().supply());
+        Sample.of(testServiceSampler.getDouble()).is(1.0);
+        assertEquals(1.0, getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getChar()).is('c');
+        assertEquals('c', getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getByte()).is((byte) 1);
+        assertEquals((byte) 1, getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getShort()).is((short)1);
+        assertEquals((short) 1, getCurrentReturnValueSupplier().supply());
+    }
+
+    private ReturnValueSupplier getCurrentReturnValueSupplier() {
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        return currentSampleDefinition.getReturnValueSupplier();
+    }
+
+    @Test
     void testSampleDefinitionWithLambda() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
@@ -135,6 +163,30 @@ class SampleTest {
 
         public String[] getArray() {
             return new String[] {"Some String"};
+        }
+
+        public int getInt() {
+            return 1;
+        }
+
+        public float getFloat() {
+            return 1.0f;
+        }
+
+        public double getDouble() {
+            return 1.0;
+        }
+
+        public char getChar() {
+            return 'c';
+        }
+
+        public byte getByte() {
+            return 1;
+        }
+
+        public short getShort() {
+            return (short) 1;
         }
 
         public String noParameter() {
