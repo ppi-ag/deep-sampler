@@ -1,5 +1,7 @@
 package org.deepsampler.core.api;
 
+import org.deepsampler.core.error.NotASamplerException;
+import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
@@ -9,10 +11,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class SampleTest {
+class SampleTest {
 
     public static final String PARAMETER_VALUE = "Blubb";
     private static final Bean BEAN_A = new Bean("a", 1);
@@ -25,20 +26,21 @@ public class SampleTest {
     }
 
     @Test
-    public void testSampleDefinitionWithoutParam() {
+    void testSampleDefinitionWithoutParam() {
         // GIVEN WHEN
         final Quantity quantitySampler = Sampler.prepare(Quantity.class);
         Sample.of(quantitySampler.getTimes()).is(4);
 
         // THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+
         assertEquals(Quantity.class, currentSampleDefinition.getSampledMethod().getTarget());
         assertTrue(currentSampleDefinition.getParameter().isEmpty());
         assertEquals(4, currentSampleDefinition.getReturnValueSupplier().supply());
     }
 
     @Test
-    public void testSampleDefinitionWithPrimitiveParam() {
+    void testSampleDefinitionWithPrimitiveParam() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)).is("New Sample");
@@ -47,12 +49,12 @@ public class SampleTest {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
 
-        assertEquals(parameter.size(), 1);
+        assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
     }
 
     @Test
-    public void testSampleDefinitionWithBeanParam() {
+    void testSampleDefinitionWithBeanParam() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(BEAN_A)).is(BEAN_B);
@@ -61,9 +63,35 @@ public class SampleTest {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
 
-        assertEquals(parameter.size(), 1);
+        assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
     }
+
+    @Test
+    void testSampleDefinitionWithLambda() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(BEAN_A)).is(() -> BEAN_B);
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+
+        assertEquals(1, parameter.size());
+        assertTrue(parameter.get(0).matches(BEAN_A_COPY));
+    }
+
+    @Test
+    void samplerForVerificationIsChecked() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.forVerification(testServiceSampler);
+
+        // THEN
+        assertThrows(NotASamplerException.class, () -> Sample.forVerification("I'm not a Sampler."));
+        assertThrows(NullPointerException.class, () -> Sample.forVerification(null));
+    }
+
 
     public static class TestService {
 

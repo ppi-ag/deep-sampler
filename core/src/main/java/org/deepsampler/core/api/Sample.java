@@ -1,8 +1,11 @@
 package org.deepsampler.core.api;
 
+import org.deepsampler.core.error.NotASamplerException;
 import org.deepsampler.core.internal.ProxyFactory;
 import org.deepsampler.core.internal.aophandler.VerifySampleHandler;
 import org.deepsampler.core.model.SampleRepository;
+
+import java.util.Objects;
 
 /**
  * This is the starting point for the definition of Samples in test classes.
@@ -38,6 +41,12 @@ public class Sample {
     }
 
     public static <T> T forVerification(final T sampler) {
+        Objects.requireNonNull(sampler);
+
+        if (!ProxyFactory.isProxyClass(sampler.getClass())) {
+            throw new NotASamplerException(sampler.getClass());
+        }
+
         return sampler;
     }
 
