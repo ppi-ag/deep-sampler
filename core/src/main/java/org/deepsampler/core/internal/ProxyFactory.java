@@ -7,6 +7,11 @@ import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
 
 public class ProxyFactory {
+
+    private ProxyFactory() {
+        //This class is not intended to be instantiated, therefore the constructor is private.
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T createProxy(final Class<T> cls, final MethodHandler proxyBehavior) {
         final javassist.util.proxy.ProxyFactory proxyFactory = new javassist.util.proxy.ProxyFactory();

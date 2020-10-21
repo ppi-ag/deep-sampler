@@ -25,13 +25,17 @@ import java.util.Objects;
  */
 public class Sample {
 
+    private Sample() {
+        // This class is meant to be used as a frontend for a static fluent API and should never be instantiated.
+    }
+
 
     /**
      * Defines a sampled method by calling the method inside of the parameter. The returned {@link SampleBuilder} will then offer possibilities to define the Sample,
      * or in other words, it offers possibilities to override the default behavior or the return value of a method.
      *
      * @param sampledMethodCall The method call that will be sampled.
-     * @param <T>
+     * @param <T> The type of the return value and therefore the type of the Sample.
      * @return A {@link SampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */

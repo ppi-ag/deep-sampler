@@ -1,8 +1,8 @@
 package org.deepsampler.core.api;
 
 import org.deepsampler.core.error.NotASamplerException;
-import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.model.ParameterMatcher;
+import org.deepsampler.core.model.ReturnValueSupplier;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +19,7 @@ class SampleTest {
     private static final Bean BEAN_A = new Bean("a", 1);
     private static final Bean BEAN_A_COPY = new Bean("a", 1);
     private static final Bean BEAN_B = new Bean("b", 2);
+    public static final String STRING_SAMPLE = "Sampled";
 
     @BeforeEach
     public void cleanUp() {
@@ -28,15 +29,15 @@ class SampleTest {
     @Test
     void testSampleDefinitionWithoutParam() {
         // GIVEN WHEN
-        final Quantity quantitySampler = Sampler.prepare(Quantity.class);
-        Sample.of(quantitySampler.getTimes()).is(4);
+        final TestService serviceSampler = Sampler.prepare(TestService.class);
+        Sample.of(serviceSampler.noParameter()).is(STRING_SAMPLE);
 
         // THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
-        assertEquals(Quantity.class, currentSampleDefinition.getSampledMethod().getTarget());
+        assertEquals(TestService.class, currentSampleDefinition.getSampledMethod().getTarget());
         assertTrue(currentSampleDefinition.getParameter().isEmpty());
-        assertEquals(4, currentSampleDefinition.getReturnValueSupplier().supply());
+        assertEquals(STRING_SAMPLE, currentSampleDefinition.getReturnValueSupplier().supply());
     }
 
     @Test
@@ -53,6 +54,21 @@ class SampleTest {
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
     }
 
+
+    void testSampleDefinitionForInterface() {
+        //GIVEN WHEN
+        final TestServiceInterface testServiceSampler = Sampler.prepare(TestServiceInterface.class);
+        Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)).is(STRING_SAMPLE);
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+
+        assertEquals(1, parameter.size());
+        assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
+    }
+
+
     @Test
     void testSampleDefinitionWithBeanParam() {
         //GIVEN WHEN
@@ -65,6 +81,48 @@ class SampleTest {
 
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
+    }
+
+    @Test
+    void testSampleDefinitionWithArrayReturnValue() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getArray()).is(new String[] {STRING_SAMPLE});
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final ReturnValueSupplier returnValueSupplier = currentSampleDefinition.getReturnValueSupplier();
+
+        assertEquals(1, ((String[]) returnValueSupplier.supply()).length);
+        assertEquals(STRING_SAMPLE, ((String[]) returnValueSupplier.supply())[0]);
+    }
+
+    @Test
+    void testSampleDefinitionWithPrimitiveReturnValues() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+
+        Sample.of(testServiceSampler.getInt()).is(1);
+        assertEquals(1, getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getFloat()).is(1.0f);
+        assertEquals(1.0f, getCurrentReturnValueSupplier().supply());
+        Sample.of(testServiceSampler.getDouble()).is(1.0);
+        assertEquals(1.0, getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getChar()).is('c');
+        assertEquals('c', getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getByte()).is((byte) 1);
+        assertEquals((byte) 1, getCurrentReturnValueSupplier().supply());
+
+        Sample.of(testServiceSampler.getShort()).is((short)1);
+        assertEquals((short) 1, getCurrentReturnValueSupplier().supply());
+    }
+
+    private ReturnValueSupplier getCurrentReturnValueSupplier() {
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        return currentSampleDefinition.getReturnValueSupplier();
     }
 
     @Test
@@ -102,6 +160,38 @@ class SampleTest {
         public Bean echoParameter(final Bean bean) {
             return bean;
         }
+
+        public String[] getArray() {
+            return new String[] {"Some String"};
+        }
+
+        public int getInt() {
+            return 1;
+        }
+
+        public float getFloat() {
+            return 1.0f;
+        }
+
+        public double getDouble() {
+            return 1.0;
+        }
+
+        public char getChar() {
+            return 'c';
+        }
+
+        public byte getByte() {
+            return 1;
+        }
+
+        public short getShort() {
+            return (short) 1;
+        }
+
+        public String noParameter() {
+            return "Hello Sample";
+        }
     }
 
     public static class Bean {
@@ -126,5 +216,9 @@ class SampleTest {
         public int hashCode() {
             return Objects.hash(someString, someInt);
         }
+    }
+
+    public interface TestServiceInterface {
+        String echoParameter(String parameter);
     }
 }
