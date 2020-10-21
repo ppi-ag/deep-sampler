@@ -1,8 +1,8 @@
 package org.deepsampler.core.api;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.deepsampler.core.error.NotASamplerException;
 import org.deepsampler.core.model.ParameterMatcher;
+import org.deepsampler.core.model.ReturnValueSupplier;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +55,6 @@ class SampleTest {
     }
 
     @Test
-    @Ignore
     void testSampleDefinitionForInterface() {
         //GIVEN WHEN
         final TestServiceInterface testServiceSampler = Sampler.prepare(TestServiceInterface.class);
@@ -82,6 +81,20 @@ class SampleTest {
 
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
+    }
+
+    @Test
+    void testSampleDefinitionWithArrayReturnValue() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getArray()).is(new String[] {STRING_SAMPLE});
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final ReturnValueSupplier returnValueSupplier = currentSampleDefinition.getReturnValueSupplier();
+
+        assertEquals(1, ((String[]) returnValueSupplier.supply()).length);
+        assertEquals(STRING_SAMPLE, ((String[]) returnValueSupplier.supply())[0]);
     }
 
     @Test
@@ -118,6 +131,10 @@ class SampleTest {
 
         public Bean echoParameter(final Bean bean) {
             return bean;
+        }
+
+        public String[] getArray() {
+            return new String[] {"Some String"};
         }
 
         public String noParameter() {

@@ -47,7 +47,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
     }
 
     private Object createEmptyArray(final Class<?> cls) {
-        return Array.newInstance(cls, 0);
+        return Array.newInstance(cls.getComponentType(), 0);
     }
 
     @SuppressWarnings("UnnecessaryBoxing")
