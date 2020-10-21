@@ -1,7 +1,7 @@
 package org.deepsampler.core.api;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.deepsampler.core.error.NotASamplerException;
-import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
@@ -19,6 +19,7 @@ class SampleTest {
     private static final Bean BEAN_A = new Bean("a", 1);
     private static final Bean BEAN_A_COPY = new Bean("a", 1);
     private static final Bean BEAN_B = new Bean("b", 2);
+    public static final String STRING_SAMPLE = "Sampled";
 
     @BeforeEach
     public void cleanUp() {
@@ -28,15 +29,15 @@ class SampleTest {
     @Test
     void testSampleDefinitionWithoutParam() {
         // GIVEN WHEN
-        final Quantity quantitySampler = Sampler.prepare(Quantity.class);
-        Sample.of(quantitySampler.getTimes()).is(4);
+        final TestService serviceSampler = Sampler.prepare(TestService.class);
+        Sample.of(serviceSampler.noParameter()).is(STRING_SAMPLE);
 
         // THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
-        assertEquals(Quantity.class, currentSampleDefinition.getSampledMethod().getTarget());
+        assertEquals(TestService.class, currentSampleDefinition.getSampledMethod().getTarget());
         assertTrue(currentSampleDefinition.getParameter().isEmpty());
-        assertEquals(4, currentSampleDefinition.getReturnValueSupplier().supply());
+        assertEquals(STRING_SAMPLE, currentSampleDefinition.getReturnValueSupplier().supply());
     }
 
     @Test
@@ -52,6 +53,22 @@ class SampleTest {
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
     }
+
+    @Test
+    @Ignore
+    void testSampleDefinitionForInterface() {
+        //GIVEN WHEN
+        final TestServiceInterface testServiceSampler = Sampler.prepare(TestServiceInterface.class);
+        Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)).is(STRING_SAMPLE);
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+
+        assertEquals(1, parameter.size());
+        assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
+    }
+
 
     @Test
     void testSampleDefinitionWithBeanParam() {
@@ -102,6 +119,10 @@ class SampleTest {
         public Bean echoParameter(final Bean bean) {
             return bean;
         }
+
+        public String noParameter() {
+            return "Hello Sample";
+        }
     }
 
     public static class Bean {
@@ -126,5 +147,9 @@ class SampleTest {
         public int hashCode() {
             return Objects.hash(someString, someInt);
         }
+    }
+
+    public interface TestServiceInterface {
+        String echoParameter(String parameter);
     }
 }
