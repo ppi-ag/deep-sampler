@@ -4,6 +4,10 @@ import org.deepsampler.core.model.*;
 
 public class ExecutionManager {
 
+    private ExecutionManager() {
+        // This constructor is private since this class is not intended to be instantiated.
+    }
+
     public static void notify(final SampleDefinition sampleDefinition) {
         getSampleInformation(sampleDefinition).increaseTimesInvoked();
     }
