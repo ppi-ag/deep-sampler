@@ -37,7 +37,7 @@ class ProxyFactoryTest {
         };
 
         // WHEN
-        InterfaceTest proxyTest = ProxyFactory.createProxy(InterfaceTest.class, methodHandler);
+        final InterfaceTest proxyTest = ProxyFactory.createProxy(InterfaceTest.class, methodHandler);
         proxyTest.test();
         proxyTest.test();
 

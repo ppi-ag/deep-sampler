@@ -13,7 +13,7 @@ public class ProxyFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T createProxy(Class<T> cls, MethodHandler proxyBehavior) {
+    public static <T> T createProxy(final Class<T> cls, final MethodHandler proxyBehavior) {
         final javassist.util.proxy.ProxyFactory proxyFactory = new javassist.util.proxy.ProxyFactory();
         if (cls.isInterface()) {
             proxyFactory.setInterfaces(new Class[]{cls});
