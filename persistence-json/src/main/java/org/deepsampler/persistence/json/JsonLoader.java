@@ -11,14 +11,14 @@ import java.nio.file.Path;
 public class JsonLoader extends JsonOperator {
     private final Path path;
 
-    public JsonLoader(Path path) {
+    public JsonLoader(final Path path) {
         this.path = path;
     }
 
     public PersistentModel load() {
         try {
             return createObjectMapper().readValue(Files.newBufferedReader(path), JsonSampleModel.class);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new JsonPersistenceException("It was not possible to deserialize/read the file", e);
         }
     }

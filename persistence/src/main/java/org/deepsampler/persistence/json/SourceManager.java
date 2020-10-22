@@ -1,7 +1,7 @@
 package org.deepsampler.persistence.json;
 
-import org.deepsampler.persistence.json.model.PersistentModel;
 import org.deepsampler.core.model.ExecutionInformation;
+import org.deepsampler.persistence.json.model.PersistentModel;
 
 import java.util.Map;
 

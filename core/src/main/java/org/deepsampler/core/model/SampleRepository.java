@@ -1,16 +1,21 @@
 package org.deepsampler.core.model;
 
-import org.deepsampler.core.error.InvalidConfigException;
+import org.deepsampler.core.error.DuplicateSampleDefinitionException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SampleRepository {
 
-    private ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(() -> new ArrayList<>());
-    private ThreadLocal<SampleDefinition> currentSample = new ThreadLocal<>();
+    private final ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(() -> new ArrayList<>());
+    private final ThreadLocal<SampleDefinition> currentSample = new ThreadLocal<>();
 
     private static SampleRepository myInstance;
+
+    /**
+     * Singleton Constructor.
+     */
+    private SampleRepository() {}
 
     public static synchronized SampleRepository getInstance() {
         if (myInstance == null) {
@@ -20,21 +25,29 @@ public class SampleRepository {
         return myInstance;
     }
 
-    public void add(SampleDefinition sampleDefinition) {
-        if (sampleDefinition.getSampledMethod() == null) {
-            throw new InvalidConfigException("%s must define a %s", sampleDefinition.toString(), SampledMethod.class.getSimpleName());
+    /**
+     * Adds the given {@link SampleDefinition} to the {@link SampleRepository#samples}
+     * and sets also the {@link SampleRepository#currentSample}.
+     *
+     * @param sampleDefinition
+     */
+    public void add(final SampleDefinition sampleDefinition) {
+        final SampleDefinition currentSampleDefinition = getCurrentSampleDefinition();
+        if(sampleDefinition.equals(currentSampleDefinition)
+                || samples.get().contains(sampleDefinition)) {
+            throw new DuplicateSampleDefinitionException(sampleDefinition);
         }
         setCurrentSample(sampleDefinition);
         samples.get().add(sampleDefinition);
     }
 
 
-    public SampleDefinition find(SampledMethod wantedSampledMethod, Object... args) {
-        for (SampleDefinition sampleDefinition : samples.get()) {
-            SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
-            boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
-            boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
-            boolean argumentsMatches = argumentsMatch(sampleDefinition, args);
+    public SampleDefinition find(final SampledMethod wantedSampledMethod, final Object... args) {
+        for (final SampleDefinition sampleDefinition : samples.get()) {
+            final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
+            final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
+            final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
+            final boolean argumentsMatches = argumentsMatch(sampleDefinition, args);
 
             if (classMatches && methodMatches && argumentsMatches) {
                 return sampleDefinition;
@@ -44,8 +57,8 @@ public class SampleRepository {
         return null;
     }
 
-    private boolean argumentsMatch(SampleDefinition sampleDefinition, Object[] arguments) {
-        List<ParameterMatcher> parameterMatchers = sampleDefinition.getParameter();
+    private boolean argumentsMatch(final SampleDefinition sampleDefinition, final Object[] arguments) {
+        final List<ParameterMatcher> parameterMatchers = sampleDefinition.getParameter();
 
         if (parameterMatchers.size() != arguments.length) {
             return false;
@@ -60,7 +73,7 @@ public class SampleRepository {
         return true;
     }
 
-    private void setCurrentSample(SampleDefinition sampleDefinition) {
+    private void setCurrentSample(final SampleDefinition sampleDefinition) {
         currentSample.set(sampleDefinition);
     }
 
@@ -72,7 +85,15 @@ public class SampleRepository {
         return samples.get();
     }
 
+    /**
+     * Clears the actual set {@link SampleRepository#currentSample} and the {@link SampleRepository#samples}
+     */
     public void clear() {
         samples.get().clear();
+        currentSample.remove();
+    }
+
+    public boolean isEmpty() {
+        return samples.get() == null || samples.get().isEmpty();
     }
 }

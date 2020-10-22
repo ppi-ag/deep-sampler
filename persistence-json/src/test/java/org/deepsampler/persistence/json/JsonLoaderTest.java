@@ -17,10 +17,10 @@ public class JsonLoaderTest {
     @Test
     public void testLoad() {
         // GIVEN
-        Path path = Paths.get("./record/testPersistent.json");
+        final Path path = Paths.get("./record/testPersistent.json");
 
         // WHEN
-        PersistentModel persistentModel = new JsonLoader(path).load();
+        final PersistentModel persistentModel = new JsonLoader(path).load();
 
         // THEN
         assertEquals(1, persistentModel.getSampleMethodToSampleMap().size());
@@ -30,10 +30,10 @@ public class JsonLoaderTest {
     @Test
     public void testLoadTime() {
         // GIVEN
-        Path path = Paths.get("./record/testTimePersistent.json");
+        final Path path = Paths.get("./record/testTimePersistent.json");
 
         // WHEN
-        PersistentModel persistentModel = new JsonLoader(path).load();
+        final PersistentModel persistentModel = new JsonLoader(path).load();
 
         // THEN
         assertEquals(1, persistentModel.getSampleMethodToSampleMap().size());

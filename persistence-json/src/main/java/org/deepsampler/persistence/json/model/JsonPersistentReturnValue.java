@@ -7,7 +7,7 @@ public class JsonPersistentReturnValue implements PersistentReturnValue {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentReturnValue(Object returnValue) {
+    public JsonPersistentReturnValue(final Object returnValue) {
         this.returnValue = returnValue;
     }
 
@@ -16,7 +16,7 @@ public class JsonPersistentReturnValue implements PersistentReturnValue {
         return returnValue;
     }
 
-    public void setReturnValue(Object returnValue) {
+    public void setReturnValue(final Object returnValue) {
         this.returnValue = returnValue;
     }
 }

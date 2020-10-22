@@ -8,7 +8,7 @@ public class MethodCall {
     private final List<Object> args;
     private final Object returnValue;
 
-    public MethodCall(Object returnValue, Object... args) {
+    public MethodCall(final Object returnValue, final Object... args) {
         this.args = Arrays.asList(args);
         this.returnValue = returnValue;
     }

@@ -17,8 +17,8 @@ public class JsonRecorderTest {
     @Test
     public void testRecord() throws Exception {
         // GIVEN
-        Path path = Paths.get("./record/testTemp.json");
-        SampleDefinition sample = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
+        final Path path = Paths.get("./record/testTemp.json");
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
         sample.setSampleId("TestMethodForRecord");
         ExecutionManager.record(sample, new MethodCall("ABC", "Args1"));
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
@@ -34,8 +34,8 @@ public class JsonRecorderTest {
     @Test
     public void testRecordLocalDateTime() throws Exception {
         // GIVEN
-        Path path = Paths.get("./record/testTimeTemp.json");
-        SampleDefinition sample = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
+        final Path path = Paths.get("./record/testTimeTemp.json");
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(getClass(), getClass().getMethod("testRecord")));
         sample.setSampleId("TestMethodForRecord");
         ExecutionManager.record(sample, new MethodCall("ABC", LocalDateTime.now()));
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), "Args1"));
@@ -62,7 +62,7 @@ public class JsonRecorderTest {
             // DEFAULT FOR JACKSON
         }
 
-        public Bean(String valueOne, String valueTwo) {
+        public Bean(final String valueOne, final String valueTwo) {
             this.valueOne = valueOne;
             this.valueTwo = valueTwo;
         }

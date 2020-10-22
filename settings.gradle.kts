@@ -1,4 +1,4 @@
-rootProject.name = "deepmock"
+rootProject.name = "deepsampler"
 
 include ("provider",
 	"provider-spring",
@@ -7,5 +7,6 @@ include ("provider",
 	"persistence",
 	"persistence-json",
 	"persistence-api",
+	"junit",
 	"junit4",
 	"junit5")

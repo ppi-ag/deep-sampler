@@ -1,4 +1,4 @@
-package org.deepsampler.provider.standalone;
+package org.deepsampler.provider.guice;
 
 import com.google.inject.Guice;
 import org.deepsampler.provider.common.SamplerInterceptorTest;

@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SpringyfiedTestServiceContainer extends TestServiceContainer {
 
 
-    private TestService testService;
+    private final TestService testService;
 
     @Autowired
-    public SpringyfiedTestServiceContainer(TestService testService) {
+    public SpringyfiedTestServiceContainer(final TestService testService) {
         this.testService = testService;
     }
 
@@ -22,6 +22,5 @@ public class SpringyfiedTestServiceContainer extends TestServiceContainer {
     public TestService getTestService() {
         return testService;
     }
-
 
 }

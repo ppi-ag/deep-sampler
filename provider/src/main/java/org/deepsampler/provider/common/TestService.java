@@ -12,7 +12,7 @@ public class TestService {
      * @param param The parameter that will be returned unchanged
      * @return the unchanged parameter value
      */
-    public String echoParameter(String param) {
+    public String echoParameter(final String param) {
         return param;
     }
 
@@ -32,7 +32,16 @@ public class TestService {
      * @param someObject The parameter that will be returned unchanged
      * @return the unchanged parameter value
      */
-    public TestBean echoParameter(TestBean someObject) {
+    public TestBean echoParameter(final TestBean someObject) {
         return someObject;
     }
+
+    /**
+     * This method is needed to test whether calls of void methods can be verified or not.
+     *
+     * @param someInt
+     */
+    public void noReturnValue(final int someInt) {
+        // There is nothing to do here, we are only interested in the method call itself.
+    };
 }

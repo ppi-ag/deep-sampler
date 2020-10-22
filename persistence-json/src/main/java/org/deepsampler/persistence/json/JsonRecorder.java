@@ -20,58 +20,58 @@ import java.util.UUID;
 public class JsonRecorder extends JsonOperator {
     private final Path path;
 
-    public JsonRecorder(Path path) {
+    public JsonRecorder(final Path path) {
         this.path = path;
     }
 
-    public void record(Map<Class<?>, ExecutionInformation> executionInformationMap) {
+    public void record(final Map<Class<?>, ExecutionInformation> executionInformationMap) {
         try {
             // CREATE PARENT DIR IF NECESSARY
-            Path parentPath = path.getParent();
+            final Path parentPath = path.getParent();
             if (!Files.exists(parentPath)) {
                 Files.createDirectories(parentPath);
             }
 
             createObjectMapper().writeValue(Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
                     toPersistentModel(executionInformationMap));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new JsonPersistenceException("It was not possible to serialize/write to json.", e);
         }
     }
 
-    private JsonSampleModel toPersistentModel(Map<Class<?>, ExecutionInformation> executionInformationMap) {
-        Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodToSample = toSampleMethodSampleMap(executionInformationMap);
+    private JsonSampleModel toPersistentModel(final Map<Class<?>, ExecutionInformation> executionInformationMap) {
+        final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodToSample = toSampleMethodSampleMap(executionInformationMap);
 
         return new JsonSampleModel(UUID.randomUUID().toString(), sampleMethodToSample);
     }
 
-    private Map<JsonPersistentSampleMethod, JsonPersistentActualSample> toSampleMethodSampleMap(Map<Class<?>, ExecutionInformation> executionInformationMap) {
-        Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodJsonPersistentActualSampleMap = new HashMap<>();
+    private Map<JsonPersistentSampleMethod, JsonPersistentActualSample> toSampleMethodSampleMap(final Map<Class<?>, ExecutionInformation> executionInformationMap) {
+        final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodJsonPersistentActualSampleMap = new HashMap<>();
 
-        for (Map.Entry<Class<?>, ExecutionInformation> informationEntry : executionInformationMap.entrySet()) {
-            ExecutionInformation information = informationEntry.getValue();
-            Map<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationMap = information.getAll();
+        for (final Map.Entry<Class<?>, ExecutionInformation> informationEntry : executionInformationMap.entrySet()) {
+            final ExecutionInformation information = informationEntry.getValue();
+            final Map<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationMap = information.getAll();
 
-            for (Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry : sampleExecutionInformationMap.entrySet()) {
+            for (final Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry : sampleExecutionInformationMap.entrySet()) {
                 addToPersistentMap(sampleMethodJsonPersistentActualSampleMap, sampleExecutionInformationEntry);
             }
         }
         return sampleMethodJsonPersistentActualSampleMap;
     }
 
-    private void addToPersistentMap(Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodJsonPersistentActualSampleMap,
-                                    Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry) {
-        SampleDefinition sample = sampleExecutionInformationEntry.getKey();
-        SampleExecutionInformation sampleExecutionInformation = sampleExecutionInformationEntry.getValue();
+    private void addToPersistentMap(final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodJsonPersistentActualSampleMap,
+                                    final Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry) {
+        final SampleDefinition sample = sampleExecutionInformationEntry.getKey();
+        final SampleExecutionInformation sampleExecutionInformation = sampleExecutionInformationEntry.getValue();
 
-        List<MethodCall> calls = sampleExecutionInformation.getMethodCalls();
+        final List<MethodCall> calls = sampleExecutionInformation.getMethodCalls();
 
-        JsonPersistentSampleMethod persistentSampleMethod = new JsonPersistentSampleMethod(sample.getSampleId());
-        JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
+        final JsonPersistentSampleMethod persistentSampleMethod = new JsonPersistentSampleMethod(sample.getSampleId());
+        final JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
-        for (MethodCall call : calls) {
-            List<Object> argsAsPersistentBeans = PersistentBeanFactory.toBeanIfNecessary(call.getArgs());
-            Object returnValuePersistentBean = PersistentBeanFactory.toBeanIfNecessary(call.getReturnValue());
+        for (final MethodCall call : calls) {
+            final List<Object> argsAsPersistentBeans = PersistentBeanFactory.toBeanIfNecessary(call.getArgs());
+            final Object returnValuePersistentBean = PersistentBeanFactory.toBeanIfNecessary(call.getReturnValue());
             jsonPersistentActualSample.addCall(new JsonPersistentParameter(argsAsPersistentBeans),
                     new JsonPersistentReturnValue(returnValuePersistentBean));
         }

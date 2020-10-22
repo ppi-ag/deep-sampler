@@ -9,6 +9,11 @@ public class ExecutionRepository {
 
     private static ExecutionRepository myInstance;
 
+    /**
+     * Singleton Constructor.
+     */
+    private ExecutionRepository() {}
+
     public static synchronized ExecutionRepository getInstance() {
         if (myInstance == null) {
             myInstance = new ExecutionRepository();
@@ -21,7 +26,7 @@ public class ExecutionRepository {
         return Collections.unmodifiableMap(executionInformation.get());
     }
 
-    public ExecutionInformation getOrCreate(Class<?> cls) {
+    public ExecutionInformation getOrCreate(final Class<?> cls) {
         return executionInformation.get().computeIfAbsent(cls, k -> new ExecutionInformation());
     }
 

@@ -1,28 +1,24 @@
 package org.deepsampler.core.api;
 
-import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.ReturnValueSupplier;
+import org.deepsampler.core.model.SampleDefinition;
+
 
 public class SampleBuilder<T> {
 
-    private final T returningProxy;
     private final SampleDefinition sampleDefinition;
 
-    public SampleBuilder(T returningProxy, SampleDefinition sampleDefinition) {
-        this.returningProxy = returningProxy;
+
+    @SuppressWarnings("unused")
+    public SampleBuilder(final T returningProxy, final SampleDefinition sampleDefinition) {
         this.sampleDefinition = sampleDefinition;
     }
 
-    public SampleBuilder id(String id) {
-        sampleDefinition.setSampleId(id);
-        return this;
-    }
-
-    public void is(T sampleReturnValue) {
+    public void is(final T sampleReturnValue) {
         sampleDefinition.setReturnValueSupplier(() -> sampleReturnValue);
     }
 
-    public void doing(ReturnValueSupplier propertySupplier) {
+    public void is(final ReturnValueSupplier propertySupplier) {
         sampleDefinition.setReturnValueSupplier(propertySupplier);
     }
 

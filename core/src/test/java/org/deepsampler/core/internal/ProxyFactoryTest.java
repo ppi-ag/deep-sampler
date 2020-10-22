@@ -13,13 +13,13 @@ class ProxyFactoryTest {
     void testCreateProxy() {
         // GIVEN
         final AtomicInteger counter = new AtomicInteger();
-        MethodHandler methodHandler = (self, thisMethod, proceed, args) -> {
+        final MethodHandler methodHandler = (self, thisMethod, proceed, args) -> {
             counter.incrementAndGet();
             return null;
         };
 
         // WHEN
-        ProxyTest proxyTest = ProxyFactory.createProxy(ProxyTest.class, methodHandler);
+        final ProxyTest proxyTest = ProxyFactory.createProxy(ProxyTest.class, methodHandler);
         proxyTest.test();
         proxyTest.test();
 

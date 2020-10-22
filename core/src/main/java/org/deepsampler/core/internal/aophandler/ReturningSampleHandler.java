@@ -3,31 +3,33 @@ package org.deepsampler.core.internal.aophandler;
 import javassist.util.proxy.MethodHandler;
 import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.error.InvalidConfigException;
+import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampledMethod;
-import org.deepsampler.core.model.ParameterMatcher;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class ReturningSampleHandler implements MethodHandler {
 
-    protected SampleDefinition createSampleDefinition(Class<?> cls, Method method, Object[] args) {
-        SampledMethod sampledMethod = new SampledMethod(cls, method);
-        SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
+    protected SampleDefinition createSampleDefinition(final Class<?> cls, final Method method, final Object[] args) {
+        final SampledMethod sampledMethod = new SampledMethod(cls, method);
+        final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
 
-        List<ParameterMatcher> parameterMatchers = Arrays.stream(args)
+        final List<ParameterMatcher> parameterMatchers = Arrays.stream(args)
                 .map(this::toMatcher)
                 .collect(Collectors.toList());
 
         sampleDefinition.setParameter(parameterMatchers);
+        sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));
         return sampleDefinition;
     }
 
-    private ParameterMatcher toMatcher(Object parameterValue) {
+    private ParameterMatcher toMatcher(final Object parameterValue) {
         if (parameterValue instanceof ParameterMatcher) {
             return (ParameterMatcher) parameterValue;
         } else {
@@ -35,7 +37,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
         }
     }
 
-    protected Object createEmptyProxy(Class<?> cls) {
+    protected Object createEmptyProxy(final Class<?> cls) {
         if (cls.isPrimitive()) {
             return createEmptyPrimitive(cls);
         } else if (cls.isArray()) {
@@ -44,12 +46,12 @@ public abstract class ReturningSampleHandler implements MethodHandler {
         return null;
     }
 
-    private Object createEmptyArray(Class<?> cls) {
-        return Array.newInstance(cls, 0);
+    private Object createEmptyArray(final Class<?> cls) {
+        return Array.newInstance(cls.getComponentType(), 0);
     }
 
     @SuppressWarnings("UnnecessaryBoxing")
-    private Object createEmptyPrimitive(Class<?> cls) {
+    private Object createEmptyPrimitive(final Class<?> cls) {
         if (cls.isAssignableFrom(int.class)) {
             return Integer.valueOf(0);
         } else if (cls.isAssignableFrom(double.class)) {

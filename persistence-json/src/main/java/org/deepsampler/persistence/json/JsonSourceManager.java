@@ -1,7 +1,7 @@
 package org.deepsampler.persistence.json;
 
-import org.deepsampler.persistence.json.model.PersistentModel;
 import org.deepsampler.core.model.ExecutionInformation;
+import org.deepsampler.persistence.json.model.PersistentModel;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,17 +12,17 @@ public class JsonSourceManager implements SourceManager {
     private final JsonRecorder jsonRecorder;
     private final JsonLoader jsonLoader;
 
-    public JsonSourceManager(String pathAsStr) {
+    public JsonSourceManager(final String pathAsStr) {
         this(Paths.get(pathAsStr));
     }
 
-    public JsonSourceManager(Path path) {
+    public JsonSourceManager(final Path path) {
         this.jsonLoader = new JsonLoader(path);
         this.jsonRecorder = new JsonRecorder(path);
     }
 
     @Override
-    public void record(Map<Class<?>, ExecutionInformation> executionInformation) {
+    public void record(final Map<Class<?>, ExecutionInformation> executionInformation) {
         jsonRecorder.record(executionInformation);
     }
 

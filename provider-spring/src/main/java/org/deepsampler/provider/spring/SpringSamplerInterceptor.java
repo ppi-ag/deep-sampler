@@ -6,15 +6,14 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.deepsampler.core.internal.api.ExecutionManager;
 import org.deepsampler.core.model.*;
-import org.deepsampler.provider.common.SamplerInterceptor;
 
 import java.util.Arrays;
 
 /**
- * A {@link SamplerInterceptor} for SpringApplications.
+ * A SamplerInterceptor for SpringApplications.
  */
 @Aspect
-public class SpringSamplerInterceptor implements SamplerInterceptor {
+public class SpringSamplerInterceptor {
 
 
     /**
@@ -25,19 +24,19 @@ public class SpringSamplerInterceptor implements SamplerInterceptor {
      * @throws Throwable
      */
     @Around("execution(* *(..)) && !target(DeepSamplerSpringConfig)")
-    public Object aroundMethod(ProceedingJoinPoint joinPoint) throws Throwable {
-        SampleDefinition sampleDefinition = findSampleDefinition(joinPoint);
+    public Object aroundMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
+        final SampleDefinition sampleDefinition = findSampleDefinition(joinPoint);
 
         if (sampleDefinition != null) {
             ExecutionManager.notify(sampleDefinition);
 
-            ReturnValueSupplier returnValueSupplier = sampleDefinition.getReturnValueSupplier();
+            final ReturnValueSupplier returnValueSupplier = sampleDefinition.getReturnValueSupplier();
 
             if (returnValueSupplier != null) {
                 return sampleDefinition.getReturnValueSupplier().supply();
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
-                Object returnValue = joinPoint.proceed();
+                final Object returnValue = joinPoint.proceed();
                 ExecutionManager.record(sampleDefinition, new MethodCall(Arrays.asList(joinPoint.getArgs()),
                         returnValue));
                 return returnValue;
@@ -52,11 +51,11 @@ public class SpringSamplerInterceptor implements SamplerInterceptor {
      * @param proceedingJoinPoint
      * @return
      */
-    private SampleDefinition findSampleDefinition(ProceedingJoinPoint proceedingJoinPoint) {
-        MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
-        Object interceptedObject = proceedingJoinPoint.getThis();
+    private SampleDefinition findSampleDefinition(final ProceedingJoinPoint proceedingJoinPoint) {
+        final MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
+        final Object interceptedObject = proceedingJoinPoint.getThis();
 
-        SampledMethod sampledMethod = new SampledMethod(interceptedObject.getClass(), signature.getMethod());
+        final SampledMethod sampledMethod = new SampledMethod(interceptedObject.getClass(), signature.getMethod());
 
         return SampleRepository.getInstance().find(sampledMethod, proceedingJoinPoint.getArgs());
     }

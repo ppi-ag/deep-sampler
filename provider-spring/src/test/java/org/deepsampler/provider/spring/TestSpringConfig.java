@@ -17,7 +17,7 @@ public class TestSpringConfig {
 
     @Bean
     @Autowired
-    public SpringyfiedTestServiceContainer testServiceContainer(TestService testService) {
+    public SpringyfiedTestServiceContainer testServiceContainer(final TestService testService) {
         return new SpringyfiedTestServiceContainer(testService);
     }
 
