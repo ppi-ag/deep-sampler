@@ -3,6 +3,9 @@ package org.deepsampler.persistence.json.bean;
 import org.deepsampler.persistence.json.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,6 +118,38 @@ class PersistentBeanFactoryTest {
     }
 
     @Test
+    void ofBeanWithDates() {
+        // GIVEN
+        final String localDate = "0$localDate";
+        final String localDateTime = "0$localDateTime";
+        final String utilDate = "0$utilDate";
+        final String sqlDate = "0$sqlDate";
+
+        final Map<String, Object> values = new HashMap<>();
+
+        final LocalDate today = LocalDate.now();
+        final LocalDateTime now = LocalDateTime.now();
+        final Date nowUtilDate = new Date();
+        final java.sql.Date nowSqlDate = java.sql.Date.valueOf(today);
+
+        values.put(localDate, today);
+        values.put(localDateTime, now);
+        values.put(utilDate, nowUtilDate);
+        values.put(sqlDate, nowSqlDate);
+
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+
+        // WHEN
+        final SimpleTestBeanWithDates testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanWithDates.class);
+
+        // THEN
+        assertEquals(today, testBean.localDate);
+        assertEquals(now, testBean.localDateTime);
+        assertEquals(nowSqlDate, testBean.sqlDate);
+        assertEquals(nowUtilDate, testBean.utilDate);
+    }
+
+    @Test
     void toBean() {
         // GIVEN
         final SimpleTestBean testBean = new SimpleTestBean();
@@ -182,6 +217,13 @@ class PersistentBeanFactoryTest {
     private static class SimpleTestBean {
         protected String abc;
         protected String def;
+    }
+
+    private static class SimpleTestBeanWithDates {
+        protected LocalDate localDate;
+        protected LocalDateTime localDateTime;
+        protected Date utilDate;
+        protected java.sql.Date sqlDate;
     }
 
     private static class SimpleTestBeanWithPrimitive {
