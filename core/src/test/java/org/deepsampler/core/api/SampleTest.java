@@ -54,7 +54,7 @@ class SampleTest {
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
     }
 
-
+    @Test
     void testSampleDefinitionForInterface() {
         //GIVEN WHEN
         final TestServiceInterface testServiceSampler = Sampler.prepare(TestServiceInterface.class);
