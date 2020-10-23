@@ -58,7 +58,7 @@ public class SampleRepository {
     }
 
     private boolean argumentsMatch(final SampleDefinition sampleDefinition, final Object[] arguments) {
-        final List<ParameterMatcher> parameterMatchers = sampleDefinition.getParameter();
+        final List<ParameterMatcher> parameterMatchers = sampleDefinition.getParameterMatchers();
 
         if (parameterMatchers.size() != arguments.length) {
             return false;

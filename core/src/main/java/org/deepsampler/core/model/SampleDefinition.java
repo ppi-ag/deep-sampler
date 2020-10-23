@@ -5,19 +5,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class SampleDefinition {
-    private static final AtomicLong ONGOING_NUMBER = new AtomicLong();
-
     private final SampledMethod sampledMethod;
 
-    /**
-     * The Parametervalues for the {@link SampledMethod}.
-     */
     private List<Object> parameterValues = new ArrayList<>();
-
-    private List<ParameterMatcher> parameter = new ArrayList<>();
+    private List<ParameterMatcher> parameterMatchers = new ArrayList<>();
     private ReturnValueSupplier returnValueSupplier;
     private String sampleId;
 
@@ -34,8 +27,8 @@ public class SampleDefinition {
         return sampledMethod;
     }
 
-    public List<ParameterMatcher> getParameter() {
-        return parameter;
+    public List<ParameterMatcher> getParameterMatchers() {
+        return parameterMatchers;
     }
 
     public void setSampleId(final String sampleId) {
@@ -46,8 +39,8 @@ public class SampleDefinition {
         return sampleId;
     }
 
-    public void setParameter(final List<ParameterMatcher> parameter) {
-        this.parameter = parameter;
+    public void setParameterMatchers(final List<ParameterMatcher> parameterMatchers) {
+        this.parameterMatchers = parameterMatchers;
     }
 
     public ReturnValueSupplier getReturnValueSupplier() {
@@ -58,12 +51,8 @@ public class SampleDefinition {
         this.returnValueSupplier = returnValueSupplier;
     }
 
-    public List<Object> getParameterValues() {
-        return this.parameterValues;
-    }
-
-    public void setParameterValues(final List<Object> paramterValues) {
-        this.parameterValues = paramterValues;
+    public void setParameterValues(final List<Object> parameterValues) {
+        this.parameterValues = parameterValues;
     }
 
     @Override

@@ -36,7 +36,7 @@ class SampleTest {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(TestService.class, currentSampleDefinition.getSampledMethod().getTarget());
-        assertTrue(currentSampleDefinition.getParameter().isEmpty());
+        assertTrue(currentSampleDefinition.getParameterMatchers().isEmpty());
         assertEquals(STRING_SAMPLE, currentSampleDefinition.getReturnValueSupplier().supply());
     }
 
@@ -48,7 +48,7 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
@@ -62,7 +62,7 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
@@ -77,7 +77,7 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
@@ -133,7 +133,7 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(BEAN_A_COPY));
@@ -220,5 +220,11 @@ class SampleTest {
 
     public interface TestServiceInterface {
         String echoParameter(String parameter);
+    }
+
+    public static class PrivateBean {
+        private String privateMethod() {
+            return "I'm a very private person";
+        }
     }
 }
