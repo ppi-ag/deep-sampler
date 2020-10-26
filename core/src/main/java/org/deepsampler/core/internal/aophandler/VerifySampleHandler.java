@@ -5,6 +5,7 @@ import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.model.*;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class VerifySampleHandler extends ReturningSampleHandler {
     private final Quantity quantity;
@@ -31,7 +32,22 @@ public class VerifySampleHandler extends ReturningSampleHandler {
             if (expected != actual) {
                 throw new VerifyException(sampleDefinition.getSampledMethod(), expected, actual);
             }
-        } else if (quantity.getTimes() != 0) {
+        } else {
+
+            final List<SampleDefinition> similarDefinition = SampleRepository.getInstance().findAllForMethod(sampledMethod);
+            if (similarDefinition.size() != 0) {
+                final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
+                for (SampleDefinition similarSampleDefinition : similarDefinition) {
+                    final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(similarSampleDefinition);
+                    if (sampleExecutionInformation.getTimesInvoked() != 0) {
+                        throw new VerifyException(similarSampleDefinition, args, sampleExecutionInformation.getTimesInvoked());
+                    }
+                }
+            }
+        }
+
+
+        if (sampleDefinition == null && quantity.getTimes() != 0) {
             throw new VerifyException(sampledMethod, args, quantity.getTimes(), 0);
         }
         return createEmptyProxy(thisMethod.getReturnType());

@@ -1,8 +1,10 @@
 package org.deepsampler.core.error;
 
+import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampledMethod;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,15 @@ public class VerifyException extends BaseException {
         super("The sampled method %s called with %s was " +
                 "expected to get invoked %s times, " +
                 "actually it got invoked %s times", sampledMethod.toString(), formatArguments(args), expected, actual);
+    }
+
+    public VerifyException(final SampleDefinition actualDefinition, final Object[] wantedArgs , final int actualTimes) {
+        super("The sampled method %s that was expected to be called with %s was actually called with %s (%s times).", actualDefinition.getSampleId(),
+                formatArguments(wantedArgs), formatArguments(actualDefinition.getParameterValues()), actualTimes);
+    }
+
+    private static String formatArguments(final List<Object> args) {
+        return formatArguments(args.toArray());
     }
 
     private static String formatArguments(final Object[] args) {
