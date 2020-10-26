@@ -32,7 +32,7 @@ public class VerifySampleHandler extends ReturningSampleHandler {
             if (expected != actual) {
                 throw new VerifyException(sampleDefinition.getSampledMethod(), expected, actual);
             }
-        } else {
+        } else if (quantity.getTimes() != 0) {
 
             final List<SampleDefinition> similarDefinition = SampleRepository.getInstance().findAllForMethod(sampledMethod);
             if (similarDefinition.size() != 0) {
