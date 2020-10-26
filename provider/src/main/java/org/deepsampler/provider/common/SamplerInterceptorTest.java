@@ -4,12 +4,16 @@ import org.deepsampler.core.api.Sample;
 import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.internal.FixedQuantity;
+import org.deepsampler.core.model.SampleRepository;
+import org.deepsampler.persistence.json.JsonSourceManager;
+import org.deepsampler.persistence.json.PersistentSample;
+import org.deepsampler.persistence.json.PersistentSampleLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.deepsampler.core.internal.FixedQuantity.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This Testclass must be be used to test all aop-provider in order to ensure that all providers would support the same
@@ -241,6 +245,28 @@ public abstract class SamplerInterceptorTest {
 
         //THEN
         assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2));
+    }
+
+    @Test
+    public void samplesCanBeRecordedAndLoaded() {
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A));
+
+        getTestService().echoParameter(VALUE_A);
+
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager("./record/samplesCanBeRecordedAndLoaded.json"));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.echoParameter(VALUE_A));
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertNotNull(getTestService().echoParameter(VALUE_A));
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
     }
 
 }

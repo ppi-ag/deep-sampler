@@ -6,6 +6,7 @@ import org.deepsampler.core.internal.api.ExecutionManager;
 import org.deepsampler.core.model.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class GuiceSamplerInterceptor implements MethodInterceptor {
 
@@ -24,8 +25,9 @@ public class GuiceSamplerInterceptor implements MethodInterceptor {
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = invocation.proceed();
-                ExecutionManager.record(sampleDefinition, new MethodCall(Arrays.asList(invocation.getArguments()),
-                        returnValue));
+                final List<Object> arguments = Arrays.asList(invocation.getArguments());
+
+                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, arguments));
                 return returnValue;
             }
         }

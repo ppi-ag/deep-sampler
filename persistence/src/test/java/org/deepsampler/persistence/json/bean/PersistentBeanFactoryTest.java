@@ -24,7 +24,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBean testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBean.class);
+        final SimpleTestBean testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBean.class);
 
         // THEN
         assertEquals("ME AND ALL", testBean.abc);
@@ -46,7 +46,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final TestBeanWithSuperclass testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, TestBeanWithSuperclass.class);
+        final TestBeanWithSuperclass testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, TestBeanWithSuperclass.class);
 
         // THEN
         assertEquals("ME AND ALL in SUPERCLASS", testBean.getAbcSuperClass());
@@ -93,7 +93,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values2);
 
         // WHEN
-        final SimpleTestBeanRec testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanRec.class);
+        final SimpleTestBeanRec testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanRec.class);
 
         // THEN
         assertEquals("ME AND MORE", testBean.str);
@@ -110,7 +110,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBeanWithPrimitive testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
+        final SimpleTestBeanWithPrimitive testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
 
         // THEN
         assertEquals(2, testBean.simpleInt);
@@ -140,7 +140,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBeanWithDates testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanWithDates.class);
+        final SimpleTestBeanWithDates testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithDates.class);
 
         // THEN
         assertEquals(today, testBean.localDate);
