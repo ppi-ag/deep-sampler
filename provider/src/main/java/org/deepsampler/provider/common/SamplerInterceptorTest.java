@@ -11,9 +11,12 @@ import org.deepsampler.persistence.json.PersistentSampleLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static org.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This Testclass must be be used to test all aop-provider in order to ensure that all providers would support the same
@@ -248,13 +251,15 @@ public abstract class SamplerInterceptorTest {
     }
 
     @Test
-    public void samplesCanBeRecordedAndLoaded() {
+    public void samplesCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(VALUE_A));
 
         getTestService().echoParameter(VALUE_A);
-
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager("./record/samplesCanBeRecordedAndLoaded.json"));
+        String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -267,6 +272,7 @@ public abstract class SamplerInterceptorTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertNotNull(getTestService().echoParameter(VALUE_A));
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+        Files.delete(Paths.get(pathToFile));
     }
 
 }

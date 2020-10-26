@@ -151,7 +151,7 @@ public class PersistentBeanFactory {
     }
 
     private static boolean isTransformationNotNecessary(final Object obj) {
-        return isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray());
+        return obj == null || isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray());
     }
 
     public static List<Object> toBeanIfNecessary(final List<Object> objectList) {
