@@ -2,6 +2,7 @@ package org.deepsampler.core.api;
 
 import org.deepsampler.core.internal.ProxyFactory;
 import org.deepsampler.core.internal.aophandler.RecordSampleHandler;
+import org.deepsampler.core.model.ExecutionRepository;
 import org.deepsampler.core.model.SampleRepository;
 
 public class Sampler {
@@ -12,6 +13,7 @@ public class Sampler {
 
     public static void clear() {
         SampleRepository.getInstance().clear();
+        ExecutionRepository.getInstance().clear();
     }
 
     public static <T> T prepare(final Class<T> cls) {

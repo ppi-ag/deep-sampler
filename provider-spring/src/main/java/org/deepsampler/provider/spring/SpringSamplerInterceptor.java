@@ -37,8 +37,7 @@ public class SpringSamplerInterceptor {
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = joinPoint.proceed();
-                ExecutionManager.record(sampleDefinition, new MethodCall(Arrays.asList(joinPoint.getArgs()),
-                        returnValue));
+                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, Arrays.asList(joinPoint.getArgs())));
                 return returnValue;
             }
         }

@@ -12,10 +12,10 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JsonLoaderTest {
+class JsonLoaderTest {
 
     @Test
-    public void testLoad() {
+    void testLoad() {
         // GIVEN
         final Path path = Paths.get("./record/testPersistent.json");
 
@@ -28,7 +28,7 @@ public class JsonLoaderTest {
     }
 
     @Test
-    public void testLoadTime() {
+    void testLoadTime() {
         // GIVEN
         final Path path = Paths.get("./record/testTimePersistent.json");
 
@@ -41,7 +41,7 @@ public class JsonLoaderTest {
     }
 
     @AfterEach
-    public void cleanUp() {
+     void cleanUp() {
         ExecutionRepository.getInstance().clear();
         SampleRepository.getInstance().clear();
     }
