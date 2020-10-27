@@ -32,7 +32,7 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
         assertAnyParameterMayAppear(0, BEAN_A, BEAN_B);
@@ -46,7 +46,7 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(2, parameter.size());
         assertAnyParameterMayAppear(0, "A random String", "Another random String");
@@ -88,7 +88,7 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
         assertTrue(parameter.get(0).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
@@ -103,7 +103,7 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
         assertFalse(parameter.get(0).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
@@ -118,7 +118,7 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(2, parameter.size());
         assertTrue(parameter.get(0).matches("Expected String"));
@@ -128,9 +128,9 @@ class MatchersTest {
     }
 
 
-    private void assertAnyParameterMayAppear(int parameterIndex, Object alternativeOne, Object alternativeTwo) {
+    private void assertAnyParameterMayAppear(final int parameterIndex, final Object alternativeOne, final Object alternativeTwo) {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameter();
+        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertTrue(parameter.get(parameterIndex).matches(alternativeOne));
         assertTrue(parameter.get(parameterIndex).matches(alternativeTwo));
@@ -146,7 +146,7 @@ class MatchersTest {
         assertThrows(InvalidMatcherConfigException.class,() -> mixMatchers(testServiceSampler));
     }
 
-    private void mixMatchers(TestService testServiceSampler) {
+    private void mixMatchers(final TestService testServiceSampler) {
         Sample.of(testServiceSampler.methodWithMultipleParams(anyString(), BEAN_A)).is("Some sampler")
 ;    }
 
@@ -157,35 +157,35 @@ class MatchersTest {
         }
 
         @SuppressWarnings("unused")
-        String methodWithMultipleParams(String someString, Bean someBean) {
+        String methodWithMultipleParams(final String someString, final Bean someBean) {
             return "Some String";
         }
 
-        int echoInt(int someInt) {
+        int echoInt(final int someInt) {
             return someInt;
         }
 
-        double echoDouble(double someDouble) {
+        double echoDouble(final double someDouble) {
             return someDouble;
         }
 
-        float echoFloat(float someFloat) {
+        float echoFloat(final float someFloat) {
             return someFloat;
         }
 
-        short echoShort(short someShort) {
+        short echoShort(final short someShort) {
             return someShort;
         }
 
-        char echoChar(char someChar) {
+        char echoChar(final char someChar) {
             return someChar;
         }
 
-        byte echoByte(byte someByte) {
+        byte echoByte(final byte someByte) {
             return someByte;
         }
 
-        boolean echoBoolean(boolean someBoolean) {
+        boolean echoBoolean(final boolean someBoolean) {
             return someBoolean;
         }
     }

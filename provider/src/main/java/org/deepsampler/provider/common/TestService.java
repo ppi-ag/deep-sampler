@@ -53,10 +53,10 @@ public class TestService {
     public Date testSqlDate(final RecTestBean someObject) {
         return new Date(1);
     }
-    }
+
 
     @SuppressWarnings("unused")
-    public String methodWithTwoParameter(String parameterOne, String parameterTwo) {
+    public String methodWithTwoParameter(final String parameterOne, final String parameterTwo) {
         return HARD_CODED_RETURN_VALUE;
     }
 }
