@@ -1,5 +1,6 @@
 package org.deepsampler.provider.common;
 
+import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.api.Sample;
 import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.error.VerifyException;
@@ -7,6 +8,8 @@ import org.deepsampler.core.internal.FixedQuantity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.deepsampler.core.api.Matchers.anyString;
+import static org.deepsampler.core.api.Matchers.equalTo;
 import static org.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -66,8 +69,8 @@ public abstract class SamplerInterceptorTest {
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        // testBeanSampler is not used, it is here to check if the sequence of preparing has any impact on Sample.of(). That should not happen.
-        final TestBean testBeanSampler = Sampler.prepare((TestBean.class));
+        // This sampler is not used, it is here to check if the sequence of preparing has any impact on Sample.of(). That should not happen.
+        Sampler.prepare((TestBean.class));
 
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
@@ -134,6 +137,39 @@ public abstract class SamplerInterceptorTest {
 
         //THEN
         assertEquals(VALUE_B + TestServiceContainer.SUFFIX_FROM_SERVICE_CONTAINER, testServiceContainer.augmentValueFromTestService());
+    }
+
+    @Test
+    public void samplesCanUseTheAnyMatcher() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(anyString())).is(VALUE_A);
+
+        //THEN
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+    }
+
+    @Test
+    public void methodWithTwoParameterCanBeSampled() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.methodWithTwoParameter("a", "b")).is(VALUE_A);
+
+        assertEquals(VALUE_A, getTestService().methodWithTwoParameter("a", "b"));
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("x", "b"));
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("a", "x"));
+
+    }
+
+    @Test
+    public void samplesCanUseAMixedCombinationOfMatchers() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.methodWithTwoParameter(anyString(), equalTo("Expected parameter value"))).is(VALUE_A);
+
+        //THEN
+        assertEquals(VALUE_A, getTestService().methodWithTwoParameter("Some uninspired random value", "Expected parameter value"));
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("Some uninspired random value", "wrong"));
     }
 
     @Test

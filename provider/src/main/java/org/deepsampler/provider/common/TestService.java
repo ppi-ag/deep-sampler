@@ -5,6 +5,8 @@ package org.deepsampler.provider.common;
  */
 public class TestService {
 
+    public static final String HARD_CODED_RETURN_VALUE = "Some value";
+
     /**
      * This method returns a primitve parameter if the method is not sampled.
      * This Method is intended to be used in positive and negative tests.
@@ -41,7 +43,13 @@ public class TestService {
      *
      * @param someInt
      */
+    @SuppressWarnings("unused")
     public void noReturnValue(final int someInt) {
         // There is nothing to do here, we are only interested in the method call itself.
-    };
+    }
+
+    @SuppressWarnings("unused")
+    public String methodWithTwoParameter(String parameterOne, String parameterTwo) {
+        return HARD_CODED_RETURN_VALUE;
+    }
 }
