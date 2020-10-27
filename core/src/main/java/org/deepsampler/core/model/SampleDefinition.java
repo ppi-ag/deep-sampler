@@ -27,6 +27,10 @@ public class SampleDefinition {
         return sampledMethod;
     }
 
+    public void setParameterMatchers(final List<ParameterMatcher> parameterMatchers) {
+        this.parameterMatchers = parameterMatchers;
+    }
+
     public List<ParameterMatcher> getParameterMatchers() {
         return parameterMatchers;
     }
@@ -39,20 +43,21 @@ public class SampleDefinition {
         return sampleId;
     }
 
-    public void setParameterMatchers(final List<ParameterMatcher> parameterMatchers) {
-        this.parameterMatchers = parameterMatchers;
+    public void setReturnValueSupplier(final ReturnValueSupplier returnValueSupplier) {
+        this.returnValueSupplier = returnValueSupplier;
     }
 
     public ReturnValueSupplier getReturnValueSupplier() {
         return returnValueSupplier;
     }
 
-    public void setReturnValueSupplier(final ReturnValueSupplier returnValueSupplier) {
-        this.returnValueSupplier = returnValueSupplier;
-    }
 
     public void setParameterValues(final List<Object> parameterValues) {
         this.parameterValues = parameterValues;
+    }
+
+    public List<Object> getParameterValues() {
+        return this.parameterValues;
     }
 
     @Override
