@@ -1,11 +1,8 @@
 package org.deepsampler.persistence;
 
-import org.deepsampler.core.api.Sample;
-import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.model.*;
 import org.deepsampler.persistence.json.JsonSourceManager;
 import org.deepsampler.persistence.json.PersistentSample;
-import org.deepsampler.persistence.json.PersistentSampleLoader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PersistentSampleLoaderTest {
 
@@ -30,7 +28,7 @@ class PersistentSampleLoaderTest {
                 .addMethodCall(new MethodCall("HELLO AGAIN", null));
 
         // WHEN
-        PersistentSample.source(new JsonSourceManager("./record/testApiSay.json"))
+        PersistentSample.source(JsonSourceManager.builder("./record/testApiSay.json").build())
                 .record();
 
         // THEN
@@ -61,7 +59,7 @@ class PersistentSampleLoaderTest {
         SampleRepository.getInstance().add(saySample);
 
         // WHEN
-        PersistentSample.source(new JsonSourceManager("./record/testApiSayPersistent.json"))
+        PersistentSample.source(JsonSourceManager.builder("./record/testApiSayPersistent.json").build())
                 .load();
 
         // THEN
