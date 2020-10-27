@@ -15,13 +15,17 @@ public class ProxyFactory {
     @SuppressWarnings("unchecked")
     public static <T> T createProxy(final Class<T> cls, final MethodHandler proxyBehavior) {
         final javassist.util.proxy.ProxyFactory proxyFactory = new javassist.util.proxy.ProxyFactory();
-        proxyFactory.setSuperclass(cls);
+        if (cls.isInterface()) {
+            proxyFactory.setInterfaces(new Class[]{cls});
+            proxyFactory.setSuperclass(Object.class);
+        } else {
+            proxyFactory.setSuperclass(cls);
+        }
         final Class<?> proxyClass = proxyFactory.createClass();
         final Objenesis objenesis = new ObjenesisStd();
         final ObjectInstantiator<?> instantiatorOf = objenesis.getInstantiatorOf(proxyClass);
         final ProxyObject proxyObject = (ProxyObject) instantiatorOf.newInstance();
         proxyObject.setHandler(proxyBehavior);
-
         return (T) proxyObject;
     }
 
