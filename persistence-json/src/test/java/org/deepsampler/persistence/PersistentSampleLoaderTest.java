@@ -30,15 +30,13 @@ public class PersistentSampleLoaderTest {
 
         // THEN
         assertTrue(Files.exists(path));
-        assertTrue(new String(Files.readAllBytes(path)).replaceAll("\\r", "").endsWith("joinPointBehaviorMap\" : {\n" +
+        assertTrue(new String(Files.readAllBytes(path)).replaceAll("\\r", "").endsWith("sampleMethodToSampleMap\" : {\n" +
                 "    \"public java.lang.String org.deepsampler.persistence.PersistentSampleLoaderTest$InnerBean.say()\" : {\n" +
                 "      \"callMap\" : [ {\n" +
                 "        \"parameter\" : {\n" +
                 "          \"args\" : [ ]\n" +
                 "        },\n" +
-                "        \"returnValue\" : {\n" +
-                "          \"returnValue\" : \"HELLO AGAIN\"\n" +
-                "        }\n" +
+                "        \"returnValue\" : \"HELLO AGAIN\"\n" +
                 "      } ]\n" +
                 "    }\n" +
                 "  }\n" +
