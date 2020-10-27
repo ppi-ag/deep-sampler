@@ -58,4 +58,8 @@ public class Sample {
         return ProxyFactory.createProxy(cls, new VerifySampleHandler(quantity, cls));
     }
 
+    public static void setIdToLastMethodCall(String id) {
+        SampleRepository.getInstance().getCurrentSampleDefinition().setSampleId(id);
+    }
+
 }

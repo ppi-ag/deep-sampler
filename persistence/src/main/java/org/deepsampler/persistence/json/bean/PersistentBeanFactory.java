@@ -19,29 +19,29 @@ public class PersistentBeanFactory {
     public static <T> T[] ofBean(final PersistentBean[] persistentBean, final Class<T> cls) {
         final T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
         for (int i = 0; i < persistentBean.length; ++i) {
-            instances[i] = ofBean(persistentBean[i], cls);
+            instances[i] = createValueFromPersistentBean(persistentBean[i], cls);
         }
         return instances;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T ofBeanIfNecessary(final Object beanObj, final Class<T> cls) {
-        if (beanObj instanceof PersistentBean) {
-            return ofBean((PersistentBean) beanObj, cls);
+    public static <T> T convertValueFromPersistentBeanIfNecessary(final Object value, final Class<T> type) {
+        if (value instanceof PersistentBean) {
+            return createValueFromPersistentBean((PersistentBean) value, type);
         }
-        return (T) beanObj;
+        return (T) value;
     }
 
-    public static <T> T ofBean(final PersistentBean persistentBean, final Class<T> cls) {
-        final T instance = instantiate(cls);
+    public static <T> T createValueFromPersistentBean(final PersistentBean value, final Class<T> type) {
+        final T instance = instantiate(type);
 
-        final Map<Field, String> fields = getAllFields(cls);
+        final Map<Field, String> fields = getAllFields(type);
 
         for (final Map.Entry<Field, String> entry : fields.entrySet()) {
             final Field field = entry.getKey();
             final String key = entry.getValue();
 
-            transferFromBean(persistentBean, instance, field, key);
+            transferFromBean(value, instance, field, key);
         }
         return instance;
     }
@@ -50,7 +50,7 @@ public class PersistentBeanFactory {
         Object lookedUpValueInBean = persistentBean.getValue(key);
         if (lookedUpValueInBean != null) {
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                lookedUpValueInBean = ofBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
+                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -147,11 +147,11 @@ public class PersistentBeanFactory {
     }
 
     public static Object toBeanIfNecessary(final Object obj) {
-        return transformationNotNecessary(obj) ? obj : toBean(obj);
+        return isTransformationNotNecessary(obj) ? obj : toBean(obj);
     }
 
-    private static boolean transformationNotNecessary(final Object obj) {
-        return isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray());
+    private static boolean isTransformationNotNecessary(final Object obj) {
+        return obj == null || isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray());
     }
 
     public static List<Object> toBeanIfNecessary(final List<Object> objectList) {

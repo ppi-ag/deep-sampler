@@ -24,7 +24,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
         final SampledMethod sampledMethod = new SampledMethod(cls, method);
         final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
 
-        sampleDefinition.setParameter(parameterMatchers);
+        sampleDefinition.setParameterMatchers(parameterMatchers);
         sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));
 
         return sampleDefinition;

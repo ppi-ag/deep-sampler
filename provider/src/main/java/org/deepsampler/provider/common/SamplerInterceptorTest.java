@@ -1,15 +1,24 @@
 package org.deepsampler.provider.common;
 
-import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.api.Sample;
 import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.internal.FixedQuantity;
+import org.deepsampler.core.model.SampleRepository;
+import org.deepsampler.persistence.json.JsonSourceManager;
+import org.deepsampler.persistence.json.PersistentSample;
+import org.deepsampler.persistence.json.PersistentSampleLoader;
+import org.deepsampler.persistence.json.error.PersistenceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.deepsampler.core.api.Matchers.anyString;
 import static org.deepsampler.core.api.Matchers.equalTo;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Date;
+
 import static org.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -276,7 +285,157 @@ public abstract class SamplerInterceptorTest {
         getTestService().noReturnValue(1);
 
         //THEN
-        assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2));
+        assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2), "The sampled method public void org.deepsampler.provider.common.TestService.noReturnValue(int) that was expected to be called with (2) was actually called with (1) (1 times).");
     }
 
+    @Test
+    public void samplesCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A));
+
+        getTestService().echoParameter(VALUE_A);
+        String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.echoParameter(VALUE_A));
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertNotNull(getTestService().echoParameter(VALUE_A));
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void voidMethodsCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        testServiceSampler.noReturnValue(2);
+
+        getTestService().noReturnValue(2);
+        getTestService().noReturnValue(3);
+        String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        testServiceSampler.noReturnValue(2);
+        source.load();
+        getTestService().noReturnValue(2);
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void sqlDateCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
+
+        getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
+        String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(new Date(1), getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B")));
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void manualIdSetForRecordingAndLoadingNoCorrectDef() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS");
+
+        getTestService().echoParameter("ABC");
+        String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS2");
+        assertThrows(PersistenceException.class,
+                source::load);
+
+        assertTrue(SampleRepository.getInstance().isEmpty());
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void manualIdSetForRecordingAndLoadingCorrectDef() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS");
+
+        getTestService().echoParameter("ABC");
+        String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS");
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals("ABC", getTestService().echoParameter("ABC"));
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void manualIdSetForRecordingAndLoadingCorrectDefVoidMethod() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        testServiceSampler.noReturnValue(2);
+        Sample.setIdToLastMethodCall("NoReturnValue");
+
+        getTestService().noReturnValue(2);
+
+        String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
+        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        testServiceSampler.noReturnValue(2);
+        Sample.setIdToLastMethodCall("NoReturnValue");
+        source.load();
+        getTestService().noReturnValue(2);
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
+        Files.delete(Paths.get(pathToFile));
+    }
 }

@@ -5,19 +5,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class SampleDefinition {
-    private static final AtomicLong ONGOING_NUMBER = new AtomicLong();
-
     private final SampledMethod sampledMethod;
 
-    /**
-     * The Parametervalues for the {@link SampledMethod}.
-     */
     private List<Object> parameterValues = new ArrayList<>();
-
-    private List<ParameterMatcher> parameter = new ArrayList<>();
+    private List<ParameterMatcher> parameterMatchers = new ArrayList<>();
     private ReturnValueSupplier returnValueSupplier;
     private String sampleId;
 
@@ -34,8 +27,12 @@ public class SampleDefinition {
         return sampledMethod;
     }
 
-    public List<ParameterMatcher> getParameter() {
-        return parameter;
+    public void setParameterMatchers(final List<ParameterMatcher> parameterMatchers) {
+        this.parameterMatchers = parameterMatchers;
+    }
+
+    public List<ParameterMatcher> getParameterMatchers() {
+        return parameterMatchers;
     }
 
     public void setSampleId(final String sampleId) {
@@ -46,24 +43,21 @@ public class SampleDefinition {
         return sampleId;
     }
 
-    public void setParameter(final List<ParameterMatcher> parameter) {
-        this.parameter = parameter;
+    public void setReturnValueSupplier(final ReturnValueSupplier returnValueSupplier) {
+        this.returnValueSupplier = returnValueSupplier;
     }
 
     public ReturnValueSupplier getReturnValueSupplier() {
         return returnValueSupplier;
     }
 
-    public void setReturnValueSupplier(final ReturnValueSupplier returnValueSupplier) {
-        this.returnValueSupplier = returnValueSupplier;
+
+    public void setParameterValues(final List<Object> parameterValues) {
+        this.parameterValues = parameterValues;
     }
 
     public List<Object> getParameterValues() {
         return this.parameterValues;
-    }
-
-    public void setParameterValues(final List<Object> paramterValues) {
-        this.parameterValues = paramterValues;
     }
 
     @Override

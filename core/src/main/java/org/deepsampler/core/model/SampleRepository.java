@@ -42,6 +42,20 @@ public class SampleRepository {
         samples.get().add(sampleDefinition);
     }
 
+    public List<SampleDefinition> findAllForMethod(SampledMethod wantedSampledMethod) {
+        List<SampleDefinition> sampleDefinitions = new ArrayList<>();
+        for (final SampleDefinition sampleDefinition : samples.get()) {
+            final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
+            final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
+            final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
+
+            if (classMatches && methodMatches) {
+                sampleDefinitions.add(sampleDefinition);
+            }
+        }
+
+        return sampleDefinitions;
+    }
 
     public SampleDefinition find(final SampledMethod wantedSampledMethod, final Object... args) {
         for (final SampleDefinition sampleDefinition : samples.get()) {
@@ -59,7 +73,7 @@ public class SampleRepository {
     }
 
     private boolean argumentsMatch(final SampleDefinition sampleDefinition, final Object[] arguments) {
-        final List<ParameterMatcher> parameterMatchers = sampleDefinition.getParameter();
+        final List<ParameterMatcher> parameterMatchers = sampleDefinition.getParameterMatchers();
 
         if (parameterMatchers.size() != arguments.length) {
             return false;
@@ -111,4 +125,5 @@ public class SampleRepository {
     public boolean isEmpty() {
         return samples.get() == null || samples.get().isEmpty();
     }
+
 }
