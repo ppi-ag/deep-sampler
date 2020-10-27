@@ -240,7 +240,7 @@ public abstract class SamplerInterceptorTest {
         getTestService().noReturnValue(1);
 
         //THEN
-        assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2));
+        assertThrows(VerifyException.class, () -> Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2), "The sampled method public void org.deepsampler.provider.common.TestService.noReturnValue(int) that was expected to be called with (2) was actually called with (1) (1 times).");
     }
 
 }
