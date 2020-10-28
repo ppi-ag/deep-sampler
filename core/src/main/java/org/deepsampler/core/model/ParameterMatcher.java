@@ -1,7 +1,5 @@
 package org.deepsampler.core.model;
 
-import java.io.Serializable;
-
-public interface ParameterMatcher extends Serializable {
+public interface ParameterMatcher {
     boolean matches(Object parameter);
 }

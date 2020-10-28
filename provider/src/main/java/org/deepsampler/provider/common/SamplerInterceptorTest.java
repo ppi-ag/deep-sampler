@@ -34,6 +34,7 @@ public abstract class SamplerInterceptorTest {
     public static final int INT_VALUE = 42;
     private static final TestBean TEST_BEAN_A = new TestBean();
     private static final TestBean TEST_BEAN_B = new TestBean();
+    public static final String MYECHOPARAMS = "MYECHOPARAMS";
 
     /**
      * The {@link TestService} is a Service that is used to test method interception by a SamplerInterceptor. Since this class must be
@@ -367,7 +368,7 @@ public abstract class SamplerInterceptorTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
 
         getTestService().echoParameter("ABC");
         final String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
@@ -391,7 +392,7 @@ public abstract class SamplerInterceptorTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
 
         getTestService().echoParameter("ABC");
         final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
@@ -402,7 +403,7 @@ public abstract class SamplerInterceptorTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());

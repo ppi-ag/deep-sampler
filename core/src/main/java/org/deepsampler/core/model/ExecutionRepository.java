@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExecutionRepository {
-    private final ThreadLocal<Map<Class<?>, ExecutionInformation>> executionInformation = ThreadLocal.withInitial(() -> new HashMap<>());
+    private final ThreadLocal<Map<Class<?>, ExecutionInformation>> executionInformation = ThreadLocal.withInitial(HashMap::new);
 
     private static ExecutionRepository myInstance;
 
@@ -32,5 +32,6 @@ public class ExecutionRepository {
 
     public void clear() {
         executionInformation.get().clear();
+        executionInformation.remove();
     }
 }
