@@ -8,6 +8,7 @@ import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.json.error.JsonPersistenceException;
 import org.deepsampler.persistence.json.model.*;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,8 +33,9 @@ public class JsonRecorder extends JsonOperator {
                 Files.createDirectories(parentPath);
             }
 
-            createObjectMapper().writeValue(Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
-                    toPersistentModel(executionInformationMap));
+            final JsonSampleModel model = toPersistentModel(executionInformationMap);
+            final BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            createObjectMapper().writeValue(writer, model);
         } catch (final IOException e) {
             throw new JsonPersistenceException("It was not possible to serialize/write to json.", e);
         }

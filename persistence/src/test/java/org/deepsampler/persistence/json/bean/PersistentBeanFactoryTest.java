@@ -3,6 +3,9 @@ package org.deepsampler.persistence.json.bean;
 import org.deepsampler.persistence.json.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +24,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBean testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBean.class);
+        final SimpleTestBean testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBean.class);
 
         // THEN
         assertEquals("ME AND ALL", testBean.abc);
@@ -43,7 +46,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final TestBeanWithSuperclass testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, TestBeanWithSuperclass.class);
+        final TestBeanWithSuperclass testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, TestBeanWithSuperclass.class);
 
         // THEN
         assertEquals("ME AND ALL in SUPERCLASS", testBean.getAbcSuperClass());
@@ -90,7 +93,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values2);
 
         // WHEN
-        final SimpleTestBeanRec testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanRec.class);
+        final SimpleTestBeanRec testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanRec.class);
 
         // THEN
         assertEquals("ME AND MORE", testBean.str);
@@ -107,11 +110,43 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBeanWithPrimitive testBean = PersistentBeanFactory.ofBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
+        final SimpleTestBeanWithPrimitive testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
 
         // THEN
         assertEquals(2, testBean.simpleInt);
         assertArrayEquals(new long[] {12, 32, 45}, testBean.longArray);
+    }
+
+    @Test
+    void ofBeanWithDates() {
+        // GIVEN
+        final String localDate = "0$localDate";
+        final String localDateTime = "0$localDateTime";
+        final String utilDate = "0$utilDate";
+        final String sqlDate = "0$sqlDate";
+
+        final Map<String, Object> values = new HashMap<>();
+
+        final LocalDate today = LocalDate.now();
+        final LocalDateTime now = LocalDateTime.now();
+        final Date nowUtilDate = new Date();
+        final java.sql.Date nowSqlDate = java.sql.Date.valueOf(today);
+
+        values.put(localDate, today);
+        values.put(localDateTime, now);
+        values.put(utilDate, nowUtilDate);
+        values.put(sqlDate, nowSqlDate);
+
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+
+        // WHEN
+        final SimpleTestBeanWithDates testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithDates.class);
+
+        // THEN
+        assertEquals(today, testBean.localDate);
+        assertEquals(now, testBean.localDateTime);
+        assertEquals(nowSqlDate, testBean.sqlDate);
+        assertEquals(nowUtilDate, testBean.utilDate);
     }
 
     @Test
@@ -182,6 +217,13 @@ class PersistentBeanFactoryTest {
     private static class SimpleTestBean {
         protected String abc;
         protected String def;
+    }
+
+    private static class SimpleTestBeanWithDates {
+        protected LocalDate localDate;
+        protected LocalDateTime localDateTime;
+        protected Date utilDate;
+        protected java.sql.Date sqlDate;
     }
 
     private static class SimpleTestBeanWithPrimitive {

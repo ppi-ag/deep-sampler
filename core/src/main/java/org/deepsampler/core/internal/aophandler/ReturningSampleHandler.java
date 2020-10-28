@@ -24,7 +24,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
                 .map(this::toMatcher)
                 .collect(Collectors.toList());
 
-        sampleDefinition.setParameter(parameterMatchers);
+        sampleDefinition.setParameterMatchers(parameterMatchers);
         sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));
         return sampleDefinition;
     }

@@ -3,6 +3,8 @@ package org.deepsampler.core.api;
 import org.deepsampler.core.model.ReturnValueSupplier;
 import org.deepsampler.core.model.SampleDefinition;
 
+import java.util.Objects;
+
 
 public class SampleBuilder<T> {
 
@@ -11,6 +13,8 @@ public class SampleBuilder<T> {
 
     @SuppressWarnings("unused")
     public SampleBuilder(final T returningProxy, final SampleDefinition sampleDefinition) {
+        Objects.requireNonNull(sampleDefinition, "the SampleDefinition must not be null.");
+
         this.sampleDefinition = sampleDefinition;
     }
 
@@ -20,6 +24,11 @@ public class SampleBuilder<T> {
 
     public void is(final ReturnValueSupplier propertySupplier) {
         sampleDefinition.setReturnValueSupplier(propertySupplier);
+    }
+
+    public SampleBuilder<T> id(final String sampleId) {
+        sampleDefinition.setSampleId(sampleId);
+        return this;
     }
 
 }
