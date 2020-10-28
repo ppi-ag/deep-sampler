@@ -332,7 +332,7 @@ public abstract class SamplerInterceptorTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
 
         getTestService().echoParameter("ABC");
         String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
@@ -343,7 +343,7 @@ public abstract class SamplerInterceptorTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS2");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS2");
         assertThrows(PersistenceException.class,
                 source::load);
 
@@ -356,7 +356,7 @@ public abstract class SamplerInterceptorTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
 
         getTestService().echoParameter("ABC");
         String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
@@ -367,7 +367,7 @@ public abstract class SamplerInterceptorTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        Sample.of(testServiceSampler.echoParameter("ABC")).id("MYECHOPARAMS");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
