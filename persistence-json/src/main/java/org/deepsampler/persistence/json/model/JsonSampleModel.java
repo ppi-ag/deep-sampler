@@ -11,15 +11,15 @@ public class JsonSampleModel implements PersistentModel {
     private String id;
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
-    private Map<JsonPersistentSampleMethod, JsonPersistentActualSample> joinPointBehaviorMap = new HashMap<>();
+    private Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodToSampleMap = new HashMap<>();
 
     public JsonSampleModel() {
         //DEFAULT CONS FOR JSON SER/DER
     }
 
-    public JsonSampleModel(final String id, final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> joinPointBehaviorMap) {
+    public JsonSampleModel(final String id, final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodToSampleMap) {
         this.id = id;
-        this.joinPointBehaviorMap = new HashMap<>(joinPointBehaviorMap);
+        this.sampleMethodToSampleMap = new HashMap<>(sampleMethodToSampleMap);
     }
 
     @Override
@@ -29,6 +29,6 @@ public class JsonSampleModel implements PersistentModel {
 
     @Override
     public Map<PersistentSampleMethod, PersistentActualSample> getSampleMethodToSampleMap() {
-        return Collections.unmodifiableMap(joinPointBehaviorMap);
+        return Collections.unmodifiableMap(sampleMethodToSampleMap);
     }
 }

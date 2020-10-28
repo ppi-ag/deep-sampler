@@ -1,26 +1,22 @@
 {
   "id" : "45b1e6e0-2142-480c-b06f-7496197d9f31",
-  "joinPointBehaviorMap" : {
+  "sampleMethodToSampleMap" : {
     "TestMethodForRecord" : {
       "callMap" : [ {
         "parameter" : {
           "args" : [ "Args1" ]
         },
-        "returnValue" : {
-          "returnValue" : "ABC"
-        }
+        "returnValue" : "ABC"
       }, {
         "parameter" : {
           "args" : [ "Args1" ]
         },
         "returnValue" : {
-          "returnValue" : {
             "@type" : "org.deepsampler.persistence.json.bean.DefaultPersistentBean",
             "values" : {
               "0$valueTwo" : "ABC",
               "0$valueOne" : "ABC"
             }
-          }
         }
       } ]
     }
