@@ -26,7 +26,7 @@ public class SampleBuilder<T> {
         sampleDefinition.setReturnValueSupplier(propertySupplier);
     }
 
-    public SampleBuilder<T> id(final String sampleId) {
+    public SampleBuilder<T> hasId(final String sampleId) {
         sampleDefinition.setSampleId(sampleId);
         return this;
     }
