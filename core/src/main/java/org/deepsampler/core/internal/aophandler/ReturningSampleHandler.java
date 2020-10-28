@@ -3,8 +3,10 @@ package org.deepsampler.core.internal.aophandler;
 import javassist.util.proxy.MethodHandler;
 import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.error.InvalidConfigException;
+import org.deepsampler.core.error.InvalidMatcherConfigException;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
+import org.deepsampler.core.model.SampleRepository;
 import org.deepsampler.core.model.SampledMethod;
 
 import java.lang.reflect.Array;
@@ -17,25 +19,17 @@ import java.util.stream.Collectors;
 public abstract class ReturningSampleHandler implements MethodHandler {
 
     protected SampleDefinition createSampleDefinition(final Class<?> cls, final Method method, final Object[] args) {
+        List<ParameterMatcher> parameterMatchers = collectMatchersForParameters(method, args);
+
         final SampledMethod sampledMethod = new SampledMethod(cls, method);
         final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
 
-        final List<ParameterMatcher> parameterMatchers = Arrays.stream(args)
-                .map(this::toMatcher)
-                .collect(Collectors.toList());
-
         sampleDefinition.setParameterMatchers(parameterMatchers);
         sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));
+
         return sampleDefinition;
     }
 
-    private ParameterMatcher toMatcher(final Object parameterValue) {
-        if (parameterValue instanceof ParameterMatcher) {
-            return (ParameterMatcher) parameterValue;
-        } else {
-            return Matchers.equalTo(parameterValue);
-        }
-    }
 
     protected Object createEmptyProxy(final Class<?> cls) {
         if (cls.isPrimitive()) {
@@ -64,10 +58,31 @@ public abstract class ReturningSampleHandler implements MethodHandler {
             return Byte.valueOf((byte) 0);
         } else if (cls.isAssignableFrom(char.class)) {
             return Character.valueOf('0');
+        } else if (cls.isAssignableFrom(boolean.class)) {
+            return Boolean.valueOf(true);
         } else if (cls.isAssignableFrom(void.class)) {
             return null;
         }
 
         throw new InvalidConfigException("The unknown primitive '" + cls + "' appeared");
     }
+
+    private List<ParameterMatcher> collectMatchersForParameters(Method method, Object[] parameters) {
+        List<ParameterMatcher> currentParameterMatchers = SampleRepository.getInstance().getCurrentParameterMatchers();
+
+        SampleRepository.getInstance().clearCurrentParameterMatchers();
+
+        if (!currentParameterMatchers.isEmpty() && currentParameterMatchers.size() != parameters.length) {
+            throw new InvalidMatcherConfigException(method);
+        }
+
+        if (currentParameterMatchers.isEmpty()) {
+            currentParameterMatchers = Arrays.stream(parameters)
+                    .map(Matchers.EqualsMatcher::new)
+                    .collect(Collectors.toList());
+        }
+
+        return currentParameterMatchers;
+    }
+
 }

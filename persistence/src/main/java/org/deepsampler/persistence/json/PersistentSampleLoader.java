@@ -117,7 +117,7 @@ public class PersistentSampleLoader {
 
     private List<ParameterMatcher> toMatcher(final List<Object> params) {
         return params.stream()
-                .map(Matchers::equalTo)
+                .map(Matchers.EqualsMatcher::new)
                 .collect(Collectors.toList());
     }
 

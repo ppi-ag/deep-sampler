@@ -7,8 +7,9 @@ import java.util.List;
 
 public class SampleRepository {
 
-    private final ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(() -> new ArrayList<>());
+    private final ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(ArrayList::new);
     private final ThreadLocal<SampleDefinition> currentSample = new ThreadLocal<>();
+    private final ThreadLocal<List<ParameterMatcher>> currentParameterMatchers = ThreadLocal.withInitial(ArrayList::new);
 
     private static SampleRepository myInstance;
 
@@ -29,7 +30,7 @@ public class SampleRepository {
      * Adds the given {@link SampleDefinition} to the {@link SampleRepository#samples}
      * and sets also the {@link SampleRepository#currentSample}.
      *
-     * @param sampleDefinition
+     * @param sampleDefinition The new SampleDefinition.
      */
     public void add(final SampleDefinition sampleDefinition) {
         final SampleDefinition currentSampleDefinition = getCurrentSampleDefinition();
@@ -79,7 +80,7 @@ public class SampleRepository {
         }
 
         for (int i = 0; i < arguments.length; i++) {
-            if (!parameterMatchers.get(0).matches(arguments[i])) {
+            if (!parameterMatchers.get(i).matches(arguments[i])) {
                 return false;
             }
         }
@@ -99,11 +100,25 @@ public class SampleRepository {
         return samples.get();
     }
 
+    public void clearCurrentParameterMatchers() {
+        currentParameterMatchers.set(new ArrayList<>());
+    }
+
+    public void addCurrentParameterMatchers(ParameterMatcher parameterMatcher) {
+        currentParameterMatchers.get().add(parameterMatcher);
+    }
+
+    public List<ParameterMatcher> getCurrentParameterMatchers() {
+        return currentParameterMatchers.get();
+    }
+
     /**
      * Clears the actual set {@link SampleRepository#currentSample} and the {@link SampleRepository#samples}
      */
     public void clear() {
         samples.get().clear();
+        samples.remove();
+        currentParameterMatchers.remove();
         currentSample.remove();
     }
 

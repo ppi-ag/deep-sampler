@@ -17,6 +17,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Date;
 
+import static org.deepsampler.core.api.Matchers.anyString;
+import static org.deepsampler.core.api.Matchers.equalTo;
 import static org.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,8 +77,8 @@ public abstract class SamplerInterceptorTest {
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        // testBeanSampler is not used, it is here to check if the sequence of preparing has any impact on Sample.of(). That should not happen.
-        final TestBean testBeanSampler = Sampler.prepare((TestBean.class));
+        // This sampler is not used, it is here to check if the sequence of preparing has any impact on Sample.of(). That should not happen.
+        Sampler.prepare((TestBean.class));
 
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
@@ -143,6 +145,39 @@ public abstract class SamplerInterceptorTest {
 
         //THEN
         assertEquals(VALUE_B + TestServiceContainer.SUFFIX_FROM_SERVICE_CONTAINER, testServiceContainer.augmentValueFromTestService());
+    }
+
+    @Test
+    public void samplesCanUseTheAnyMatcher() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(anyString())).is(VALUE_A);
+
+        //THEN
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+    }
+
+    @Test
+    public void methodWithTwoParameterCanBeSampled() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.methodWithTwoParameter("a", "b")).is(VALUE_A);
+
+        assertEquals(VALUE_A, getTestService().methodWithTwoParameter("a", "b"));
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("x", "b"));
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("a", "x"));
+
+    }
+
+    @Test
+    public void samplesCanUseAMixedCombinationOfMatchers() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.methodWithTwoParameter(anyString(), equalTo("Expected parameter value"))).is(VALUE_A);
+
+        //THEN
+        assertEquals(VALUE_A, getTestService().methodWithTwoParameter("Some uninspired random value", "Expected parameter value"));
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("Some uninspired random value", "wrong"));
     }
 
     @Test
@@ -260,8 +295,8 @@ public abstract class SamplerInterceptorTest {
         Sample.of(testServiceSampler.echoParameter(VALUE_A));
 
         getTestService().echoParameter(VALUE_A);
-        String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        final String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        final PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -286,8 +321,8 @@ public abstract class SamplerInterceptorTest {
 
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
-        String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        final String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
+        final PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -311,8 +346,8 @@ public abstract class SamplerInterceptorTest {
         testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
 
         getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
-        String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        final String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
+        final PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -335,8 +370,8 @@ public abstract class SamplerInterceptorTest {
         Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
 
         getTestService().echoParameter("ABC");
-        String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        final String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
+        final PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -359,8 +394,8 @@ public abstract class SamplerInterceptorTest {
         Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS");
 
         getTestService().echoParameter("ABC");
-        String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
+        final PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -385,8 +420,8 @@ public abstract class SamplerInterceptorTest {
 
         getTestService().noReturnValue(2);
 
-        String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
+        final PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
