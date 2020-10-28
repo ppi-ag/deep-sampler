@@ -16,14 +16,14 @@ public class Matchers {
      * @return a matcher that accepts any parameter value
      */
     @SuppressWarnings("unused")
-    public static <T> T any(Class<T> type) {
+    public static <T> T any(final Class<T> type) {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return null;
     }
 
     public static String anyString() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
-        return "Dummy String";
+        return "";
     }
 
     public static int anyInt() {
@@ -84,14 +84,14 @@ public class Matchers {
 
     public static class EqualsMatcher implements ParameterMatcher {
 
-        private Object expectedObject;
+        private final Object expectedObject;
 
-        public EqualsMatcher(Object expectedObject) {
+        public EqualsMatcher(final Object expectedObject) {
             this.expectedObject = expectedObject;
         }
 
         @Override
-        public boolean matches(Object parameter) {
+        public boolean matches(final Object parameter) {
             return Objects.equals(expectedObject, parameter);
         }
     }
