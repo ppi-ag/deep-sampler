@@ -2,7 +2,7 @@ package org.deepsampler.core.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class ExecutionInformationTest {
 
@@ -16,6 +16,6 @@ class ExecutionInformationTest {
         final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
 
         // THEN
-        assertTrue(sampleExecutionInformation == executionInformation.getOrCreateBySample(sampleDefinition));
+        assertSame(sampleExecutionInformation, executionInformation.getOrCreateBySample(sampleDefinition));
     }
 }

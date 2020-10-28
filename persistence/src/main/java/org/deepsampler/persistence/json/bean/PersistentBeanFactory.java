@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 
 public class PersistentBeanFactory {
 
+    private PersistentBeanFactory() {
+        // This class is not intended to be instantiated.
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T[] ofBean(final PersistentBean[] persistentBean, final Class<T> cls) {
         final T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
