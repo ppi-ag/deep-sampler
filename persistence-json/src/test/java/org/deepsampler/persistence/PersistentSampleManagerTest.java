@@ -1,11 +1,8 @@
 package org.deepsampler.persistence;
 
-import org.deepsampler.core.api.Sample;
-import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.model.*;
 import org.deepsampler.persistence.json.JsonSourceManager;
 import org.deepsampler.persistence.json.PersistentSample;
-import org.deepsampler.persistence.json.PersistentSampleLoader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +12,7 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PersistentSampleLoaderTest {
+class PersistentSampleManagerTest {
 
     @Test
     void testSimpleApiRecord() throws Exception {

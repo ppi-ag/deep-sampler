@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class PersistentSampleLoader {
+public class PersistentSampleManager {
     private final List<SourceManager> sourceManagerList = new ArrayList<>();
 
-    public PersistentSampleLoader(final SourceManager sourceManager) {
+    public PersistentSampleManager(final SourceManager sourceManager) {
         addSourceProvider(sourceManager);
     }
 
-    public PersistentSampleLoader source(final SourceManager sourceManager) {
+    public PersistentSampleManager source(final SourceManager sourceManager) {
         addSourceProvider(sourceManager);
         return this;
     }
