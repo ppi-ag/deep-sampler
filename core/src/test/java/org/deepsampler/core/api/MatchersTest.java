@@ -32,9 +32,8 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(1, parameter.size());
+        assertEquals(1, currentSampleDefinition.getNumberOfParameters());
         assertAnyParameterMayAppear(0, BEAN_A, BEAN_B);
     }
 
@@ -46,9 +45,8 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(2, parameter.size());
+        assertEquals(2, currentSampleDefinition.getNumberOfParameters());
         assertAnyParameterMayAppear(0, "A random String", "Another random String");
         assertAnyParameterMayAppear(1, BEAN_A, BEAN_B);
     }
@@ -88,11 +86,10 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(1, parameter.size());
-        assertTrue(parameter.get(0).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
-        assertFalse(parameter.get(0).matches(BEAN_B));
+        assertEquals(1, currentSampleDefinition.getNumberOfParameters());
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
+        assertFalse(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_B));
     }
 
     @Test
@@ -103,11 +100,10 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(1, parameter.size());
-        assertFalse(parameter.get(0).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
-        assertTrue(parameter.get(0).matches(BEAN_A));
+        assertEquals(1, currentSampleDefinition.getNumberOfParameters());
+        assertFalse(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_A));
     }
 
     @Test
@@ -118,23 +114,21 @@ class MatchersTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(2, parameter.size());
-        assertTrue(parameter.get(0).matches("Expected String"));
-        assertFalse(parameter.get(0).matches("Wrong String"));
-        assertTrue(parameter.get(1).matches(BEAN_A));
-        assertFalse(parameter.get(1).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
+        assertEquals(2, currentSampleDefinition.getParameterMatchers().size());
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("Expected String"));
+        assertFalse(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("Wrong String"));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(1, Bean.class).matches(BEAN_A));
+        assertFalse(currentSampleDefinition.getParameterMatcherAs(1, Bean.class).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
     }
 
 
     private void assertAnyParameterMayAppear(final int parameterIndex, final Object alternativeOne, final Object alternativeTwo) {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
 
-        assertTrue(parameter.get(parameterIndex).matches(alternativeOne));
-        assertTrue(parameter.get(parameterIndex).matches(alternativeTwo));
-        assertTrue(parameter.get(parameterIndex).matches(null));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(parameterIndex, Object.class).matches(alternativeOne));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(parameterIndex, Object.class).matches(alternativeTwo));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(parameterIndex, Object.class).matches(null));
     }
 
 
@@ -149,6 +143,36 @@ class MatchersTest {
     private void mixMatchers(final TestService testServiceSampler) {
         Sample.of(testServiceSampler.methodWithMultipleParams(anyString(), BEAN_A)).is("Some sampler")
 ;    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testCustomMatcher() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.methodWithMultipleParams(Matchers.matcher(new ContainsMatcher("ABC")), any(Bean.class)))
+                .is("Some result");
+
+        // THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+
+        assertEquals(2, parameter.size());
+        assertTrue(((ParameterMatcher<String>)parameter.get(0)).matches("XABCX"));
+        assertFalse(((ParameterMatcher<String>)parameter.get(0)).matches("ABDX"));
+    }
+
+    static class ContainsMatcher implements ParameterMatcher<String> {
+        private final String containedStr;
+
+        public ContainsMatcher(String containedStr) {
+            this.containedStr = containedStr;
+        }
+
+        @Override
+        public boolean matches(String parameter) {
+            return parameter.contains(containedStr);
+        }
+    }
 
     static class TestService {
 

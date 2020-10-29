@@ -5,12 +5,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SampleDefinition {
     private final SampledMethod sampledMethod;
 
     private List<Object> parameterValues = new ArrayList<>();
-    private List<ParameterMatcher> parameterMatchers = new ArrayList<>();
+    private List<ParameterMatcher<?>> parameterMatchers = new ArrayList<>();
     private ReturnValueSupplier returnValueSupplier;
     private String sampleId;
 
@@ -27,12 +28,23 @@ public class SampleDefinition {
         return sampledMethod;
     }
 
-    public void setParameterMatchers(final List<ParameterMatcher> parameterMatchers) {
+    public void setParameterMatchers(final List<ParameterMatcher<?>> parameterMatchers) {
         this.parameterMatchers = parameterMatchers;
     }
 
-    public List<ParameterMatcher> getParameterMatchers() {
+    public List<ParameterMatcher<?>> getParameterMatchers() {
         return parameterMatchers;
+    }
+
+    public int getNumberOfParameters() {
+        return parameterMatchers.size();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> ParameterMatcher<T> getParameterMatcherAs(int i, Class<T> cls) {
+        Objects.requireNonNull(cls);
+
+        return (ParameterMatcher<T>) parameterMatchers.get(i);
     }
 
     public void setSampleId(final String sampleId) {

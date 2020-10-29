@@ -83,7 +83,7 @@ public class PersistentSampleLoader {
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
         List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
-        final List<ParameterMatcher> parameterMatchers = toMatcher(parameterValues);
+        final List<ParameterMatcher<?>> parameterMatchers = toMatcher(parameterValues);
 
         final SampleDefinition sample = new SampleDefinition(matchingJointPoint);
         sample.setSampleId(joinPointId);
@@ -115,7 +115,7 @@ public class PersistentSampleLoader {
         return PersistentBeanFactory.convertValueFromPersistentBeanIfNecessary(persistentBean, type);
     }
 
-    private List<ParameterMatcher> toMatcher(final List<Object> params) {
+    private List<ParameterMatcher<?>> toMatcher(final List<Object> params) {
         return params.stream()
                 .map(Matchers.EqualsMatcher::new)
                 .collect(Collectors.toList());
