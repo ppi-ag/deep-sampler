@@ -1,5 +1,7 @@
 package org.deepsampler.persistence.json;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import org.deepsampler.core.model.ExecutionInformation;
 import org.deepsampler.persistence.json.extension.DeserializationExtension;
@@ -54,13 +56,13 @@ public class JsonSourceManager implements SourceManager {
             this.pathToJson = Paths.get(pathToJsonAsString);
         }
 
-        public <T> Builder addSerializer(SerializationExtension<T> serializationExtension) {
-            serializerList.add(serializationExtension);
+        public <T> Builder addSerializer(Class<? extends T> cls, JsonSerializer<T>jsonSerializer) {
+            serializerList.add(new SerializationExtension<>(cls, jsonSerializer));
             return this;
         }
 
-        public <T> Builder addDeserializer(DeserializationExtension<T> deserializationExtension) {
-            deserializerList.add(deserializationExtension);
+        public <T> Builder addDeserializer(Class<T> cls, JsonDeserializer<? extends T> deserializer) {
+            deserializerList.add(new DeserializationExtension<>(cls, deserializer));
             return this;
         }
 

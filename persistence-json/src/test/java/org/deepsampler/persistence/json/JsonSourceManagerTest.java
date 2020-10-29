@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.deepsampler.core.model.*;
-import org.deepsampler.persistence.json.extension.DeserializationExtension;
-import org.deepsampler.persistence.json.extension.SerializationExtension;
 import org.deepsampler.persistence.json.model.JsonPersistentParameter;
 import org.deepsampler.persistence.json.model.PersistentModel;
 import org.junit.jupiter.api.Test;
@@ -27,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JsonSourceManagerTest {
 
     @Test
-    public void testBuilderWithSer() throws NoSuchMethodException, IOException {
+    public void testBuilderWithSerializer() throws NoSuchMethodException, IOException {
         // GIVEN
         Map<Class<?>, ExecutionInformation> executionInformationMap = new HashMap<>();
         ExecutionInformation executionInformation = new ExecutionInformation();
@@ -41,8 +39,8 @@ public class JsonSourceManagerTest {
 
         // WHEN
         JsonSourceManager sourceManager = JsonSourceManager.builder(pathAsString)
-                .addDeserializer(new DeserializationExtension<>(JsonPersistentParameter.class, new CustomJsonDeserializer()))
-                .addSerializer(new SerializationExtension<>(JsonPersistentParameter.class, new CustomJsonSerializer()))
+                .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
+                .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
                 .build();
         sourceManager.record(executionInformationMap);
 
@@ -81,7 +79,7 @@ public class JsonSourceManagerTest {
     }
 
     @Test
-    public void testBuilderWithSerLoad() {
+    public void testBuilderWithSerializerLoad() {
         // GIVEN
         final String pathAsString = "./record/testPersistent.json";
 
@@ -106,8 +104,8 @@ public class JsonSourceManagerTest {
 
         // WHEN
         JsonSourceManager sourceManager = JsonSourceManager.builder(pathAsString)
-                .addDeserializer(new DeserializationExtension<>(JsonPersistentParameter.class, new CustomJsonDeserializer()))
-                .addSerializer(new SerializationExtension<>(JsonPersistentParameter.class, new CustomJsonSerializer()))
+                .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
+                .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
                 .build();
         PersistentModel persistentModel = sourceManager.load();
 
