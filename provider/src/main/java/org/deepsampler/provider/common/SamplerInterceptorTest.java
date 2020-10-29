@@ -261,7 +261,7 @@ public abstract class SamplerInterceptorTest {
 
         getTestService().echoParameter(VALUE_A);
         String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        PersistentSampleLoader source = PersistentSample.source(JsonSourceManager.builder(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -287,7 +287,7 @@ public abstract class SamplerInterceptorTest {
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
         String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        PersistentSampleLoader source = PersistentSample.source(JsonSourceManager.builder(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -312,7 +312,7 @@ public abstract class SamplerInterceptorTest {
 
         getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
         String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        PersistentSampleLoader source = PersistentSample.source(JsonSourceManager.builder(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -336,7 +336,7 @@ public abstract class SamplerInterceptorTest {
 
         getTestService().echoParameter("ABC");
         String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        PersistentSampleLoader source = PersistentSample.source(JsonSourceManager.builder(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -360,7 +360,7 @@ public abstract class SamplerInterceptorTest {
 
         getTestService().echoParameter("ABC");
         String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        PersistentSampleLoader source = PersistentSample.source(JsonSourceManager.builder(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -386,7 +386,7 @@ public abstract class SamplerInterceptorTest {
         getTestService().noReturnValue(2);
 
         String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        PersistentSampleLoader source = PersistentSample.source(new JsonSourceManager(pathToFile));
+        PersistentSampleLoader source = PersistentSample.source(JsonSourceManager.builder(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
