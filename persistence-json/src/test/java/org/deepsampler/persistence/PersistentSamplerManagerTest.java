@@ -2,6 +2,7 @@ package org.deepsampler.persistence;
 
 import org.deepsampler.core.model.*;
 import org.deepsampler.persistence.json.JsonSourceManager;
+import org.deepsampler.persistence.json.PersistentSampler;
 import org.deepsampler.persistence.json.PersistentSample;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PersistentSampleLoaderTest {
+class PersistentSamplerManagerTest {
 
     @Test
     void testSimpleApiRecord() throws Exception {
@@ -28,13 +29,13 @@ class PersistentSampleLoaderTest {
                 .addMethodCall(new MethodCall("HELLO AGAIN", null));
 
         // WHEN
-        PersistentSample.source(JsonSourceManager.builder("./record/testApiSay.json").build())
+        PersistentSampler.source(JsonSourceManager.builder("./record/testApiSay.json").build())
                 .record();
 
         // THEN
         assertTrue(Files.exists(path));
         assertTrue(new String(Files.readAllBytes(path)).replaceAll("\\r", "").endsWith("sampleMethodToSampleMap\" : {\n" +
-                "    \"public java.lang.String org.deepsampler.persistence.PersistentSampleLoaderTest$InnerBean.say()\" : {\n" +
+                "    \"public java.lang.String org.deepsampler.persistence.PersistentSamplerManagerTest$InnerBean.say()\" : {\n" +
                 "      \"callMap\" : [ {\n" +
                 "        \"parameter\" : {\n" +
                 "          \"args\" : [ ]\n" +
@@ -55,7 +56,7 @@ class PersistentSampleLoaderTest {
         SampleRepository.getInstance().add(saySample);
 
         // WHEN
-        PersistentSample.source(JsonSourceManager.builder("./record/testApiSayPersistent.json").build())
+        PersistentSampler.source(JsonSourceManager.builder("./record/testApiSayPersistent.json").build())
                 .load();
 
         // THEN
