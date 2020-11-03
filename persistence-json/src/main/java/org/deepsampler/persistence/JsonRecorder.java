@@ -1,43 +1,42 @@
-package org.deepsampler.persistence;
+package org.deepsampler.persistence.json;
 
+import com.fasterxml.jackson.databind.Module;
 import org.deepsampler.core.model.ExecutionInformation;
 import org.deepsampler.core.model.MethodCall;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleExecutionInformation;
-import org.deepsampler.persistence.bean.PersistentBeanFactory;
-import org.deepsampler.persistence.error.JsonPersistenceException;
-import org.deepsampler.persistence.model.JsonPersistentActualSample;
-import org.deepsampler.persistence.model.JsonPersistentParameter;
-import org.deepsampler.persistence.model.JsonPersistentSampleMethod;
-import org.deepsampler.persistence.model.JsonSampleModel;
+import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.json.error.JsonPersistenceException;
+import org.deepsampler.persistence.json.extension.SerializationExtension;
+import org.deepsampler.persistence.json.model.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JsonRecorder extends JsonOperator {
-    private final Path path;
 
-    public JsonRecorder(final Path path) {
-        this.path = path;
+    public JsonRecorder(Path pathToJson) {
+        super(pathToJson, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+    }
+
+    public JsonRecorder(Path pathToJson, List<SerializationExtension<?>> serializationExtensions, List<Module> moduleList) {
+        super(pathToJson, Collections.emptyList(), serializationExtensions, moduleList);
     }
 
     public void record(final Map<Class<?>, ExecutionInformation> executionInformationMap) {
         try {
             // CREATE PARENT DIR IF NECESSARY
-            final Path parentPath = path.getParent();
+            final Path parentPath = getPath().getParent();
             if (!Files.exists(parentPath)) {
                 Files.createDirectories(parentPath);
             }
 
             final JsonSampleModel model = toPersistentModel(executionInformationMap);
-            final BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            final BufferedWriter writer = Files.newBufferedWriter(getPath(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             createObjectMapper().writeValue(writer, model);
         } catch (final IOException e) {
             throw new JsonPersistenceException("It was not possible to serialize/write to json.", e);

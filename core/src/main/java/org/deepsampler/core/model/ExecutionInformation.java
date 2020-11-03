@@ -8,8 +8,8 @@ public class ExecutionInformation {
 
     private final Map<SampleDefinition, SampleExecutionInformation> behaviorExecutionInformationMap = new HashMap<>();
 
-    public SampleExecutionInformation getOrCreateBySample(final SampleDefinition behavior) {
-        return behaviorExecutionInformationMap.computeIfAbsent(behavior, b -> new SampleExecutionInformation(0));
+    public SampleExecutionInformation getOrCreateBySample(final SampleDefinition sampleDefinition) {
+        return behaviorExecutionInformationMap.computeIfAbsent(sampleDefinition, b -> new SampleExecutionInformation(0));
     }
 
     public Map<SampleDefinition, SampleExecutionInformation> getAll() {
