@@ -14,21 +14,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DeepSamplerExtensionTest {
+class DeepSamplerExtensionTest {
 
     @PrepareSampler
     private TestBean testBeanSampler;
 
     @Test
     @Order(1)
-    public void testBeanHasBeenSampled() {
+    void testBeanHasBeenSampled() {
         assertNotNull(testBeanSampler);
         assertTrue(ProxyFactory.isProxyClass(testBeanSampler.getClass()));
     }
 
     @Test
     @Order(2)
-    public void addSamplesThatShouldBeClearedInNextTest() {
+    void addSamplesThatShouldBeClearedInNextTest() {
         assertTrue(SampleRepository.getInstance().isEmpty());
         Sample.of(testBeanSampler.getSomeInt()).is(1);
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -36,7 +36,7 @@ public class DeepSamplerExtensionTest {
 
     @Test
     @Order(3)
-    public void samplesFromLastTestShouldBeCleared() {
+    void samplesFromLastTestShouldBeCleared() {
         assertTrue(SampleRepository.getInstance().isEmpty());
     }
 }

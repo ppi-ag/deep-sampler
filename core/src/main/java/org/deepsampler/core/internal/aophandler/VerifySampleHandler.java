@@ -35,9 +35,9 @@ public class VerifySampleHandler extends ReturningSampleHandler {
         } else if (quantity.getTimes() != 0) {
 
             final List<SampleDefinition> similarDefinition = SampleRepository.getInstance().findAllForMethod(sampledMethod);
-            if (similarDefinition.size() != 0) {
+            if (!similarDefinition.isEmpty()) {
                 final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
-                for (SampleDefinition similarSampleDefinition : similarDefinition) {
+                for (final SampleDefinition similarSampleDefinition : similarDefinition) {
                     final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(similarSampleDefinition);
                     if (sampleExecutionInformation.getTimesInvoked() != 0) {
                         throw new VerifyException(similarSampleDefinition, args, sampleExecutionInformation.getTimesInvoked());

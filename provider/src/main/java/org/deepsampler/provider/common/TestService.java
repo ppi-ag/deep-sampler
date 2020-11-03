@@ -48,8 +48,9 @@ public class TestService {
     @SuppressWarnings("unused")
     public void noReturnValue(final int someInt) {
         // There is nothing to do here, we are only interested in the method call itself.
-    };
+    }
 
+    @SuppressWarnings("unused")
     public Date testSqlDate(final RecTestBean someObject) {
         return new Date(1);
     }
