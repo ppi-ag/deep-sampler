@@ -10,7 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PersistentSamplerManagerTest {
 
@@ -27,7 +28,7 @@ class PersistentSamplerManagerTest {
                 .addMethodCall(new MethodCall("HELLO AGAIN", null));
 
         // WHEN
-        PersistentSampler.source(new JsonSourceManager("./record/testApiSay.json"))
+        PersistentSampler.source(JsonSourceManager.builder("./record/testApiSay.json").build())
                 .record();
 
         // THEN
@@ -54,7 +55,7 @@ class PersistentSamplerManagerTest {
         SampleRepository.getInstance().add(saySample);
 
         // WHEN
-        PersistentSampler.source(new JsonSourceManager("./record/testApiSayPersistent.json"))
+        PersistentSampler.source(JsonSourceManager.builder("./record/testApiSayPersistent.json").build())
                 .load();
 
         // THEN
