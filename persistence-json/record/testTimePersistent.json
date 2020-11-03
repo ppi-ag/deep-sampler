@@ -5,10 +5,10 @@
       "callMap" : [ {
         "parameter" : {
           "args" : [ {
-            "@type" : "org.deepsampler.persistence.json.bean.DefaultPersistentBean",
+            "@type" : "org.deepsampler.persistence.bean.DefaultPersistentBean",
             "values" : {
               "0$date" : {
-                "@type" : "org.deepsampler.persistence.json.bean.DefaultPersistentBean",
+                "@type" : "org.deepsampler.persistence.bean.DefaultPersistentBean",
                 "values" : {
                   "0$month" : [ "java.lang.Short", 10 ],
                   "0$year" : 2020,
@@ -16,7 +16,7 @@
                 }
               },
               "0$time" : {
-                "@type" : "org.deepsampler.persistence.json.bean.DefaultPersistentBean",
+                "@type" : "org.deepsampler.persistence.bean.DefaultPersistentBean",
                 "values" : {
                   "0$minute" : [ "java.lang.Byte", 28 ],
                   "0$second" : [ "java.lang.Byte", 23 ],
@@ -33,7 +33,7 @@
           "args" : [ "Args1" ]
         },
         "returnValue" : {
-          "@type" : "org.deepsampler.persistence.json.bean.DefaultPersistentBean",
+          "@type" : "org.deepsampler.persistence.bean.DefaultPersistentBean",
           "values" : {
             "0$valueTwo" : "ABC",
             "0$valueOne" : "ABC"
