@@ -3,7 +3,6 @@ package org.deepsampler.persistence;
 import org.deepsampler.core.model.*;
 import org.deepsampler.persistence.json.JsonSourceManager;
 import org.deepsampler.persistence.json.PersistentSampler;
-import org.deepsampler.persistence.json.PersistentSample;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
