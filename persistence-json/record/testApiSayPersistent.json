@@ -1,14 +1,12 @@
 {
   "id" : "e189ff1a-24ca-4a0b-ad70-d80a612b3a98",
-  "joinPointBehaviorMap" : {
+  "sampleMethodToSampleMap" : {
     "public java.lang.String org.deepsampler.persistence.PersistentSampleLoaderTest$InnerBean.say()" : {
       "callMap" : [ {
         "parameter" : {
           "args" : [ ]
         },
-        "returnValue" : {
-          "returnValue" : "HELLO AGAIN"
-        }
+        "returnValue" : "HELLO AGAIN"
       } ]
     }
   }

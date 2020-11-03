@@ -2,13 +2,13 @@ package org.deepsampler.persistence.json.model;
 
 public class JsonPersistentMethodCall implements PersistentMethodCall {
     private JsonPersistentParameter parameter;
-    private JsonPersistentReturnValue returnValue;
+    private Object returnValue;
 
     public JsonPersistentMethodCall() {
         // DEFAULT CONST FOR JSON SER/DES
     }
 
-    public JsonPersistentMethodCall(final JsonPersistentParameter jsonPersistentParameter, final JsonPersistentReturnValue jsonPersistentReturnValue) {
+    public JsonPersistentMethodCall(final JsonPersistentParameter jsonPersistentParameter, final Object jsonPersistentReturnValue) {
         this.parameter = jsonPersistentParameter;
         this.returnValue = jsonPersistentReturnValue;
     }
@@ -19,11 +19,11 @@ public class JsonPersistentMethodCall implements PersistentMethodCall {
     }
 
     @Override
-    public JsonPersistentReturnValue getPersistentReturnValue() {
+    public Object getPersistentReturnValue() {
         return returnValue;
     }
 
-    public void setReturnValue(final JsonPersistentReturnValue returnValue) {
+    public void setReturnValue(final Object returnValue) {
         this.returnValue = returnValue;
     }
 

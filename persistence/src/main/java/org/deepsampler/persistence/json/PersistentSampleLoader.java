@@ -77,7 +77,7 @@ public class PersistentSampleLoader {
     private SampleDefinition mapToSample(final SampledMethod matchingJointPoint, final PersistentSampleMethod persistentSampleMethod,
                                          final PersistentMethodCall call) {
         final List<Object> parameterEnvelopes = call.getPersistentParameter().getParameter();
-        final Object returnValueEnvelope = call.getPersistentReturnValue().getReturnValue();
+        final Object returnValueEnvelope = call.getPersistentReturnValue();
         final Class<?>[] parameterTypes = matchingJointPoint.getMethod().getParameterTypes();
         final Class<?> returnType = matchingJointPoint.getMethod().getReturnType();
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
@@ -117,7 +117,7 @@ public class PersistentSampleLoader {
 
     private List<ParameterMatcher> toMatcher(final List<Object> params) {
         return params.stream()
-                .map(Matchers::equalTo)
+                .map(Matchers.EqualsMatcher::new)
                 .collect(Collectors.toList());
     }
 

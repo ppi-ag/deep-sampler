@@ -77,7 +77,7 @@ public class JsonRecorder extends JsonOperator {
             final List<Object> argsAsPersistentBeans = PersistentBeanFactory.toBeanIfNecessary(call.getArgs());
             final Object returnValuePersistentBean = PersistentBeanFactory.toBeanIfNecessary(call.getReturnValue());
             jsonPersistentActualSample.addCall(new JsonPersistentParameter(argsAsPersistentBeans),
-                    new JsonPersistentReturnValue(returnValuePersistentBean));
+                    returnValuePersistentBean);
         }
         sampleMethodJsonPersistentActualSampleMap.put(persistentSampleMethod, jsonPersistentActualSample);
     }
