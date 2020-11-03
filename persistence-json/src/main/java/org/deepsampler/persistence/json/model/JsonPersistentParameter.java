@@ -1,4 +1,6 @@
-package org.deepsampler.persistence.model;
+package org.deepsampler.persistence.json.model;
+
+import org.deepsampler.persistence.model.PersistentParameter;
 
 import java.util.ArrayList;
 import java.util.List;

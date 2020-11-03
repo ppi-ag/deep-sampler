@@ -1,7 +1,7 @@
 {
   "id" : "e189ff1a-24ca-4a0b-ad70-d80a612b3a98",
   "sampleMethodToSampleMap" : {
-    "public java.lang.String org.deepsampler.persistence.PersistentSamplerManagerTest$InnerBean.say()" : {
+    "public java.lang.String org.deepsampler.persistence.json.PersistentSamplerManagerTest$InnerBean.say()" : {
       "callMap" : [ {
         "parameter" : {
           "args" : [ ]

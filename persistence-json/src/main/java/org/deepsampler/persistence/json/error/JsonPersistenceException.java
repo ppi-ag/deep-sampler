@@ -1,4 +1,6 @@
-package org.deepsampler.persistence.error;
+package org.deepsampler.persistence.json.error;
+
+import org.deepsampler.persistence.error.PersistenceException;
 
 public class JsonPersistenceException extends PersistenceException {
 

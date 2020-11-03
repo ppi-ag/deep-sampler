@@ -1,4 +1,6 @@
-package org.deepsampler.persistence.model;
+package org.deepsampler.persistence.json.model;
+
+import org.deepsampler.persistence.model.PersistentMethodCall;
 
 public class JsonPersistentMethodCall implements PersistentMethodCall {
     private JsonPersistentParameter parameter;

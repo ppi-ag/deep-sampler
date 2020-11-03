@@ -1,4 +1,4 @@
-package org.deepsampler.persistence;
+package org.deepsampler.persistence.json;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;

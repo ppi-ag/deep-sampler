@@ -1,4 +1,4 @@
-package org.deepsampler.persistence;
+package org.deepsampler.persistence.json;
 
 import org.deepsampler.core.internal.api.ExecutionManager;
 import org.deepsampler.core.model.*;

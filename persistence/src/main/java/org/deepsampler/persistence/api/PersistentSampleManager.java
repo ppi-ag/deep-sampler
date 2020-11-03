@@ -2,8 +2,8 @@ package org.deepsampler.persistence.api;
 
 import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.model.*;
-import org.deepsampler.persistence.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.error.PersistenceException;
+import org.deepsampler.persistence.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.model.PersistentActualSample;
 import org.deepsampler.persistence.model.PersistentMethodCall;
 import org.deepsampler.persistence.model.PersistentModel;
