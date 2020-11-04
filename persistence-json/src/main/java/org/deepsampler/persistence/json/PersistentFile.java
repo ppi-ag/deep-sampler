@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 
+/**
+ * Representation of an ordinary file in the file system.
+ */
 public class PersistentFile implements PersistentResource {
 
     private final Path filePath;
@@ -15,6 +18,9 @@ public class PersistentFile implements PersistentResource {
         this.filePath = filePath;
     }
 
+    /**
+     * @return path of the persistent file in the filesystem
+     */
     public Path getFilePath() {
         return filePath;
     }

@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.OpenOption;
 
+/**
+ * Representation of a file in the jar archive.
+ */
 public class PersistentClassPathResource implements PersistentResource {
 
     private final String resourcePath;

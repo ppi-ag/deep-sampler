@@ -34,6 +34,24 @@ public class JsonSourceManager implements SourceManager {
         return jsonLoader.load(persistentSamplerContext);
     }
 
+    /**
+     * Create a builder for the {@link JsonSourceManager} with an {@link PersistentResource}. A persistent
+     * resource is an abstract representation of an persistent file. There are two different ways
+     * you can access files in java:
+     * <ul>
+     *     <li>via classpath in a jar</li>
+     *     <li>in the filesystem</li>
+     * </ul>
+     *
+     * For each way there is an implementation of {@link PersistentResource}:
+     * <ul>
+     *     <li>{@link PersistentFile}</li>
+     *     <li>{@link PersistentClassPathResource}</li>
+     * </ul>
+     *
+     * @param resource
+     * @return
+     */
     public static Builder builder(final PersistentResource resource) {
         return new Builder(resource);
     }
