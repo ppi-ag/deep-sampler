@@ -2,8 +2,9 @@ package org.deepsampler.persistence.api;
 
 import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.model.*;
+import org.deepsampler.persistence.PersistentSamplerContext;
+import org.deepsampler.persistence.bean.ext.BeanFactoryExtension;
 import org.deepsampler.persistence.error.PersistenceException;
-import org.deepsampler.persistence.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.model.PersistentActualSample;
 import org.deepsampler.persistence.model.PersistentMethodCall;
 import org.deepsampler.persistence.model.PersistentModel;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  */
 public class PersistentSampleManager {
     private final List<SourceManager> sourceManagerList = new ArrayList<>();
+    private final PersistentSamplerContext persistentSamplerContext = new PersistentSamplerContext();
 
     public PersistentSampleManager(final SourceManager sourceManager) {
         addSourceProvider(sourceManager);
@@ -36,24 +38,28 @@ public class PersistentSampleManager {
         return this;
     }
 
+    public void beanExtension(BeanFactoryExtension beanFactoryExtension) {
+        persistentSamplerContext.addBeanFactoryExtension(beanFactoryExtension);
+    }
+
     /**
-     * End of chain method: {@link SourceManager#record(Map)} on all added {@link SourceManager}s.
+     * End of chain method: {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
     public void record() {
         for (final SourceManager sourceManager: sourceManagerList) {
-            sourceManager.record(ExecutionRepository.getInstance().getAll());
+            sourceManager.save(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
         }
     }
 
     /**
-     * End of chain method: Calls {@link SourceManager#load()} on all {@link SourceManager}s and write
+     * End of chain method: Calls {@link SourceManager#load(PersistentSamplerContext)} on all {@link SourceManager}s and write
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {
         for (final SourceManager sourceManager: sourceManagerList) {
             final Map<String, SampledMethod> definedSamples = SampleRepository.getInstance().getSamples().stream()
                     .collect(Collectors.toMap(SampleDefinition::getSampleId, SampleDefinition::getSampledMethod));
-            final PersistentModel persistentModel = sourceManager.load();
+            final PersistentModel persistentModel = sourceManager.load(persistentSamplerContext);
 
             final List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
 
@@ -129,7 +135,7 @@ public class PersistentSampleManager {
     }
 
     private Object unwrapValue(final Class<?> type, final Object persistentBean) {
-        return PersistentBeanFactory.convertValueFromPersistentBeanIfNecessary(persistentBean, type);
+        return persistentSamplerContext.getPersistentBeanFactory().convertValueFromPersistentBeanIfNecessary(persistentBean, type);
     }
 
     private List<ParameterMatcher<?>> toMatcher(final List<Object> params) {

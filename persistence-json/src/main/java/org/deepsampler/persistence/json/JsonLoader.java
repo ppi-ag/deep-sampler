@@ -1,8 +1,9 @@
 package org.deepsampler.persistence.json;
 
 import com.fasterxml.jackson.databind.Module;
-import org.deepsampler.persistence.json.extension.DeserializationExtension;
+import org.deepsampler.persistence.PersistentSamplerContext;
 import org.deepsampler.persistence.json.error.JsonPersistenceException;
+import org.deepsampler.persistence.json.extension.DeserializationExtension;
 import org.deepsampler.persistence.json.model.JsonSampleModel;
 import org.deepsampler.persistence.model.PersistentModel;
 
@@ -22,7 +23,7 @@ public class JsonLoader extends JsonOperator {
         super(pathToJson, deserializerList, Collections.emptyList(), moduleList);
     }
 
-    public PersistentModel load() {
+    public PersistentModel load(PersistentSamplerContext persistentSamplerContext) {
         try {
             return createObjectMapper().readValue(Files.newBufferedReader(getPath()), JsonSampleModel.class);
         } catch (final IOException e) {
