@@ -14,7 +14,7 @@ import java.util.Map;
  * <p>
  *     You will have to define two methods:
  *     <ul>
- *         <li>record(...): Basically you have to write the provided data to your data source. There is no constraint on
+ *         <li>save(...): Basically you have to write the provided data to your data source. There is no constraint on
  *         how you do it, you just should write it in a form so that you are able to load it correctly again.</li>
  *         <li>load(...): Load your data and transform your data to an implementation of {@link PersistentModel}</li>
  *     </ul>
@@ -23,12 +23,12 @@ import java.util.Map;
 public interface SourceManager {
 
     /**
-     * Record the executionInformation collected on runtime to your data source.
+     * Save the executionInformation collected on runtime to your data source.
      *
      * @param executionInformation the executionInformation mapped by class
      * @param persistentSamplerContext context of the persistent sampler
      */
-    void record(Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext);
+    void save(Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext);
 
     /**
      * Load the data you wrote. You will also have to transform this (if not already happened by design) to an

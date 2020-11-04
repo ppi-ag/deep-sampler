@@ -43,11 +43,11 @@ public class PersistentSampleManager {
     }
 
     /**
-     * End of chain method: {@link SourceManager#record(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
+     * End of chain method: {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
     public void record() {
         for (final SourceManager sourceManager: sourceManagerList) {
-            sourceManager.record(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
+            sourceManager.save(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
         }
     }
 

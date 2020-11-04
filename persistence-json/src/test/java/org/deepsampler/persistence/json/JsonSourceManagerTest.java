@@ -43,7 +43,7 @@ public class JsonSourceManagerTest {
                 .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
                 .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
                 .build();
-        sourceManager.record(executionInformationMap, new PersistentSamplerContext());
+        sourceManager.save(executionInformationMap, new PersistentSamplerContext());
 
         // THEN
         Files.exists(Paths.get(pathAsString));
@@ -71,7 +71,7 @@ public class JsonSourceManagerTest {
         JsonSourceManager sourceManager = JsonSourceManager.builder(pathAsString)
                 .addModule(module)
                 .build();
-        sourceManager.record(executionInformationMap, new PersistentSamplerContext());
+        sourceManager.save(executionInformationMap, new PersistentSamplerContext());
 
         // THEN
         Files.exists(Paths.get(pathAsString));

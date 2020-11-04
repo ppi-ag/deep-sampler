@@ -27,7 +27,7 @@ public class JsonSourceManager implements SourceManager {
     }
 
     @Override
-    public void record(final Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext) {
+    public void save(final Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext) {
         jsonRecorder.record(executionInformation, persistentSamplerContext);
     }
 
