@@ -3,7 +3,7 @@ package org.deepsampler.persistence.json.bean;
 import org.deepsampler.persistence.json.model.PersistentBean;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class DefaultPersistentBean implements PersistentBean {
@@ -11,11 +11,11 @@ public class DefaultPersistentBean implements PersistentBean {
     private Map<String, Object> values;
 
     public DefaultPersistentBean() {
-        values = new HashMap<>();
+        values = new LinkedHashMap<>();
     }
 
     public DefaultPersistentBean(final Map<String, Object> values) {
-        this.values = new HashMap<>(values);
+        this.values = new LinkedHashMap<>(values);
     }
 
     @Override

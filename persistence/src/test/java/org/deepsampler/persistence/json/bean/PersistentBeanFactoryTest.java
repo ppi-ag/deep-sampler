@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -271,6 +272,43 @@ class PersistentBeanFactoryTest {
         @SuppressWarnings("unchecked")
         public <T> T ofBean(PersistentBean bean, Class<T> cls) {
             return (T) new SimpleTestBean();
+        }
+    }
+
+    @Test
+    void ofBeanSimpleImmutable() {
+        // GIVEN
+        final String keyOne = "0$abc";
+        final String keyTwo = "0$def";
+        final Map<String, Object> values = new LinkedHashMap<>();
+        values.put(keyOne, "ME AND ALL");
+        values.put(keyTwo, "ME AND MORE");
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+
+        // WHEN
+        final ImmutableSimpleTestBean testBean = new PersistentBeanFactory()
+                .createValueFromPersistentBean(defaultPersistentBean, ImmutableSimpleTestBean.class);
+
+        // THEN
+        assertEquals("ME AND ALL", testBean.getAbc());
+        assertEquals("ME AND MORE", testBean.getDef());
+    }
+
+    private static class ImmutableSimpleTestBean {
+        private final String abc;
+        private final String def;
+
+        public ImmutableSimpleTestBean(String abc, String def) {
+            this.abc = abc;
+            this.def = def;
+        }
+
+        public String getAbc() {
+            return abc;
+        }
+
+        public String getDef() {
+            return def;
         }
     }
 
