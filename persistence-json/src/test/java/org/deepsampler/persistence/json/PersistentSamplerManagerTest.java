@@ -28,7 +28,7 @@ class PersistentSamplerManagerTest {
                 .addMethodCall(new MethodCall("HELLO AGAIN", null));
 
         // WHEN
-        PersistentSampler.source(JsonSourceManager.builder("./record/testApiSay.json").build())
+        PersistentSampler.source(JsonSourceManager.builderWithFile("./record/testApiSay.json").build())
                 .record();
 
         // THEN
@@ -55,7 +55,7 @@ class PersistentSamplerManagerTest {
         SampleRepository.getInstance().add(saySample);
 
         // WHEN
-        PersistentSampler.source(JsonSourceManager.builder("./record/testApiSayPersistent.json").build())
+        PersistentSampler.source(JsonSourceManager.builderWithFile("./record/testApiSayPersistent.json").build())
                 .load();
 
         // THEN
@@ -74,7 +74,7 @@ class PersistentSamplerManagerTest {
                 .addMethodCall(new MethodCall(LocalDateTime.of(2019, 2 ,2 ,2 ,2), null));
 
         // WHEN
-        PersistentSampler.source(JsonSourceManager.builder("./record/testApiDate.json").build())
+        PersistentSampler.source(JsonSourceManager.builderWithFile("./record/testApiDate.json").build())
                 .record();
 
         // THEN
@@ -101,7 +101,7 @@ class PersistentSamplerManagerTest {
         SampleRepository.getInstance().add(dateSample);
 
         // WHEN
-        PersistentSampler.source(JsonSourceManager.builder("./record/testApiDatePersistent.json").build())
+        PersistentSampler.source(JsonSourceManager.builderWithFile("./record/testApiDatePersistent.json").build())
                 .load();
 
         // THEN

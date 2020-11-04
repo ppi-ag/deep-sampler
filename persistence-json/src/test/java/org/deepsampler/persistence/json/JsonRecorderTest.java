@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,11 +23,11 @@ class JsonRecorderTest {
 
         final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
         sample.setSampleId("TestMethodForRecord");
-        ExecutionManager.record(sample, new MethodCall("ABC", Arrays.asList("Args1")));
-        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Arrays.asList("Args1")));
+        ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList("Args1")));
+        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
 
         // WHEN
-        new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+        new JsonRecorder(new PersistentFile(path)).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));
@@ -40,11 +40,11 @@ class JsonRecorderTest {
         final Path path = Paths.get("./record/testTimeTemp.json");
         final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
         sample.setSampleId("TestMethodForRecord");
-        ExecutionManager.record(sample, new MethodCall("ABC", Arrays.asList(LocalDateTime.now())));
-        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Arrays.asList("Args1")));
+        ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList(LocalDateTime.now())));
+        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
 
         // WHEN
-        new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+        new JsonRecorder(new PersistentFile(path)).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));

@@ -15,28 +15,27 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.deepsampler.persistence.json.extension.DeserializationExtension;
 import org.deepsampler.persistence.json.extension.SerializationExtension;
 
-import java.nio.file.Path;
 import java.util.List;
 
 public abstract class JsonOperator {
 
-    private final Path path;
+    private final PersistentResource persistentResource;
     private final List<SerializationExtension<?>> serializationExtensions;
     private final List<DeserializationExtension<?>> deserializationExtensions;
     private final List<Module> moduleList;
 
-    protected JsonOperator(Path pathToJson,
+    protected JsonOperator(PersistentResource persistentResource,
                         List<DeserializationExtension<?>> deserializerList,
                         List<SerializationExtension<?>> serializerList,
                         List<Module> moduleList) {
-        this.path = pathToJson;
+        this.persistentResource = persistentResource;
         this.serializationExtensions = serializerList;
         this.deserializationExtensions = deserializerList;
         this.moduleList = moduleList;
     }
 
-    protected Path getPath() {
-        return path;
+    protected PersistentResource getPersistentResource() {
+        return persistentResource;
     }
 
     protected ObjectMapper createObjectMapper() {

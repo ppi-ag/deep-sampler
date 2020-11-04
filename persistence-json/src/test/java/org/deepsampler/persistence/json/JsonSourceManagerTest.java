@@ -20,8 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JsonSourceManagerTest {
 
@@ -39,7 +38,7 @@ public class JsonSourceManagerTest {
         final String pathAsString = "./abc.json";
 
         // WHEN
-        JsonSourceManager sourceManager = JsonSourceManager.builder(pathAsString)
+        JsonSourceManager sourceManager = JsonSourceManager.builderWithFile(pathAsString)
                 .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
                 .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
                 .build();
@@ -68,7 +67,7 @@ public class JsonSourceManagerTest {
         final SimpleModule module = new SimpleModule();
         module.addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer());
         module.addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer());
-        JsonSourceManager sourceManager = JsonSourceManager.builder(pathAsString)
+        JsonSourceManager sourceManager = JsonSourceManager.builderWithFile(pathAsString)
                 .addModule(module)
                 .build();
         sourceManager.save(executionInformationMap, new PersistentSamplerContext());
@@ -88,7 +87,7 @@ public class JsonSourceManagerTest {
         final SimpleModule module = new SimpleModule();
         module.addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer());
         module.addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer());
-        JsonSourceManager sourceManager = JsonSourceManager.builder(pathAsString)
+        JsonSourceManager sourceManager = JsonSourceManager.builderWithFile(pathAsString)
                 .addModule(module)
                 .build();
         PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
@@ -104,7 +103,7 @@ public class JsonSourceManagerTest {
         final String pathAsString = "./record/testPersistent.json";
 
         // WHEN
-        JsonSourceManager sourceManager = JsonSourceManager.builder(pathAsString)
+        JsonSourceManager sourceManager = JsonSourceManager.builderWithFile(pathAsString)
                 .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
                 .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
                 .build();
@@ -112,6 +111,17 @@ public class JsonSourceManagerTest {
 
         // THEN
         assertNull(persistentModel.getSampleMethodToSampleMap().entrySet().iterator().next()
+                .getValue().getAllCalls().get(0).getPersistentParameter().getParameter());
+    }
+
+    @Test
+    public void testBuilderWithClassPathResource() {
+        // WHEN
+        JsonSourceManager sourceManager = JsonSourceManager.builder(new PersistentClassPathResource("myTestJson.json", getClass())).build();
+        PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
+
+        // THEN
+        assertNotNull(persistentModel.getSampleMethodToSampleMap().entrySet().iterator().next()
                 .getValue().getAllCalls().get(0).getPersistentParameter().getParameter());
     }
 

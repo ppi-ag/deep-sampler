@@ -1,6 +1,7 @@
 package org.deepsampler.persistence.bean;
 
 import org.deepsampler.persistence.bean.ext.BeanFactoryExtension;
+import org.deepsampler.persistence.error.PersistenceException;
 import org.deepsampler.persistence.model.PersistentBean;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -8,16 +9,14 @@ import org.objenesis.instantiator.ObjectInstantiator;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PersistentBeanFactory {
 
-    private final List<org.deepsampler.persistence.bean.ext.BeanFactoryExtension> beanFactoryExtensions = new ArrayList<>();
+    private final List<BeanFactoryExtension> beanFactoryExtensions = new ArrayList<>();
 
     public void addExtension(BeanFactoryExtension extension) {
         beanFactoryExtensions.add(extension);
@@ -47,17 +46,71 @@ public class PersistentBeanFactory {
             return applicableExtensions.get(0).ofBean(value, type);
         }
 
-        final T instance = instantiate(type);
-
+        final T instance;
         final Map<Field, String> fields = getAllFields(type);
+
+        if (hasFinalFields(fields)) {
+            instance = instantiateUsingMatchingConstructor(type, value, fields);
+        } else {
+            instance = instantiate(type);
+
+            for (final Map.Entry<Field, String> entry : fields.entrySet()) {
+                final Field field = entry.getKey();
+                final String key = entry.getValue();
+
+                transferFromBean(value, instance, field, key);
+            }
+        }
+        return instance;
+    }
+
+    private <T> T instantiateUsingMatchingConstructor(final Class<T> type,
+                                                      final PersistentBean persistentBean,
+                                                      Map<Field, String> fields) {
+        try {
+            return createInstance(type, persistentBean, fields);
+
+        } catch (NoSuchMethodException | InstantiationException
+                | IllegalAccessException | InvocationTargetException e) {
+            throw new PersistenceException("While the type %s has final fields, it was " +
+                    "tried to use a matching constructor for all field-values. Because this" +
+                    "was not possbile, please provide a BeanFactoryExtension.", e, type);
+        }
+    }
+
+    private <T> T createInstance(Class<T> type, PersistentBean persistentBean, Map<Field, String> fields) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Class<?>[] parameterTypes = fields.keySet()
+                .stream()
+                .map(Field::getType)
+                .toArray(Class[]::new);
+
+        List<Object> values = createValuesForConstructingInstance(persistentBean, fields);
+        return type.getDeclaredConstructor(parameterTypes)
+                .newInstance(values.toArray());
+    }
+
+    private List<Object> createValuesForConstructingInstance(PersistentBean persistentBean, Map<Field, String> fields) {
+        List<Object> values = new ArrayList<>();
 
         for (final Map.Entry<Field, String> entry : fields.entrySet()) {
             final Field field = entry.getKey();
             final String key = entry.getValue();
 
-            transferFromBean(value, instance, field, key);
+            Object lookedUpValueInBean = persistentBean.getValue(key);
+            if (lookedUpValueInBean != null) {
+                if (lookedUpValueInBean instanceof DefaultPersistentBean) {
+                    lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
+                }
+            }
+            values.add(lookedUpValueInBean);
         }
-        return instance;
+        return values;
+    }
+
+    private boolean hasFinalFields(Map<Field, String> fields) {
+        return fields.entrySet()
+                .stream()
+                .anyMatch(entry -> Modifier.isFinal(entry.getKey().getModifiers()));
     }
 
     private <T> void transferFromBean(final PersistentBean persistentBean, final T instance, final Field field, final String key) {
@@ -150,7 +203,7 @@ public class PersistentBeanFactory {
     }
 
     private Map<Field, String> getAllFields(final Class<?> cls) {
-        final Map<Field, String> fields = new HashMap<>();
+        final Map<Field, String> fields = new LinkedHashMap<>();
         Class<?> currentCls = cls;
         int depth = 0;
         while (currentCls != null) {
