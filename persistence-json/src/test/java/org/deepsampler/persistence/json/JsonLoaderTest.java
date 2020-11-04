@@ -2,6 +2,7 @@ package org.deepsampler.persistence.json;
 
 import org.deepsampler.core.model.ExecutionRepository;
 import org.deepsampler.core.model.SampleRepository;
+import org.deepsampler.persistence.PersistentSamplerContext;
 import org.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
 import org.deepsampler.persistence.model.PersistentModel;
 import org.junit.jupiter.api.AfterEach;

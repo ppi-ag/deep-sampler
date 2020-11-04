@@ -80,7 +80,7 @@ class PersistentSamplerManagerTest {
         // THEN
         assertTrue(Files.exists(path));
         assertTrue(new String(Files.readAllBytes(path)).replaceAll("\\r", "").endsWith("sampleMethodToSampleMap\" : {\n" +
-                "    \"public java.time.LocalDateTime org.deepsampler.persistence.PersistentSamplerManagerTest$DateBean.now()\" : {\n" +
+                "    \"public java.time.LocalDateTime org.deepsampler.persistence.json.PersistentSamplerManagerTest$DateBean.now()\" : {\n" +
                 "      \"callMap\" : [ {\n" +
                 "        \"parameter\" : {\n" +
                 "          \"args\" : [ ]\n" +

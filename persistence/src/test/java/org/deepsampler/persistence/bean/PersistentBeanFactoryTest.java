@@ -1,7 +1,6 @@
 package org.deepsampler.persistence.bean;
 
-import org.deepsampler.persistence.json.bean.ext.StandardBeanFactoryExtension;
-import org.deepsampler.persistence.json.model.PersistentBean;
+import org.deepsampler.persistence.bean.ext.StandardBeanFactoryExtension;
 import org.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 

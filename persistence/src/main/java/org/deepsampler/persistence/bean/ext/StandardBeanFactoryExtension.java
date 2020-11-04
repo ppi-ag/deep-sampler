@@ -1,7 +1,7 @@
-package org.deepsampler.persistence.json.bean.ext;
+package org.deepsampler.persistence.bean.ext;
 
-import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
-import org.deepsampler.persistence.json.model.PersistentBean;
+import org.deepsampler.persistence.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.model.PersistentBean;
 
 public abstract class StandardBeanFactoryExtension implements BeanFactoryExtension {
 

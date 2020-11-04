@@ -2,14 +2,9 @@ package org.deepsampler.persistence.api;
 
 import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.model.*;
-import org.deepsampler.persistence.json.bean.ext.BeanFactoryExtension;
-import org.deepsampler.persistence.json.error.PersistenceException;
-import org.deepsampler.persistence.json.model.PersistentActualSample;
-import org.deepsampler.persistence.json.model.PersistentMethodCall;
-import org.deepsampler.persistence.json.model.PersistentModel;
-import org.deepsampler.persistence.json.model.PersistentSampleMethod;
+import org.deepsampler.persistence.PersistentSamplerContext;
+import org.deepsampler.persistence.bean.ext.BeanFactoryExtension;
 import org.deepsampler.persistence.error.PersistenceException;
-import org.deepsampler.persistence.bean.PersistentBeanFactory;
 import org.deepsampler.persistence.model.PersistentActualSample;
 import org.deepsampler.persistence.model.PersistentMethodCall;
 import org.deepsampler.persistence.model.PersistentModel;
@@ -48,7 +43,7 @@ public class PersistentSampleManager {
     }
 
     /**
-     * End of chain method: {@link SourceManager#record(Map)} on all added {@link SourceManager}s.
+     * End of chain method: {@link SourceManager#record(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
     public void record() {
         for (final SourceManager sourceManager: sourceManagerList) {
@@ -57,7 +52,7 @@ public class PersistentSampleManager {
     }
 
     /**
-     * End of chain method: Calls {@link SourceManager#load()} on all {@link SourceManager}s and write
+     * End of chain method: Calls {@link SourceManager#load(PersistentSamplerContext)} on all {@link SourceManager}s and write
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {

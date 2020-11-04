@@ -1,6 +1,7 @@
 package org.deepsampler.persistence.api;
 
 import org.deepsampler.core.model.ExecutionInformation;
+import org.deepsampler.persistence.PersistentSamplerContext;
 import org.deepsampler.persistence.model.PersistentModel;
 
 import java.util.Map;
@@ -25,14 +26,16 @@ public interface SourceManager {
      * Record the executionInformation collected on runtime to your data source.
      *
      * @param executionInformation the executionInformation mapped by class
+     * @param persistentSamplerContext context of the persistent sampler
      */
-    void record(Map<Class<?>, ExecutionInformation> executionInformation);
+    void record(Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext);
 
     /**
      * Load the data you wrote. You will also have to transform this (if not already happened by design) to an
      * implementation of {@link PersistentModel}.
      *
+     * @param persistentSamplerContext context of the persistent sampler
      * @return PersistentModel
      */
-    PersistentModel load();
+    PersistentModel load(PersistentSamplerContext persistentSamplerContext);
 }

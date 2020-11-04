@@ -1,6 +1,7 @@
-package org.deepsampler.persistence.json.bean.ext;
+package org.deepsampler.persistence.bean.ext;
 
-import org.deepsampler.persistence.json.model.PersistentBean;
+
+import org.deepsampler.persistence.model.PersistentBean;
 
 public interface BeanFactoryExtension {
     boolean isProcessable(Class<?> beanCls);
