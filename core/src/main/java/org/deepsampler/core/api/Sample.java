@@ -46,7 +46,7 @@ public class Sample {
 
     /**
      * Along with the subsequent method call it defines a Sample for which the framework should start to track
-     * the times this Sample is used in the component. This is necessary to be able to verify the invocation
+     * how often this Sample is used in the component. This is necessary to be able to verify the invocation
      * of a specific method.
      *
      * @param sampler the sampler for which you want to activate a method call
