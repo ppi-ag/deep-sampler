@@ -1,7 +1,7 @@
-package org.deepsampler.persistence.json;
+package org.deepsampler.persistence;
 
-import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
-import org.deepsampler.persistence.json.bean.ext.JavaTimeExtension;
+import org.deepsampler.persistence.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.bean.ext.JavaTimeExtension;
 
 public class SamplerBeanFactory {
 

@@ -1,12 +1,12 @@
-package org.deepsampler.persistence.json;
+package org.deepsampler.persistence;
 
-import org.deepsampler.persistence.json.bean.ext.BeanFactoryExtension;
-import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.bean.ext.BeanFactoryExtension;
 
 public class PersistentSamplerContext {
     private final PersistentBeanFactory persistentBeanFactory = SamplerBeanFactory.create();
 
-    void addBeanFactoryExtension(BeanFactoryExtension beanFactoryExtension) {
+    public void addBeanFactoryExtension(BeanFactoryExtension beanFactoryExtension) {
         persistentBeanFactory.addExtension(beanFactoryExtension);
     }
 

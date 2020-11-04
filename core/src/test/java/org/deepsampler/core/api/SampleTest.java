@@ -48,10 +48,10 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
-        assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches(PARAMETER_VALUE));
     }
 
     @Test
@@ -62,10 +62,10 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
-        assertTrue(parameter.get(0).matches(PARAMETER_VALUE));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches(PARAMETER_VALUE));
     }
 
 
@@ -77,10 +77,10 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
-        assertTrue(parameter.get(0).matches(BEAN_A_COPY));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_A_COPY));
     }
 
     @Test
@@ -133,10 +133,10 @@ class SampleTest {
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher> parameter = currentSampleDefinition.getParameterMatchers();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
 
         assertEquals(1, parameter.size());
-        assertTrue(parameter.get(0).matches(BEAN_A_COPY));
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_A_COPY));
     }
 
     @Test

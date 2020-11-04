@@ -1,7 +1,6 @@
-package org.deepsampler.persistence.json.bean;
+package org.deepsampler.persistence.bean;
 
 import org.deepsampler.persistence.json.bean.ext.BeanFactoryExtension;
-import org.deepsampler.persistence.json.error.PersistenceException;
 import org.deepsampler.persistence.json.model.PersistentBean;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -16,8 +15,7 @@ import java.util.stream.Collectors;
 
 public class PersistentBeanFactory {
 
-    private final List<BeanFactoryExtension> beanFactoryExtensions = new ArrayList<>();
-    private Class[] parameterTypes;
+    private final List<org.deepsampler.persistence.bean.ext.BeanFactoryExtension> beanFactoryExtensions = new ArrayList<>();
 
     public void addExtension(BeanFactoryExtension extension) {
         beanFactoryExtensions.add(extension);

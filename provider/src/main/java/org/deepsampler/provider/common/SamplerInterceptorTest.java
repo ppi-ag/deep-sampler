@@ -5,10 +5,10 @@ import org.deepsampler.core.api.Sampler;
 import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.model.SampleRepository;
+import org.deepsampler.persistence.api.PersistentSampleManager;
+import org.deepsampler.persistence.api.PersistentSampler;
+import org.deepsampler.persistence.error.PersistenceException;
 import org.deepsampler.persistence.json.JsonSourceManager;
-import org.deepsampler.persistence.json.PersistentSampleManager;
-import org.deepsampler.persistence.json.PersistentSampler;
-import org.deepsampler.persistence.json.error.PersistenceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

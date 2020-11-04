@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import org.deepsampler.core.model.ExecutionInformation;
+import org.deepsampler.persistence.PersistentSamplerContext;
+import org.deepsampler.persistence.api.SourceManager;
 import org.deepsampler.persistence.json.extension.DeserializationExtension;
 import org.deepsampler.persistence.json.extension.SerializationExtension;
-import org.deepsampler.persistence.json.model.PersistentModel;
+import org.deepsampler.persistence.model.PersistentModel;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ public class JsonSourceManager implements SourceManager {
 
 
     @Override
-    public void record(final Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext) {
+    public void save(final Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext) {
         jsonRecorder.record(executionInformation, persistentSamplerContext);
     }
 

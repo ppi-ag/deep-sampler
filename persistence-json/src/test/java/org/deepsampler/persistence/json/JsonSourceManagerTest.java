@@ -8,8 +8,9 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.deepsampler.core.model.*;
+import org.deepsampler.persistence.PersistentSamplerContext;
 import org.deepsampler.persistence.json.model.JsonPersistentParameter;
-import org.deepsampler.persistence.json.model.PersistentModel;
+import org.deepsampler.persistence.model.PersistentModel;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class JsonSourceManagerTest {
                 .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
                 .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
                 .build();
-        sourceManager.record(executionInformationMap, new PersistentSamplerContext());
+        sourceManager.save(executionInformationMap, new PersistentSamplerContext());
 
         // THEN
         Files.exists(Paths.get(pathAsString));
@@ -69,7 +70,7 @@ public class JsonSourceManagerTest {
         JsonSourceManager sourceManager = JsonSourceManager.builderWithFile(pathAsString)
                 .addModule(module)
                 .build();
-        sourceManager.record(executionInformationMap, new PersistentSamplerContext());
+        sourceManager.save(executionInformationMap, new PersistentSamplerContext());
 
         // THEN
         Files.exists(Paths.get(pathAsString));
