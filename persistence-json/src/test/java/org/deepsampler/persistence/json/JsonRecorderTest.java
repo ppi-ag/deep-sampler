@@ -26,7 +26,7 @@ class JsonRecorderTest {
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Arrays.asList("Args1")));
 
         // WHEN
-        new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll());
+        new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));
@@ -43,7 +43,7 @@ class JsonRecorderTest {
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Arrays.asList("Args1")));
 
         // WHEN
-        new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll());
+        new JsonRecorder(path).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));

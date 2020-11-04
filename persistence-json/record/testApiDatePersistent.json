@@ -1,0 +1,13 @@
+{
+  "id" : "85016168-0584-4583-8490-cf8e1eb4445f",
+  "sampleMethodToSampleMap" : {
+    "public java.time.LocalDateTime org.deepsampler.persistence.PersistentSamplerManagerTest$DateBean.now()" : {
+      "callMap" : [ {
+        "parameter" : {
+          "args" : [ ]
+        },
+        "returnValue" : [ "java.time.LocalDateTime", [ 2019, 2, 2, 2, 2 ] ]
+      } ]
+    }
+  }
+}

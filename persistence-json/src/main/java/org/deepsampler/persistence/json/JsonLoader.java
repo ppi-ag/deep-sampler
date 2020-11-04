@@ -22,7 +22,7 @@ public class JsonLoader extends JsonOperator {
         super(pathToJson, deserializerList, Collections.emptyList(), moduleList);
     }
 
-    public PersistentModel load() {
+    public PersistentModel load(PersistentSamplerContext persistentSamplerContext) {
         try {
             return createObjectMapper().readValue(Files.newBufferedReader(getPath()), JsonSampleModel.class);
         } catch (final IOException e) {

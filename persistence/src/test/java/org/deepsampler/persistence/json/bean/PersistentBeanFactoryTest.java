@@ -1,5 +1,6 @@
 package org.deepsampler.persistence.json.bean;
 
+import org.deepsampler.persistence.json.bean.ext.StandardBeanFactoryExtension;
 import org.deepsampler.persistence.json.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBean testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBean.class);
+        final SimpleTestBean testBean = new PersistentBeanFactory().createValueFromPersistentBean(defaultPersistentBean, SimpleTestBean.class);
 
         // THEN
         assertEquals("ME AND ALL", testBean.abc);
@@ -46,7 +47,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final TestBeanWithSuperclass testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, TestBeanWithSuperclass.class);
+        final TestBeanWithSuperclass testBean = new PersistentBeanFactory().createValueFromPersistentBean(defaultPersistentBean, TestBeanWithSuperclass.class);
 
         // THEN
         assertEquals("ME AND ALL in SUPERCLASS", testBean.getAbcSuperClass());
@@ -70,7 +71,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean2 = new DefaultPersistentBean(values2);
 
         // WHEN
-        final SimpleTestBean[] testBean = PersistentBeanFactory.ofBean(new DefaultPersistentBean[] {defaultPersistentBean, defaultPersistentBean2}, SimpleTestBean.class);
+        final SimpleTestBean[] testBean = new PersistentBeanFactory().ofBean(new DefaultPersistentBean[] {defaultPersistentBean, defaultPersistentBean2}, SimpleTestBean.class);
 
         // THEN
         assertEquals("ME AND ALL", testBean[0].abc);
@@ -93,7 +94,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values2);
 
         // WHEN
-        final SimpleTestBeanRec testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanRec.class);
+        final SimpleTestBeanRec testBean = new PersistentBeanFactory().createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanRec.class);
 
         // THEN
         assertEquals("ME AND MORE", testBean.str);
@@ -110,7 +111,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBeanWithPrimitive testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
+        final SimpleTestBeanWithPrimitive testBean = new PersistentBeanFactory().createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithPrimitive.class);
 
         // THEN
         assertEquals(2, testBean.simpleInt);
@@ -140,7 +141,7 @@ class PersistentBeanFactoryTest {
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
-        final SimpleTestBeanWithDates testBean = PersistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithDates.class);
+        final SimpleTestBeanWithDates testBean = new PersistentBeanFactory().createValueFromPersistentBean(defaultPersistentBean, SimpleTestBeanWithDates.class);
 
         // THEN
         assertEquals(today, testBean.localDate);
@@ -157,7 +158,7 @@ class PersistentBeanFactoryTest {
         testBean.def = "456";
 
         // WHEN
-        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
 
         // THEN
         assertEquals("123", bean.getValue("0$abc"));
@@ -173,7 +174,7 @@ class PersistentBeanFactoryTest {
         testBean.str = "ABC";
 
         // WHEN
-        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
 
         // THEN
         assertEquals("ABC", bean.getValue("0$str"));
@@ -188,7 +189,7 @@ class PersistentBeanFactoryTest {
         testBean.longArray = new long[] {21};
 
         // WHEN
-        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
 
         // THEN
         assertEquals(2, bean.getValue("0$simpleInt"));
@@ -205,13 +206,72 @@ class PersistentBeanFactoryTest {
         testBean.setAbcSuperClass("SUPER");
 
         // WHEN
-        final PersistentBean bean  = PersistentBeanFactory.toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
 
         // THEN
         assertEquals("abc", bean.getValue("0$abc"));
         assertEquals("SUPER", bean.getValue("1$abc"));
         assertEquals("def", bean.getValue("1$def"));
         assertEquals("yxc", bean.getValue("0$yxc"));
+    }
+
+    @Test
+    void toBeanWithSimpleExtension() {
+        // GIVEN
+        SimpleTestBean simpleTestBean = new SimpleTestBean();
+        simpleTestBean.abc = "A";
+        PersistentBeanFactory persistentBeanFactory = new PersistentBeanFactory();
+        persistentBeanFactory.addExtension(new SimpleTestExtension());
+        SimpleTestBeanWithPrimitive simpleTestBeanWithPrimitive = new SimpleTestBeanWithPrimitive();
+        simpleTestBeanWithPrimitive.simpleInt = 3;
+
+        // WHEN
+        PersistentBean bean = persistentBeanFactory.toBean(simpleTestBean);
+        PersistentBean beanWithPrim = persistentBeanFactory.toBean(simpleTestBeanWithPrimitive);
+
+        // THEN
+        assertEquals(0, bean.getValues().size());
+        assertEquals(2, beanWithPrim.getValues().size());
+        assertEquals(3, beanWithPrim.getValue("0$simpleInt"));
+    }
+
+    @Test
+    void ofBeanWithSimpleExtension() {
+        // GIVEN
+        final String keyOne = "0$abc";
+        final String keyTwo = "0$def";
+        final Map<String, Object> values = new HashMap<>();
+        values.put(keyOne, "ME AND ALL");
+        values.put(keyTwo, "ME AND MORE");
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+        PersistentBeanFactory persistentBeanFactory = new PersistentBeanFactory();
+        persistentBeanFactory.addExtension(new SimpleTestExtension());
+
+        // WHEN
+        final SimpleTestBean testBean = persistentBeanFactory.createValueFromPersistentBean(defaultPersistentBean, SimpleTestBean.class);
+
+        // THEN
+        assertNull(testBean.abc);
+        assertNull(testBean.def);
+    }
+
+    private static class SimpleTestExtension extends StandardBeanFactoryExtension {
+
+        @Override
+        public boolean isProcessable(Class<?> beanCls) {
+            return SimpleTestBean.class.isAssignableFrom(beanCls);
+        }
+
+        @Override
+        public PersistentBean toBean(Object bean) {
+            return new DefaultPersistentBean();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T ofBean(PersistentBean bean, Class<T> cls) {
+            return (T) new SimpleTestBean();
+        }
     }
 
     private static class SimpleTestBean {

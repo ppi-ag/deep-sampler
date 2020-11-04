@@ -25,13 +25,13 @@ public class JsonSourceManager implements SourceManager {
     }
 
     @Override
-    public void record(final Map<Class<?>, ExecutionInformation> executionInformation) {
-        jsonRecorder.record(executionInformation);
+    public void record(final Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext) {
+        jsonRecorder.record(executionInformation, persistentSamplerContext);
     }
 
     @Override
-    public PersistentModel load() {
-        return jsonLoader.load();
+    public PersistentModel load(PersistentSamplerContext persistentSamplerContext) {
+        return jsonLoader.load(persistentSamplerContext);
     }
 
     public static Builder builder(final String pathAsString) {

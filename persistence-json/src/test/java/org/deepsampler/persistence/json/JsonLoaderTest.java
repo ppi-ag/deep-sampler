@@ -20,7 +20,7 @@ class JsonLoaderTest {
         final Path path = Paths.get("./record/testPersistent.json");
 
         // WHEN
-        final PersistentModel persistentModel = new JsonLoader(path).load();
+        final PersistentModel persistentModel = new JsonLoader(path).load(new PersistentSamplerContext());
 
         // THEN
         assertEquals(1, persistentModel.getSampleMethodToSampleMap().size());
@@ -33,7 +33,7 @@ class JsonLoaderTest {
         final Path path = Paths.get("./record/testTimePersistent.json");
 
         // WHEN
-        final PersistentModel persistentModel = new JsonLoader(path).load();
+        final PersistentModel persistentModel = new JsonLoader(path).load(new PersistentSamplerContext());
 
         // THEN
         assertEquals(1, persistentModel.getSampleMethodToSampleMap().size());

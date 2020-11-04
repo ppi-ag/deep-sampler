@@ -2,7 +2,7 @@ package org.deepsampler.persistence.json;
 
 import org.deepsampler.core.api.Matchers;
 import org.deepsampler.core.model.*;
-import org.deepsampler.persistence.json.bean.PersistentBeanFactory;
+import org.deepsampler.persistence.json.bean.ext.BeanFactoryExtension;
 import org.deepsampler.persistence.json.error.PersistenceException;
 import org.deepsampler.persistence.json.model.PersistentActualSample;
 import org.deepsampler.persistence.json.model.PersistentMethodCall;
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class PersistentSampleManager {
     private final List<SourceManager> sourceManagerList = new ArrayList<>();
+    private final PersistentSamplerContext persistentSamplerContext = new PersistentSamplerContext();
 
     public PersistentSampleManager(final SourceManager sourceManager) {
         addSourceProvider(sourceManager);
@@ -26,9 +27,13 @@ public class PersistentSampleManager {
         return this;
     }
 
+    public void beanExtension(BeanFactoryExtension beanFactoryExtension) {
+        persistentSamplerContext.addBeanFactoryExtension(beanFactoryExtension);
+    }
+
     public void record() {
         for (final SourceManager sourceManager: sourceManagerList) {
-            sourceManager.record(ExecutionRepository.getInstance().getAll());
+            sourceManager.record(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
         }
     }
 
@@ -36,7 +41,7 @@ public class PersistentSampleManager {
         for (final SourceManager sourceManager: sourceManagerList) {
             final Map<String, SampledMethod> definedSamples = SampleRepository.getInstance().getSamples().stream()
                     .collect(Collectors.toMap(SampleDefinition::getSampleId, SampleDefinition::getSampledMethod));
-            final PersistentModel persistentModel = sourceManager.load();
+            final PersistentModel persistentModel = sourceManager.load(persistentSamplerContext);
 
             final List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
 
@@ -112,7 +117,7 @@ public class PersistentSampleManager {
     }
 
     private Object unwrapValue(final Class<?> type, final Object persistentBean) {
-        return PersistentBeanFactory.convertValueFromPersistentBeanIfNecessary(persistentBean, type);
+        return persistentSamplerContext.getPersistentBeanFactory().convertValueFromPersistentBeanIfNecessary(persistentBean, type);
     }
 
     private List<ParameterMatcher> toMatcher(final List<Object> params) {
