@@ -44,6 +44,15 @@ public class Sample {
                 SampleRepository.getInstance().getCurrentSampleDefinition());
     }
 
+    /**
+     * Along with the subsequent method call it defines a Sample for which the framework should start to track
+     * how often this Sample is used in the component. This is necessary to be able to verify the invocation
+     * of a specific method.
+     *
+     * @param sampler the sampler for which you want to activate a method call
+     * @param <T> the type of the target Class/sampler
+     * @return the sampler itself
+     */
     public static <T> T forVerification(final T sampler) {
         Objects.requireNonNull(sampler);
 
@@ -54,10 +63,28 @@ public class Sample {
         return sampler;
     }
 
+    /**
+     * Along with the subsequent method call you can assert that this method call has been called
+     * <code>quantity</code>-times. If the quantity doesn't match exactly this method
+     * will throw a {@link org.deepsampler.core.error.VerifyException}. If it does match nothing will happen.
+     *
+     * @param cls the class of which you want to assert a specific method invocation
+     * @param quantity the quantity you expect this invocation to happen
+     * @param <T> the type of the class you want assert
+     * @return Proxy to subsequently define the method which invocation you want to assert
+     */
     public static <T> T verifyCallQuantity(final Class<T> cls, final Quantity quantity) {
         return ProxyFactory.createProxy(cls, new VerifySampleHandler(quantity, cls));
     }
 
+    /**
+     * This method will set the <code>sampleId</code> of the last defined sampleDefinition. Mostly you
+     * want to set the sampleId with the Method {@link SampleBuilder#hasId(String)}. But in case of
+     * void-returning methods, it is not possible to create a {@link SampleBuilder}. As a consequence
+     * you will need to set the id with this method.
+     *
+     * @param id the id you want to set.
+     */
     public static void setIdToLastMethodCall(String id) {
         SampleRepository.getInstance().getCurrentSampleDefinition().setSampleId(id);
     }

@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import org.deepsampler.core.model.ExecutionInformation;
+import org.deepsampler.persistence.api.SourceManager;
 import org.deepsampler.persistence.json.extension.DeserializationExtension;
 import org.deepsampler.persistence.json.extension.SerializationExtension;
-import org.deepsampler.persistence.json.model.PersistentModel;
+import org.deepsampler.persistence.model.PersistentModel;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

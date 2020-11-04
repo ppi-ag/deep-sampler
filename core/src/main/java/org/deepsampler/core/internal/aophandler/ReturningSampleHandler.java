@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public abstract class ReturningSampleHandler implements MethodHandler {
 
     protected SampleDefinition createSampleDefinition(final Class<?> cls, final Method method, final Object[] args) {
-        List<ParameterMatcher> parameterMatchers = collectMatchersForParameters(method, args);
+        List<ParameterMatcher<?>> parameterMatchers = collectMatchersForParameters(method, args);
 
         final SampledMethod sampledMethod = new SampledMethod(cls, method);
         final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
@@ -67,8 +67,8 @@ public abstract class ReturningSampleHandler implements MethodHandler {
         throw new InvalidConfigException("The unknown primitive '" + cls + "' appeared");
     }
 
-    private List<ParameterMatcher> collectMatchersForParameters(Method method, Object[] parameters) {
-        List<ParameterMatcher> currentParameterMatchers = SampleRepository.getInstance().getCurrentParameterMatchers();
+    private List<ParameterMatcher<?>> collectMatchersForParameters(Method method, Object[] parameters) {
+        List<ParameterMatcher<?>> currentParameterMatchers = SampleRepository.getInstance().getCurrentParameterMatchers();
 
         SampleRepository.getInstance().clearCurrentParameterMatchers();
 

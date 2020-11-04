@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.deepsampler.core.model.*;
 import org.deepsampler.persistence.json.model.JsonPersistentParameter;
-import org.deepsampler.persistence.json.model.PersistentModel;
+import org.deepsampler.persistence.model.PersistentModel;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

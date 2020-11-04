@@ -1,8 +1,7 @@
-package org.deepsampler.persistence;
+package org.deepsampler.persistence.json;
 
 import org.deepsampler.core.model.*;
-import org.deepsampler.persistence.json.JsonSourceManager;
-import org.deepsampler.persistence.json.PersistentSampler;
+import org.deepsampler.persistence.api.PersistentSampler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +34,7 @@ class PersistentSamplerManagerTest {
         // THEN
         assertTrue(Files.exists(path));
         assertTrue(new String(Files.readAllBytes(path)).replaceAll("\\r", "").endsWith("sampleMethodToSampleMap\" : {\n" +
-                "    \"public java.lang.String org.deepsampler.persistence.PersistentSamplerManagerTest$InnerBean.say()\" : {\n" +
+                "    \"public java.lang.String org.deepsampler.persistence.json.PersistentSamplerManagerTest$InnerBean.say()\" : {\n" +
                 "      \"callMap\" : [ {\n" +
                 "        \"parameter\" : {\n" +
                 "          \"args\" : [ ]\n" +
