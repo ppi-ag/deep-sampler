@@ -5,6 +5,39 @@ import org.deepsampler.core.model.SampleRepository;
 
 import java.util.Objects;
 
+/**
+ * <p>
+ * When we are creating a stub with {@link Sample#of(Object)} we would normally call the method we want to stub with the parameters we expect
+ * that they will be used in the real invocation later. But there are two problems with this approach:
+ * </p>
+ * <ul>
+ *     <li>We don't always know which parameter will occur in the real invocation</li>
+ *     <li>We might want to define a return value for a whole set of parameters</li>
+ * </ul>
+ * <p>
+ * To solve this problems DeepSampler introduces {@link Matchers}. This class contains some factory methods to create common matchers.
+ * A typical usage could look like this:
+ * </p>
+ * <br>
+ * <code>
+ *      TestBean testBean = Sampler.prepare(TestBean.class);<br>
+ *      Sample.of(testBean.echoParam(Matchers.any(String.class))).is("Hello!");
+ * </code>
+ * <br>
+ * <br>
+ * <p>
+ * With this definition every call of <code>echoParam</code>, regardless of the concrete parameter, will return "Hello!".<br>
+ * </p>
+ * <p>
+ * There are two things you have to care about when using matchers:
+ * </p>
+ * <ul>
+ *     <li>You cant't mix matchers and normal parameters when defining a sample.</li>
+ *     <li>The order of method calls when defining a sample matters! So you have to call it within the method invocation you want to stub!</li>
+ * </ul>
+ * To use your own matcher you have to implement {@link ParameterMatcher} and call {@link Matchers#matcher(ParameterMatcher)} withing the method
+ * invocation you want to stub.
+ */
 public class Matchers {
 
     private Matchers() {
@@ -21,54 +54,85 @@ public class Matchers {
         return null;
     }
 
+    /**
+     * Accepts any string as parameter.
+     * @return a matcher that accepts any string parameter
+     */
     public static String anyString() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return "";
     }
 
+    /**
+     * Accepts any int as parameter.
+     * @return a matcher that accepts any int parameter
+     */
     public static int anyInt() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return 42;
     }
 
+    /**
+     * Accepts any double as parameter.
+     * @return a matcher that accepts any double parameter
+     */
     public static double anyDouble() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return 42.0;
     }
 
+    /**
+     * Accepts any boolean as parameter.
+     * @return a matcher that accepts any boolean parameter
+     */
     public static boolean anyBoolean() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return true;
     }
 
+    /**
+     * Accepts any short as parameter.
+     * @return a matcher that accepts any short parameter
+     */
     public static short anyShort() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return (short) 42;
     }
 
+    /**
+     * Accepts any float as parameter.
+     * @return a matcher that accepts any float parameter
+     */
     public static float anyFloat() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return 42.0f;
     }
 
+    /**
+     * Accepts any byte as parameter.
+     * @return a matcher that accepts any byte parameter
+     */
     public static byte anyByte() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return (byte) 42;
     }
 
+    /**
+     * Accepts any char as parameter.
+     * @return a matcher that accepts any char parameter
+     */
     public static char anyChar() {
         SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
         return 'c';
     }
-
 
     /**
      * Accepts a parameter that equals to expectedParameter. Equality is tested using the .equals()-Method.
      * @param expectedParameter the expected value
      * @return a matcher that accepts a parameter that is equal to expectedParameter. Equality is tested using the .equals()-Method.
      */
-    public static <T> T equalTo(final Object expectedParameter) {
-        SampleRepository.getInstance().addCurrentParameterMatchers(new EqualsMatcher(expectedParameter));
+    public static <T> T equalTo(final T expectedParameter) {
+        SampleRepository.getInstance().addCurrentParameterMatchers(new EqualsMatcher<>(expectedParameter));
         return null;
     }
 
@@ -82,16 +146,28 @@ public class Matchers {
         return null;
     }
 
-    public static class EqualsMatcher implements ParameterMatcher {
+    /**
+     * Can be called with a custom {@link ParameterMatcher} to make DeepSampler remember for which position the
+     * matcher should be used in the process.
+     * @param matcher an implementation of {@link ParameterMatcher}
+     * @param <T> type of matcher
+     * @return matcher
+     */
+    public static <T> T matcher(final ParameterMatcher<T> matcher) {
+        SampleRepository.getInstance().addCurrentParameterMatchers(matcher);
+        return null;
+    }
 
-        private final Object expectedObject;
+    public static class EqualsMatcher<T> implements ParameterMatcher<T> {
 
-        public EqualsMatcher(final Object expectedObject) {
+        private final T expectedObject;
+
+        public EqualsMatcher(final T expectedObject) {
             this.expectedObject = expectedObject;
         }
 
         @Override
-        public boolean matches(final Object parameter) {
+        public boolean matches(final T parameter) {
             return Objects.equals(expectedObject, parameter);
         }
     }

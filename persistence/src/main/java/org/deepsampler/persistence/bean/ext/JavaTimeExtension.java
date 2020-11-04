@@ -1,4 +1,4 @@
-package org.deepsampler.persistence.json.bean.ext;
+package org.deepsampler.persistence.bean.ext;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

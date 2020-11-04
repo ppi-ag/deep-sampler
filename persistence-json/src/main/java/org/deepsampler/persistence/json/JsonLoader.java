@@ -1,10 +1,11 @@
 package org.deepsampler.persistence.json;
 
 import com.fasterxml.jackson.databind.Module;
+import org.deepsampler.persistence.PersistentSamplerContext;
 import org.deepsampler.persistence.json.error.JsonPersistenceException;
 import org.deepsampler.persistence.json.extension.DeserializationExtension;
 import org.deepsampler.persistence.json.model.JsonSampleModel;
-import org.deepsampler.persistence.json.model.PersistentModel;
+import org.deepsampler.persistence.model.PersistentModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
