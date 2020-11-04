@@ -1,6 +1,8 @@
 package org.deepsampler.persistence.json.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.deepsampler.persistence.model.PersistentActualSample;
+import org.deepsampler.persistence.model.PersistentMethodCall;
 
 import java.util.ArrayList;
 import java.util.Collections;

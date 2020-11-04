@@ -12,7 +12,7 @@
           "args" : [ "Args1" ]
         },
         "returnValue" : {
-            "@type" : "org.deepsampler.persistence.json.bean.DefaultPersistentBean",
+            "@type" : "org.deepsampler.persistence.bean.DefaultPersistentBean",
             "values" : {
               "0$valueTwo" : "ABC",
               "0$valueOne" : "ABC"

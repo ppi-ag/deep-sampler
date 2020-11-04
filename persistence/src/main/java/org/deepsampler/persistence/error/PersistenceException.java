@@ -1,4 +1,4 @@
-package org.deepsampler.persistence.json.error;
+package org.deepsampler.persistence.error;
 
 import org.deepsampler.core.error.BaseException;
 

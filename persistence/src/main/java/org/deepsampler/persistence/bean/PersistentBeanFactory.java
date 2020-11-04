@@ -1,6 +1,6 @@
-package org.deepsampler.persistence.json.bean;
+package org.deepsampler.persistence.bean;
 
-import org.deepsampler.persistence.json.model.PersistentBean;
+import org.deepsampler.persistence.model.PersistentBean;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;

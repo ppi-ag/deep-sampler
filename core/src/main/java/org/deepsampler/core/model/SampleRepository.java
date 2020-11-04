@@ -9,7 +9,7 @@ public class SampleRepository {
 
     private final ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(ArrayList::new);
     private final ThreadLocal<SampleDefinition> currentSample = new ThreadLocal<>();
-    private final ThreadLocal<List<ParameterMatcher>> currentParameterMatchers = ThreadLocal.withInitial(ArrayList::new);
+    private final ThreadLocal<List<ParameterMatcher<?>>> currentParameterMatchers = ThreadLocal.withInitial(ArrayList::new);
 
     private static SampleRepository myInstance;
 
@@ -72,15 +72,17 @@ public class SampleRepository {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     private boolean argumentsMatch(final SampleDefinition sampleDefinition, final Object[] arguments) {
-        final List<ParameterMatcher> parameterMatchers = sampleDefinition.getParameterMatchers();
+        final List<ParameterMatcher<?>> parameterMatchers = sampleDefinition.getParameterMatchers();
 
         if (parameterMatchers.size() != arguments.length) {
             return false;
         }
 
         for (int i = 0; i < arguments.length; i++) {
-            if (!parameterMatchers.get(i).matches(arguments[i])) {
+            final ParameterMatcher<Object> parameterMatcher = (ParameterMatcher<Object>) parameterMatchers.get(i);
+            if (!parameterMatcher.matches(arguments[i])) {
                 return false;
             }
         }
@@ -104,11 +106,11 @@ public class SampleRepository {
         currentParameterMatchers.set(new ArrayList<>());
     }
 
-    public void addCurrentParameterMatchers(ParameterMatcher parameterMatcher) {
+    public void addCurrentParameterMatchers(ParameterMatcher<?> parameterMatcher) {
         currentParameterMatchers.get().add(parameterMatcher);
     }
 
-    public List<ParameterMatcher> getCurrentParameterMatchers() {
+    public List<ParameterMatcher<?>> getCurrentParameterMatchers() {
         return currentParameterMatchers.get();
     }
 
