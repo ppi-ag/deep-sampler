@@ -1,7 +1,7 @@
 package org.deepsampler.core.api;
 
 /**
- * Represents a quantity to measure the times a stubbed method got called.
+ * Represents a quantity to measure the number of times a stubbed method got called.
  */
 public interface Quantity {
 
