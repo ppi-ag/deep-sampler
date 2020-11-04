@@ -8,7 +8,6 @@ import org.deepsampler.persistence.json.extension.DeserializationExtension;
 import org.deepsampler.persistence.json.extension.SerializationExtension;
 import org.deepsampler.persistence.json.model.PersistentModel;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +19,10 @@ public class JsonSourceManager implements SourceManager {
     private final JsonLoader jsonLoader;
 
     public JsonSourceManager(Builder builder) {
-        this.jsonLoader = new JsonLoader(builder.pathToJson, builder.deserializerList, builder.moduleList);
-        this.jsonRecorder = new JsonRecorder(builder.pathToJson, builder.serializerList, builder.moduleList);
+        this.jsonLoader = new JsonLoader(builder.resource, builder.deserializerList, builder.moduleList);
+        this.jsonRecorder = new JsonRecorder(builder.resource, builder.serializerList, builder.moduleList);
     }
+
 
     @Override
     public void record(final Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext) {
@@ -34,26 +34,22 @@ public class JsonSourceManager implements SourceManager {
         return jsonLoader.load(persistentSamplerContext);
     }
 
-    public static Builder builder(final String pathAsString) {
-        return new Builder(pathAsString);
+    public static Builder builder(final PersistentResource resource) {
+        return new Builder(resource);
     }
 
-    public static Builder builder(final Path path) {
-        return new Builder(path);
+    public static Builder builderWithFile(String pathAsString) {
+        return new Builder(new PersistentFile(Paths.get(pathAsString)));
     }
 
     public static class Builder {
-        private final Path pathToJson;
+        private final PersistentResource resource;
         private final List<SerializationExtension<?>> serializerList = new ArrayList<>();
         private final List<DeserializationExtension<?>> deserializerList = new ArrayList<>();
         private final List<Module> moduleList = new ArrayList<>();
 
-        private Builder(Path pathToJson) {
-            this.pathToJson = pathToJson;
-        }
-
-        private Builder(String pathToJsonAsString) {
-            this.pathToJson = Paths.get(pathToJsonAsString);
+        private Builder(PersistentResource resource) {
+            this.resource = resource;
         }
 
         public <T> Builder addSerializer(Class<? extends T> cls, JsonSerializer<T>jsonSerializer) {

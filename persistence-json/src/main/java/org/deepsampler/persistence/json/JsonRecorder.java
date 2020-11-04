@@ -14,6 +14,7 @@ import org.deepsampler.persistence.json.model.JsonSampleModel;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -21,24 +22,28 @@ import java.util.*;
 
 public class JsonRecorder extends JsonOperator {
 
-    public JsonRecorder(Path pathToJson) {
-        super(pathToJson, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+    public JsonRecorder(PersistentResource persistentResource) {
+        super(persistentResource, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
     }
 
-    public JsonRecorder(Path pathToJson, List<SerializationExtension<?>> serializationExtensions, List<Module> moduleList) {
-        super(pathToJson, Collections.emptyList(), serializationExtensions, moduleList);
+    public JsonRecorder(PersistentResource persistentResource, List<SerializationExtension<?>> serializationExtensions, List<Module> moduleList) {
+        super(persistentResource, Collections.emptyList(), serializationExtensions, moduleList);
     }
 
     public void record(final Map<Class<?>, ExecutionInformation> executionInformationMap, PersistentSamplerContext persistentSamplerContext) {
         try {
-            // CREATE PARENT DIR IF NECESSARY
-            final Path parentPath = getPath().getParent();
-            if (!Files.exists(parentPath)) {
-                Files.createDirectories(parentPath);
+            final PersistentResource persistentResource = getPersistentResource();
+            if (persistentResource instanceof PersistentFile) {
+                // CREATE PARENT DIR IF NECESSARY
+                final Path parentPath = ((PersistentFile) persistentResource).getFilePath().getParent();
+                if (!Files.exists(parentPath)) {
+                    Files.createDirectories(parentPath);
+                }
             }
 
             final JsonSampleModel model = toPersistentModel(executionInformationMap, persistentSamplerContext);
-            final BufferedWriter writer = Files.newBufferedWriter(getPath(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(persistentResource.writeAsStream(StandardOpenOption.TRUNCATE_EXISTING,
+                    StandardOpenOption.CREATE)));
             createObjectMapper().writeValue(writer, model);
         } catch (final IOException e) {
             throw new JsonPersistenceException("It was not possible to serialize/write to json.", e);
