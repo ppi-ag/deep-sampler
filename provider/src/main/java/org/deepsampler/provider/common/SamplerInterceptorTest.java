@@ -6,8 +6,8 @@ import org.deepsampler.core.error.VerifyException;
 import org.deepsampler.core.internal.FixedQuantity;
 import org.deepsampler.core.model.SampleRepository;
 import org.deepsampler.persistence.json.JsonSourceManager;
-import org.deepsampler.persistence.json.PersistentSampler;
 import org.deepsampler.persistence.json.PersistentSampleManager;
+import org.deepsampler.persistence.json.PersistentSampler;
 import org.deepsampler.persistence.json.error.PersistenceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 import static org.deepsampler.core.api.Matchers.anyString;
 import static org.deepsampler.core.api.Matchers.equalTo;
@@ -435,7 +436,32 @@ public abstract class SamplerInterceptorTest {
         getTestService().noReturnValue(2);
 
         assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals("NoReturnValue", SampleRepository.getInstance().getSamples().get(0).getSampleId());
         Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void localDateTimeCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.testLocalDateTime());
+
+        getTestService().testLocalDateTime();
+
+        final String pathToFile = "./record/localDateTimeCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder(pathToFile).build());
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.testLocalDateTime());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(LocalDateTime.of(2020, 10, 29, 10, 10, 10), getTestService().testLocalDateTime());
         Files.delete(Paths.get(pathToFile));
     }
 }

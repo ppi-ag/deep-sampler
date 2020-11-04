@@ -1,6 +1,7 @@
 package org.deepsampler.provider.common;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 /**
  * A Service that will be instrumented to test the interceptors.
@@ -59,5 +60,9 @@ public class TestService {
     @SuppressWarnings("unused")
     public String methodWithTwoParameter(final String parameterOne, final String parameterTwo) {
         return HARD_CODED_RETURN_VALUE;
+    }
+
+    public LocalDateTime testLocalDateTime() {
+        return LocalDateTime.of(2020, 10, 29, 10, 10, 10);
     }
 }
