@@ -85,4 +85,8 @@ public class TestService {
         counter++;
     }
 
+    public void setCounter(final int counter) {
+        this.counter = counter;
+    }
+
 }

@@ -57,10 +57,10 @@ public class SampleBuilder<T> extends VoidSampleBuilder {
      * <p>
      * In essence using Answers gives free control on what a stubbed method should do.
      *
-     * @param propertySupplier supplier you want to get evaluated when the stubbed method get invoked
+     * @param answer supplier you want to get evaluated when the stubbed method get invoked
      */
-    public void is(final Answer propertySupplier) {
-        getSampleDefinition().setAnswer(propertySupplier);
+    public void answers(final Answer<?> answer) {
+        getSampleDefinition().setAnswer(answer);
     }
 
 

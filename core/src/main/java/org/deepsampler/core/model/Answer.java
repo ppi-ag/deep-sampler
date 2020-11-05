@@ -22,5 +22,5 @@ public interface Answer<E extends Exception> extends Serializable {
      * @param stubMethodInvocation A description of the stubbed method
      * @return a Sample that should be returned by the stubbed method.
      */
-    Object answer(StubMethodInvocation stubMethodInvocation) throws E;
+    Object call(StubMethodInvocation stubMethodInvocation) throws E;
 }

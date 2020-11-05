@@ -98,7 +98,7 @@ public class Sample {
      * @return A {@link VoidSampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */
-    public static VoidSampleBuilder of(final VoidCall sampledMethodCall) {
+    public static <E extends Exception> VoidSampleBuilder of(final VoidCall<E> sampledMethodCall) {
         final SampleRepository sampleRepository = SampleRepository.getInstance();
 
         final SampleDefinition lastSampleDefinition = sampleRepository.getCurrentSampleDefinition();

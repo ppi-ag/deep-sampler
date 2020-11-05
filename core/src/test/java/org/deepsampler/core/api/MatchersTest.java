@@ -164,12 +164,12 @@ class MatchersTest {
     static class ContainsMatcher implements ParameterMatcher<String> {
         private final String containedStr;
 
-        public ContainsMatcher(String containedStr) {
+        public ContainsMatcher(final String containedStr) {
             this.containedStr = containedStr;
         }
 
         @Override
-        public boolean matches(String parameter) {
+        public boolean matches(final String parameter) {
             return parameter.contains(containedStr);
         }
     }

@@ -35,7 +35,7 @@ public class SpringSamplerInterceptor {
 
             if (answer != null) {
                 final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(joinPoint.getArgs()), joinPoint.getThis());
-                return sampleDefinition.getAnswer().answer(stubMethodInvocation);
+                return sampleDefinition.getAnswer().call(stubMethodInvocation);
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = joinPoint.proceed();

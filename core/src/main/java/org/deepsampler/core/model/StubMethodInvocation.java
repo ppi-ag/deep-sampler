@@ -1,13 +1,12 @@
 package org.deepsampler.core.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Describes the actual call of a stubbed method.
  */
 public class StubMethodInvocation {
-    private List<Object> parameters = new ArrayList<>();
+    private final List<Object> parameters;
     private final Object stubInstance;
 
     public StubMethodInvocation(final List<Object> parameters, final Object stubInstance) {
@@ -28,7 +27,8 @@ public class StubMethodInvocation {
      * Gives access to the instance of the stubbed class where the current method is called on.
      * @return The instance of the stub
      */
-    public Object getStubInstance() {
-        return stubInstance;
+    @SuppressWarnings("unchecked")
+    public <T> T getStubInstance() {
+        return (T) stubInstance;
     }
 }

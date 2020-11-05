@@ -36,6 +36,7 @@ public abstract class SamplerInterceptorTest {
     private static final TestBean TEST_BEAN_A = new TestBean();
     private static final TestBean TEST_BEAN_B = new TestBean();
     public static final String MYECHOPARAMS = "MYECHOPARAMS";
+    public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
 
     /**
      * The {@link TestService} is a Service that is used to test method interception by a SamplerInterceptor. Since this class must be
@@ -296,20 +297,20 @@ public abstract class SamplerInterceptorTest {
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.throwsException()).isException(Exception.class);
+        Sample.of(testServiceSampler.throwsException()).throwsException(Exception.class);
 
         //THEN
         assertThrows(Exception.class, () -> getTestService().throwsException());
     }
 
     @Test
-    public void runtimeExceptionCanBeThrownByStub() throws Exception{
+    public void runtimeExceptionCanBeThrownByStub() {
         //WHEN UNCHANGED
         assertDoesNotThrow(() -> getTestService().getMinusOne());
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.getMinusOne()).isException(new RuntimeException());
+        Sample.of(testServiceSampler.getMinusOne()).throwsException(new RuntimeException());
 
         //THEN
         assertThrows(RuntimeException.class, () -> getTestService().getMinusOne());
@@ -322,7 +323,7 @@ public abstract class SamplerInterceptorTest {
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(() -> testServiceSampler.voidThrowsException()).isException(Exception.class);
+        Sample.of(testServiceSampler::voidThrowsException).throwsException(Exception.class);
 
         //THEN
         assertThrows(Exception.class, () -> getTestService().voidThrowsException());
@@ -335,7 +336,7 @@ public abstract class SamplerInterceptorTest {
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(() -> testServiceSampler.voidThrowsException()).isException(new RuntimeException());
+        Sample.of(testServiceSampler::voidThrowsException).throwsException(new RuntimeException());
 
         //THEN
         assertThrows(RuntimeException.class, () -> getTestService().voidThrowsException());
@@ -344,17 +345,38 @@ public abstract class SamplerInterceptorTest {
     @Test
     public void voidMethodCanBeDeactivated() {
         //WHEN UNCHANGED
+        getTestService().setCounter(0);
         assertEquals(0, getTestService().getCounter());
         getTestService().incrementCounter();
         assertEquals(1, getTestService().getCounter());
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(() -> testServiceSampler.incrementCounter()).doesNothing();
+        Sample.of(testServiceSampler::incrementCounter).doesNothing();
 
         //THEN
         getTestService().incrementCounter();
         assertEquals(1, getTestService().getCounter());
+    }
+
+    @Test
+    void behaviorOfVoidMethodCanBeChanged() {
+        //WHEN UNCHANGED
+        assertEquals(0, getTestService().getCounter());
+        getTestService().incrementCounter();
+        assertEquals(1, getTestService().getCounter());
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+
+        Sample.of(testServiceSampler::incrementCounter).answers(stubMethodInvocation -> {
+            final TestService testService = stubMethodInvocation.getStubInstance();
+            testService.setCounter(100);
+        });
+
+        //THEN
+        getTestService().incrementCounter();
+        assertEquals(100, getTestService().getCounter());
     }
 
     @Test
@@ -486,7 +508,7 @@ public abstract class SamplerInterceptorTest {
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         testServiceSampler.noReturnValue(2);
-        Sample.setIdToLastMethodCall("NoReturnValue");
+        Sample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
 
         getTestService().noReturnValue(2);
 
@@ -499,12 +521,12 @@ public abstract class SamplerInterceptorTest {
         assertTrue(SampleRepository.getInstance().isEmpty());
 
         testServiceSampler.noReturnValue(2);
-        Sample.setIdToLastMethodCall("NoReturnValue");
+        Sample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
         source.load();
         getTestService().noReturnValue(2);
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals("NoReturnValue", SampleRepository.getInstance().getSamples().get(0).getSampleId());
+        assertEquals(NO_RETURN_VALUE_SAMPLE_ID, SampleRepository.getInstance().getSamples().get(0).getSampleId());
         Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
         Files.delete(Paths.get(pathToFile));
     }
