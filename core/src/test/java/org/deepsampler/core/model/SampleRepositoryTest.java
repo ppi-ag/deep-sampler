@@ -172,7 +172,7 @@ class SampleRepositoryTest {
 
         final SampleDefinition registeredSampleDefinition = new SampleDefinition(sampledMethod);
         registeredSampleDefinition.setParameterMatchers(parameter);
-        registeredSampleDefinition.setReturnValueSupplier(() -> returnValue);
+        registeredSampleDefinition.setAnswer(invocation -> returnValue);
         return registeredSampleDefinition;
     }
 

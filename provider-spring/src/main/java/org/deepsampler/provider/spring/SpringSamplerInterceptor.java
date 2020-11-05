@@ -23,6 +23,7 @@ public class SpringSamplerInterceptor {
      * @return
      * @throws Throwable
      */
+    @SuppressWarnings("unused")
     @Around("execution(* *(..)) && !target(DeepSamplerSpringConfig)")
     public Object aroundMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
         final SampleDefinition sampleDefinition = findSampleDefinition(joinPoint);
@@ -30,10 +31,11 @@ public class SpringSamplerInterceptor {
         if (sampleDefinition != null) {
             ExecutionManager.notify(sampleDefinition);
 
-            final ReturnValueSupplier returnValueSupplier = sampleDefinition.getReturnValueSupplier();
+            final Answer answer = sampleDefinition.getAnswer();
 
-            if (returnValueSupplier != null) {
-                return sampleDefinition.getReturnValueSupplier().supply();
+            if (answer != null) {
+                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(joinPoint.getArgs()), joinPoint.getThis());
+                return sampleDefinition.getAnswer().call(stubMethodInvocation);
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = joinPoint.proceed();

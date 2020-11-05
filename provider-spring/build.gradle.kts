@@ -5,5 +5,5 @@ dependencies {
     implementation("org.springframework:spring-context:5.2.8.RELEASE")
     implementation("org.springframework:spring-test:5.2.8.RELEASE")
     implementation(project(":core"))
-    implementation(project(":provider"))
+    testImplementation(testFixtures(project(":provider")))
 }

@@ -38,7 +38,7 @@ public class PersistentSampleManager {
         return this;
     }
 
-    public void beanExtension(BeanFactoryExtension beanFactoryExtension) {
+    public void beanExtension(final BeanFactoryExtension beanFactoryExtension) {
         persistentSamplerContext.addBeanFactoryExtension(beanFactoryExtension);
     }
 
@@ -105,7 +105,7 @@ public class PersistentSampleManager {
         final Class<?> returnType = matchingJointPoint.getMethod().getReturnType();
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
-        List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
+        final List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
         final List<ParameterMatcher<?>> parameterMatchers = toMatcher(parameterValues);
 
         final SampleDefinition sample = new SampleDefinition(matchingJointPoint);
@@ -114,7 +114,7 @@ public class PersistentSampleManager {
         sample.setParameterValues(parameterValues);
 
         final Object returnValue = unwrapValue(returnType, returnValueEnvelope);
-        sample.setReturnValueSupplier(() -> returnValue);
+        sample.setAnswer(invocation -> returnValue);
 
         return sample;
     }
