@@ -32,9 +32,7 @@ public class VoidSampleBuilder {
      * @param sampleDefinition {@link SampleDefinition}
      */
     public VoidSampleBuilder(final SampleDefinition sampleDefinition) {
-        Objects.requireNonNull(sampleDefinition, "the SampleDefinition must not be null.");
-
-        this.sampleDefinition = sampleDefinition;
+        this.sampleDefinition = Objects.requireNonNull(sampleDefinition, "the SampleDefinition must not be null.");
     }
 
     protected SampleDefinition getSampleDefinition() {
