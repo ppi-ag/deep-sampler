@@ -142,7 +142,7 @@ public class Matchers {
      * @param expectedParameter the expected parameter object
      * @return a matcher that accepts a parameter object that is expected to be the same object as expectedParameter.
      */
-    public static <T> T sameAs(final Object expectedParameter) {
+    public static <T> T sameAs(final T expectedParameter) {
         SampleRepository.getInstance().addCurrentParameterMatchers(actualParameter -> actualParameter == expectedParameter);
         return null;
     }
