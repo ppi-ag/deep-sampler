@@ -18,10 +18,11 @@ public class GuiceSamplerInterceptor implements MethodInterceptor {
         if (sampleDefinition != null) {
             ExecutionManager.notify(sampleDefinition);
 
-            final ReturnValueSupplier returnValueSupplier = sampleDefinition.getReturnValueSupplier();
+            final Answer answer = sampleDefinition.getAnswer();
 
-            if (returnValueSupplier != null) {
-                return sampleDefinition.getReturnValueSupplier().supply();
+            if (answer != null) {
+                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(invocation.getArguments()), invocation.getThis());
+                return sampleDefinition.getAnswer().answer(stubMethodInvocation);
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = invocation.proceed();

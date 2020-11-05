@@ -60,7 +60,7 @@ class PersistentSamplerManagerTest {
 
         // THEN
         assertEquals(1, SampleRepository.getInstance().getSamples().size());
-        assertEquals("HELLO AGAIN", SampleRepository.getInstance().getSamples().get(0).getReturnValueSupplier().supply());
+        assertEquals("HELLO AGAIN", SampleRepository.getInstance().getSamples().get(0).getAnswer().answer(null));
     }
 
     @Test
@@ -106,7 +106,7 @@ class PersistentSamplerManagerTest {
 
         // THEN
         assertEquals(1, SampleRepository.getInstance().getSamples().size());
-        assertEquals(LocalDateTime.of(2019, 2, 2, 2, 2), SampleRepository.getInstance().getSamples().get(0).getReturnValueSupplier().supply());
+        assertEquals(LocalDateTime.of(2019, 2, 2, 2, 2), SampleRepository.getInstance().getSamples().get(0).getAnswer().answer(null));
     }
 
     @AfterEach
