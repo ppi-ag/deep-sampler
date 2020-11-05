@@ -18,8 +18,7 @@ import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
-import static org.deepsampler.core.api.Matchers.anyString;
-import static org.deepsampler.core.api.Matchers.equalTo;
+import static org.deepsampler.core.api.Matchers.*;
 import static org.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -187,7 +186,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodNotCalled() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_A))).is(TEST_BEAN_B);
 
         // CALL
         getTestService().echoParameter(TEST_BEAN_B);
@@ -201,7 +200,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodCalledOnce() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_A))).is(TEST_BEAN_B);
 
         // CALL
         getTestService().echoParameter(TEST_BEAN_A);
@@ -216,7 +215,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodCalledMultipleAndMixed() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_B)).is(TEST_BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_B))).is(TEST_BEAN_B);
         Sample.of(testServiceSampler.getMinusOne()).is(1);
 
         // CALL
@@ -249,7 +248,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodCalledWithoutSample() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_B));
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_B)));
         Sample.of(testServiceSampler.getMinusOne());
 
         // CALL

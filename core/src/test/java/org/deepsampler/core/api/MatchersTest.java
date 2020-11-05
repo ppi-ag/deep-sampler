@@ -166,7 +166,7 @@ class MatchersTest {
     void parameterWithoutEqualsIsDetected() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.provocateMissingEqualsException(new BeanWithoutEquals())).is(BEAN_A);
+        Sample.of(testServiceSampler.provokeMissingEqualsException(new BeanWithoutEquals())).is(BEAN_A);
 
         // THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
@@ -227,7 +227,8 @@ class MatchersTest {
             return someBoolean;
         }
 
-        Bean provocateMissingEqualsException(final BeanWithoutEquals parameter) { return null; }
+        @SuppressWarnings("unused")
+        Bean provokeMissingEqualsException(final BeanWithoutEquals parameter) { return null; }
     }
 
     static class Bean {
