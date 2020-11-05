@@ -18,7 +18,7 @@ public class GuiceSamplerInterceptor implements MethodInterceptor {
         if (sampleDefinition != null) {
             ExecutionManager.notify(sampleDefinition);
 
-            final Answer answer = sampleDefinition.getAnswer();
+            final Answer<?> answer = sampleDefinition.getAnswer();
 
             if (answer != null) {
                 final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(invocation.getArguments()), invocation.getThis());

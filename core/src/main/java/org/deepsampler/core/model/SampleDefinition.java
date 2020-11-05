@@ -12,7 +12,7 @@ public class SampleDefinition {
 
     private List<Object> parameterValues = new ArrayList<>();
     private List<ParameterMatcher<?>> parameterMatchers = new ArrayList<>();
-    private Answer answer;
+    private Answer<Exception> answer;
     private String sampleId;
 
     public SampleDefinition(final SampledMethod sampledMethod) {
@@ -55,11 +55,11 @@ public class SampleDefinition {
         return sampleId;
     }
 
-    public void setAnswer(final Answer answer) {
+    public void setAnswer(final Answer<Exception> answer) {
         this.answer = answer;
     }
 
-    public Answer getAnswer() {
+    public Answer<Exception> getAnswer() {
         return answer;
     }
 

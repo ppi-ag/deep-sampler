@@ -59,8 +59,8 @@ public class SampleBuilder<T> extends VoidSampleBuilder {
      *
      * @param answer supplier you want to get evaluated when the stubbed method get invoked
      */
-    public void answers(final Answer<?> answer) {
-        getSampleDefinition().setAnswer(answer);
+    public void answers(final Answer<? extends Exception> answer) {
+        getSampleDefinition().setAnswer((Answer<Exception>) answer);
     }
 
 

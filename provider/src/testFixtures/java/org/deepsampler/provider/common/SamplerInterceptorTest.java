@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * This Testclass must be be used to test all aop-provider in order to ensure that all providers would support the same
  * functionality.
  */
+@SuppressWarnings("java:S5960")
 public abstract class SamplerInterceptorTest {
 
     public static final String VALUE_A = "Value A";

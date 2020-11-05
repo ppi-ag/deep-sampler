@@ -68,12 +68,12 @@ public class TestService {
         return LocalDateTime.of(2020, 10, 29, 10, 10, 10);
     }
 
-    public String throwsException() throws Exception {
+    public String throwsException() throws TestException {
         // The Exception must be thrown by the Answer (Stub)
         return null;
     }
 
-    public void voidThrowsException() throws Exception {
+    public void voidThrowsException() throws TestException {
         // The Exception must be thrown by the Answer (Stub)
     }
 

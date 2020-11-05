@@ -163,16 +163,20 @@ class MatchersTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void parameterWithoutEqualsIsDetected() {
         //GIVEN WHEN
+        final BeanWithoutEquals beanWithoutEquals = new BeanWithoutEquals();
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.provokeMissingEqualsException(new BeanWithoutEquals())).is(BEAN_A);
+        Sample.of(testServiceSampler.provokeMissingEqualsException(beanWithoutEquals)).is(BEAN_A);
 
         // THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
 
-        assertThrows(InvalidConfigException.class, () -> ((ParameterMatcher<BeanWithoutEquals>) parameter.get(0)).matches(new BeanWithoutEquals()));
+        final ParameterMatcher<BeanWithoutEquals> matcher = (ParameterMatcher<BeanWithoutEquals>) parameter.get(0);
+
+        assertThrows(InvalidConfigException.class, () -> matcher.matches(beanWithoutEquals));
     }
 
     static class ContainsMatcher implements ParameterMatcher<String> {
