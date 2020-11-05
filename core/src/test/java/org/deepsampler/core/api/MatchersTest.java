@@ -2,6 +2,7 @@ package org.deepsampler.core.api;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.deepsampler.core.error.InvalidConfigException;
 import org.deepsampler.core.error.InvalidMatcherConfigException;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
@@ -161,15 +162,28 @@ class MatchersTest {
         assertFalse(((ParameterMatcher<String>)parameter.get(0)).matches("ABDX"));
     }
 
+    @Test
+    void parameterWithoutEqualsIsDetected() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.provocateMissingEqualsException(new BeanWithoutEquals())).is(BEAN_A);
+
+        // THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+
+        assertThrows(InvalidConfigException.class, () -> ((ParameterMatcher<BeanWithoutEquals>) parameter.get(0)).matches(new BeanWithoutEquals()));
+    }
+
     static class ContainsMatcher implements ParameterMatcher<String> {
         private final String containedStr;
 
-        public ContainsMatcher(String containedStr) {
+        public ContainsMatcher(final String containedStr) {
             this.containedStr = containedStr;
         }
 
         @Override
-        public boolean matches(String parameter) {
+        public boolean matches(final String parameter) {
             return parameter.contains(containedStr);
         }
     }
@@ -212,6 +226,8 @@ class MatchersTest {
         boolean echoBoolean(final boolean someBoolean) {
             return someBoolean;
         }
+
+        Bean provocateMissingEqualsException(final BeanWithoutEquals parameter) { return null; }
     }
 
     static class Bean {
@@ -232,5 +248,9 @@ class MatchersTest {
         public int hashCode() {
             return HashCodeBuilder.reflectionHashCode(this, true);
         }
+    }
+
+    static class BeanWithoutEquals {
+
     }
 }

@@ -1,5 +1,6 @@
 package org.deepsampler.core.api;
 
+import org.deepsampler.core.error.InvalidConfigException;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleRepository;
 
@@ -158,6 +159,12 @@ public class Matchers {
         return null;
     }
 
+    /**
+     * This Matcher is typically used by {@link Matchers#equalTo(Object)}, but since it is also used internally in various places
+     * it is implemented as a class rather then a simple lambda, as it is the case with most of the Matchers.
+     *
+     * @param <T>
+     */
     public static class EqualsMatcher<T> implements ParameterMatcher<T> {
 
         private final T expectedObject;
@@ -168,7 +175,22 @@ public class Matchers {
 
         @Override
         public boolean matches(final T parameter) {
+            checkObjectImplementsEquals(parameter);
             return Objects.equals(expectedObject, parameter);
+        }
+
+        private void checkObjectImplementsEquals(final Object object) {
+            if (object == null) {
+                return;
+            }
+
+            try {
+                object.getClass().getDeclaredMethod("equals", Object.class);
+            } catch (final NoSuchMethodException e) {
+                throw new InvalidConfigException("The class %s must implement equals() if you want to use an %s",
+                        object.getClass().getName(),
+                        EqualsMatcher.class.getName());
+            }
         }
     }
 }
