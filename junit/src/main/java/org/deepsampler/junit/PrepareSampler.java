@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Properties that are annotated with {@link PrepareSampler} are automatically populated with a sampled instance of the property
  * created by {@link org.deepsampler.core.api.Sampler#prepare(Class)}.
+ *
  * This Annotation is used by the DeepSamplerRule (junit4) and the DeepSamplerExtension (junit5).
  */
 @Retention(RetentionPolicy.RUNTIME)
