@@ -38,10 +38,10 @@ public class JsonSourceManagerTest {
         final String pathAsString = "./abc.json";
 
         // WHEN
-        final JsonSourceManager sourceManager = JsonSourceManager.builder().withFile(pathAsString)
+        final JsonSourceManager sourceManager = JsonSourceManager.builder()
                 .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
                 .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
-                .build();
+                .buildWithFile(pathAsString);
         sourceManager.save(executionInformationMap, new PersistentSamplerContext());
 
         // THEN
@@ -67,9 +67,9 @@ public class JsonSourceManagerTest {
         final SimpleModule module = new SimpleModule();
         module.addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer());
         module.addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer());
-        final JsonSourceManager sourceManager = JsonSourceManager.builder().withFile(pathAsString)
+        final JsonSourceManager sourceManager = JsonSourceManager.builder()
                 .addModule(module)
-                .build();
+                .buildWithFile(pathAsString);
         sourceManager.save(executionInformationMap, new PersistentSamplerContext());
 
         // THEN
@@ -87,9 +87,9 @@ public class JsonSourceManagerTest {
         final SimpleModule module = new SimpleModule();
         module.addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer());
         module.addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer());
-        final JsonSourceManager sourceManager = JsonSourceManager.builder().withFile(pathAsString)
+        final JsonSourceManager sourceManager = JsonSourceManager.builder()
                 .addModule(module)
-                .build();
+                .buildWithFile(pathAsString);
         final PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
 
         // THEN
@@ -103,10 +103,10 @@ public class JsonSourceManagerTest {
         final String pathAsString = "./record/testPersistent.json";
 
         // WHEN
-        final JsonSourceManager sourceManager = JsonSourceManager.builder().withFile(pathAsString)
+        final JsonSourceManager sourceManager = JsonSourceManager.builder()
                 .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
                 .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
-                .build();
+                .buildWithFile(pathAsString);
         final PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
 
         // THEN
@@ -118,8 +118,7 @@ public class JsonSourceManagerTest {
     public void testBuilderWithClassPathResource() {
         // WHEN
         final JsonSourceManager sourceManager = JsonSourceManager.builder()
-                .withResource(new PersistentClassPathResource("myTestJson.json", getClass()))
-                .build();
+                .buildWithResource(new PersistentClassPathResource("myTestJson.json", getClass()));
         final PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
 
         // THEN

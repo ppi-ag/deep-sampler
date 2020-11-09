@@ -51,7 +51,6 @@ public class JsonSourceManager implements SourceManager {
      *     <li>{@link PersistentClassPathResource}</li>
      * </ul>
      *
-     * @param resource
      * @return
      */
     public static Builder builder() {
@@ -79,22 +78,18 @@ public class JsonSourceManager implements SourceManager {
             return this;
         }
 
-        public Builder withResource(final PersistentResource resource) {
+        public JsonSourceManager buildWithResource(final PersistentResource resource) {
             this.resource = resource;
-            return this;
+            return new JsonSourceManager(this);
         }
 
-        public Builder withFile(final String filePath) {
+        public JsonSourceManager buildWithFile(final String filePath) {
             this.resource = new PersistentFile(Paths.get(filePath));
-            return this;
+            return new JsonSourceManager(this);
         }
 
-        public Builder withClassPathResource(final String filePath, final Class<?> anchor) {
+        public JsonSourceManager buildWithClassPathResource(final String filePath, final Class<?> anchor) {
             this.resource = new PersistentClassPathResource(filePath, anchor);
-            return this;
-        }
-
-        public JsonSourceManager build() {
             return new JsonSourceManager(this);
         }
 

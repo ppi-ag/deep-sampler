@@ -51,9 +51,9 @@ public class JUnitPluginUtils {
 
         final JsonSourceManager.Builder persistentSampleManagerBuilder = loadBuilder(loadSamples.persistenceManagerProvider());
 
-        configureBuilderForResource(testMethod, loadSamples, persistentSampleManagerBuilder);
+        final JsonSourceManager jsonSourceManager = createSourceManager(testMethod, loadSamples, persistentSampleManagerBuilder);
 
-        PersistentSampler.source(persistentSampleManagerBuilder.build()).load();
+        PersistentSampler.source(jsonSourceManager).load();
     }
 
     private static JsonSourceManager.Builder loadBuilder(final Class<? extends PersistentSampleManagerProvider> persistenceManagerProviderClass) {
@@ -65,13 +65,13 @@ public class JUnitPluginUtils {
         }
     }
 
-    private static void configureBuilderForResource(final Method testMethod, final LoadSamples loadSamples, final JsonSourceManager.Builder persistentSampleManagerBuilder) {
+    private static JsonSourceManager createSourceManager(final Method testMethod, final LoadSamples loadSamples, final JsonSourceManager.Builder persistentSampleManagerBuilder) {
         if (!loadSamples.classPath().isEmpty()) {
-            persistentSampleManagerBuilder.withClassPathResource(loadSamples.classPath(), testMethod.getDeclaringClass());
+            return persistentSampleManagerBuilder.buildWithClassPathResource(loadSamples.classPath(), testMethod.getDeclaringClass());
         } else if (!loadSamples.file().isEmpty()) {
-            persistentSampleManagerBuilder.withFile(loadSamples.file());
+            return persistentSampleManagerBuilder.buildWithFile(loadSamples.file());
         } else {
-            persistentSampleManagerBuilder.withClassPathResource(getDefaultJsonFileName(testMethod), testMethod.getDeclaringClass());
+            return persistentSampleManagerBuilder.buildWithClassPathResource(getDefaultJsonFileName(testMethod), testMethod.getDeclaringClass());
         }
     }
 
@@ -86,7 +86,7 @@ public class JUnitPluginUtils {
 
         final String fileName = loadSamples.file().isEmpty() ? getDefaultJsonFileNameWithFolder(testMethod) : loadSamples.file();
 
-        PersistentSampler.source(persistentSampleManagerBuilder.withFile(fileName).build()).record();
+        PersistentSampler.source(persistentSampleManagerBuilder.buildWithFile(fileName)).record();
     }
 
     private static String getDefaultJsonFileNameWithFolder(final Method testMethod) {
