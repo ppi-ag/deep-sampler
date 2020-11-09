@@ -4,6 +4,7 @@ dependencies {
     implementation(project(":persistence"))
     implementation(project(":persistence-json"))
     implementation(project(":junit"))
+    testImplementation(testFixtures(project(":junit")))
 }
 
 tasks.test {

@@ -1,11 +1,9 @@
 package org.deepsampler.junit4;
 
-import org.deepsampler.core.api.Sample;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
 import org.deepsampler.core.model.SampledMethod;
 import org.deepsampler.junit.*;
-import org.deepsampler.persistence.json.JsonSourceManager;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,7 +79,7 @@ public class PersistentSamplerTest {
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON, persistenceManagerProvider = TestPersistenceMangerProvider.class)
+    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON, persistenceManagerProvider = TestPersistenceManagerProvider.class)
     public void fSamplerCanBeSavedInSpecificFileWithSpecificBuilder() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.
@@ -125,23 +123,5 @@ public class PersistentSamplerTest {
         assertEquals(42, getSomeInt.getAnswer().call(null));
     }
 
-    public static class TestSampleFixture implements SamplerFixture {
-
-        @PrepareSampler
-        private TestBean testBeanSampler;
-
-        @Override
-        public void defineSamplers() {
-            Sample.of(testBeanSampler.getSomeInt());
-        }
-    }
-
-    public static class TestPersistenceMangerProvider implements PersistentSampleManagerProvider {
-
-        @Override
-        public JsonSourceManager.Builder configurePersistentSampleManager() {
-            return JsonSourceManager.builder();
-        }
-    }
 
 }

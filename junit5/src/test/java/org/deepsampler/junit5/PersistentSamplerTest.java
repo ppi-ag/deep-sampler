@@ -1,11 +1,9 @@
 package org.deepsampler.junit5;
 
-import org.deepsampler.core.api.Sample;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
 import org.deepsampler.core.model.SampledMethod;
 import org.deepsampler.junit.*;
-import org.deepsampler.persistence.json.JsonSourceManager;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -87,7 +85,7 @@ public class PersistentSamplerTest {
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON, persistenceManagerProvider = TestPersistenceMangerProvider.class)
+    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON, persistenceManagerProvider = TestPersistenceManagerProvider.class)
     @Order(5)
     void samplerCanBeSavedInSpecificFileWithSpecificBuilder() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
@@ -136,23 +134,5 @@ public class PersistentSamplerTest {
     }
 
 
-    public static class TestSampleFixture implements SamplerFixture {
-
-        @PrepareSampler
-        private TestBean testBeanSampler;
-
-        @Override
-        public void defineSamplers() {
-            Sample.of(testBeanSampler.getSomeInt());
-        }
-    }
-
-    public static class TestPersistenceMangerProvider implements PersistentSampleManagerProvider {
-
-        @Override
-        public JsonSourceManager.Builder configurePersistentSampleManager() {
-            return JsonSourceManager.builder();
-        }
-    }
 
 }

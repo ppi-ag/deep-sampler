@@ -1,7 +1,7 @@
 {
   "id" : "e189ff1a-24ca-4a0b-ad70-d80a612b3a98",
   "sampleMethodToSampleMap" : {
-    "public int org.deepsampler.junit.TestBean.getSomeInt()" : {
+    "public int org.deepsampler.junit4.TestBean.getSomeInt()" : {
       "callMap" : [ {
         "parameter" : {
           "args" : [ ]

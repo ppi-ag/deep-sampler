@@ -4,6 +4,7 @@ import org.deepsampler.core.api.Sample;
 import org.deepsampler.core.internal.ProxyFactory;
 import org.deepsampler.core.model.SampleRepository;
 import org.deepsampler.junit.PrepareSampler;
+import org.deepsampler.junit.TestBean;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
