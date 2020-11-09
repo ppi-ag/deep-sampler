@@ -90,7 +90,7 @@ public class JUnitPluginUtils {
     }
 
     private static String getDefaultJsonFileNameWithFolder(final Method testMethod) {
-        return testMethod.getDeclaringClass().getName().replaceAll("\\.", "/") + "_" + testMethod.getName() + ".json";
+        return testMethod.getDeclaringClass().getName().replace(".", "/") + "_" + testMethod.getName() + ".json";
     }
 
     private static String getDefaultJsonFileName(final Method testMethod) {

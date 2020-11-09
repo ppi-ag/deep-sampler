@@ -1,8 +1,5 @@
 package org.deepsampler.junit4;
 
-import org.deepsampler.core.model.SampleDefinition;
-import org.deepsampler.core.model.SampleRepository;
-import org.deepsampler.core.model.SampledMethod;
 import org.deepsampler.junit.*;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -14,7 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenStubbed;
+import static org.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
+import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PersistentSamplerTest {
@@ -31,14 +30,7 @@ public class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples
     public void aSamplerCanBeLoadedFromFile() throws Exception {
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
-
-        assertFalse(sampleRepository.isEmpty());
-
-        final SampledMethod expectedSampledMethod = new SampledMethod(TestBean.class, TestBean.class.getMethod("getSomeInt"));
-        final SampleDefinition getSomeInt = sampleRepository.findAllForMethod(expectedSampledMethod).get(0);
-
-        assertEquals(42, getSomeInt.getAnswer().call(null));
+        assertTestBeanHasBeenStubbed();
     }
 
     @Test
@@ -47,11 +39,7 @@ public class PersistentSamplerTest {
     public void bSamplerCanBeSaved() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.
-        if (Files.exists(EXPECTED_SAVED_SAMPLER)) {
-            Files.delete(EXPECTED_SAVED_SAMPLER);
-        }
-
-        assertFalse(Files.exists(EXPECTED_SAVED_SAMPLER));
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_SAVED_SAMPLER);
     }
 
     @Test
@@ -65,11 +53,7 @@ public class PersistentSamplerTest {
     public void dSamplerCanBeSavedInSpecificFile() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.
-        if (Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON))) {
-            Files.delete(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
-        }
-
-        assertFalse(Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON)));
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
     }
 
     @Test
@@ -83,11 +67,7 @@ public class PersistentSamplerTest {
     public void fSamplerCanBeSavedInSpecificFileWithSpecificBuilder() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.
-        if (Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON))) {
-            Files.delete(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
-        }
-
-        assertFalse(Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON)));
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
     }
 
     @Test
@@ -99,28 +79,14 @@ public class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples(file = LOAD_SPECIFIC_FILE_JSON)
     public void fSamplerCanBeLoadedFromSpecificFile() throws Exception {
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
-
-        assertFalse(sampleRepository.isEmpty());
-
-        final SampledMethod expectedSampledMethod = new SampledMethod(TestBean.class, TestBean.class.getMethod("getSomeInt"));
-        final SampleDefinition getSomeInt = sampleRepository.findAllForMethod(expectedSampledMethod).get(0);
-
-        assertEquals(42, getSomeInt.getAnswer().call(null));
+        assertTestBeanHasBeenStubbed();
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples(classPath = LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON)
     public void gSamplerCanBeLoadedFromSpecificClasspathResource() throws Exception {
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
-
-        assertFalse(sampleRepository.isEmpty());
-
-        final SampledMethod expectedSampledMethod = new SampledMethod(TestBean.class, TestBean.class.getMethod("getSomeInt"));
-        final SampleDefinition getSomeInt = sampleRepository.findAllForMethod(expectedSampledMethod).get(0);
-
-        assertEquals(42, getSomeInt.getAnswer().call(null));
+        assertTestBeanHasBeenStubbed();
     }
 
 

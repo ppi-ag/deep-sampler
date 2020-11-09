@@ -2,6 +2,7 @@ package org.deepsampler.junit;
 
 import org.deepsampler.core.api.Sample;
 
+@SuppressWarnings("unused")
 public class TestSampleFixture implements SamplerFixture {
 
     @PrepareSampler

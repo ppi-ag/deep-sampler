@@ -10,4 +10,5 @@ dependencies {
     testFixturesImplementation(project(":core"))
     testFixturesImplementation(project(":persistence-json"))
     testFixturesImplementation(project(":persistence"))
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
 }

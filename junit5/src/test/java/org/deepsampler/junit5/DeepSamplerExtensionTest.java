@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SuppressWarnings("unused")
 class DeepSamplerExtensionTest {
 
     @PrepareSampler
