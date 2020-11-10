@@ -1,4 +1,4 @@
-package org.deepsampler.junit5;
+package org.deepsampler.junit;
 
 /**
  * A simple Bean that represents non primitive types in TestCases.
@@ -13,10 +13,12 @@ public class TestBean {
         this.someInt = someInt;
     }
 
+    @SuppressWarnings("unused")
     public String getSomeString() {
         return someString;
     }
 
+    @SuppressWarnings("unused")
     public void setSomeString(final String someString) {
         this.someString = someString;
     }
@@ -25,6 +27,7 @@ public class TestBean {
         return someInt;
     }
 
+    @SuppressWarnings("unused")
     public void setSomeInt(final int someInt) {
         this.someInt = someInt;
     }

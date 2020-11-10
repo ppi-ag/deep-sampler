@@ -4,6 +4,7 @@ import org.deepsampler.core.api.Sample;
 import org.deepsampler.core.internal.ProxyFactory;
 import org.deepsampler.core.model.SampleRepository;
 import org.deepsampler.junit.PrepareSampler;
+import org.deepsampler.junit.TestBean;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SuppressWarnings("unused")
 class DeepSamplerExtensionTest {
 
     @PrepareSampler

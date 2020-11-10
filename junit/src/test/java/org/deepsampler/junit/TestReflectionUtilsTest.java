@@ -14,11 +14,11 @@ class TestReflectionUtilsTest {
     @Test
     void declaredAndInheritedFieldsAreFound() {
         // DO
-        Stream<Field> declaredAndInheritedFieldStream = TestReflectionUtils.getDeclaredAndInheritedFields(SubTestBean.class);
+        final Stream<Field> declaredAndInheritedFieldStream = JUnitPluginUtils.getDeclaredAndInheritedFields(SubTestBean.class);
 
         // Since the order in which reflection iterates over fields is not defined and may change, we sort the list
         // so selecting expected Fields using indexes is save. We also need to filter some proxy-fields that are introduced by jacoco
-        List<Field> declaredAndInheritedFields = declaredAndInheritedFieldStream.sorted(this::sortByName)//
+        final List<Field> declaredAndInheritedFields = declaredAndInheritedFieldStream.sorted(this::sortByName)//
                 .filter(field -> !field.getName().startsWith("$")) //
                 .collect(Collectors.toList());
 
@@ -31,18 +31,18 @@ class TestReflectionUtilsTest {
 
     @Test
     void preparationAnnotationIsDetected() throws NoSuchFieldException {
-        Field field = TestBean.class.getDeclaredField("testBeanSampler");
-        assertTrue(TestReflectionUtils.shouldBeSampled(field));
+        final Field field = TestBean.class.getDeclaredField("testBeanSampler");
+        assertTrue(JUnitPluginUtils.shouldBeSampled(field));
     }
 
     @Test
     void aSamplerCanBeCreatedAndAssignedToAField() throws NoSuchFieldException {
         // WITH
-        Field field = TestBean.class.getDeclaredField("testBeanSampler");
-        TestBean bean = new TestBean();
+        final Field field = TestBean.class.getDeclaredField("testBeanSampler");
+        final TestBean bean = new TestBean();
 
         // DO
-        TestReflectionUtils.assignNewSamplerToField(bean, field);
+        JUnitPluginUtils.assignNewSamplerToField(bean, field);
 
         // THEN EXPECT
         assertNotNull(bean.testBeanSampler);
@@ -50,7 +50,7 @@ class TestReflectionUtilsTest {
 
 
 
-    private int sortByName(Field left, Field right) {
+    private int sortByName(final Field left, final Field right) {
         return left.getName().compareTo(right.getName());
     }
 

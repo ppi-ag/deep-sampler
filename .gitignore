@@ -6,3 +6,4 @@ build
 
 # Ignore Intellij-Settings
 .idea
+/junit4/org/

@@ -14,23 +14,23 @@ public class PersistentClassPathResource implements PersistentResource {
     private final String resourcePath;
     private final Class<?> anchor;
 
-    public PersistentClassPathResource(String resourcePath, Class<?> anchor) {
+    public PersistentClassPathResource(final String resourcePath, final Class<?> anchor) {
         this.resourcePath = resourcePath;
         this.anchor = anchor;
     }
 
     @Override
-    public InputStream readAsStream(OpenOption... openOptions) {
+    public InputStream readAsStream(final OpenOption... openOptions) {
         final InputStream resourceAsStream = anchor.getResourceAsStream(resourcePath);
         if (resourceAsStream == null) {
-            throw new JsonPersistenceException("There is no resource %s.", resourcePath);
+            throw new JsonPersistenceException("There is no resource '%s'. It is searched on the classpath relative to the class %s", resourcePath, anchor.getName());
         }
 
         return resourceAsStream;
     }
 
     @Override
-    public OutputStream writeAsStream(OpenOption... openOptions) {
+    public OutputStream writeAsStream(final OpenOption... openOptions) {
         throw new IllegalArgumentException("You can't write java resources!");
     }
 }

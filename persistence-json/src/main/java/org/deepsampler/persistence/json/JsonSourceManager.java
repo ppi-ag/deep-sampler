@@ -20,19 +20,19 @@ public class JsonSourceManager implements SourceManager {
     private final JsonRecorder jsonRecorder;
     private final JsonLoader jsonLoader;
 
-    public JsonSourceManager(Builder builder) {
+    public JsonSourceManager(final Builder builder) {
         this.jsonLoader = new JsonLoader(builder.resource, builder.deserializerList, builder.moduleList);
         this.jsonRecorder = new JsonRecorder(builder.resource, builder.serializerList, builder.moduleList);
     }
 
 
     @Override
-    public void save(final Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext) {
+    public void save(final Map<Class<?>, ExecutionInformation> executionInformation, final PersistentSamplerContext persistentSamplerContext) {
         jsonRecorder.record(executionInformation, persistentSamplerContext);
     }
 
     @Override
-    public PersistentModel load(PersistentSamplerContext persistentSamplerContext) {
+    public PersistentModel load(final PersistentSamplerContext persistentSamplerContext) {
         return jsonLoader.load(persistentSamplerContext);
     }
 
@@ -51,43 +51,45 @@ public class JsonSourceManager implements SourceManager {
      *     <li>{@link PersistentClassPathResource}</li>
      * </ul>
      *
-     * @param resource
      * @return
      */
-    public static Builder builder(final PersistentResource resource) {
-        return new Builder(resource);
-    }
-
-    public static Builder builderWithFile(String pathAsString) {
-        return new Builder(new PersistentFile(Paths.get(pathAsString)));
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
-        private final PersistentResource resource;
+        private PersistentResource resource;
         private final List<SerializationExtension<?>> serializerList = new ArrayList<>();
         private final List<DeserializationExtension<?>> deserializerList = new ArrayList<>();
         private final List<Module> moduleList = new ArrayList<>();
 
-        private Builder(PersistentResource resource) {
-            this.resource = resource;
-        }
-
-        public <T> Builder addSerializer(Class<? extends T> cls, JsonSerializer<T>jsonSerializer) {
+        public <T> Builder addSerializer(final Class<? extends T> cls, final JsonSerializer<T>jsonSerializer) {
             serializerList.add(new SerializationExtension<>(cls, jsonSerializer));
             return this;
         }
 
-        public <T> Builder addDeserializer(Class<T> cls, JsonDeserializer<? extends T> deserializer) {
+        public <T> Builder addDeserializer(final Class<T> cls, final JsonDeserializer<? extends T> deserializer) {
             deserializerList.add(new DeserializationExtension<>(cls, deserializer));
             return this;
         }
 
-        public <T> Builder addModule(Module module) {
+        public <T> Builder addModule(final Module module) {
             moduleList.add(module);
             return this;
         }
 
-        public JsonSourceManager build() {
+        public JsonSourceManager buildWithResource(final PersistentResource resource) {
+            this.resource = resource;
+            return new JsonSourceManager(this);
+        }
+
+        public JsonSourceManager buildWithFile(final String filePath) {
+            this.resource = new PersistentFile(Paths.get(filePath));
+            return new JsonSourceManager(this);
+        }
+
+        public JsonSourceManager buildWithClassPathResource(final String filePath, final Class<?> anchor) {
+            this.resource = new PersistentClassPathResource(filePath, anchor);
             return new JsonSourceManager(this);
         }
 
