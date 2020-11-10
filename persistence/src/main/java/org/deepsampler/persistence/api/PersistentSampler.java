@@ -43,7 +43,7 @@ public class PersistentSampler {
      * for interacting with the persistent data source (file, database, whatever you like=.
      *
      * @param sourceManager the {@link SourceManager}
-     * @return
+     * @return A new {@link PersistentSampleManager}
      */
     public static PersistentSampleManager source(final SourceManager sourceManager) {
         return new PersistentSampleManager(sourceManager);

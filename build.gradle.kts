@@ -17,6 +17,8 @@ allprojects {
     }
 }
 
+
+
 jacoco {
     toolVersion = "0.8.5"
     reportsDir = file("$buildDir/customJacocoReportDir")
@@ -42,6 +44,7 @@ subprojects {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+    withSourcesJar()
 }
 
 dependencies {
@@ -55,6 +58,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport, tasks.jacocoTestCoverageVerification)
 }
+
 
 tasks.jacocoTestReport {
     dependsOn(tasks.named<Test>("test"))

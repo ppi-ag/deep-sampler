@@ -5,7 +5,7 @@ package org.deepsampler.core.model;
  * In the case of void methods, this can be done like so:
  *
  * <code>
- *     Sample.of(() -> sampler.doSomeThing()).answers(invocation -> doSomethingElse());
+ *     Sample.of(() -&gt; sampler.doSomeThing()).answers(invocation -&gt; doSomethingElse());
  * </code>
  *
  * In essence using Answers gives free control on what a stubbed method should do.
