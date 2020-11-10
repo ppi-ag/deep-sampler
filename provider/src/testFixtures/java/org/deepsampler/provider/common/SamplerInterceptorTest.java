@@ -18,8 +18,7 @@ import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
-import static org.deepsampler.core.api.Matchers.anyString;
-import static org.deepsampler.core.api.Matchers.equalTo;
+import static org.deepsampler.core.api.Matchers.*;
 import static org.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * This Testclass must be be used to test all aop-provider in order to ensure that all providers would support the same
  * functionality.
  */
+@SuppressWarnings("java:S5960")
 public abstract class SamplerInterceptorTest {
 
     public static final String VALUE_A = "Value A";
@@ -36,6 +36,7 @@ public abstract class SamplerInterceptorTest {
     private static final TestBean TEST_BEAN_A = new TestBean();
     private static final TestBean TEST_BEAN_B = new TestBean();
     public static final String MYECHOPARAMS = "MYECHOPARAMS";
+    public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
 
     /**
      * The {@link TestService} is a Service that is used to test method interception by a SamplerInterceptor. Since this class must be
@@ -186,7 +187,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodNotCalled() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_A))).is(TEST_BEAN_B);
 
         // CALL
         getTestService().echoParameter(TEST_BEAN_B);
@@ -200,7 +201,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodCalledOnce() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_A)).is(TEST_BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_A))).is(TEST_BEAN_B);
 
         // CALL
         getTestService().echoParameter(TEST_BEAN_A);
@@ -215,7 +216,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodCalledMultipleAndMixed() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_B)).is(TEST_BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_B))).is(TEST_BEAN_B);
         Sample.of(testServiceSampler.getMinusOne()).is(1);
 
         // CALL
@@ -248,7 +249,7 @@ public abstract class SamplerInterceptorTest {
     public void verifyMethodCalledWithoutSample() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(TEST_BEAN_B));
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_B)));
         Sample.of(testServiceSampler.getMinusOne());
 
         // CALL
@@ -290,6 +291,95 @@ public abstract class SamplerInterceptorTest {
     }
 
     @Test
+    public void exceptionCanBeThrownByStub() throws Exception{
+        //WHEN UNCHANGED
+        assertDoesNotThrow(() -> getTestService().throwsException());
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.throwsException()).throwsException(Exception.class);
+
+        //THEN
+        assertThrows(Exception.class, () -> getTestService().throwsException());
+    }
+
+    @Test
+    public void runtimeExceptionCanBeThrownByStub() {
+        //WHEN UNCHANGED
+        assertDoesNotThrow(() -> getTestService().getMinusOne());
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getMinusOne()).throwsException(new RuntimeException());
+
+        //THEN
+        assertThrows(RuntimeException.class, () -> getTestService().getMinusOne());
+    }
+
+    @Test
+    public void exceptionCanBeThrownByVoidStub() {
+        //WHEN UNCHANGED
+        assertDoesNotThrow(() -> getTestService().voidThrowsException());
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler::voidThrowsException).throwsException(Exception.class);
+
+        //THEN
+        assertThrows(Exception.class, () -> getTestService().voidThrowsException());
+    }
+
+    @Test
+    public void runtimeExceptionCanBeThrownBVoidStub() {
+        //WHEN UNCHANGED
+        assertDoesNotThrow(() -> getTestService().voidThrowsException());
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler::voidThrowsException).throwsException(new RuntimeException());
+
+        //THEN
+        assertThrows(RuntimeException.class, () -> getTestService().voidThrowsException());
+    }
+
+    @Test
+    public void voidMethodCanBeDeactivated() {
+        //WHEN UNCHANGED
+        getTestService().setCounter(0);
+        assertEquals(0, getTestService().getCounter());
+        getTestService().incrementCounter();
+        assertEquals(1, getTestService().getCounter());
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler::incrementCounter).doesNothing();
+
+        //THEN
+        getTestService().incrementCounter();
+        assertEquals(1, getTestService().getCounter());
+    }
+
+    @Test
+    void behaviorOfVoidMethodCanBeChanged() {
+        //WHEN UNCHANGED
+        assertEquals(0, getTestService().getCounter());
+        getTestService().incrementCounter();
+        assertEquals(1, getTestService().getCounter());
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+
+        Sample.of(testServiceSampler::incrementCounter).answers(stubMethodInvocation -> {
+            final TestService testService = stubMethodInvocation.getStubInstance();
+            testService.setCounter(100);
+        });
+
+        //THEN
+        getTestService().incrementCounter();
+        assertEquals(100, getTestService().getCounter());
+    }
+
+    @Test
     public void samplesCanBeRecordedAndLoaded() throws IOException {
         Sampler.clear();
 
@@ -297,8 +387,8 @@ public abstract class SamplerInterceptorTest {
         Sample.of(testServiceSampler.echoParameter(VALUE_A));
 
         getTestService().echoParameter(VALUE_A);
-        String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
-        PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
+        final String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -323,8 +413,8 @@ public abstract class SamplerInterceptorTest {
 
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
-        String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
-        PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
+        final String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -348,8 +438,8 @@ public abstract class SamplerInterceptorTest {
         testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
 
         getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
-        String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
-        PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
+        final String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -372,8 +462,8 @@ public abstract class SamplerInterceptorTest {
         Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
 
         getTestService().echoParameter("ABC");
-        String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
-        PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
+        final String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -396,8 +486,8 @@ public abstract class SamplerInterceptorTest {
         Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
 
         getTestService().echoParameter("ABC");
-        String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
+        final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -418,12 +508,12 @@ public abstract class SamplerInterceptorTest {
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         testServiceSampler.noReturnValue(2);
-        Sample.setIdToLastMethodCall("NoReturnValue");
+        Sample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
 
         getTestService().noReturnValue(2);
 
-        String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
+        final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builderWithFile(pathToFile).build());
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -431,12 +521,12 @@ public abstract class SamplerInterceptorTest {
         assertTrue(SampleRepository.getInstance().isEmpty());
 
         testServiceSampler.noReturnValue(2);
-        Sample.setIdToLastMethodCall("NoReturnValue");
+        Sample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
         source.load();
         getTestService().noReturnValue(2);
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals("NoReturnValue", SampleRepository.getInstance().getSamples().get(0).getSampleId());
+        assertEquals(NO_RETURN_VALUE_SAMPLE_ID, SampleRepository.getInstance().getSamples().get(0).getSampleId());
         Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
         Files.delete(Paths.get(pathToFile));
     }

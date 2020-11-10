@@ -10,6 +10,8 @@ public class TestService {
 
     public static final String HARD_CODED_RETURN_VALUE = "Some value";
 
+    private int counter = 0;
+
     /**
      * This method returns a primitve parameter if the method is not sampled.
      * This Method is intended to be used in positive and negative tests.
@@ -65,4 +67,26 @@ public class TestService {
     public LocalDateTime testLocalDateTime() {
         return LocalDateTime.of(2020, 10, 29, 10, 10, 10);
     }
+
+    public String throwsException() throws TestException {
+        // The Exception must be thrown by the Answer (Stub)
+        return null;
+    }
+
+    public void voidThrowsException() throws TestException {
+        // The Exception must be thrown by the Answer (Stub)
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void incrementCounter() {
+        counter++;
+    }
+
+    public void setCounter(final int counter) {
+        this.counter = counter;
+    }
+
 }

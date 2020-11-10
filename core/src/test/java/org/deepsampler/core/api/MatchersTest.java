@@ -2,6 +2,7 @@ package org.deepsampler.core.api;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.deepsampler.core.error.InvalidConfigException;
 import org.deepsampler.core.error.InvalidMatcherConfigException;
 import org.deepsampler.core.model.ParameterMatcher;
 import org.deepsampler.core.model.SampleDefinition;
@@ -161,15 +162,32 @@ class MatchersTest {
         assertFalse(((ParameterMatcher<String>)parameter.get(0)).matches("ABDX"));
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    void parameterWithoutEqualsIsDetected() {
+        //GIVEN WHEN
+        final BeanWithoutEquals beanWithoutEquals = new BeanWithoutEquals();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.provokeMissingEqualsException(beanWithoutEquals)).is(BEAN_A);
+
+        // THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+
+        final ParameterMatcher<BeanWithoutEquals> matcher = (ParameterMatcher<BeanWithoutEquals>) parameter.get(0);
+
+        assertThrows(InvalidConfigException.class, () -> matcher.matches(beanWithoutEquals));
+    }
+
     static class ContainsMatcher implements ParameterMatcher<String> {
         private final String containedStr;
 
-        public ContainsMatcher(String containedStr) {
+        public ContainsMatcher(final String containedStr) {
             this.containedStr = containedStr;
         }
 
         @Override
-        public boolean matches(String parameter) {
+        public boolean matches(final String parameter) {
             return parameter.contains(containedStr);
         }
     }
@@ -212,6 +230,9 @@ class MatchersTest {
         boolean echoBoolean(final boolean someBoolean) {
             return someBoolean;
         }
+
+        @SuppressWarnings("unused")
+        Bean provokeMissingEqualsException(final BeanWithoutEquals parameter) { return null; }
     }
 
     static class Bean {
@@ -232,5 +253,9 @@ class MatchersTest {
         public int hashCode() {
             return HashCodeBuilder.reflectionHashCode(this, true);
         }
+    }
+
+    static class BeanWithoutEquals {
+
     }
 }

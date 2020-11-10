@@ -1,8 +1,8 @@
 package org.deepsampler.core.api;
 
 import org.deepsampler.core.error.NotASamplerException;
+import org.deepsampler.core.model.Answer;
 import org.deepsampler.core.model.ParameterMatcher;
-import org.deepsampler.core.model.ReturnValueSupplier;
 import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +28,7 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithoutParam() {
+    void testSampleDefinitionWithoutParam() throws Exception {
         // GIVEN WHEN
         final TestService serviceSampler = Sampler.prepare(TestService.class);
         Sample.of(serviceSampler.noParameter()).is(STRING_SAMPLE);
@@ -37,7 +38,7 @@ class SampleTest {
 
         assertEquals(TestService.class, currentSampleDefinition.getSampledMethod().getTarget());
         assertTrue(currentSampleDefinition.getParameterMatchers().isEmpty());
-        assertEquals(STRING_SAMPLE, currentSampleDefinition.getReturnValueSupplier().supply());
+        assertEquals(STRING_SAMPLE, currentSampleDefinition.getAnswer().call(null));
     }
 
     @Test
@@ -84,52 +85,52 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithArrayReturnValue() {
+    void testSampleDefinitionWithArrayReturnValue() throws Exception {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.getArray()).is(new String[] {STRING_SAMPLE});
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final ReturnValueSupplier returnValueSupplier = currentSampleDefinition.getReturnValueSupplier();
+        final Answer<?> answer = currentSampleDefinition.getAnswer();
 
-        assertEquals(1, ((String[]) returnValueSupplier.supply()).length);
-        assertEquals(STRING_SAMPLE, ((String[]) returnValueSupplier.supply())[0]);
+        assertEquals(1, ((String[]) answer.call(null)).length);
+        assertEquals(STRING_SAMPLE, ((String[]) answer.call(null))[0]);
     }
 
     @Test
-    void testSampleDefinitionWithPrimitiveReturnValues() {
+    void testSampleDefinitionWithPrimitiveReturnValues() throws Exception {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
 
         Sample.of(testServiceSampler.getInt()).is(1);
-        assertEquals(1, getCurrentReturnValueSupplier().supply());
+        assertEquals(1, getCurrentReturnValueSupplier().call(null));
 
         Sample.of(testServiceSampler.getFloat()).is(1.0f);
-        assertEquals(1.0f, getCurrentReturnValueSupplier().supply());
+        assertEquals(1.0f, getCurrentReturnValueSupplier().call(null));
         Sample.of(testServiceSampler.getDouble()).is(1.0);
-        assertEquals(1.0, getCurrentReturnValueSupplier().supply());
+        assertEquals(1.0, getCurrentReturnValueSupplier().call(null));
 
         Sample.of(testServiceSampler.getChar()).is('c');
-        assertEquals('c', getCurrentReturnValueSupplier().supply());
+        assertEquals('c', getCurrentReturnValueSupplier().call(null));
 
         Sample.of(testServiceSampler.getByte()).is((byte) 1);
-        assertEquals((byte) 1, getCurrentReturnValueSupplier().supply());
+        assertEquals((byte) 1, getCurrentReturnValueSupplier().call(null));
 
         Sample.of(testServiceSampler.getShort()).is((short)1);
-        assertEquals((short) 1, getCurrentReturnValueSupplier().supply());
+        assertEquals((short) 1, getCurrentReturnValueSupplier().call(null));
     }
 
-    private ReturnValueSupplier getCurrentReturnValueSupplier() {
+    private Answer<?> getCurrentReturnValueSupplier() {
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        return currentSampleDefinition.getReturnValueSupplier();
+        return currentSampleDefinition.getAnswer();
     }
 
     @Test
     void testSampleDefinitionWithLambda() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(BEAN_A)).is(() -> BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(BEAN_A)).answers(invocation -> BEAN_B);
 
         //THEN
         final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
@@ -137,6 +138,89 @@ class SampleTest {
 
         assertEquals(1, parameter.size());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_A_COPY));
+    }
+
+    @Test
+    void exceptionCanBeThrownBySample() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(BEAN_A)).throwsException(Exception.class);
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final Answer<?> answer = currentSampleDefinition.getAnswer();
+
+        assertThrows(Exception.class, () -> answer.call(null));
+    }
+
+    @Test
+    void runTimeExceptionCanBeThrownBySample() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(BEAN_A)).throwsException(new RuntimeException());
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final Answer<?> answer = currentSampleDefinition.getAnswer();
+
+        assertThrows(Exception.class, () -> answer.call(null));
+    }
+
+    @Test
+    void voidMethodThrowsAnExceptionBySample() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler::voidMethod).throwsException(Exception.class);
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final Answer<?> answer = currentSampleDefinition.getAnswer();
+
+        assertThrows(Exception.class, () -> answer.call(null));
+    }
+
+    @Test
+    void voidMethodThrowsAnRuntimeExceptionBySample() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler::voidMethod).throwsException(new RuntimeException());
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final Answer<?> answer = currentSampleDefinition.getAnswer();
+
+        assertThrows(RuntimeException.class, () -> answer.call(null));
+    }
+
+
+    @Test
+    void callOfANonSamplerInsideOfAVoidCallIsDetected() {
+        //GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+
+        //WHEN UNCHANGED
+        assertDoesNotThrow(() -> Sample.of(testServiceSampler::voidMethod));
+
+        //THEN
+        assertThrows(NotASamplerException.class, () -> Sample.of(() -> {}));
+    }
+
+    @Test
+    void voidMethodsCanBeReplacedByVoidAnswers() throws Exception {
+        //GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+
+        final AtomicInteger counter = new AtomicInteger(0);
+
+        // WHEN
+        Sample.of(testServiceSampler::voidMethod).answers(stubMethodInvocation -> counter.set(1));
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final Answer<?> answer = currentSampleDefinition.getAnswer();
+        answer.call(null);
+
+        assertEquals(1, counter.get());
     }
 
     @Test
@@ -192,6 +276,10 @@ class SampleTest {
         public String noParameter() {
             return "Hello Sample";
         }
+
+        public void voidMethod() {
+            //The behavior of this method is entirely determined by Sampl
+        }
     }
 
     public static class Bean {
@@ -222,9 +310,4 @@ class SampleTest {
         String echoParameter(String parameter);
     }
 
-    public static class PrivateBean {
-        private String privateMethod() {
-            return "I'm a very private person";
-        }
-    }
 }

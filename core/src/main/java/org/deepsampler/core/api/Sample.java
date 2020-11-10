@@ -3,6 +3,7 @@ package org.deepsampler.core.api;
 import org.deepsampler.core.error.NotASamplerException;
 import org.deepsampler.core.internal.ProxyFactory;
 import org.deepsampler.core.internal.aophandler.VerifySampleHandler;
+import org.deepsampler.core.model.SampleDefinition;
 import org.deepsampler.core.model.SampleRepository;
 
 import java.util.Objects;
@@ -85,8 +86,38 @@ public class Sample {
      *
      * @param id the id you want to set.
      */
-    public static void setIdToLastMethodCall(String id) {
+    public static void setIdToLastMethodCall(final String id) {
         SampleRepository.getInstance().getCurrentSampleDefinition().setSampleId(id);
+    }
+
+    /**
+     * Defines a stubbed void method by calling the method inside of a lambda. The returned {@link VoidSampleBuilder} will then offer possibilities to define the Sample,
+     * or in other words, it offers possibilities to override the default behavior or the stubbed method.
+     *
+     * @param sampledMethodCall The method call as a lambda expression, that will be sampled.
+     * @return A {@link VoidSampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
+     * fluent API only.
+     */
+    public static <E extends Exception> VoidSampleBuilder of(final VoidCall<E> sampledMethodCall) {
+        final SampleRepository sampleRepository = SampleRepository.getInstance();
+
+        final SampleDefinition lastSampleDefinition = sampleRepository.getCurrentSampleDefinition();
+
+        try {
+            sampledMethodCall.call();
+        } catch (final Exception e) {
+            throw new NotASamplerException("The VoidCall did throw an Exception. Did you call an unstubbed method inside of the lamda, " +
+                    "instead of a method on a Sampler?", e);
+        }
+
+        final SampleDefinition newSampleDefinition = sampleRepository.getCurrentSampleDefinition();
+
+        if (lastSampleDefinition == newSampleDefinition) {
+            throw new NotASamplerException("sampledMethodCall did not call a method on a Sampler. Did you use a " +
+                    "sampled object created by @PrepareSampler or Sampler.prepare()?");
+        }
+
+        return new VoidSampleBuilder(newSampleDefinition);
     }
 
 }

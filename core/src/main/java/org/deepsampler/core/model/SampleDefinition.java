@@ -12,7 +12,7 @@ public class SampleDefinition {
 
     private List<Object> parameterValues = new ArrayList<>();
     private List<ParameterMatcher<?>> parameterMatchers = new ArrayList<>();
-    private ReturnValueSupplier returnValueSupplier;
+    private Answer<Exception> answer;
     private String sampleId;
 
     public SampleDefinition(final SampledMethod sampledMethod) {
@@ -41,7 +41,7 @@ public class SampleDefinition {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> ParameterMatcher<T> getParameterMatcherAs(int i, Class<T> cls) {
+    public <T> ParameterMatcher<T> getParameterMatcherAs(final int i, final Class<T> cls) {
         Objects.requireNonNull(cls);
 
         return (ParameterMatcher<T>) parameterMatchers.get(i);
@@ -55,12 +55,12 @@ public class SampleDefinition {
         return sampleId;
     }
 
-    public void setReturnValueSupplier(final ReturnValueSupplier returnValueSupplier) {
-        this.returnValueSupplier = returnValueSupplier;
+    public void setAnswer(final Answer<Exception> answer) {
+        this.answer = answer;
     }
 
-    public ReturnValueSupplier getReturnValueSupplier() {
-        return returnValueSupplier;
+    public Answer<Exception> getAnswer() {
+        return answer;
     }
 
 
