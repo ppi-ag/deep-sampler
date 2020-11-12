@@ -91,3 +91,11 @@ tasks.jacocoTestCoverageVerification {
         }
     }
 }
+
+
+tasks.register<Javadoc>("JavadocAll") {
+    source = fileTree(".").matching {include("**/src/main/java/**")}
+
+    val classPathList = subprojects.flatMap { subProject -> subProject.sourceSets.main.get().compileClasspath }
+    classpath = files(classPathList)
+}
