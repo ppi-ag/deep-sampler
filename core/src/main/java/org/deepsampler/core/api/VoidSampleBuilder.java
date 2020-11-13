@@ -80,7 +80,7 @@ public class VoidSampleBuilder {
      * This can be done by using an Answer like so:
      *
      * <code>
-     * Sample.of(() -> sampler.doSomething())).answer(invocation -> doSomethingElse());
+     * Sample.of(() -&gt; sampler.doSomething())).answer(invocation -&gt; doSomethingElse());
      * </code>
      *
      * In essence using Answers gives free control on what a stubbed method should do.

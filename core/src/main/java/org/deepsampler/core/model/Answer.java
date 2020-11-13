@@ -8,7 +8,7 @@ import java.io.Serializable;
  * This can be done by using an Answer like so:
  *
  * <code>
- *     Sample.of(sampler.echo(anyString())).answer(invocation -> invocation.getParameters().get(0));
+ *     Sample.of(sampler.echo(anyString())).answer(invocation -&gt; invocation.getParameters().get(0));
  * </code>
  *
  * In essence using Answers gives free control on what a stubbed method should do.
