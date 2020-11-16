@@ -1,0 +1,24 @@
+{
+  "id" : "45b1e6e0-2142-480c-b06f-7496197d9f31",
+  "sampleMethodToSampleMap" : {
+    "TestMethodForRecord" : {
+      "callMap" : [ {
+        "parameter" : {
+          "args" : [ "Args1" ]
+        },
+        "returnValue" : "ABC"
+      }, {
+        "parameter" : {
+          "args" : [ "Args1" ]
+        },
+        "returnValue" : {
+            "@type" : "de.ppi.deepsampler.persistence.bean.DefaultPersistentBean",
+            "values" : {
+              "0$valueTwo" : "ABC",
+              "0$valueOne" : "ABC"
+            }
+        }
+      } ]
+    }
+  }
+}

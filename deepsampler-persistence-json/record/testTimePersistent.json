@@ -1,0 +1,45 @@
+{
+  "id" : "1d6e3376-66ed-401a-a3e3-5f8a0991f60e",
+  "sampleMethodToSampleMap" : {
+    "TestMethodForRecord" : {
+      "callMap" : [ {
+        "parameter" : {
+          "args" : [ {
+            "@type" : "de.ppi.deepsampler.persistence.bean.DefaultPersistentBean",
+            "values" : {
+              "0$date" : {
+                "@type" : "de.ppi.deepsampler.persistence.bean.DefaultPersistentBean",
+                "values" : {
+                  "0$month" : [ "java.lang.Short", 10 ],
+                  "0$year" : 2020,
+                  "0$day" : [ "java.lang.Short", 9 ]
+                }
+              },
+              "0$time" : {
+                "@type" : "de.ppi.deepsampler.persistence.bean.DefaultPersistentBean",
+                "values" : {
+                  "0$minute" : [ "java.lang.Byte", 28 ],
+                  "0$second" : [ "java.lang.Byte", 23 ],
+                  "0$hour" : [ "java.lang.Byte", 18 ],
+                  "0$nano" : 45217000
+                }
+              }
+            }
+          } ]
+        },
+        "returnValue" : "ABC"
+      }, {
+        "parameter" : {
+          "args" : [ "Args1" ]
+        },
+        "returnValue" : {
+          "@type" : "de.ppi.deepsampler.persistence.bean.DefaultPersistentBean",
+          "values" : {
+            "0$valueTwo" : "ABC",
+            "0$valueOne" : "ABC"
+          }
+        }
+      } ]
+    }
+  }
+}
