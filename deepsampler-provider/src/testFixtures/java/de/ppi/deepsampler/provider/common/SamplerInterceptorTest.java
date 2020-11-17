@@ -296,7 +296,7 @@ public abstract class SamplerInterceptorTest {
     }
 
     @Test
-    public void exceptionCanBeThrownByStub() throws Exception{
+    public void exceptionCanBeThrownByStub() throws TestException {
         //WHEN UNCHANGED
         assertDoesNotThrow(() -> getTestService().throwsException());
 
