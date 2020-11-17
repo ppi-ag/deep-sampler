@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020  PPI AG (Hamburg, Germany)
+ * This program is made available under the terms of the MIT License.
+ */
+
 dependencies {
     implementation("org.aspectj:aspectjrt:1.9.6")
     implementation("org.aspectj:aspectjweaver:1.9.6")
