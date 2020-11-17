@@ -1,12 +1,11 @@
 rootProject.name = "deepsampler"
 
-include ("provider",
-	"provider-spring",
-	"provider-guice",
-	"core",
-	"persistence",
-	"persistence-json",
-	"persistence-api",
-	"junit",
-	"junit4",
-	"junit5")
+include ("deepsampler-provider",
+	"deepsampler-provider-spring",
+	"deepsampler-provider-guice",
+	"deepsampler-core",
+	"deepsampler-persistence",
+	"deepsampler-persistence-json",
+	"deepsampler-junit",
+	"deepsampler-junit4",
+	"deepsampler-junit5")
