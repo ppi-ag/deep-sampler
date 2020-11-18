@@ -4,18 +4,17 @@
 
 DeepSampler is a stubbing framework for integrated component tests. 
 
-The API is able to stub
-methods anywhere _deep_ inside of an object tree of any size without the need to manually move a stubbed instance 
+The API is able to _stub_ methods anywhere _deep_ inside of an object tree of any size without the need to manually move a stubbed instance 
 from a test case into the object tree. 
 
-In order to cope with large test data (called _Samples_) DeepSampler can separate test logic from test data by loading
-and saving test data in JSON-files. Stubs can be switched to a record mode in order to record test data by running 
-a test case using the original (stubbed) data sources. 
+For tests with large test data (called _Samples_) DeepSampler can separate test logic from test data by _loading_
+and _saving_ test data in JSON-files. The JSON-files can be _recorded_ by activating the record-mode and simply running
+a test case. If a stub is in record-mode, it routes calls to the original methods and collects all data that flows through the stub.  
+This collected data can then be saved to JSON-files.
 
 For light-way tests with smaller Samples, where using separate JSON-files might be unnecessary, DeepSampler 
 provides an API that can be used to define Samples
-conventionally inside test classes. The API also comes with means to freely redefine the behavior of stubbed methods,
-for situations where static Samples are insufficient. 
+conveniently inside test classes. The API also comes with means to freely redefine the behavior of stubbed methods.
 
 ## License
 DeepSampler is made available under the terms of the __MIT License__ (see [LICENSE.md](./LICENSE.md)).
