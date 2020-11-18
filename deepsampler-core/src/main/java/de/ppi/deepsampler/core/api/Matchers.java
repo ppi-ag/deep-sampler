@@ -54,6 +54,8 @@ public class Matchers {
     /**
      * Accepts any parameter value.
      * @return a matcher that accepts any parameter value
+     * @param <T> The type of the parameter that will be accepted
+     * @param type The {@link Class} of the parameter that will be accepted independently from its concrete value.
      */
     @SuppressWarnings("unused")
     public static <T> T any(final Class<T> type) {
@@ -136,7 +138,8 @@ public class Matchers {
     /**
      * Accepts a parameter that equals to expectedParameter. Equality is tested using the .equals()-Method.
      * @param expectedParameter the expected value
-     * @return a matcher that accepts a parameter that is equal to expectedParameter. Equality is tested using the .equals()-Method.
+     * @param <T> The type of the parameter that is expected.
+     * @return A matcher that accepts a parameter that is equal to expectedParameter. Equality is tested using the .equals()-Method.
      */
     public static <T> T equalTo(final T expectedParameter) {
         SampleRepository.getInstance().addCurrentParameterMatchers(new EqualsMatcher<>(expectedParameter));
@@ -146,6 +149,7 @@ public class Matchers {
     /**
      * Accepts a parameter-object that is identical to expectedParameter. Equality is tests using the == operator.
      * @param expectedParameter the expected parameter object
+     * @param <T> The type of the parameter that is expected.
      * @return a matcher that accepts a parameter object that is expected to be the same object as expectedParameter.
      */
     public static <T> T sameAs(final T expectedParameter) {
@@ -169,7 +173,7 @@ public class Matchers {
      * This Matcher is typically used by {@link Matchers#equalTo(Object)}, but since it is also used internally in various places
      * it is implemented as a class rather then a simple lambda, as it is the case with most of the Matchers.
      *
-     * @param <T>
+     * @param <T> The type of the objects that will be compared by this Matcher.
      */
     public static class EqualsMatcher<T> implements ParameterMatcher<T> {
 

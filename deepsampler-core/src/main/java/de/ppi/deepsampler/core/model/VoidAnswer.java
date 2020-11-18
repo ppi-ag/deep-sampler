@@ -22,6 +22,8 @@ public interface VoidAnswer<E extends Exception> {
      * A method that is executed as a replacement of the stubbed method.
      *
      * @param stubMethodInvocation A description of the stubbed method
+     * @throws E By declaring the {@link Exception} as a generic type, this functional interface can cope with methods that throw any kind of {@link Exception} an
+     * also allows methods that don't declare an {@link Exception} at all.
      */
     void call(StubMethodInvocation stubMethodInvocation) throws E;
 }

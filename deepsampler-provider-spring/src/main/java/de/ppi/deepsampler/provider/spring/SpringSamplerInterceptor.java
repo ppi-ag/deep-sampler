@@ -24,9 +24,13 @@ public class SpringSamplerInterceptor {
     /**
      * Intercepts all Methods in SpringBeans and delegates to {@link SampleDefinition}s that have been defined within test classes.
      *
-     * @param joinPoint
-     * @return
-     * @throws Throwable
+     * @param joinPoint The AOP-JoinPoint that describes which method will be called and which method can now be intercepted. I.e. this method
+     *                  will become a stub if the method is described by a Sampler.
+     * @return If the intercepted method is a stub, the return value is determined by the Sampler, otherwise this is the original return value comming from
+     * the original method as described by the joinPoint.
+     * @throws Throwable Since we intercept all methods in general it is possible that any kind of {@link Exception}, even {@link Throwable} is thrown.
+     * Even though declaring {@link Throwable} in a throws clause is usually not recommended, this is done by Spring itself (for comprehensible reasons),
+     * so we are also forced to do so.
      */
     @SuppressWarnings("unused")
     @Around("execution(* *(..)) && !target(DeepSamplerSpringConfig)")
@@ -54,8 +58,8 @@ public class SpringSamplerInterceptor {
 
     /**
      * Searches for a {@link SampleDefinition} that matches to a particular method call.
-     * @param proceedingJoinPoint
-     * @return
+     * @param proceedingJoinPoint describes the intercepted method. If a {@link SampleDefinition} for this method hs beed defined, this method will be stubbed.
+     * @return If the intercepted method (as described by proceedingJoinPoint) has a Sampler the {@link SampleDefinition} will be returned, otherwise null.
      */
     private SampleDefinition findSampleDefinition(final ProceedingJoinPoint proceedingJoinPoint) {
         final MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();

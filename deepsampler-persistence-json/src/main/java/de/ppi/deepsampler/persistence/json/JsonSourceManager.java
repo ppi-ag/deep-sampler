@@ -56,7 +56,7 @@ public class JsonSourceManager implements SourceManager {
      *     <li>{@link PersistentClassPathResource}</li>
      * </ul>
      *
-     * @return
+     * @return The Builder
      */
     public static Builder builder() {
         return new Builder();
