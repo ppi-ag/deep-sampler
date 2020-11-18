@@ -1,4 +1,4 @@
-# DeepSampler
+![DeepSamplerA](./docs/assets/logo.svg)
 DeepSampler is a stubbing framework for integrated component tests. 
 
 The API is able to stub
