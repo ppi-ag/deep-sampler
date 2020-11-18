@@ -9,19 +9,19 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 
 public class DeserializationExtension<T> {
 
-    private final Class<T> cls;
-    private final JsonDeserializer<? extends T> jsonDeserializer;
+    private final Class<T> typeToSerialize;
+    private final JsonDeserializer<T> jsonDeserializer;
 
-    public DeserializationExtension(Class<T> cls, JsonDeserializer<? extends T> jsonDeserializer) {
-        this.cls = cls;
+    public DeserializationExtension(final Class<T> typeToSerialize, final JsonDeserializer<T> jsonDeserializer) {
+        this.typeToSerialize = typeToSerialize;
         this.jsonDeserializer = jsonDeserializer;
     }
 
-    public Class<T> getCls() {
-        return cls;
+    public Class<T> getTypeToSerialize() {
+        return typeToSerialize;
     }
 
-    public JsonDeserializer<? extends T> getJsonDeserializer() {
+    public JsonDeserializer<T> getJsonDeserializer() {
         return jsonDeserializer;
     }
 }

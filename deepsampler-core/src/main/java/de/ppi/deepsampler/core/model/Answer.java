@@ -26,6 +26,8 @@ public interface Answer<E extends Exception> extends Serializable {
      *
      * @param stubMethodInvocation A description of the stubbed method
      * @return a Sample that should be returned by the stubbed method.
+     * @throws E By declaring the {@link Exception} as a generic type, this functional interface can cope with methods that throw any kind of {@link Exception} and
+     * also allows methods that don't declare an {@link Exception} at all.
      */
     Object call(StubMethodInvocation stubMethodInvocation) throws E;
 }

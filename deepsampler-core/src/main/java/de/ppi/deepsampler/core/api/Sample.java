@@ -101,6 +101,8 @@ public class Sample {
      * or in other words, it offers possibilities to override the default behavior or the stubbed method.
      *
      * @param sampledMethodCall The method call as a lambda expression, that will be sampled.
+     * @param <E> If the stubbed method (called by the functional interface {@link VoidCall}) throws an {@link Exception}, E defines the type of that {@link Exception}
+     *           E may be a caught or an uncaught (i.e. {@link RuntimeException} Exception.
      * @return A {@link VoidSampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */

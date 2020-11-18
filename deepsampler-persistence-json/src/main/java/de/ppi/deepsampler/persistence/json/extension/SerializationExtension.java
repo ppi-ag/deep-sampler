@@ -8,16 +8,16 @@ package de.ppi.deepsampler.persistence.json.extension;
 import com.fasterxml.jackson.databind.JsonSerializer;
 
 public class SerializationExtension<T> {
-    private final Class<? extends T> cls;
+    private final Class<? extends T> typeToSerialize;
     private final JsonSerializer<T> jsonSerializer;
 
-    public SerializationExtension(Class<? extends T> cls, JsonSerializer<T> jsonSerializer) {
-        this.cls = cls;
+    public SerializationExtension(final Class<? extends T> typeToSerialize, final JsonSerializer<T> jsonSerializer) {
+        this.typeToSerialize = typeToSerialize;
         this.jsonSerializer = jsonSerializer;
     }
 
-    public Class<? extends T> getCls() {
-        return cls;
+    public Class<? extends T> getTypeToSerialize() {
+        return typeToSerialize;
     }
 
     public JsonSerializer<T> getJsonSerializer() {

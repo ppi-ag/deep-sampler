@@ -9,12 +9,14 @@ plugins {
 }
 
 allprojects {
+    version = "1.0.0"
+    group = "de.ppi.deepsampler"
+
     repositories {
         jcenter()
     }
 }
 
-version = "1.0.0"
 
 
 jacoco {

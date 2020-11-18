@@ -23,7 +23,7 @@ public class PersistentBeanFactory {
 
     private final List<BeanFactoryExtension> beanFactoryExtensions = new ArrayList<>();
 
-    public void addExtension(BeanFactoryExtension extension) {
+    public void addExtension(final BeanFactoryExtension extension) {
         beanFactoryExtensions.add(extension);
     }
 
@@ -71,11 +71,11 @@ public class PersistentBeanFactory {
 
     private <T> T instantiateUsingMatchingConstructor(final Class<T> type,
                                                       final PersistentBean persistentBean,
-                                                      Map<Field, String> fields) {
+                                                      final Map<Field, String> fields) {
         try {
             return createInstance(type, persistentBean, fields);
 
-        } catch (NoSuchMethodException | InstantiationException
+        } catch (final NoSuchMethodException | InstantiationException
                 | IllegalAccessException | InvocationTargetException e) {
             throw new PersistenceException("While the type %s has final fields, it was " +
                     "tried to use a matching constructor for all field-values. Because this" +
@@ -83,36 +83,34 @@ public class PersistentBeanFactory {
         }
     }
 
-    private <T> T createInstance(Class<T> type, PersistentBean persistentBean, Map<Field, String> fields) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Class<?>[] parameterTypes = fields.keySet()
+    private <T> T createInstance(final Class<T> type, final PersistentBean persistentBean, final Map<Field, String> fields) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        final Class<?>[] parameterTypes = fields.keySet()
                 .stream()
                 .map(Field::getType)
                 .toArray(Class[]::new);
 
-        List<Object> values = createValuesForConstructingInstance(persistentBean, fields);
+        final List<Object> values = createValuesForConstructingInstance(persistentBean, fields);
         return type.getDeclaredConstructor(parameterTypes)
                 .newInstance(values.toArray());
     }
 
-    private List<Object> createValuesForConstructingInstance(PersistentBean persistentBean, Map<Field, String> fields) {
-        List<Object> values = new ArrayList<>();
+    private List<Object> createValuesForConstructingInstance(final PersistentBean persistentBean, final Map<Field, String> fields) {
+        final List<Object> values = new ArrayList<>();
 
         for (final Map.Entry<Field, String> entry : fields.entrySet()) {
             final Field field = entry.getKey();
             final String key = entry.getValue();
 
             Object lookedUpValueInBean = persistentBean.getValue(key);
-            if (lookedUpValueInBean != null) {
-                if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                    lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
-                }
+            if (lookedUpValueInBean instanceof DefaultPersistentBean) {
+                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
             }
             values.add(lookedUpValueInBean);
         }
         return values;
     }
 
-    private boolean hasFinalFields(Map<Field, String> fields) {
+    private boolean hasFinalFields(final Map<Field, String> fields) {
         return fields.entrySet()
                 .stream()
                 .anyMatch(entry -> Modifier.isFinal(entry.getKey().getModifiers()));
@@ -135,7 +133,7 @@ public class PersistentBeanFactory {
     }
 
     public PersistentBean toBean(final Object obj) {
-        List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(obj.getClass());
+        final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(obj.getClass());
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
             return applicableExtensions.get(0).toBean(obj);
@@ -162,6 +160,7 @@ public class PersistentBeanFactory {
         return new DefaultPersistentBean(valuesForBean);
     }
 
+    @SuppressWarnings("java:S3011") // We need the possibility to set the values of private fields for deserialization.
     private void setValue(final Object obj, final Field field, final Object value) {
         try {
             field.setAccessible(true);
@@ -171,6 +170,7 @@ public class PersistentBeanFactory {
         }
     }
 
+    @SuppressWarnings("java:S3011") // We need the possibility to get the values of private fields for serialization.
     private Object retrieveValue(final Object obj, final Field field) {
         final Object fieldValue;
         try {
@@ -227,7 +227,7 @@ public class PersistentBeanFactory {
         return isTransformationNotNecessary(obj) ? obj : toBean(obj);
     }
 
-    private List<BeanFactoryExtension> findApplicableExtensions(Class<?> cls) {
+    private List<BeanFactoryExtension> findApplicableExtensions(final Class<?> cls) {
         return beanFactoryExtensions.stream().filter(ext -> ext.isProcessable(cls)).collect(Collectors.toList());
     }
 

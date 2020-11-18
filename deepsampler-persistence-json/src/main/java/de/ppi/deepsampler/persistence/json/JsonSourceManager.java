@@ -10,10 +10,10 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.Module;
 import de.ppi.deepsampler.core.model.ExecutionInformation;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
-import de.ppi.deepsampler.persistence.json.extension.DeserializationExtension;
-import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.api.SourceManager;
+import de.ppi.deepsampler.persistence.json.extension.DeserializationExtension;
 import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
+import de.ppi.deepsampler.persistence.model.PersistentModel;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class JsonSourceManager implements SourceManager {
      *     <li>{@link PersistentClassPathResource}</li>
      * </ul>
      *
-     * @return
+     * @return The Builder
      */
     public static Builder builder() {
         return new Builder();
@@ -68,17 +68,17 @@ public class JsonSourceManager implements SourceManager {
         private final List<DeserializationExtension<?>> deserializerList = new ArrayList<>();
         private final List<Module> moduleList = new ArrayList<>();
 
-        public <T> Builder addSerializer(final Class<? extends T> cls, final JsonSerializer<T>jsonSerializer) {
-            serializerList.add(new SerializationExtension<>(cls, jsonSerializer));
+        public <T> Builder addSerializer(final Class<T> typeToSerialize, final JsonSerializer<T>jsonSerializer) {
+            serializerList.add(new SerializationExtension<>(typeToSerialize, jsonSerializer));
             return this;
         }
 
-        public <T> Builder addDeserializer(final Class<T> cls, final JsonDeserializer<? extends T> deserializer) {
-            deserializerList.add(new DeserializationExtension<>(cls, deserializer));
+        public <T> Builder addDeserializer(final Class<T> typeToSerialize, final JsonDeserializer<T> deserializer) {
+            deserializerList.add(new DeserializationExtension<>(typeToSerialize, deserializer));
             return this;
         }
 
-        public <T> Builder addModule(final Module module) {
+        public Builder addModule(final Module module) {
             moduleList.add(module);
             return this;
         }

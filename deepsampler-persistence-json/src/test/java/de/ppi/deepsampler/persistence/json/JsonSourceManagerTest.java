@@ -27,10 +27,10 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonSourceManagerTest {
+class JsonSourceManagerTest {
 
     @Test
-    public void testBuilderWithSerializer() throws NoSuchMethodException, IOException {
+    void testBuilderWithSerializer() throws NoSuchMethodException, IOException {
         // GIVEN
         final Map<Class<?>, ExecutionInformation> executionInformationMap = new HashMap<>();
         final ExecutionInformation executionInformation = new ExecutionInformation();
@@ -56,7 +56,7 @@ public class JsonSourceManagerTest {
     }
 
     @Test
-    public void testBuilderWithModule() throws Exception {
+    void testBuilderWithModule() throws Exception {
         // GIVEN
         final Map<Class<?>, ExecutionInformation> executionInformationMap = new HashMap<>();
         final ExecutionInformation executionInformation = new ExecutionInformation();
@@ -84,7 +84,7 @@ public class JsonSourceManagerTest {
     }
 
     @Test
-    public void testBuilderWithSerializerLoad() {
+    void testBuilderWithSerializerLoad() {
         // GIVEN
         final String pathAsString = "./record/testPersistent.json";
 
@@ -103,7 +103,7 @@ public class JsonSourceManagerTest {
     }
 
     @Test
-    public void testBuilderWithModLoad() {
+    void testBuilderWithModLoad() {
         // GIVEN
         final String pathAsString = "./record/testPersistent.json";
 
@@ -120,7 +120,7 @@ public class JsonSourceManagerTest {
     }
 
     @Test
-    public void testBuilderWithClassPathResource() {
+    void testBuilderWithClassPathResource() {
         // WHEN
         final JsonSourceManager sourceManager = JsonSourceManager.builder()
                 .buildWithResource(new PersistentClassPathResource("myTestJson.json", getClass()));

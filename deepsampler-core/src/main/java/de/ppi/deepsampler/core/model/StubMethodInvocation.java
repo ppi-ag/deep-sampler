@@ -31,6 +31,7 @@ public class StubMethodInvocation {
     /**
      * Gives access to the instance of the stubbed class where the current method is called on.
      * @return The instance of the stub
+     * @param <T> The type of the stub
      */
     @SuppressWarnings("unchecked")
     public <T> T getStubInstance() {

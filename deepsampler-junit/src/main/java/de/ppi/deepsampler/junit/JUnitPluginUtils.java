@@ -9,7 +9,9 @@ import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -39,11 +41,15 @@ public class JUnitPluginUtils {
         final Class<? extends SamplerFixture> samplerFixtureClass = fixture.value();
 
         try {
-            final SamplerFixture samplerFixture = samplerFixtureClass.newInstance();
+            final Constructor<? extends SamplerFixture> samplerFixtureClassConstructor = samplerFixtureClass.getConstructor();
+            final SamplerFixture samplerFixture = samplerFixtureClassConstructor.newInstance();
+
             injectSamplers(samplerFixture);
             samplerFixture.defineSamplers();
-        } catch (final InstantiationException | IllegalAccessException e) {
+        } catch (final InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new JUnitPreparationException("The SamplerFixture %s could not be loaded", e, samplerFixtureClass.getName());
+        } catch (final NoSuchMethodException e) {
+            throw new JUnitPreparationException("The SamplerFixture %s must provide a default constructor.", e, samplerFixtureClass.getName());
         }
     }
 
@@ -63,10 +69,14 @@ public class JUnitPluginUtils {
 
     private static JsonSourceManager.Builder loadBuilder(final Class<? extends PersistentSampleManagerProvider> persistenceManagerProviderClass) {
         try {
-            final PersistentSampleManagerProvider persistentSampleManagerProvider = persistenceManagerProviderClass.newInstance();
+            final Constructor<? extends PersistentSampleManagerProvider> persistenceManagerProviderClassConstructor = persistenceManagerProviderClass.getConstructor();
+            final PersistentSampleManagerProvider persistentSampleManagerProvider = persistenceManagerProviderClassConstructor.newInstance();
+
             return persistentSampleManagerProvider.configurePersistentSampleManager();
-        } catch (final InstantiationException | IllegalAccessException e) {
+        } catch (final InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new JUnitPreparationException("The PersistentSampleManagerProvider %s could not be loaded.", e, persistenceManagerProviderClass.getName());
+        } catch (final NoSuchMethodException e) {
+            throw new JUnitPreparationException("%s must define a default constructor.", e, persistenceManagerProviderClass.getName());
         }
     }
 
