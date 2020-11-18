@@ -1,4 +1,5 @@
-![DeepSamplerA](./docs/assets/logo.svg)
+<img src="https://github.com/ppi-ag/deep-sampler/blob/main/docs/assets/logo.svg" alt="DeepSampler" width="33%"/>
+
 DeepSampler is a stubbing framework for integrated component tests. 
 
 The API is able to stub
