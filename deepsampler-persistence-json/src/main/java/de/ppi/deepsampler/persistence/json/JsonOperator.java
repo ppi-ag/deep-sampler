@@ -29,10 +29,10 @@ public abstract class JsonOperator {
     private final List<DeserializationExtension<?>> deserializationExtensions;
     private final List<Module> moduleList;
 
-    protected JsonOperator(PersistentResource persistentResource,
-                        List<DeserializationExtension<?>> deserializerList,
-                        List<SerializationExtension<?>> serializerList,
-                        List<Module> moduleList) {
+    protected JsonOperator(final PersistentResource persistentResource,
+                           final List<DeserializationExtension<?>> deserializerList,
+                           final List<SerializationExtension<?>> serializerList,
+                           final List<Module> moduleList) {
         this.persistentResource = persistentResource;
         this.serializationExtensions = serializerList;
         this.deserializationExtensions = deserializerList;
@@ -58,22 +58,22 @@ public abstract class JsonOperator {
     }
 
     @SuppressWarnings("unchecked")
-    private void applyCustomExtensions(ObjectMapper objectMapper) {
-        SimpleModule simpleModule = new SimpleModule();
+    private void applyCustomExtensions(final ObjectMapper objectMapper) {
+        final SimpleModule simpleModule = new SimpleModule();
 
-        for (DeserializationExtension<?> deserializationExtension : deserializationExtensions) {
-            DeserializationExtension<Object> deserializationObjExtension = (DeserializationExtension<Object>) deserializationExtension;
-            simpleModule.addDeserializer(deserializationObjExtension.getCls(), deserializationObjExtension.getJsonDeserializer());
+        for (final DeserializationExtension<?> deserializationExtension : deserializationExtensions) {
+            final DeserializationExtension<Object> deserializationObjExtension = (DeserializationExtension<Object>) deserializationExtension;
+            simpleModule.addDeserializer(deserializationObjExtension.getTypeToSerialize(), deserializationObjExtension.getJsonDeserializer());
         }
 
-        for (SerializationExtension<?> serializationExtension : serializationExtensions) {
-            SerializationExtension<Object> serializationObjExtension = (SerializationExtension<Object>) serializationExtension;
-            simpleModule.addSerializer(serializationObjExtension.getCls(), serializationObjExtension.getJsonSerializer());
+        for (final SerializationExtension<?> serializationExtension : serializationExtensions) {
+            final SerializationExtension<Object> serializationObjExtension = (SerializationExtension<Object>) serializationExtension;
+            simpleModule.addSerializer(serializationObjExtension.getTypeToSerialize(), serializationObjExtension.getJsonSerializer());
         }
 
         objectMapper.registerModule(simpleModule);
 
-        for (Module module : moduleList) {
+        for (final Module module : moduleList) {
             objectMapper.registerModule(module);
         }
     }
