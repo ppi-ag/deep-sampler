@@ -9,8 +9,7 @@ from a test case into the object tree.
 
 For tests with large test data (called _Samples_) DeepSampler can separate test logic from test data by _loading_
 and _saving_ test data in JSON-files. The JSON-files can be _recorded_ by activating the record-mode and simply running
-a test case. If a stub is in record-mode, it routes calls to the original methods and collects all data that flows through the stub.  
-This collected data can then be saved to JSON-files.
+a test case. If a stub is in record-mode, it routes calls to the original methods and collects all data that flows through the stub. This collected data can then be saved to JSON-files.
 
 For light-way tests with smaller Samples, where using separate JSON-files might be unnecessary, DeepSampler 
 provides an API that can be used to define Samples
