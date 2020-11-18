@@ -1,5 +1,7 @@
 <img src="https://github.com/ppi-ag/deep-sampler/blob/main/docs/assets/logo.svg" alt="DeepSampler" width="33%"/>
 
+![Java CI with Gradle](https://github.com/ppi-ag/deep-sampler/workflows/Java%20CI%20with%20Gradle/badge.svg)
+
 DeepSampler is a stubbing framework for integrated component tests. 
 
 The API is able to stub
