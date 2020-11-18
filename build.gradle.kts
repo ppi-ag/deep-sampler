@@ -6,6 +6,7 @@
 plugins {
     `java-library`
     jacoco
+    id("org.sonarqube") version "3.0"
 }
 
 allprojects {
@@ -22,6 +23,14 @@ allprojects {
 jacoco {
     toolVersion = "0.8.5"
     reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "ppi-ag_deep-sampler")
+        property("sonar.organization", "ppi-ag")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 subprojects {
