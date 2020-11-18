@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 public class DeepSamplerExtension implements TestInstancePostProcessor, BeforeEachCallback, AfterEachCallback {
 
     @Override
-    public void postProcessTestInstance(final Object testInstance, final ExtensionContext context) throws Exception {
+    public void postProcessTestInstance(final Object testInstance, final ExtensionContext context) {
         JUnitPluginUtils.injectSamplers(testInstance);
     }
 

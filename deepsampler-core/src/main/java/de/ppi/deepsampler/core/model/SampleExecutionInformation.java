@@ -11,7 +11,7 @@ import java.util.List;
 
 public class SampleExecutionInformation {
 
-    private int timesInvoked = 0;
+    private int timesInvoked ;
     private final List<MethodCall> methodCallList = new ArrayList<>();
 
     public SampleExecutionInformation(final int timesInvoked) {

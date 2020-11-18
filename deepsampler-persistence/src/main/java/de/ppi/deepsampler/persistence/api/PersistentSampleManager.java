@@ -38,12 +38,12 @@ public class PersistentSampleManager {
      * @param sourceManager the {@link SourceManager}
      * @return this
      */
-    public PersistentSampleManager source(final SourceManager sourceManager) {
+    public PersistentSampleManager addSource(final SourceManager sourceManager) {
         addSourceProvider(sourceManager);
         return this;
     }
 
-    public void beanExtension(final BeanFactoryExtension beanFactoryExtension) {
+    public void addBeanExtension(final BeanFactoryExtension beanFactoryExtension) {
         persistentSamplerContext.addBeanFactoryExtension(beanFactoryExtension);
     }
 
