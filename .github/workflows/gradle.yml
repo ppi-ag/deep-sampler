@@ -24,3 +24,7 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Collect coverage data with Gradle
+      run: ./gradlew codeCoverageReport
+    - name: Analyze quality with sonar using Gradle
+      run: ./gradlew sonarqube
