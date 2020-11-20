@@ -95,7 +95,7 @@ class JsonSourceManagerTest {
         final JsonSourceManager sourceManager = JsonSourceManager.builder()
                 .addModule(module)
                 .buildWithFile(pathAsString);
-        final PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
+        final PersistentModel persistentModel = sourceManager.load();
 
         // THEN
         assertNull(persistentModel.getSampleMethodToSampleMap().entrySet().iterator().next()
@@ -112,7 +112,7 @@ class JsonSourceManagerTest {
                 .addDeserializer(JsonPersistentParameter.class, new CustomJsonDeserializer())
                 .addSerializer(JsonPersistentParameter.class, new CustomJsonSerializer())
                 .buildWithFile(pathAsString);
-        final PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
+        final PersistentModel persistentModel = sourceManager.load();
 
         // THEN
         assertNull(persistentModel.getSampleMethodToSampleMap().entrySet().iterator().next()
@@ -124,7 +124,7 @@ class JsonSourceManagerTest {
         // WHEN
         final JsonSourceManager sourceManager = JsonSourceManager.builder()
                 .buildWithResource(new PersistentClassPathResource("myTestJson.json", getClass()));
-        final PersistentModel persistentModel = sourceManager.load(new PersistentSamplerContext());
+        final PersistentModel persistentModel = sourceManager.load();
 
         // THEN
         assertNotNull(persistentModel.getSampleMethodToSampleMap().entrySet().iterator().next()
