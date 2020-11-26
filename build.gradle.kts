@@ -14,6 +14,12 @@ allprojects {
     version = "1.0.0"
     group = "de.ppi"
 
+    apply(plugin = "java-library")
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     repositories {
         jcenter()
     }
@@ -110,12 +116,6 @@ subprojects {
 
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    //withSourcesJar()
-}
-
 dependencies {
     testImplementation("org.mockito:mockito-core:3.3.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
@@ -136,7 +136,6 @@ tasks.register<Javadoc>("JavadocAll") {
     val classPathList = subprojects.flatMap { subProject -> subProject.sourceSets.main.get().compileClasspath }
     classpath = files(classPathList)
 }
-
 
 fun Project.collectTestCoverage() {
     apply(plugin = "jacoco")

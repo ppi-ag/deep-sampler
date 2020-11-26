@@ -6,7 +6,6 @@
 package de.ppi.deepsampler.persistence.json;
 
 import com.fasterxml.jackson.databind.Module;
-import de.ppi.deepsampler.persistence.PersistentSamplerContext;
 import de.ppi.deepsampler.persistence.json.error.JsonPersistenceException;
 import de.ppi.deepsampler.persistence.json.extension.DeserializationExtension;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
@@ -31,7 +30,7 @@ public class JsonLoader extends JsonOperator {
         super(persistentResource, deserializerList, Collections.emptyList(), moduleList);
     }
 
-    public PersistentModel load(PersistentSamplerContext persistentSamplerContext) {
+    public PersistentModel load() {
         try {
             InputStream in = Objects.requireNonNull(getPersistentResource().readAsStream());
             return createObjectMapper().readValue(new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)), JsonSampleModel.class);
