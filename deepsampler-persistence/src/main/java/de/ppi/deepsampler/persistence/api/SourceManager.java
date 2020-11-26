@@ -34,11 +34,10 @@ public interface SourceManager {
     void save(Map<Class<?>, ExecutionInformation> executionInformation, PersistentSamplerContext persistentSamplerContext);
 
     /**
-     * Load the data you wrote. You will also have to transform this (if not already happened by design) to an
+     * Load the persistent data. You will also have to transform this (if not already happened by design) to an
      * implementation of {@link PersistentModel}.
      *
-     * @param persistentSamplerContext context of the persistent sampler
      * @return PersistentModel
      */
-    PersistentModel load(PersistentSamplerContext persistentSamplerContext);
+    PersistentModel load();
 }
