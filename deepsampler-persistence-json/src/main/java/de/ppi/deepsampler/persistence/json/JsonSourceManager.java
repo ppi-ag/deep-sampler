@@ -37,8 +37,8 @@ public class JsonSourceManager implements SourceManager {
     }
 
     @Override
-    public PersistentModel load(final PersistentSamplerContext persistentSamplerContext) {
-        return jsonLoader.load(persistentSamplerContext);
+    public PersistentModel load() {
+        return jsonLoader.load();
     }
 
     /**

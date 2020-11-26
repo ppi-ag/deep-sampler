@@ -7,17 +7,36 @@ plugins {
     `java-library`
     jacoco
     id("org.sonarqube") version "3.0"
+    id("com.vanniktech.maven.publish") version "0.13.0"
 }
 
 allprojects {
     version = "1.0.0"
-    group = "de.ppi.deepsampler"
+    group = "de.ppi"
+
+    apply(plugin = "java-library")
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 
     repositories {
         jcenter()
     }
 }
 
+tasks.jar {
+    from("LICENSE.md") {
+        into("/META-INF")
+    }
+}
+
+mavenPublish {
+    nexus {
+        baseUrl = "https://oss.sonatype.org/service/local/"
+        stagingProfile = "de.ppi"
+    }
+}
 
 
 sonarqube {
@@ -70,12 +89,19 @@ tasks.register<JacocoReport>("codeCoverageReport") {
 var projectsWithoutTests = arrayOf("deepsampler-provider")
 
 subprojects {
+
     apply(plugin = "java-library")
 
     if (!projectsWithoutTests.contains(project.name)) {
         collectTestCoverage()
     }
 
+
+    tasks.jar {
+        from("../LICENSE.md") {
+            into("/META-INF")
+        }
+    }
 
     dependencies {
         testImplementation("org.mockito:mockito-core:3.3.3")
@@ -88,12 +114,6 @@ subprojects {
 
 
 
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
 }
 
 dependencies {
@@ -116,9 +136,6 @@ tasks.register<Javadoc>("JavadocAll") {
     val classPathList = subprojects.flatMap { subProject -> subProject.sourceSets.main.get().compileClasspath }
     classpath = files(classPathList)
 }
-
-
-
 
 fun Project.collectTestCoverage() {
     apply(plugin = "jacoco")

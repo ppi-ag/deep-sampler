@@ -5,6 +5,7 @@
 
 plugins {
     `java-test-fixtures`
+    id("com.vanniktech.maven.publish")
 }
 
 dependencies {

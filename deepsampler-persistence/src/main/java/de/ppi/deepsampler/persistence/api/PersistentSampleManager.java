@@ -57,14 +57,14 @@ public class PersistentSampleManager {
     }
 
     /**
-     * End of chain method: Calls {@link SourceManager#load(PersistentSamplerContext)} on all {@link SourceManager}s and write
+     * End of chain method: Calls {@link SourceManager#load()} on all {@link SourceManager}s and write
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {
         for (final SourceManager sourceManager: sourceManagerList) {
             final Map<String, SampledMethod> definedSamples = SampleRepository.getInstance().getSamples().stream()
                     .collect(Collectors.toMap(SampleDefinition::getSampleId, SampleDefinition::getSampledMethod));
-            final PersistentModel persistentModel = sourceManager.load(persistentSamplerContext);
+            final PersistentModel persistentModel = sourceManager.load();
 
             final List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
 
