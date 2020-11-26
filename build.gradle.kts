@@ -13,6 +13,13 @@ allprojects {
     version = "1.0.0"
     group = "de.ppi.deepsampler"
 
+    apply(plugin = "java-library")
+    java {
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     repositories {
         jcenter()
     }
@@ -88,12 +95,6 @@ subprojects {
 
 
 
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
 }
 
 dependencies {
