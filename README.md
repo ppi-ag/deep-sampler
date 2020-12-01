@@ -19,7 +19,7 @@ conveniently inside test classes. The API also comes with means to completely re
 The following tutorial demonstrates how to use DeepSampler with JUnit5 and Guice. You can download or clone the complete
 code from [DeepSampler Examples](https://github.com/ppi-ag/deep-sampler-examples).
 ### Installation
-We will use Maven to build the example. As first step, we add the following dependencies to our pom.xml:
+We use Maven to build the example. So, as a first step, we add the following dependencies to our pom.xml:
 
 ```
 <dependency>
@@ -36,9 +36,6 @@ We will use Maven to build the example. As first step, we add the following depe
    <scope>test</scope>
 </dependency>
 ```
-
-Guice and JUnit5 should now also be loaded automatically by Maven, since JUnit5 is a transient dependency of `deepsampler-junit5` and
-Guice is a transient dependency of `deepsampler-provider-guice`.
 
 ### The Testee
 Let's say we have a `GreetingService` that would create greeting messages for particular persons. We know only the ID 
