@@ -60,7 +60,7 @@ class GreetingServiceTest {
 
 __[TLDR;]__ `DeepSamplerExtension` basically provides annotations as a means of convenience for most common
 use cases of DeepSampler. However, DeepSampler can be used without this extension and even outside of JUnit Tests.
-(See [Define a Sampler by API](#Define a Sampler by API))
+(See [Define a Sampler by API](#define-a-sampler-by-api))
 
 The actual stubbing is done by an aop-provider that uses - in this case - Guice aop. It is activated by passing
 the `DeepSamplerModule` to guice. In real life we would most likely have a Guice module for the testee, and we would want
