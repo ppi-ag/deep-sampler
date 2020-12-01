@@ -15,6 +15,8 @@ allprojects {
     group = "de.ppi"
 
     apply(plugin = "java-library")
+    apply(plugin = "jacoco")
+
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -22,6 +24,10 @@ allprojects {
 
     repositories {
         jcenter()
+    }
+
+    jacoco {
+        toolVersion = "0.8.6"
     }
 }
 
