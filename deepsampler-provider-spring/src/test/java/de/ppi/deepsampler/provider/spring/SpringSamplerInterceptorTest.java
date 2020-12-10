@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.provider.spring;
 
+import de.ppi.deepsampler.provider.common.FinalTestService;
 import de.ppi.deepsampler.provider.common.SamplerInterceptorTest;
 import de.ppi.deepsampler.provider.common.TestService;
 import de.ppi.deepsampler.provider.common.TestServiceContainer;
@@ -25,10 +26,18 @@ public class SpringSamplerInterceptorTest extends SamplerInterceptorTest {
     @Autowired
     private TestService testService;
 
+    @Autowired
+    private FinalTestService finalTestService;
+
 
     @Override
     public TestService getTestService() {
         return testService;
+    }
+
+    @Override
+    public FinalTestService getFinalTestService() {
+        return finalTestService;
     }
 
     @Override

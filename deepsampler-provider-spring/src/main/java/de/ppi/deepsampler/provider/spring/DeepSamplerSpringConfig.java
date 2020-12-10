@@ -13,7 +13,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * Basic Spring Configuration that enables DeepSampler in a Spring Application.
  */
 @Configuration
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class DeepSamplerSpringConfig {
 
     @Bean
