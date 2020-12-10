@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.provider.guice;
 
 import com.google.inject.Guice;
+import de.ppi.deepsampler.provider.common.FinalTestService;
 import de.ppi.deepsampler.provider.common.SamplerInterceptorTest;
 import de.ppi.deepsampler.provider.common.TestService;
 import de.ppi.deepsampler.provider.common.TestServiceContainer;
@@ -23,6 +24,9 @@ public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
     @Inject
     private TestService testService;
 
+    @Inject
+    private FinalTestService finalTestService;
+
 
     public GuiceSamplerInterceptorTest() {
         Guice.createInjector(new DeepSamplerModule()).injectMembers(this);
@@ -31,6 +35,11 @@ public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
     @Override
     public TestService getTestService() {
         return testService;
+    }
+
+    @Override
+    public FinalTestService getFinalTestService() {
+        return finalTestService;
     }
 
     @Override

@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.provider.spring;
 
+import de.ppi.deepsampler.provider.common.FinalTestService;
 import de.ppi.deepsampler.provider.common.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,11 @@ public class TestSpringConfig {
     @Bean
     public TestService testObjectService() {
         return new TestService();
+    }
+
+    @Bean
+    public FinalTestService finalTestObjectService() {
+        return new FinalTestService();
     }
 
     @Bean
