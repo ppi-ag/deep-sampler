@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,10 +58,51 @@ class JsonRecorderTest {
         Files.delete(path);
     }
 
+    @Test
+    void testRecordLocalDateTimeWithoutParent() throws Exception {
+        // GIVEN
+        final Path path = Paths.get("testTimeTemp.json");
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        sample.setSampleId("TestMethodForRecord");
+        ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList(LocalDateTime.now())));
+        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
+
+        // WHEN
+        new JsonRecorder(new PersistentFile(path)).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+
+        // THEN
+        assertTrue(Files.exists(path));
+        Files.delete(path);
+    }
+
+    @Test
+    void testWithComplicatedCollections() throws Exception {
+        // GIVEN
+        CollectionBean bean = new CollectionBean();
+        bean.stringCollection = new ArrayList<>();
+        bean.stringCollection.add("AC");
+        final Path path = Paths.get("testTimeTemp.json");
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        sample.setSampleId("TestMethodForRecord");
+        ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList(bean)));
+        ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
+
+        // WHEN
+        new JsonRecorder(new PersistentFile(path)).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+
+        // THEN
+        assertTrue(Files.exists(path));
+        Files.delete(path);
+    }
+
     @AfterEach
     void cleanUp() {
         ExecutionRepository.getInstance().clear();
         SampleRepository.getInstance().clear();
+    }
+
+    private static class CollectionBean {
+        private Collection<Object> stringCollection;
     }
 
     private static class Bean {
