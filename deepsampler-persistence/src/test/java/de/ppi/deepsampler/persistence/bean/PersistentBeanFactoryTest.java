@@ -300,7 +300,7 @@ class PersistentBeanFactoryTest {
     void testImmutableCollectionBean() {
         // GIVEN
         final CollectionBean bean = new CollectionBean();
-        bean.collectionOfStrings = List.of("AB", "CD");
+        bean.collectionOfStrings = Arrays.asList("AB", "CD");
 
         // WHEN
         PersistentBean persistentBean = new PersistentBeanFactory().toBean(bean);
