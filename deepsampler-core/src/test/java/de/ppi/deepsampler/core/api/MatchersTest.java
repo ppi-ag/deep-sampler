@@ -186,6 +186,7 @@ class MatchersTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void equalsMatcherAllowsEqualsMethodInSuperType() {
         // GIVEN WHEN
         final BeanWithInheritedEquals bean = new BeanWithInheritedEquals("a", 1);
