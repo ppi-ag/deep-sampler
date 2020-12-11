@@ -32,8 +32,7 @@ public class SpringSamplerInterceptor {
      * Even though declaring {@link Throwable} in a throws clause is usually not recommended, this is done by Spring itself (for comprehensible reasons),
      * so we are also forced to do so.
      */
-    @SuppressWarnings("unused")
-    @Around("execution(* *(..)) && !target(DeepSamplerSpringConfig)")
+    @Around("execution(* *(..)) && !target(DeepSamplerSpringConfig) && !within(is(EnumType)) && !within(is(FinalType))")
     public Object aroundMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
         final SampleDefinition sampleDefinition = findSampleDefinition(joinPoint);
 

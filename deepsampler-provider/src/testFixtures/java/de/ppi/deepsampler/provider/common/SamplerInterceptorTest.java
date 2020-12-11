@@ -43,6 +43,7 @@ public abstract class SamplerInterceptorTest {
     public static final String MYECHOPARAMS = "MYECHOPARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
 
+
     /**
      * The {@link TestService} is a Service that is used to test method interception by a SamplerInterceptor. Since this class must be
      * instantiated by the concrete Dependency Injection Framework, the creation of this instance must be done by the concrete TestCase.
@@ -50,6 +51,14 @@ public abstract class SamplerInterceptorTest {
      * @return An instance of {@link TestService} that has been created in a way that enables method interception by a particular AOP-framework (i.e. Spring).
      */
     public abstract TestService getTestService();
+
+    /**
+     * The {@link FinalTestService} is a Service that is used to test if aop-providers can cope with final classes (final classes cannot be intercepted).
+     * Since this class must be instantiated by the concrete Dependency Injection Framework, the creation of this instance must be done by the concrete TestCase.
+     *
+     * @return An instance of {@link FinalTestService} that has been created in a way that enables method interception by a particular AOP-framework (i.e. Spring).
+     */
+    public abstract FinalTestService getFinalTestService();
 
     /**
      * The {@link TestServiceContainer} delegates to {@link TestService} and is used to test deeper object trees.
@@ -75,6 +84,17 @@ public abstract class SamplerInterceptorTest {
 
         //THEN
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+    }
+
+    @Test
+    public void finalClassCannotBeStubbed() {
+        // GIVEN WHEN
+        FinalTestService finalTestService = getFinalTestService();
+
+        // THEN
+        assertNotNull(finalTestService);
+
+        assertThrows(RuntimeException.class, () -> Sampler.prepare(FinalTestService.class));
     }
 
 
