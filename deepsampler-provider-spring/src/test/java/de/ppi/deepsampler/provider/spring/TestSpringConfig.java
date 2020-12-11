@@ -7,13 +7,15 @@ package de.ppi.deepsampler.provider.spring;
 
 import de.ppi.deepsampler.provider.common.FinalTestService;
 import de.ppi.deepsampler.provider.common.TestService;
+import de.ppi.deepsampler.provider.testservices.DecoupledTestService;
+import de.ppi.deepsampler.provider.testservices.DecoupledTestServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @Configuration
-@Import(DeepSamplerSpringConfig.class)
+@EnableAspectJAutoProxy
 public class TestSpringConfig {
 
     @Bean
@@ -26,10 +28,21 @@ public class TestSpringConfig {
         return new FinalTestService();
     }
 
+
     @Bean
     @Autowired
     public SpringyfiedTestServiceContainer testServiceContainer(final TestService testService) {
         return new SpringyfiedTestServiceContainer(testService);
+    }
+
+    @Bean
+    public DecoupledTestService decoupledTestService() {
+        return new DecoupledTestServiceImpl();
+    }
+
+    @Bean
+    public CustomSpringSamplerInterceptor samplerInterceptor() {
+        return new CustomSpringSamplerInterceptor();
     }
 
 }
