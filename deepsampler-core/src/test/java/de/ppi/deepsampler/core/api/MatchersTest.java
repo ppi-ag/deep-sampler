@@ -15,7 +15,6 @@ import de.ppi.deepsampler.core.error.InvalidConfigException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static de.ppi.deepsampler.core.api.Matchers.*;
