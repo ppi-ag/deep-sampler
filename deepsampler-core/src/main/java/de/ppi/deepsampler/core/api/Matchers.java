@@ -10,6 +10,7 @@ import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleRepository;
 
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -195,12 +196,20 @@ public class Matchers {
             }
 
             try {
-                object.getClass().getDeclaredMethod("equals", Object.class);
+                Method equals = object.getClass().getMethod("equals", Object.class);
+
+                if (equals.getDeclaringClass().equals(Object.class)) {
+                    complainAboutMissingEqualsMethod(object);
+                }
             } catch (final NoSuchMethodException e) {
-                throw new InvalidConfigException("The class %s must implement equals() if you want to use an %s",
-                        object.getClass().getName(),
-                        EqualsMatcher.class.getName());
+                complainAboutMissingEqualsMethod(object);
             }
+        }
+
+        private void complainAboutMissingEqualsMethod(Object object) {
+            throw new InvalidConfigException("The class %s must implement equals() if you want to use an %s",
+                    object.getClass().getName(),
+                    EqualsMatcher.class.getName());
         }
     }
 }

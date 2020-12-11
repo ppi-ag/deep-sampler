@@ -15,6 +15,7 @@ import de.ppi.deepsampler.core.error.InvalidConfigException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static de.ppi.deepsampler.core.api.Matchers.*;
@@ -147,8 +148,8 @@ class MatchersTest {
     }
 
     private void mixMatchers(final TestService testServiceSampler) {
-        Sample.of(testServiceSampler.methodWithMultipleParams(anyString(), BEAN_A)).is("Some sampler")
-;    }
+        Sample.of(testServiceSampler.methodWithMultipleParams(anyString(), BEAN_A)).is("Some sampler");
+    }
 
     @Test
     @SuppressWarnings("unchecked")
@@ -182,6 +183,22 @@ class MatchersTest {
         final ParameterMatcher<BeanWithoutEquals> matcher = (ParameterMatcher<BeanWithoutEquals>) parameter.get(0);
 
         assertThrows(InvalidConfigException.class, () -> matcher.matches(beanWithoutEquals));
+    }
+
+    @Test
+    void equalsMatcherAllowsEqualsMethodInSuperType() {
+        // GIVEN WHEN
+        final BeanWithInheritedEquals bean = new BeanWithInheritedEquals("a", 1);
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.acceptInheritedEquals(bean)).is(BEAN_A);
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+
+        final EqualsMatcher<BeanWithInheritedEquals> matcher = (EqualsMatcher<BeanWithInheritedEquals>) parameter.get(0);
+
+        assertTrue(matcher.matches(bean));
     }
 
     static class ContainsMatcher implements ParameterMatcher<String> {
@@ -238,6 +255,10 @@ class MatchersTest {
 
         @SuppressWarnings("unused")
         Bean provokeMissingEqualsException(final BeanWithoutEquals parameter) { return null; }
+
+        Bean acceptInheritedEquals(final BeanWithInheritedEquals bean){
+            return null;
+        }
     }
 
     static class Bean {
@@ -262,5 +283,12 @@ class MatchersTest {
 
     static class BeanWithoutEquals {
 
+    }
+
+    static class BeanWithInheritedEquals extends Bean {
+
+        BeanWithInheritedEquals(String someString, int someInt) {
+            super(someString, someInt);
+        }
     }
 }
