@@ -16,12 +16,12 @@ public class DeepSamplerModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bindInterceptor(new AnyInterceptableClass(), Matchers.any(), new GuiceSamplerInterceptor());
+        bindInterceptor(new AnyInterceptableClass(), Matchers.any(), new GuiceSamplerAspect());
     }
 
 
     /**
-     * We try to intercept all classes on the current classpath, but there are some classes (e.g final classes ane enums)
+     * We try to intercept all classes on the current classpath, but there are some classes (e.g final classes and enums)
      * that cannot be intercepted by guice. These classes are ignored by this {@link Matcher}.
      */
     private static class AnyInterceptableClass extends AbstractMatcher<Class> {

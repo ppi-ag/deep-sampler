@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * functionality.
  */
 @SuppressWarnings("java:S5960")
-public abstract class SamplerInterceptorTest {
+public abstract class SamplerAspectTest {
 
     public static final String VALUE_A = "Value A";
     public static final String VALUE_B = "Value B";

@@ -3,38 +3,36 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.provider.guice;
+package de.ppi.deepsampler.provider.spring;
 
-import com.google.inject.Guice;
 import de.ppi.deepsampler.provider.common.FinalTestService;
-import de.ppi.deepsampler.provider.common.SamplerInterceptorTest;
+import de.ppi.deepsampler.provider.common.SamplerAspectTest;
 import de.ppi.deepsampler.provider.common.TestService;
 import de.ppi.deepsampler.provider.common.TestServiceContainer;
 import de.ppi.deepsampler.provider.testservices.DecoupledTestService;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.inject.Inject;
-
-
-public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TestSpringConfig.class)
+public class SpringSamplerAspectTest extends SamplerAspectTest {
 
     public static final String VALUE_FROM_OUTER_CLASS = " additional stuff to ensure that this method has not been changed";
 
-    @Inject
-    private GuicyfiedTestServiceContainer testServiceContainer;
+    @Autowired
+    private SpringyfiedTestServiceContainer testServiceContainer;
 
-    @Inject
+    @Autowired
     private TestService testService;
 
-    @Inject
+    @Autowired
     private FinalTestService finalTestService;
 
-    @Inject
+    @Autowired
     private DecoupledTestService decoupledTestService;
 
-
-    public GuiceSamplerInterceptorTest() {
-        Guice.createInjector(new TestModule()).injectMembers(this);
-    }
 
     @Override
     public TestService getTestService() {
@@ -55,6 +53,5 @@ public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
     public DecoupledTestService getDecoupledTestService() {
         return decoupledTestService;
     }
-
 
 }

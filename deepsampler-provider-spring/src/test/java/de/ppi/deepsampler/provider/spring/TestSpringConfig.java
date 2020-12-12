@@ -41,8 +41,8 @@ public class TestSpringConfig {
     }
 
     @Bean
-    public CustomSpringSamplerInterceptor samplerInterceptor() {
-        return new CustomSpringSamplerInterceptor();
+    public CustomSpringSamplerAspect customSpringSamplerAspect() {
+        return new CustomSpringSamplerAspect();
     }
 
 }

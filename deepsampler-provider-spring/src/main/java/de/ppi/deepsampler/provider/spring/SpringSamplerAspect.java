@@ -22,12 +22,12 @@ import java.util.Arrays;
  * {@link org.springframework.context.annotation.EnableAspectJAutoProxy}.
  * <br>
  * The intercepted (i.e. stubbed) classes are defined using an AspectJ PointCut. This is done
- * by implementing {@link SpringSamplerInterceptor#include()}. The method must be annotated with  {@link org.aspectj.lang.annotation.Pointcut}.
+ * by implementing {@link SpringSamplerAspect#include()}. The method must be annotated with  {@link org.aspectj.lang.annotation.Pointcut}.
  * The annotation can then in turn define the classes that will be intercepted using the Pointcut expression language.
  * <br>
  * A short introduction in Pointcut expressions can be found here: https://www.baeldung.com/spring-aop-pointcut-tutorial.
  */
-public abstract class SpringSamplerInterceptor {
+public abstract class SpringSamplerAspect {
 
 
     /**
@@ -63,7 +63,11 @@ public abstract class SpringSamplerInterceptor {
      * Even though declaring {@link Throwable} in a throws clause is usually not recommended, this is done by Spring itself (for comprehensible reasons),
      * so we are also forced to do so.
      */
-    @Around("!@target(org.springframework.context.annotation.Configuration) && !within(is(EnumType)) && !within(is(FinalType)) && include()")
+    @Around("!@within(org.springframework.context.annotation.Configuration) "
+            + "&& !@within(org.aspectj.lang.annotation.Aspect) "
+            + "&& !within(is(EnumType)) "
+            + "&& !within(is(FinalType)) "
+            + "&& include()")
     public Object aroundMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
         final SampleDefinition sampleDefinition = findSampleDefinition(joinPoint);
 
