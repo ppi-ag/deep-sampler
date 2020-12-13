@@ -10,7 +10,6 @@ import de.ppi.deepsampler.provider.common.FinalTestService;
 import de.ppi.deepsampler.provider.common.SamplerInterceptorTest;
 import de.ppi.deepsampler.provider.common.TestService;
 import de.ppi.deepsampler.provider.common.TestServiceContainer;
-import de.ppi.deepsampler.provider.testservices.DecoupledTestService;
 
 import javax.inject.Inject;
 
@@ -28,12 +27,9 @@ public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
     @Inject
     private FinalTestService finalTestService;
 
-    @Inject
-    private DecoupledTestService decoupledTestService;
-
 
     public GuiceSamplerInterceptorTest() {
-        Guice.createInjector(new TestModule()).injectMembers(this);
+        Guice.createInjector(new DeepSamplerModule()).injectMembers(this);
     }
 
     @Override
@@ -49,11 +45,6 @@ public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
     @Override
     public TestServiceContainer getTestServiceContainer() {
         return testServiceContainer;
-    }
-
-    @Override
-    public DecoupledTestService getDecoupledTestService() {
-        return decoupledTestService;
     }
 
 
