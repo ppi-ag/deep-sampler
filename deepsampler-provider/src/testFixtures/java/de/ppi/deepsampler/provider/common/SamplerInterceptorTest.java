@@ -7,6 +7,7 @@ package de.ppi.deepsampler.provider.common;
 
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.VerifyException;
 import de.ppi.deepsampler.core.internal.FixedQuantity;
 import de.ppi.deepsampler.core.model.SampleRepository;
@@ -84,6 +85,34 @@ public abstract class SamplerInterceptorTest {
 
         //THEN
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+    }
+
+    @Test
+    public void equalsMatcherComplainsWhenParameterHasNoEqualsMethod() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(new TestBeanWithoutEquals())).is(new TestBeanWithoutEquals());
+
+        assertThrows(InvalidConfigException.class, () -> getTestService().echoParameter(new TestBeanWithoutEquals()));
+    }
+
+    @Test
+    public void canCopeWithNullValue() {
+        //WHEN UNCHANGED
+        assertEquals(null, getTestService().echoParameter((String) null));
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
+
+        //THEN
+        assertNull(getTestService().echoParameter((String) null));
+
+        //GIVEN WHEN
+        Sample.of(testServiceSampler.echoParameter((String) null)).is(VALUE_A);
+
+        //THEN
+        assertEquals(VALUE_A, getTestService().echoParameter((String) null));
     }
 
     @Test

@@ -49,6 +49,17 @@ public class TestService {
     }
 
     /**
+     * We expect that DeepSampler throws an Exception if the {@link de.ppi.deepsampler.core.api.Matchers.EqualsMatcher}
+     * is used, although the parameter doesn't implement equals(). This method is used to test this expectation.
+     *
+     * @param someObjectWithoutEquals a parameter without an equals()-method
+     * @return the unchanged parameter
+     */
+    public TestBeanWithoutEquals echoParameter(final TestBeanWithoutEquals someObjectWithoutEquals) {
+        return someObjectWithoutEquals;
+    }
+
+    /**
      * This method is needed to test whether calls of void methods can be verified or not.
      *
      * @param someInt
