@@ -43,8 +43,15 @@ public class PersistentSampleManager {
         return this;
     }
 
-    public void addBeanExtension(final BeanFactoryExtension beanFactoryExtension) {
+    /**
+     * Add a {@link BeanFactoryExtension} to the sample manager.
+     *
+     * @param beanFactoryExtension {@link BeanFactoryExtension}
+     * @return this
+     */
+    public PersistentSampleManager addBeanExtension(final BeanFactoryExtension beanFactoryExtension) {
         persistentSamplerContext.addBeanFactoryExtension(beanFactoryExtension);
+        return this;
     }
 
     /**

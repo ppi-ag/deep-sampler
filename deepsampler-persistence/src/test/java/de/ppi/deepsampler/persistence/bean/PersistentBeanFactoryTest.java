@@ -11,10 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -297,6 +294,23 @@ class PersistentBeanFactoryTest {
         // THEN
         assertEquals("ME AND ALL", testBean.getAbc());
         assertEquals("ME AND MORE", testBean.getDef());
+    }
+
+    @Test
+    void testImmutableCollectionBean() {
+        // GIVEN
+        final CollectionBean bean = new CollectionBean();
+        bean.collectionOfStrings = Arrays.asList("AB", "CD");
+
+        // WHEN
+        PersistentBean persistentBean = new PersistentBeanFactory().toBean(bean);
+
+        // THEN
+        assertNotNull(persistentBean.getValue("0$collectionOfStrings"));
+    }
+
+    private static class CollectionBean {
+        Collection<String> collectionOfStrings;
     }
 
     private static class ImmutableSimpleTestBean {
