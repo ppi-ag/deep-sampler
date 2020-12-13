@@ -146,9 +146,13 @@ public abstract class SamplerAspectTest {
         // The following cast is not possible if the AOP-Framework creates a Proxy based on the interface DecoupledTestService
         // instead as a subclass of DecoupledTestServiceImpl. This is the case with Spring-AOP by default. Even though up-casts,
         // like the following one, are bad smelling code, we expect them to occur frequently. So DeepSampler must cope with it.
+        // To enable this, we have to exclude classes from being intercepted by adding a proper Pointcut expression to our
+        // Spring-Aspect.
         DecoupledTestServiceImpl implementation = (DecoupledTestServiceImpl) decoupledTestService;
         assertNotNull(implementation);
     }
+
+
 
 
     @Test
