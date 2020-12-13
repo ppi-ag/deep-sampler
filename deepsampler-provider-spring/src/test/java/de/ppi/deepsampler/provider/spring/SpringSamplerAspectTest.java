@@ -9,7 +9,6 @@ import de.ppi.deepsampler.provider.common.FinalTestService;
 import de.ppi.deepsampler.provider.common.SamplerAspectTest;
 import de.ppi.deepsampler.provider.common.TestService;
 import de.ppi.deepsampler.provider.common.TestServiceContainer;
-import de.ppi.deepsampler.provider.testservices.DecoupledTestService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,9 +29,6 @@ public class SpringSamplerAspectTest extends SamplerAspectTest {
     @Autowired
     private FinalTestService finalTestService;
 
-    @Autowired
-    private DecoupledTestService decoupledTestService;
-
 
     @Override
     public TestService getTestService() {
@@ -47,11 +43,6 @@ public class SpringSamplerAspectTest extends SamplerAspectTest {
     @Override
     public TestServiceContainer getTestServiceContainer() {
         return testServiceContainer;
-    }
-
-    @Override
-    public DecoupledTestService getDecoupledTestService() {
-        return decoupledTestService;
     }
 
 }

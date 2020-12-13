@@ -7,6 +7,7 @@ package de.ppi.deepsampler.provider.common;
 
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.VerifyException;
 import de.ppi.deepsampler.core.internal.FixedQuantity;
 import de.ppi.deepsampler.core.model.SampleRepository;
@@ -14,8 +15,6 @@ import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
-import de.ppi.deepsampler.provider.testservices.DecoupledTestService;
-import de.ppi.deepsampler.provider.testservices.DecoupledTestServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,14 +69,6 @@ public abstract class SamplerAspectTest {
      */
     public abstract TestServiceContainer getTestServiceContainer();
 
-    /**
-     * The {@link DecoupledTestService} is used to test if decoupled classes that are autowired by their interfaces can be stubbed.
-     * Since this class must be instantiated by the concrete Dependency Injection Framework, the creation of this instance must be done by the concrete TestCase.
-     *
-     * @return An instance of {@link DecoupledTestService} that has been created in a way that enables method interception by a particular AOP-framework (i.e. Spring).
-     */
-    public abstract DecoupledTestService getDecoupledTestService();
-
     @BeforeEach
     public void cleanUp() {
         Sampler.clear();
@@ -97,6 +88,34 @@ public abstract class SamplerAspectTest {
     }
 
     @Test
+    public void equalsMatcherComplainsWhenParameterHasNoEqualsMethod() {
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(new TestBeanWithoutEquals())).is(new TestBeanWithoutEquals());
+
+        assertThrows(InvalidConfigException.class, () -> getTestService().echoParameter(new TestBeanWithoutEquals()));
+    }
+
+    @Test
+    public void canCopeWithNullValue() {
+        //WHEN UNCHANGED
+        assertEquals(null, getTestService().echoParameter((String) null));
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
+
+        //THEN
+        assertNull(getTestService().echoParameter((String) null));
+
+        //GIVEN WHEN
+        Sample.of(testServiceSampler.echoParameter((String) null)).is(VALUE_A);
+
+        //THEN
+        assertEquals(VALUE_A, getTestService().echoParameter((String) null));
+    }
+
+    @Test
     public void finalClassCannotBeStubbed() {
         // GIVEN WHEN
         FinalTestService finalTestService = getFinalTestService();
@@ -105,20 +124,6 @@ public abstract class SamplerAspectTest {
         assertNotNull(finalTestService);
 
         assertThrows(RuntimeException.class, () -> Sampler.prepare(FinalTestService.class));
-    }
-
-    @Test
-    public void serviceCanBeCastedFromInterfaceToConcrete() {
-        // GIVEN WHEN
-        DecoupledTestService decoupledTestService = getDecoupledTestService();
-
-        // THEN
-
-        // The following cast is not possible if the AOP-Framework creates a Proxy based on the interface DecoupledTestService
-        // instead as a subclass of DecoupledTestServiceImpl. This is the case with Spring-AOP by default. Even though up-casts,
-        // like the following one, are bad smelling code, we expect them to occur frequently. So DeepSampler must cope with it.
-        DecoupledTestServiceImpl implementation = (DecoupledTestServiceImpl) decoupledTestService;
-        assertNotNull(implementation);
     }
 
 
