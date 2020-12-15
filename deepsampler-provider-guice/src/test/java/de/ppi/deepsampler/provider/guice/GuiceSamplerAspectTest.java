@@ -6,14 +6,16 @@
 package de.ppi.deepsampler.provider.guice;
 
 import com.google.inject.Guice;
-import de.ppi.deepsampler.provider.common.SamplerInterceptorTest;
+import de.ppi.deepsampler.provider.common.FinalTestService;
+import de.ppi.deepsampler.provider.common.SamplerAspectTest;
 import de.ppi.deepsampler.provider.common.TestService;
 import de.ppi.deepsampler.provider.common.TestServiceContainer;
+import de.ppi.deepsampler.provider.testservices.DecoupledTestService;
 
 import javax.inject.Inject;
 
 
-public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
+public class GuiceSamplerAspectTest extends SamplerAspectTest {
 
     public static final String VALUE_FROM_OUTER_CLASS = " additional stuff to ensure that this method has not been changed";
 
@@ -23,9 +25,15 @@ public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
     @Inject
     private TestService testService;
 
+    @Inject
+    private FinalTestService finalTestService;
 
-    public GuiceSamplerInterceptorTest() {
-        Guice.createInjector(new DeepSamplerModule()).injectMembers(this);
+    @Inject
+    private DecoupledTestService decoupledTestService;
+
+
+    public GuiceSamplerAspectTest() {
+        Guice.createInjector(new TestModule()).injectMembers(this);
     }
 
     @Override
@@ -34,8 +42,18 @@ public class GuiceSamplerInterceptorTest extends SamplerInterceptorTest {
     }
 
     @Override
+    public FinalTestService getFinalTestService() {
+        return finalTestService;
+    }
+
+    @Override
     public TestServiceContainer getTestServiceContainer() {
         return testServiceContainer;
+    }
+
+    @Override
+    public DecoupledTestService getDecoupledTestService() {
+        return decoupledTestService;
     }
 
 

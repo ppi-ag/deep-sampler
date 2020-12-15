@@ -42,7 +42,7 @@ public class JsonRecorder extends JsonOperator {
             if (persistentResource instanceof PersistentFile) {
                 // CREATE PARENT DIR IF NECESSARY
                 final Path parentPath = ((PersistentFile) persistentResource).getFilePath().getParent();
-                if (!Files.exists(parentPath)) {
+                if (parentPath != null && !Files.exists(parentPath)) {
                     Files.createDirectories(parentPath);
                 }
             }

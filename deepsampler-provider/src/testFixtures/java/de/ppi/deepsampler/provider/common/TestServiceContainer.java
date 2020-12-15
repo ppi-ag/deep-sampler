@@ -21,7 +21,7 @@ public abstract class TestServiceContainer {
      * @return
      */
     public String augmentValueFromTestService() {
-        final String valueFromTestService = getTestService().echoParameter(SamplerInterceptorTest.VALUE_C);
+        final String valueFromTestService = getTestService().echoParameter(SamplerAspectTest.VALUE_C);
         return valueFromTestService + SUFFIX_FROM_SERVICE_CONTAINER;
     }
 

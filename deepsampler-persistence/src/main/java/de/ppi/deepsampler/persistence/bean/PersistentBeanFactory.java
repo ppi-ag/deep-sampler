@@ -149,9 +149,9 @@ public class PersistentBeanFactory {
 
             if (fieldValue != null) {
                 if (isObjectArray(field.getType())) {
-                    fieldValue = toBean((Object[]) fieldValue);
+                    fieldValue = toBeanIfNecessary((Object[]) fieldValue);
                 } else if (!isPrimitive(field.getType()) && !field.getType().isArray()) {
-                    fieldValue = toBean(fieldValue);
+                    fieldValue = toBeanIfNecessary(fieldValue);
                 }
             }
             valuesForBean.put(keyForField, fieldValue);
@@ -243,10 +243,10 @@ public class PersistentBeanFactory {
                 .collect(Collectors.toList());
     }
 
-    public PersistentBean[] toBean(final Object[] objects) {
-        final PersistentBean[] persistentBeans = new DefaultPersistentBean[objects.length];
+    public Object[] toBeanIfNecessary(final Object[] objects) {
+        final Object[] persistentBeans = new Object[objects.length];
         for (int i = 0; i < objects.length; ++i) {
-            persistentBeans[i] = toBean(objects[i]);
+            persistentBeans[i] = toBeanIfNecessary(objects[i]);
         }
         return persistentBeans;
     }
