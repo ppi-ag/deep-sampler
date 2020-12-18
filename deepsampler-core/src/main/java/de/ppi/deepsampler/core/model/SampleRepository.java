@@ -6,19 +6,22 @@
 package de.ppi.deepsampler.core.model;
 
 import de.ppi.deepsampler.core.api.Sample;
+import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.DuplicateSampleDefinitionException;
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SampleRepository {
 
-    private final ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(ArrayList::new);
-    private final ThreadLocal<SampleDefinition> currentSample = new ThreadLocal<>();
-    private final ThreadLocal<SampleDefinition> lastSample = new ThreadLocal<>();
-    private final ThreadLocal<List<ParameterMatcher<?>>> currentParameterMatchers = ThreadLocal.withInitial(ArrayList::new);
+    private List<SampleDefinition> samples = new ArrayList<>();
+    private SampleDefinition currentSample;
+    private SampleDefinition lastSample;
+    private List<ParameterMatcher<?>> currentParameterMatchers = new ArrayList<>();
 
-    private static SampleRepository myInstance;
+    private static SampleRepositoryScope sampleRepositoryScope = new SampleRepositoryThreadScope();
 
     /**
      * Singleton Constructor.
@@ -26,11 +29,13 @@ public class SampleRepository {
     private SampleRepository() {}
 
     public static synchronized SampleRepository getInstance() {
-        if (myInstance == null) {
-            myInstance = new SampleRepository();
-        }
+        return sampleRepositoryScope.getOrCreate(SampleRepository::new);
+    }
 
-        return myInstance;
+    public static synchronized void setScope(SampleRepositoryScope sampleRepositoryScope) {
+        Objects.requireNonNull(sampleRepositoryScope, "The SampleRepositoryScope must not be null.");
+
+        SampleRepository.sampleRepositoryScope = sampleRepositoryScope;
     }
 
     /**
@@ -42,16 +47,16 @@ public class SampleRepository {
     public void add(final SampleDefinition sampleDefinition) {
         final SampleDefinition currentSampleDefinition = getCurrentSampleDefinition();
         if(sampleDefinition.equals(currentSampleDefinition)
-                || samples.get().contains(sampleDefinition)) {
+                || samples.contains(sampleDefinition)) {
             throw new DuplicateSampleDefinitionException(sampleDefinition);
         }
         setCurrentSample(sampleDefinition);
-        samples.get().add(sampleDefinition);
+        samples.add(sampleDefinition);
     }
 
     public List<SampleDefinition> findAllForMethod(SampledMethod wantedSampledMethod) {
         List<SampleDefinition> sampleDefinitions = new ArrayList<>();
-        for (final SampleDefinition sampleDefinition : samples.get()) {
+        for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
             final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
             final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
@@ -65,7 +70,7 @@ public class SampleRepository {
     }
 
     public SampleDefinition find(final SampledMethod wantedSampledMethod, final Object... args) {
-        for (final SampleDefinition sampleDefinition : samples.get()) {
+        for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
             final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
             final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
@@ -98,50 +103,49 @@ public class SampleRepository {
     }
 
     private void setCurrentSample(final SampleDefinition sampleDefinition) {
-        currentSample.set(sampleDefinition);
+        currentSample = sampleDefinition;
     }
 
     public SampleDefinition getCurrentSampleDefinition() {
-        return currentSample.get();
+        return currentSample;
     }
 
     public SampleDefinition getLastSampleDefinition() {
-        return lastSample.get();
+        return lastSample;
     }
 
     public void setLastSampleDefinition(SampleDefinition sampleDefinition) {
-        lastSample.set(sampleDefinition);
+        lastSample = sampleDefinition;
     }
 
     public List<SampleDefinition> getSamples() {
-        return samples.get();
+        return samples;
     }
 
     public void clearCurrentParameterMatchers() {
-        currentParameterMatchers.set(new ArrayList<>());
+        currentParameterMatchers = new ArrayList<>();
     }
 
     public void addCurrentParameterMatchers(ParameterMatcher<?> parameterMatcher) {
-        currentParameterMatchers.get().add(parameterMatcher);
+        currentParameterMatchers.add(parameterMatcher);
     }
 
     public List<ParameterMatcher<?>> getCurrentParameterMatchers() {
-        return currentParameterMatchers.get();
+        return currentParameterMatchers;
     }
 
     /**
      * Clears the actual set {@link SampleRepository#currentSample} and the {@link SampleRepository#samples}
      */
     public void clear() {
-        samples.get().clear();
-        samples.remove();
-        currentParameterMatchers.remove();
-        currentSample.remove();
-        lastSample.remove();
+        samples = new ArrayList<>();
+        clearCurrentParameterMatchers();
+        currentSample = null;
+        lastSample = null;
     }
 
     public boolean isEmpty() {
-        return samples.get() == null || samples.get().isEmpty();
+        return samples.isEmpty();
     }
 
 }
