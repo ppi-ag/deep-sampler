@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.core.model;
 
+import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.error.DuplicateSampleDefinitionException;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class SampleRepository {
 
     private final ThreadLocal<List<SampleDefinition>> samples = ThreadLocal.withInitial(ArrayList::new);
     private final ThreadLocal<SampleDefinition> currentSample = new ThreadLocal<>();
+    private final ThreadLocal<SampleDefinition> lastSample = new ThreadLocal<>();
     private final ThreadLocal<List<ParameterMatcher<?>>> currentParameterMatchers = ThreadLocal.withInitial(ArrayList::new);
 
     private static SampleRepository myInstance;
@@ -103,6 +105,14 @@ public class SampleRepository {
         return currentSample.get();
     }
 
+    public SampleDefinition getLastSampleDefinition() {
+        return lastSample.get();
+    }
+
+    public void setLastSampleDefinition(SampleDefinition sampleDefinition) {
+        lastSample.set(sampleDefinition);
+    }
+
     public List<SampleDefinition> getSamples() {
         return samples.get();
     }
@@ -127,6 +137,7 @@ public class SampleRepository {
         samples.remove();
         currentParameterMatchers.remove();
         currentSample.remove();
+        lastSample.remove();
     }
 
     public boolean isEmpty() {
