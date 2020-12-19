@@ -5,10 +5,7 @@
 
 package de.ppi.deepsampler.core.model;
 
-import de.ppi.deepsampler.core.api.Sample;
-import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.DuplicateSampleDefinitionException;
-import de.ppi.deepsampler.core.error.InvalidConfigException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +18,7 @@ public class SampleRepository {
     private SampleDefinition lastSample;
     private List<ParameterMatcher<?>> currentParameterMatchers = new ArrayList<>();
 
-    private static SampleRepositoryScope sampleRepositoryScope = new SampleRepositoryThreadScope();
+    private static Scope sampleRepositoryScope = new ThreadScope();
 
     /**
      * Singleton Constructor.
@@ -32,7 +29,7 @@ public class SampleRepository {
         return sampleRepositoryScope.getOrCreate(SampleRepository::new);
     }
 
-    public static synchronized void setScope(SampleRepositoryScope sampleRepositoryScope) {
+    public static synchronized void setScope(Scope sampleRepositoryScope) {
         Objects.requireNonNull(sampleRepositoryScope, "The SampleRepositoryScope must not be null.");
 
         SampleRepository.sampleRepositoryScope = sampleRepositoryScope;

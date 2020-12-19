@@ -10,14 +10,14 @@ package de.ppi.deepsampler.core.model;
 import java.util.function.Supplier;
 
 /**
- * A thread scope for the {@link SampleRepository}. If this scope is used, Samples and all associated data cannoit be
+ * A thread scope for the {@link SampleRepository}. If this scope is used, Samples and all associated data cannot be
  * shared across separated {@link Thread}s.
  *
  * This is the default scope.
  *
- * The scope can be changed using {@link SampleRepository#setScope(SampleRepositoryScope)}.
+ * The scope can be changed using {@link SampleRepository#setScope(Scope)}.
  */
-public class SampleRepositoryThreadScope implements SampleRepositoryScope {
+public class ThreadScope implements Scope {
 
     private final ThreadLocal<SampleRepository> sampleRepository = new ThreadLocal<>();
 
