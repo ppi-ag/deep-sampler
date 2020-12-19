@@ -11,6 +11,8 @@ import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.VerifyException;
 import de.ppi.deepsampler.core.internal.FixedQuantity;
 import de.ppi.deepsampler.core.model.SampleRepository;
+import de.ppi.deepsampler.core.model.SingletonScope;
+import de.ppi.deepsampler.core.model.ThreadScope;
 import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
@@ -25,6 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static de.ppi.deepsampler.core.api.Matchers.*;
 import static de.ppi.deepsampler.core.internal.FixedQuantity.*;
@@ -635,5 +641,87 @@ public abstract class SamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertEquals(LocalDateTime.of(2020, 10, 29, 10, 10, 10), getTestService().testLocalDateTime());
         Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void threadScopeWorks() throws ExecutionException, InterruptedException {
+        Sampler.clear();
+
+        // WHEN UNCHANGED
+        assertTrue(SampleRepository.getInstance().getSamples().isEmpty());
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+
+        // GIVEN
+        SampleRepository.setScope(new ThreadScope());
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        // WHEN
+
+        Future<?> createsASampler = executorService.submit(() -> {
+            final TestService testServiceSampler = Sampler.prepare(TestService.class);
+            Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
+
+            assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+        });
+
+        Future<?> findsNoSampler = executorService.submit(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // THEN
+            assertEquals(VALUE_B, getTestService().echoParameter(VALUE_B));
+        });
+
+        createsASampler.get();
+        findsNoSampler.get();
+
+        // THEN
+        assertEquals(VALUE_B, getTestService().echoParameter(VALUE_B));
+
+    }
+
+    @Test
+    public void singletonScopeWorks() throws ExecutionException, InterruptedException {
+        Sampler.clear();
+
+        // WHEN UNCHANGED
+        assertTrue(SampleRepository.getInstance().getSamples().isEmpty());
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+
+        // GIVEN
+        SampleRepository.setScope(new SingletonScope());
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        //WHEN
+
+        Future<?> createsASampler = executorService.submit(() -> {
+            final TestService testServiceSampler = Sampler.prepare(TestService.class);
+            Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
+
+            assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+        });
+
+        Future<?> findsNoSampler = executorService.submit(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // THEN
+            assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+        });
+
+        createsASampler.get();
+        findsNoSampler.get();
+
+        // THEN
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+
     }
 }
