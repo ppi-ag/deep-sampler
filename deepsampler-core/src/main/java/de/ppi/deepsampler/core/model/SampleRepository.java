@@ -29,6 +29,12 @@ public class SampleRepository {
         return sampleRepositoryScope.getOrCreate(SampleRepository::new);
     }
 
+    /**
+     * Sets the scope of the {@link SampleRepository} end defines the visibility limits of Samples.
+     * The default {@link Scope} is {@link ThreadScope}, so by default Samples are not shared across {@link Thread}s.
+     *
+     * @param sampleRepositoryScope The {@link Scope} that should be used by the {@link SampleRepository}.
+     */
     public static synchronized void setScope(Scope sampleRepositoryScope) {
         Objects.requireNonNull(sampleRepositoryScope, "The SampleRepositoryScope must not be null.");
 
