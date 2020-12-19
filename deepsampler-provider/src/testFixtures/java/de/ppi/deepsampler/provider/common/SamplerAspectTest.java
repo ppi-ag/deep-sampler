@@ -37,7 +37,7 @@ import static de.ppi.deepsampler.core.internal.FixedQuantity.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * This Testclass must be be used to test all aop-provider in order to ensure that all providers would support the same
+ * This TestClass must be be used to test all aop-provider in order to ensure that all providers would support the same
  * functionality.
  */
 @SuppressWarnings("java:S5960")
@@ -49,7 +49,7 @@ public abstract class SamplerAspectTest {
     public static final int INT_VALUE = 42;
     private static final TestBean TEST_BEAN_A = new TestBean();
     private static final TestBean TEST_BEAN_B = new TestBean();
-    public static final String MYECHOPARAMS = "MYECHOPARAMS";
+    public static final String MY_ECHO_PARAMS = "MY ECHO PARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
 
 
@@ -115,7 +115,7 @@ public abstract class SamplerAspectTest {
     @Test
     public void canCopeWithNullValue() {
         //WHEN UNCHANGED
-        assertEquals(null, getTestService().echoParameter((String) null));
+        assertNull(getTestService().echoParameter((String) null));
 
         // GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
@@ -547,7 +547,7 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
 
         getTestService().echoParameter("ABC");
         final String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
@@ -558,7 +558,7 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MYECHOPARAMS2");
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MY WRONG ECHO PARAMS");
         assertThrows(PersistenceException.class,
                 source::load);
 
@@ -571,7 +571,7 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
 
         getTestService().echoParameter("ABC");
         final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
@@ -582,7 +582,7 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MYECHOPARAMS);
+        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
