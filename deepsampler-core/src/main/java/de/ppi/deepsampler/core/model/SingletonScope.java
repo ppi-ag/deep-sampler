@@ -10,10 +10,10 @@ package de.ppi.deepsampler.core.model;
 import java.util.function.Supplier;
 
 /**
- * A singleton scope for the {@link SampleRepository}. If this scope is used, Samples and all associated data is
+ * A singleton scope for the {@link SampleRepository}. If this scope is used,  Samples and all associated data are
  * shared across separated {@link Thread}s.
  *
- * The default scop is {@link ThreadScope}.
+ * The default scope is {@link ThreadScope}.
  *
  * The scope can be changed using {@link SampleRepository#setScope(Scope)}.
  */
@@ -34,5 +34,10 @@ public class SingletonScope implements Scope {
         }
 
         return sampleRepository;
+    }
+
+    @Override
+    public void cleanUp() {
+        sampleRepository = null;
     }
 }

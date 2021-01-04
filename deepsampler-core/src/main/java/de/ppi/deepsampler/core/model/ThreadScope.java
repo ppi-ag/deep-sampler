@@ -37,4 +37,9 @@ public class ThreadScope implements Scope {
 
         return sampleRepository.get();
     }
+
+    @Override
+    public void cleanUp() {
+        sampleRepository.remove();
+    }
 }

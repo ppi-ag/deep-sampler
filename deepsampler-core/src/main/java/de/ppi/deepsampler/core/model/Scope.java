@@ -30,4 +30,10 @@ public interface Scope {
      */
     SampleRepository getOrCreate(Supplier<SampleRepository> supplier);
 
+    /**
+     * Cleans resources that might be referenced by a Scope. cleanUp() is called on a Scope that will be
+     * replaced by a new Scope.
+     */
+    void cleanUp();
+
 }
