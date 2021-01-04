@@ -9,8 +9,6 @@ import de.ppi.deepsampler.persistence.bean.ext.CollectionMapExtension;
 import de.ppi.deepsampler.persistence.bean.ext.JavaTimeExtension;
 import de.ppi.deepsampler.persistence.bean.PersistentBeanFactory;
 
-import java.util.List;
-
 public class SamplerBeanFactory {
 
     private SamplerBeanFactory() {
