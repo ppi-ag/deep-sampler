@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.provider.common;
 
+import de.ppi.deepsampler.core.api.Execution;
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
@@ -723,5 +724,47 @@ public abstract class SamplerAspectTest {
         // THEN
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
 
+    }
+
+    @Test
+    void testPostProcessSampleReturnGlobal() {
+        // GIVEN
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A)).is(VALUE_B);
+        Sample.of(testServiceSampler.testLocalDateTime()).is(LocalDateTime.MIN);
+        Execution.useGlobal((a, b, c) -> null);
+
+        // WHEN
+        String resultEcho = getTestService().echoParameter(VALUE_A);
+        LocalDateTime localDateTime = getTestService().testLocalDateTime();
+
+        // THEN
+        assertNull(resultEcho);
+        assertNull(localDateTime);
+    }
+
+    @Test
+    void testPostProcessSampleReturnLocal() {
+        // GIVEN
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A)).is(VALUE_B);
+        Sample.of(testServiceSampler.testLocalDateTime()).is(LocalDateTime.MIN);
+        Execution.useForLastSample((a, b, c) -> {
+            // THEN
+            assertEquals("public java.time.LocalDateTime de.ppi.deepsampler.provider.common.TestService.testLocalDateTime()", a.getSampleId());
+            assertEquals(getTestService(), b.getStubInstance());
+            assertEquals(LocalDateTime.MIN, c);
+            return null;
+        });
+
+        // WHEN
+        String resultEcho = getTestService().echoParameter(VALUE_A);
+        LocalDateTime localDateTime = getTestService().testLocalDateTime();
+
+        // THEN
+        assertEquals(VALUE_B, resultEcho);
+        assertNull(localDateTime);
     }
 }

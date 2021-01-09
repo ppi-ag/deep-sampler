@@ -78,7 +78,7 @@ public abstract class SpringSamplerAspect {
 
             if (answer != null) {
                 final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(joinPoint.getArgs()), joinPoint.getThis());
-                return sampleDefinition.getAnswer().call(stubMethodInvocation);
+                return ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = joinPoint.proceed();
