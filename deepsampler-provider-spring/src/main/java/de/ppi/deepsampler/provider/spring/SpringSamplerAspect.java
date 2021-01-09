@@ -38,13 +38,13 @@ public abstract class SpringSamplerAspect {
      * be defined using a method that is named according to a module or a layer. For instance:
      * <br>
      * <pre>
-     * @Pointcut("within(org.my.application.dao..*)")
+     * {@literal @}Pointcut("within(org.my.application.dao..*)")
      * public void daoLayer() {}
      *
-     * @Pointcut("within(org.my.application.simulation..*)")
+     * {@literal @}Pointcut("within(org.my.application.simulation..*)")
      * public void simulationLayer() {}
      *
-     * @Pointcut("daoLayer() || simulationLayer()")
+     * {@literal @}Pointcut("daoLayer() || simulationLayer()")
      * public void include() {}
      *
      * </pre>
