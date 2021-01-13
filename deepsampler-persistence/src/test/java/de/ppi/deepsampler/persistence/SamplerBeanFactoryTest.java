@@ -1,6 +1,5 @@
 package de.ppi.deepsampler.persistence;
 
-import de.ppi.deepsampler.persistence.bean.PersistentBeanFactory;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 

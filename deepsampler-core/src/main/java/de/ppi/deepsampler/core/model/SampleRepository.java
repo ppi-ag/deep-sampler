@@ -5,8 +5,6 @@
 
 package de.ppi.deepsampler.core.model;
 
-import de.ppi.deepsampler.core.error.DuplicateSampleDefinitionException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -48,11 +46,6 @@ public class SampleRepository {
      * @param sampleDefinition The new SampleDefinition.
      */
     public void add(final SampleDefinition sampleDefinition) {
-        final SampleDefinition currentSampleDefinition = getCurrentSampleDefinition();
-        if(sampleDefinition.equals(currentSampleDefinition)
-                || samples.contains(sampleDefinition)) {
-            throw new DuplicateSampleDefinitionException(sampleDefinition);
-        }
         setCurrentSample(sampleDefinition);
         samples.add(sampleDefinition);
     }

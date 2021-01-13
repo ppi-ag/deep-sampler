@@ -6,7 +6,6 @@
 package de.ppi.deepsampler.core.model;
 
 import de.ppi.deepsampler.core.api.Sampler;
-import de.ppi.deepsampler.core.error.DuplicateSampleDefinitionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -99,55 +98,6 @@ class SampleRepositoryTest {
         SampleRepository.getInstance().add(sampleDefinition);
         final SampledMethod lookupMethod = createSampledMethod(TestObject.class, "someMethod");
         assertNull(SampleRepository.getInstance().find(lookupMethod, "otherArg"));
-    }
-
-    /**
-     * Tests {@link SampleRepository#add(SampleDefinition)} for {@link DuplicateSampleDefinitionException}
-     * with different {@link SampleDefinition}s.
-     *
-     * @throws NoSuchMethodException NoSuchMethodException
-     */
-    @Test
-    void duplicatedSampleInSamplesThrowsDSDException() throws NoSuchMethodException {
-        final SampleDefinition sampleDefinition = createSampleDefinition(
-                createSampledMethod(TestObject.class, "firstMethod"),
-                Collections.singletonList(parameter -> parameter.equals("Argument")),
-                "ReturnValue"
-        );
-        final SampleDefinition newCurrentSampleDefinition = createSampleDefinition(
-                createSampledMethod(TestObject.class, "secondMethod"),
-                Collections.singletonList(parameter -> parameter.equals("Other Argument")),
-                "Other ReturnValue"
-        );
-
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
-
-        sampleRepository.add(sampleDefinition);
-        sampleRepository.add(newCurrentSampleDefinition);
-
-        assertThrows(DuplicateSampleDefinitionException.class,
-                () ->  sampleRepository.add(sampleDefinition));
-    }
-
-    /**
-     * Tests {@link SampleRepository#add(SampleDefinition)} for {@link DuplicateSampleDefinitionException}
-     * with different {@link SampleDefinition}s.
-     *
-     * @throws NoSuchMethodException  NoSuchMethodException
-     */
-    @Test
-    void duplicatedCurrentSampleThrowsDSDException() throws NoSuchMethodException {
-        final SampleDefinition sampleDefinition = createSampleDefinition(
-                createSampledMethod(TestObject.class, "firstMethod"),
-                Collections.singletonList(parameter -> parameter.equals("Argument")),
-                "ReturnValue"
-        );
-
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
-        sampleRepository.add(sampleDefinition);
-
-        assertThrows(DuplicateSampleDefinitionException.class,
-                () ->  sampleRepository.add(sampleDefinition));
     }
 
     @Test

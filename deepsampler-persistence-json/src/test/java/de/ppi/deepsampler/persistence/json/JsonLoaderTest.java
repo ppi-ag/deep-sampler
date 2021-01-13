@@ -7,7 +7,6 @@ package de.ppi.deepsampler.persistence.json;
 
 import de.ppi.deepsampler.core.model.ExecutionRepository;
 import de.ppi.deepsampler.core.model.SampleRepository;
-import de.ppi.deepsampler.persistence.PersistentSamplerContext;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
 import org.junit.jupiter.api.AfterEach;
