@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static de.ppi.deepsampler.core.internal.SampleHandling.argumentsMatch;
+
 public class SampleRepository {
 
     private List<SampleDefinition> samples = new ArrayList<>();
@@ -85,24 +87,6 @@ public class SampleRepository {
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private boolean argumentsMatch(final SampleDefinition sampleDefinition, final Object[] arguments) {
-        final List<ParameterMatcher<?>> parameterMatchers = sampleDefinition.getParameterMatchers();
-
-        if (parameterMatchers.size() != arguments.length) {
-            return false;
-        }
-
-        for (int i = 0; i < arguments.length; i++) {
-            final ParameterMatcher<Object> parameterMatcher = (ParameterMatcher<Object>) parameterMatchers.get(i);
-            if (!parameterMatcher.matches(arguments[i])) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void setCurrentSample(final SampleDefinition sampleDefinition) {
