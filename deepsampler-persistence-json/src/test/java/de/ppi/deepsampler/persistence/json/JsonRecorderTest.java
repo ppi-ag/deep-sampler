@@ -8,6 +8,10 @@ package de.ppi.deepsampler.persistence.json;
 import de.ppi.deepsampler.core.internal.api.ExecutionManager;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
+import de.ppi.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
+import de.ppi.deepsampler.persistence.model.PersistentActualSample;
+import de.ppi.deepsampler.persistence.model.PersistentModel;
+import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +22,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsonRecorderTest {
@@ -38,6 +44,33 @@ class JsonRecorderTest {
 
         // THEN
         assertTrue(Files.exists(path));
+
+        Files.delete(path);
+    }
+
+    @Test
+    void doesNotRecordRedundantCalls() throws Exception {
+        // GIVEN
+        final Path path = Paths.get("./record/testTemp.json");
+
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        sample.setSampleId("TestMethodForRecord");
+        ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList("Args1")));
+        ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList("Args1")));
+
+        // WHEN
+        new JsonRecorder(new PersistentFile(path)).record(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+
+        // THEN
+        assertTrue(Files.exists(path));
+
+        final PersistentModel loadedModel = new JsonLoader(new PersistentFile(path)).load();
+        Map<PersistentSampleMethod, PersistentActualSample> sampleMap = loadedModel.getSampleMethodToSampleMap();
+        PersistentActualSample persistentActualSample = sampleMap.get(new JsonPersistentSampleMethod("TestMethodForRecord"));
+
+        assertEquals(1, sampleMap.size());
+        assertEquals(1, persistentActualSample.getAllCalls().size());
+
         Files.delete(path);
     }
 

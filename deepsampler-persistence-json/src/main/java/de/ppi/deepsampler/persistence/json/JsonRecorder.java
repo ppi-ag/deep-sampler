@@ -91,10 +91,19 @@ public class JsonRecorder extends JsonOperator {
         for (final MethodCall call : calls) {
             final List<Object> argsAsPersistentBeans = persistentSamplerContext.getPersistentBeanFactory().toBeanIfNecessary(call.getArgs());
             final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanFactory().toBeanIfNecessary(call.getReturnValue());
-            jsonPersistentActualSample.addCall(new JsonPersistentParameter(argsAsPersistentBeans),
-                    returnValuePersistentBean);
+            final JsonPersistentParameter newParameters = new JsonPersistentParameter(argsAsPersistentBeans);
+
+            if (!callWithSameParametersExists(jsonPersistentActualSample, newParameters)) {
+                // We don't want to record redundant calls since this might lead to quite big JSON-Files. So we only add new calls.
+                jsonPersistentActualSample.addCall(newParameters, returnValuePersistentBean);
+            }
         }
         sampleMethodJsonPersistentActualSampleMap.put(persistentSampleMethod, jsonPersistentActualSample);
+    }
+
+    private boolean callWithSameParametersExists(JsonPersistentActualSample jsonPersistentActualSample, JsonPersistentParameter parameter) {
+        return jsonPersistentActualSample.getAllCalls().stream()//
+            .anyMatch(call -> call.getPersistentParameter().equals(parameter));
     }
 
 }
