@@ -83,13 +83,13 @@ public class SampleDefinition {
         //A method should only be sampled once and is identified by signature independent from its return value!
         //Comparing also 'returnValueSupplier' leads to inconsistent behavior during
         //definition of two SampleDefinitions with same SampleMethod (and args) but different returnValues.
-        return Objects.equals(sampledMethod, that.sampledMethod) &&
+        return Objects.equals(sampledMethod.getMethod(), that.sampledMethod.getMethod()) &&
                 Objects.equals(parameterValues, that.parameterValues) &&
                 Objects.equals(sampleId, that.sampleId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sampledMethod, parameterValues, sampleId);
+        return Objects.hash(sampledMethod.getMethod(), parameterValues, sampleId);
     }
 }
