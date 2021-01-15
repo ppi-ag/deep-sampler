@@ -211,6 +211,26 @@ where the current test case is located. The file name is created using the class
 In this case DeepSampler would try to load a file named 
 `./de/ppi/deepsampler/examples/helloworld/GreetingServiceTest_loadSamplesFromJson.json`.
 
+## Scopes
+DeepSampler is by default Thread-scoped. So Samples, that have been defined 
+in one Thread, are available only in this particular Thread.
+
+But you can change the Scope using `SampleRepository::setScope`. DeepSampler comes with two
+predefined Scopes:
+   * `ThreadScope`: Samples are Thread-exclusive, this is the default.
+   * `SingeltonScope`: The same Samples are available across the entire VM and all Threads share the same Samples.
+
+You can also define your own custom Scope by implementing the interface 
+`de.ppi.deepsampler.core.model.Scope`. 
+  
+🔎 __Note__ the Scope must be changed before the first Samples have been defined.
+
+The following line would make all Samples available across all Threads:
+```
+    SampleRepository.setScope(new SingletonScope());
+```
+
+
 
 # License
 DeepSampler is made available under the terms of the __MIT License__ (see [LICENSE.md](./LICENSE.md)).
