@@ -111,7 +111,7 @@ That's it, we can now call the testee and check the results as usual:
 @Test
 void greetingShouldBeGenerated() {
    Sample.of(personDaoSampler.loadPerson(1)).is(new Person("Sarek"));
-
+                                                    👇
    assertEquals("Hello Sarek!", greetingService.createGreeting(1));
 }
 ```
@@ -124,9 +124,9 @@ void greetingShouldBeGenerated() {
    Sample.of(personDaoSampler.loadPerson(1)).is(new Person("Sarek"));
 
    assertEquals("Hello Sarek!", greetingService.createGreeting(1));
-
+             👇
    Sampler.clear();
-
+                          👇
    assertEquals("Hello Geordi La Forge!", greetingService.createGreeting(1));
 }
 ```
