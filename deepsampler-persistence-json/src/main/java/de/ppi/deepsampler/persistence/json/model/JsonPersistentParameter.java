@@ -9,6 +9,7 @@ import de.ppi.deepsampler.persistence.model.PersistentParameter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class JsonPersistentParameter implements PersistentParameter {
 
@@ -29,5 +30,18 @@ public class JsonPersistentParameter implements PersistentParameter {
 
     public void setParameter(final List<Object> args) {
         this.args = new ArrayList<>(args);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JsonPersistentParameter that = (JsonPersistentParameter) o;
+        return Objects.equals(args, that.args);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(args);
     }
 }

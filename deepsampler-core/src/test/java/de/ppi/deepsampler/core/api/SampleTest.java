@@ -10,7 +10,6 @@ import de.ppi.deepsampler.core.model.Answer;
 import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +45,68 @@ class SampleTest {
         assertTrue(currentSampleDefinition.getParameterMatchers().isEmpty());
         assertEquals(STRING_SAMPLE, currentSampleDefinition.getAnswer().call(null));
     }
+
+    @Test
+    void callOfANonSamplerIsDetectedIBeforeSamplerHasBeenDefined() {
+        // GIVEN
+        final TestService notASampler = new TestService();
+        // THEN
+        Sampler.clear();
+        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler.echoParameter(PARAMETER_VALUE)));
+    }
+
+    @Test
+    void callOfAVoidNonSamplerIsDetectedIBeforeSamplerHasBeenDefined() {
+        // GIVEN
+        final TestService notASampler = new TestService();
+        // THEN
+        Sampler.clear();
+        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler::voidMethod));
+    }
+
+    @Test
+    void callOfANonSamplerIsDetectedAfterSamplersHasBeenDefined() {
+        //GIVEN
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService notASampler = new TestService();
+
+        //WHEN UNCHANGED
+        assertDoesNotThrow(() -> Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)));
+
+        // THEN
+        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler.echoParameter(PARAMETER_VALUE)));
+    }
+
+    @Test
+    void callOfAVoidNonSamplerIsDetectedAfterSamplersHasBeenDefined() {
+        //GIVEN
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService notASampler = new TestService();
+
+        //WHEN UNCHANGED
+        assertDoesNotThrow(() -> Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)));
+
+        // THEN
+        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler::voidMethod));
+    }
+
+    @Test
+    void callOfANonSamplerIsDetectedAfterVoidSamplersHasBeenDefined() {
+        //GIVEN
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestService notASampler = new TestService();
+
+        //WHEN
+        Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE));
+        Sample.of(testServiceSampler::voidMethod);
+
+        // THEN
+        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler::voidMethod));
+    }
+
 
     @Test
     void testSampleDefinitionWithPrimitiveParam() {
@@ -205,7 +266,7 @@ class SampleTest {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
 
         //WHEN UNCHANGED
-        Assertions.assertDoesNotThrow(() -> Sample.of(testServiceSampler::voidMethod));
+        assertDoesNotThrow(() -> Sample.of(testServiceSampler::voidMethod));
 
         //THEN
         assertThrows(NotASamplerException.class, () -> Sample.of(() -> {}));

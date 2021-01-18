@@ -111,7 +111,7 @@ That's it, we can now call the testee and check the results as usual:
 @Test
 void greetingShouldBeGenerated() {
    Sample.of(personDaoSampler.loadPerson(1)).is(new Person("Sarek"));
-
+                                                    👇
    assertEquals("Hello Sarek!", greetingService.createGreeting(1));
 }
 ```
@@ -124,9 +124,9 @@ void greetingShouldBeGenerated() {
    Sample.of(personDaoSampler.loadPerson(1)).is(new Person("Sarek"));
 
    assertEquals("Hello Sarek!", greetingService.createGreeting(1));
-
+             👇
    Sampler.clear();
-
+                          👇
    assertEquals("Hello Geordi La Forge!", greetingService.createGreeting(1));
 }
 ```
@@ -210,6 +210,26 @@ By default `LoadSamples` searches for the JSON-file on the classpath. It expects
 where the current test case is located. The file name is created using the class name, and the method name of the package. 
 In this case DeepSampler would try to load a file named 
 `./de/ppi/deepsampler/examples/helloworld/GreetingServiceTest_loadSamplesFromJson.json`.
+
+## Scopes
+DeepSampler is by default Thread-scoped. So Samples, that have been defined 
+in one Thread, are available only in this particular Thread.
+
+But you can change the Scope using `SampleRepository::setScope`. DeepSampler comes with two
+predefined Scopes:
+   * `ThreadScope`: Samples are Thread-exclusive, this is the default.
+   * `SingeltonScope`: The same Samples are available across the entire VM and all Threads share the same Samples.
+
+You can also define your own custom Scope by implementing the interface 
+`de.ppi.deepsampler.core.model.Scope`. 
+  
+🔎 __Note__ the Scope must be changed before the first Samples have been defined.
+
+The following line would make all Samples available across all Threads:
+```
+    SampleRepository.setScope(new SingletonScope());
+```
+
 
 
 # License

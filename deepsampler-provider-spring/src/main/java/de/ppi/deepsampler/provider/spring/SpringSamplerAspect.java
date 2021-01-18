@@ -97,9 +97,11 @@ public abstract class SpringSamplerAspect {
      */
     private SampleDefinition findSampleDefinition(final ProceedingJoinPoint proceedingJoinPoint) {
         final MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
-        final Object interceptedObject = proceedingJoinPoint.getThis();
 
-        final SampledMethod sampledMethod = new SampledMethod(interceptedObject.getClass(), signature.getMethod());
+        // It is important not to take the target type from proceedingJoinPoint.getTarget() because this could return
+        // another Proxy if other Aspects are running on the same method. In those cases the type would be the type of some
+        // generic Proxy-class. Using the signature doesn't have this problem.
+        final SampledMethod sampledMethod = new SampledMethod(signature.getDeclaringType(), signature.getMethod());
 
         return SampleRepository.getInstance().find(sampledMethod, proceedingJoinPoint.getArgs());
     }

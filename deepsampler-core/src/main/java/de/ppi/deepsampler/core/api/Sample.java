@@ -47,8 +47,16 @@ public class Sample {
      * fluent API only.
      */
     public static <T> SampleBuilder<T> of(final T sampledMethodCall) {
-        return new SampleBuilder<>(sampledMethodCall,
-                SampleRepository.getInstance().getCurrentSampleDefinition());
+        SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        SampleDefinition lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
+
+        if (currentSampleDefinition == lastSampleDefinition) {
+            throw new NotASamplerException("sampledMethodCall is not a Sampler. Did you prepare the Sampler using Sampler.prepare() or @PrepareSampler?");
+        }
+
+        SampleRepository.getInstance().setLastSampleDefinition(currentSampleDefinition);
+
+        return new SampleBuilder<>(sampledMethodCall, currentSampleDefinition);
     }
 
     /**
