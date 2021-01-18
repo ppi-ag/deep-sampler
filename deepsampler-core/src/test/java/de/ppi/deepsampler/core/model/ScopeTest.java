@@ -107,6 +107,40 @@ class ScopeTest {
         assertNumberOfSamplers(0);
     }
 
+    @Test
+    void singletonScopeIsCleanedUp() {
+        // GIVEN
+        SampleRepository.setScope(new SingletonScope());
+
+        TestService sampler = Sampler.prepare(TestService.class);
+        Sample.of(sampler.first()).is("The first will be the last");
+
+        assertNumberOfSamplers(1);
+
+        // WHEN
+        SampleRepository.setScope(new ThreadScope());
+
+        // THEN
+        assertNumberOfSamplers(0);
+    }
+
+    @Test
+    void threadScopeIsCleanedUp() {
+        // GIVEN
+        SampleRepository.setScope(new ThreadScope());
+
+        TestService sampler = Sampler.prepare(TestService.class);
+        Sample.of(sampler.first()).is("The first will be the last");
+
+        assertNumberOfSamplers(1);
+
+        // WHEN
+        SampleRepository.setScope(new SingletonScope());
+
+        // THEN
+        assertNumberOfSamplers(0);
+    }
+
     private void assertNumberOfSamplers(int expectedSamplers) {
         List<SampleDefinition> samples = SampleRepository.getInstance().getSamples();
         assertEquals(expectedSamplers, samples.size());
