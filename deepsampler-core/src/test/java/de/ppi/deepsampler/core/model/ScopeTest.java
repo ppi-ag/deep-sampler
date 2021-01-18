@@ -36,12 +36,12 @@ class ScopeTest {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
         Future<?> thread1 = executorService.submit(() -> {
-                TestService sampler = Sampler.prepare(TestService.class);
-                Sample.of(sampler.first()).is("The first will be the last");
+            TestService sampler = Sampler.prepare(TestService.class);
+            Sample.of(sampler.first()).is("The first will be the last");
 
-                assertNumberOfSamplers(1);
+            assertNumberOfSamplers(1);
 
-                await().atMost(1, SECONDS).until(() -> numberOfSamplersIsReached(2));
+            await().atMost(1, SECONDS).until(() -> numberOfSamplersIsReached(2));
         });
 
         Future<?> thread2 = executorService.submit(() -> {
