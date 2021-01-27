@@ -195,7 +195,11 @@ public class PersistentBeanFactory {
                 || cls == Long[].class
                 || cls == char[].class
                 || cls == String[].class
-                || cls == Character[].class);
+                || cls == Character[].class
+                || cls == Float[].class
+                || cls == float[].class
+                || cls == Double[].class
+                || cls == double[].class);
     }
 
     private boolean isPrimitive(final Class<?> cls) {
@@ -206,7 +210,9 @@ public class PersistentBeanFactory {
                 || cls == Short.class
                 || cls == Long.class
                 || cls == String.class
-                || cls == Character.class;
+                || cls == Character.class
+                || cls == Float.class
+                || cls == Double.class;
     }
 
     private Map<Field, String> getAllFields(final Class<?> cls) {
