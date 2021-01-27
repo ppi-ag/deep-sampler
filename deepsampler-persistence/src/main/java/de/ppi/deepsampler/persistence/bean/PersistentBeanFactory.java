@@ -103,7 +103,7 @@ public class PersistentBeanFactory {
 
             Object lookedUpValueInBean = persistentBean.getValue(key);
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
+                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
             }
             values.add(lookedUpValueInBean);
         }
@@ -120,7 +120,7 @@ public class PersistentBeanFactory {
         Object lookedUpValueInBean = persistentBean.getValue(key);
         if (lookedUpValueInBean != null) {
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getDeclaringClass());
+                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -194,7 +194,8 @@ public class PersistentBeanFactory {
                 || cls == long[].class
                 || cls == Long[].class
                 || cls == char[].class
-                || cls == String[].class);
+                || cls == String[].class
+                || cls == Character[].class);
     }
 
     private boolean isPrimitive(final Class<?> cls) {
@@ -204,7 +205,8 @@ public class PersistentBeanFactory {
                 || cls == Byte.class
                 || cls == Short.class
                 || cls == Long.class
-                || cls == String.class;
+                || cls == String.class
+                || cls == Character.class;
     }
 
     private Map<Field, String> getAllFields(final Class<?> cls) {
