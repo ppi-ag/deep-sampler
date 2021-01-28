@@ -142,10 +142,19 @@ class SampleRepositoryTest {
                 "ReturnValue"
         );
 
+        final SampleDefinition sampleDefinitionFour = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+        sampleDefinitionFour.setSampleId("MyId");
+
+
         // THEN
         assertNotEquals(sampleDefinitionOne, sampleDefinitionTwo);
         assertEquals(sampleDefinitionOne, sampleDefinitionThree);
-
+        assertNotEquals(sampleDefinitionOne, null);
+        assertNotEquals(sampleDefinitionOne, sampleDefinitionFour);
     }
 
     private SampleDefinition createSampleDefinition(
