@@ -28,14 +28,14 @@ We use Maven to build the example. So, as a first step, we add the following dep
 <dependency>
    <groupId>de.ppi</groupId>
    <artifactId>deepsampler-junit5</artifactId>
-   <version>1.0.3</version>
+   <version>1.0.4</version>
    <scope>test</scope>
 </dependency>
 
 <dependency>
    <groupId>de.ppi</groupId>
    <artifactId>deepsampler-provider-guice</artifactId>
-   <version>1.0.3</version>
+   <version>1.0.4</version>
    <scope>test</scope>
 </dependency>
 ```
