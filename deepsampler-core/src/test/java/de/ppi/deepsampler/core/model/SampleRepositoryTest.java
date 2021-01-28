@@ -121,6 +121,33 @@ class SampleRepositoryTest {
         assertTrue(SampleRepository.getInstance().isEmpty());
     }
 
+    @Test
+    void sampleDefinitionEqualsWorks() throws NoSuchMethodException {
+        //GIVEN
+        final SampleDefinition sampleDefinitionOne = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionTwo = createSampleDefinition(
+                createSampledMethod(TestObject.class, "secondMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionThree = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        // THEN
+        assertNotEquals(sampleDefinitionOne, sampleDefinitionTwo);
+        assertEquals(sampleDefinitionOne, sampleDefinitionThree);
+
+    }
+
     private SampleDefinition createSampleDefinition(
             final SampledMethod sampledMethod,
             final List<ParameterMatcher<?>> parameter,
