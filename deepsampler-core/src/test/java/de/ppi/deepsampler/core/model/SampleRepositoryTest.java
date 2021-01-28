@@ -43,6 +43,7 @@ class SampleRepositoryTest {
         final SampleDefinition expectedSampleDefinition =
                 SampleRepository.getInstance().find(foundSampledMethod, "Argument");
         assertNotNull(expectedSampleDefinition);
+        assertEquals(registeredSampleDefinition, expectedSampleDefinition);
     }
 
     @Test
@@ -118,6 +119,42 @@ class SampleRepositoryTest {
     void samplesListIsNotNullOrIsEmpty() {
         assertNotNull(SampleRepository.getInstance().getSamples());
         assertTrue(SampleRepository.getInstance().isEmpty());
+    }
+
+    @Test
+    void sampleDefinitionEqualsWorks() throws NoSuchMethodException {
+        //GIVEN
+        final SampleDefinition sampleDefinitionOne = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionTwo = createSampleDefinition(
+                createSampledMethod(TestObject.class, "secondMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionThree = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionFour = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+        sampleDefinitionFour.setSampleId("MyId");
+
+
+        // THEN
+        assertNotEquals(sampleDefinitionOne, sampleDefinitionTwo);
+        assertEquals(sampleDefinitionOne, sampleDefinitionThree);
+        assertNotEquals(sampleDefinitionOne, null);
+        assertNotEquals(sampleDefinitionOne, sampleDefinitionFour);
     }
 
     private SampleDefinition createSampleDefinition(
