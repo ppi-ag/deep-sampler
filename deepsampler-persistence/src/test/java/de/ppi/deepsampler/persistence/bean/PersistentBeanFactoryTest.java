@@ -178,8 +178,10 @@ class PersistentBeanFactoryTest {
 
         // WHEN
         final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
+        SimpleTestBeanRec[] beanRec = new PersistentBeanFactory().ofBean(new PersistentBean[] {bean}, SimpleTestBeanRec.class);
 
         // THEN
+        assertEquals(testBean.beanInBean.str, beanRec[0].beanInBean.str);
         assertEquals("ABC", bean.getValue("0$str"));
         assertEquals("REC",((PersistentBean) bean.getValue("0$beanInBean")).getValue("0$str"));
     }
@@ -309,6 +311,20 @@ class PersistentBeanFactoryTest {
         assertNotNull(persistentBean.getValue("0$collectionOfStrings"));
     }
 
+    @Test
+    void testCharacterToAndOf() {
+        // GIVEN
+        Cs cs = new Cs();
+        cs.character = '2';
+        PersistentBean b = new PersistentBeanFactory().toBean(cs);
+
+        // WHEN
+        Cs[] result = new PersistentBeanFactory().ofBean(new PersistentBean[] {b}, Cs.class);
+
+        // THEN
+        assertEquals(cs.character, result[0].character);
+    }
+
     private static class CollectionBean {
         Collection<String> collectionOfStrings;
     }
@@ -351,6 +367,10 @@ class PersistentBeanFactoryTest {
     private static class SimpleTestBeanRec {
         protected SimpleTestBeanRec beanInBean;
         protected String str;
+    }
+
+    private static class Cs {
+        Character character = '2';
     }
 
     private static class TestBeanWithSuperclass extends SimpleTestBean {
