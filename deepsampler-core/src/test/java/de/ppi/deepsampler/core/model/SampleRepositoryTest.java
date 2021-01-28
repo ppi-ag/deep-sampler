@@ -43,6 +43,7 @@ class SampleRepositoryTest {
         final SampleDefinition expectedSampleDefinition =
                 SampleRepository.getInstance().find(foundSampledMethod, "Argument");
         assertNotNull(expectedSampleDefinition);
+        assertEquals(registeredSampleDefinition, expectedSampleDefinition);
     }
 
     @Test
