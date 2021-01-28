@@ -153,7 +153,7 @@ class SampleRepositoryTest {
         // THEN
         assertNotEquals(sampleDefinitionOne, sampleDefinitionTwo);
         assertEquals(sampleDefinitionOne, sampleDefinitionThree);
-        assertNotEquals(sampleDefinitionOne, null);
+        assertNotEquals(null, sampleDefinitionOne);
         assertNotEquals(sampleDefinitionOne, sampleDefinitionFour);
     }
 
