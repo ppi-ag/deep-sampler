@@ -1,0 +1,30 @@
+toc:
+  - title: Installation
+    subItems:
+      - page: Maven
+        url: /instalation-maven.html
+      - page: Gradle
+        url: /installation-gradle.html
+  - title: Setting up test environment
+    subItems:
+      - page: Spring
+        url: /spring.html
+      - page: Guice
+        url: /guice.html
+      - page: JUnit 4
+        url: /junit4.html
+      - page: JUnit 5
+        url: /junit5.html 
+  - title: Sampling
+    subItems:
+      - page: Defining Stubs
+        url: /stubbing.html
+      - page: SamplerFixtures
+        url: /samplerFixtures.html
+  - page: Recording Samples
+    subItems:
+      - page: Recoding Sample JSONs
+        url: /recorder.html
+      - page: Replaying Samples from Sample JSONs
+        url: /player.html
+        
