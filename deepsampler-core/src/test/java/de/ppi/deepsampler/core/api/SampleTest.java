@@ -52,7 +52,11 @@ class SampleTest {
         final TestService notASampler = new TestService();
         // THEN
         Sampler.clear();
-        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler.echoParameter(PARAMETER_VALUE)));
+        assertThrows(NotASamplerException.class, () -> shouldThrowExceptionAttemptingToSampleANonSampler(notASampler));
+    }
+
+    private void shouldThrowExceptionAttemptingToSampleANonSampler(TestService notASampler) {
+        Sample.of(notASampler.echoParameter(PARAMETER_VALUE));
     }
 
     @Test
@@ -75,7 +79,7 @@ class SampleTest {
         assertDoesNotThrow(() -> Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)));
 
         // THEN
-        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler.echoParameter(PARAMETER_VALUE)));
+        assertThrows(NotASamplerException.class, () -> shouldThrowExceptionAttemptingToSampleANonSampler(notASampler));
     }
 
     @Test
