@@ -5,7 +5,7 @@
 
 plugins {
     `java-library`
-    jacoco
+    id("jacoco")
     id("org.sonarqube") version "3.0"
     id("com.vanniktech.maven.publish") version "0.13.0"
 }
@@ -15,7 +15,6 @@ allprojects {
     group = "de.ppi"
 
     apply(plugin = "java-library")
-    apply(plugin = "jacoco")
 
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -26,15 +25,8 @@ allprojects {
         jcenter()
     }
 
-    jacoco {
-        toolVersion = "0.8.6"
-    }
-
 }
 
-jacoco {
-    toolVersion = "0.8.6"
-}
 
 tasks.jar {
     from("LICENSE.md") {
@@ -104,6 +96,10 @@ subprojects {
     apply(plugin = "java-library")
 
     if (!projectsWithoutTests.contains(project.name)) {
+        apply(plugin = "jacoco")
+        jacoco {
+            toolVersion = "0.8.6"
+        }
         collectTestCoverage()
     }
 
