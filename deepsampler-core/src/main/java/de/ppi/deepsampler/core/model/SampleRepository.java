@@ -36,6 +36,7 @@ public class SampleRepository {
     public static synchronized void setScope(Scope sampleRepositoryScope) {
         Objects.requireNonNull(sampleRepositoryScope, "The SampleRepositoryScope must not be null.");
 
+        SampleRepository.sampleRepositoryScope.cleanUp();
         SampleRepository.sampleRepositoryScope = sampleRepositoryScope;
     }
 
