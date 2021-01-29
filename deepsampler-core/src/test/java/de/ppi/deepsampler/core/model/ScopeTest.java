@@ -39,11 +39,11 @@ class ScopeTest {
             TestService sampler = Sampler.prepare(TestService.class);
             Sample.of(sampler.first()).is("The first will be the last");
 
-            await().atMost(1, SECONDS).until(() -> numberOfSamplersIsReached(2));
+            await().atMost(2, SECONDS).until(() -> numberOfSamplersIsReached(2));
         });
 
         Future<?> thread2 = executorService.submit(() -> {
-            await().atMost(1, SECONDS).until(() -> numberOfSamplersIsReached(1));
+            await().atMost(2, SECONDS).until(() -> numberOfSamplersIsReached(1));
 
             TestService sampler = Sampler.prepare(TestService.class);
             Sample.of(sampler.second()).is("The second will be the first");
@@ -78,7 +78,7 @@ class ScopeTest {
             assertNumberOfSamplers(1);
             threadLog.add("First new Sampler");
 
-            await().atMost(1, SECONDS).until(() -> threadLog.contains("Second new Sampler"));
+            await().atMost(2, SECONDS).until(() -> threadLog.contains("Second new Sampler"));
 
             assertNumberOfSamplers(1);
         });
@@ -86,7 +86,7 @@ class ScopeTest {
         Future<?> thread2 = executorService.submit(() -> {
             assertNumberOfSamplers(0);
 
-            await().atMost(1, SECONDS).until(() -> threadLog.contains("First new Sampler"));
+            await().atMost(2, SECONDS).until(() -> threadLog.contains("First new Sampler"));
             assertNumberOfSamplers(0);
 
 
@@ -146,7 +146,7 @@ class ScopeTest {
 
     private boolean numberOfSamplersIsReached(int expectedSamplers) {
         List<SampleDefinition> samples = SampleRepository.getInstance().getSamples();
-        return expectedSamplers == samples.size();
+        return expectedSamplers <= samples.size();
     }
 
 
