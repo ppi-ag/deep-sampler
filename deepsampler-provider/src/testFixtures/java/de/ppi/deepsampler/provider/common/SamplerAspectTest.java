@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.provider.common;
 
+import de.ppi.deepsampler.core.api.Matchers;
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
@@ -101,6 +102,25 @@ public abstract class SamplerAspectTest {
 
         //THEN
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+    }
+
+    @Test
+    public void customMatcherWithWrongParameterTypeIsIgnored() {
+        //WHEN UNCHANGED
+        assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+
+        // GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final TestServiceContainer anotherSampler = Sampler.prepare(TestServiceContainer.class);
+
+        Sample.of(testServiceSampler.anotherMethodThatReturnsStrings(Matchers.matcher(a -> true))).is(VALUE_B);
+        Sample.of(anotherSampler.echoParameter(Matchers.matcher(a -> true))).is(TEST_BEAN_B);
+
+        //THEN
+        // The first Samplers type would fit, but the method is different, it should be ignored
+        // The second Samplers Method would fit, but the type is wrong so it should be ignored
+        // If either one or the other Sampler ist not ignored, Matchers.matcher() would yield a ClassCastException.
+        assertEquals(TEST_BEAN_A, getTestService().echoParameter(TEST_BEAN_A));
     }
 
     @Test

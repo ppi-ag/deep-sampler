@@ -25,4 +25,15 @@ public abstract class TestServiceContainer {
         return valueFromTestService + SUFFIX_FROM_SERVICE_CONTAINER;
     }
 
+    /**
+     * This method returns a non primitive parameter if the method is not mocked.
+     * This Method is intended to be used in positive and negative tests.
+     *
+     * @param someObject The parameter that will be returned unchanged
+     * @return the unchanged parameter value
+     */
+    public TestBean echoParameter(final TestBean someObject) {
+        return someObject;
+    }
+
 }
