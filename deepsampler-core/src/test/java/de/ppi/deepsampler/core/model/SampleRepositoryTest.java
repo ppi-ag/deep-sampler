@@ -6,7 +6,6 @@
 package de.ppi.deepsampler.core.model;
 
 import de.ppi.deepsampler.core.api.Sampler;
-import de.ppi.deepsampler.core.error.DuplicateSampleDefinitionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +43,7 @@ class SampleRepositoryTest {
         final SampleDefinition expectedSampleDefinition =
                 SampleRepository.getInstance().find(foundSampledMethod, "Argument");
         assertNotNull(expectedSampleDefinition);
+        assertEquals(registeredSampleDefinition, expectedSampleDefinition);
     }
 
     @Test
@@ -101,55 +101,6 @@ class SampleRepositoryTest {
         assertNull(SampleRepository.getInstance().find(lookupMethod, "otherArg"));
     }
 
-    /**
-     * Tests {@link SampleRepository#add(SampleDefinition)} for {@link DuplicateSampleDefinitionException}
-     * with different {@link SampleDefinition}s.
-     *
-     * @throws NoSuchMethodException NoSuchMethodException
-     */
-    @Test
-    void duplicatedSampleInSamplesThrowsDSDException() throws NoSuchMethodException {
-        final SampleDefinition sampleDefinition = createSampleDefinition(
-                createSampledMethod(TestObject.class, "firstMethod"),
-                Collections.singletonList(parameter -> parameter.equals("Argument")),
-                "ReturnValue"
-        );
-        final SampleDefinition newCurrentSampleDefinition = createSampleDefinition(
-                createSampledMethod(TestObject.class, "secondMethod"),
-                Collections.singletonList(parameter -> parameter.equals("Other Argument")),
-                "Other ReturnValue"
-        );
-
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
-
-        sampleRepository.add(sampleDefinition);
-        sampleRepository.add(newCurrentSampleDefinition);
-
-        assertThrows(DuplicateSampleDefinitionException.class,
-                () ->  sampleRepository.add(sampleDefinition));
-    }
-
-    /**
-     * Tests {@link SampleRepository#add(SampleDefinition)} for {@link DuplicateSampleDefinitionException}
-     * with different {@link SampleDefinition}s.
-     *
-     * @throws NoSuchMethodException  NoSuchMethodException
-     */
-    @Test
-    void duplicatedCurrentSampleThrowsDSDException() throws NoSuchMethodException {
-        final SampleDefinition sampleDefinition = createSampleDefinition(
-                createSampledMethod(TestObject.class, "firstMethod"),
-                Collections.singletonList(parameter -> parameter.equals("Argument")),
-                "ReturnValue"
-        );
-
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
-        sampleRepository.add(sampleDefinition);
-
-        assertThrows(DuplicateSampleDefinitionException.class,
-                () ->  sampleRepository.add(sampleDefinition));
-    }
-
     @Test
     void getSamplesFromSampleRepository() throws NoSuchMethodException {
         final List<SampleDefinition> expectedSampleList = new ArrayList<>();
@@ -168,6 +119,42 @@ class SampleRepositoryTest {
     void samplesListIsNotNullOrIsEmpty() {
         assertNotNull(SampleRepository.getInstance().getSamples());
         assertTrue(SampleRepository.getInstance().isEmpty());
+    }
+
+    @Test
+    void sampleDefinitionEqualsWorks() throws NoSuchMethodException {
+        //GIVEN
+        final SampleDefinition sampleDefinitionOne = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionTwo = createSampleDefinition(
+                createSampledMethod(TestObject.class, "secondMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionThree = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+
+        final SampleDefinition sampleDefinitionFour = createSampleDefinition(
+                createSampledMethod(TestObject.class, "firstMethod"),
+                Collections.singletonList(parameter -> parameter.equals("Argument")),
+                "ReturnValue"
+        );
+        sampleDefinitionFour.setSampleId("MyId");
+
+
+        // THEN
+        assertNotEquals(sampleDefinitionOne, sampleDefinitionTwo);
+        assertEquals(sampleDefinitionOne, sampleDefinitionThree);
+        assertNotEquals(null, sampleDefinitionOne);
+        assertNotEquals(sampleDefinitionOne, sampleDefinitionFour);
     }
 
     private SampleDefinition createSampleDefinition(

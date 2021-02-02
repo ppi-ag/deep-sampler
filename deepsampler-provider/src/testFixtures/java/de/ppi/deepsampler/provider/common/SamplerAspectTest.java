@@ -524,9 +524,9 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
+        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
 
-        getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
+        getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
         final String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
@@ -535,13 +535,15 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B"));
+        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals(new Date(1), getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A"), "B")));
+        assertEquals(new Date(1), getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
         Files.delete(Paths.get(pathToFile));
     }
+
+
 
     @Test
     public void manualIdSetForRecordingAndLoadingNoCorrectDef() throws IOException {
@@ -767,4 +769,5 @@ public abstract class SamplerAspectTest {
         assertEquals(VALUE_B, resultEcho);
         assertNull(localDateTime);
     }
+
 }
