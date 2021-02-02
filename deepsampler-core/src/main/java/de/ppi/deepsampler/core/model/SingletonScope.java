@@ -38,6 +38,8 @@ public class SingletonScope implements Scope {
 
     @Override
     public void cleanUp() {
-        sampleRepository = null;
+        if (sampleRepository != null) {
+            sampleRepository.clear();
+        }
     }
 }

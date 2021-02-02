@@ -9,13 +9,12 @@ import de.ppi.deepsampler.core.error.InvalidMatcherConfigException;
 import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Objects;
 
 import static de.ppi.deepsampler.core.api.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -271,13 +270,17 @@ class MatchersTest {
         }
 
         @Override
-        public boolean equals(final Object other) {
-            return EqualsBuilder.reflectionEquals(other, this, true);
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Bean bean = (Bean) o;
+            return someInt == bean.someInt &&
+                    Objects.equals(someString, bean.someString);
         }
 
         @Override
         public int hashCode() {
-            return HashCodeBuilder.reflectionHashCode(this, true);
+            return Objects.hash(someString, someInt);
         }
     }
 

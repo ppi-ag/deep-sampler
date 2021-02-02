@@ -10,10 +10,12 @@ import java.util.Objects;
 public class RecTestBean {
     private final RecTestBean testBean;
     private final String value;
+    private final Character character;
 
-    public RecTestBean(RecTestBean testBean, String value) {
+    public RecTestBean(RecTestBean testBean, String value, Character character) {
         this.testBean = testBean;
         this.value = value;
+        this.character = character;
     }
 
     public RecTestBean getTestBean() {
@@ -22,6 +24,10 @@ public class RecTestBean {
 
     public String getValue() {
         return value;
+    }
+
+    public Character getCharacter() {
+        return character;
     }
 
     @Override

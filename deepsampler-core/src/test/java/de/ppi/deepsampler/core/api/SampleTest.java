@@ -10,7 +10,6 @@ import de.ppi.deepsampler.core.model.Answer;
 import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,11 @@ class SampleTest {
         final TestService notASampler = new TestService();
         // THEN
         Sampler.clear();
-        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler.echoParameter(PARAMETER_VALUE)));
+        assertThrows(NotASamplerException.class, () -> shouldThrowExceptionAttemptingToSampleANonSampler(notASampler));
+    }
+
+    private void shouldThrowExceptionAttemptingToSampleANonSampler(TestService notASampler) {
+        Sample.of(notASampler.echoParameter(PARAMETER_VALUE));
     }
 
     @Test
@@ -76,7 +79,7 @@ class SampleTest {
         assertDoesNotThrow(() -> Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)));
 
         // THEN
-        assertThrows(NotASamplerException.class, () -> Sample.of(notASampler.echoParameter(PARAMETER_VALUE)));
+        assertThrows(NotASamplerException.class, () -> shouldThrowExceptionAttemptingToSampleANonSampler(notASampler));
     }
 
     @Test

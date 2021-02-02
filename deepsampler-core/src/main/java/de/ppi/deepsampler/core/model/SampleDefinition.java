@@ -5,9 +5,6 @@
 
 package de.ppi.deepsampler.core.model;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -78,29 +75,22 @@ public class SampleDefinition {
     }
 
     @Override
-    public boolean equals(final Object other) {
-        if (this == other) return true;
-        if (other == null || this.getClass() != other.getClass()) return false;
-        final SampleDefinition that = (SampleDefinition) other;
-
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SampleDefinition that = (SampleDefinition) o;
         //Only these three fields should be compared to identify a SampleDefinition.
         //A method should only be sampled once and is identified by signature independent from its return value!
         //Comparing also 'returnValueSupplier' leads to inconsistent behavior during
         //definition of two SampleDefinitions with same SampleMethod (and args) but different returnValues.
-        return new EqualsBuilder()
-                .append(this.sampledMethod.getMethod(), that.sampledMethod.getMethod())
-                .append(this.parameterValues, that.parameterValues)
-                .append(this.sampleId, that.sampleId)
-                .isEquals();
+        return Objects.equals(sampledMethod.getMethod(), that.sampledMethod.getMethod()) &&
+                Objects.equals(parameterValues, that.parameterValues) &&
+                Objects.equals(sampleId, that.sampleId);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(this.sampledMethod)
-                .append(this.parameterValues)
-                .append(this.sampleId)
-                .toHashCode();
+        return Objects.hash(sampledMethod.getMethod(), parameterValues, sampleId);
     }
 
     @Override
