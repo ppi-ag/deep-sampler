@@ -102,4 +102,15 @@ public class SampleDefinition {
                 .append(this.sampleId)
                 .toHashCode();
     }
+
+    @Override
+    public String toString() {
+        return "SampleDefinition{" +
+                "sampledMethod=" + sampledMethod +
+                ", parameterValues=" + parameterValues +
+                ", parameterMatchers=" + parameterMatchers +
+                ", answer=" + answer +
+                ", sampleId='" + sampleId + '\'' +
+                '}';
+    }
 }

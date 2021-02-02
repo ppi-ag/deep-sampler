@@ -117,6 +117,14 @@ public class SampleRepository {
         currentParameterMatchers.add(parameterMatcher);
     }
 
+    public void setCurrentParameterMatchers(ParameterMatcher<?> parameterMatcher) {
+        currentParameterMatchers.set(currentParameterMatchers.size() - 1, parameterMatcher);
+    }
+
+    public ParameterMatcher<?> getLastParameterMatcher() {
+        return currentParameterMatchers.get(currentParameterMatchers.size() - 1);
+    }
+
     public List<ParameterMatcher<?>> getCurrentParameterMatchers() {
         return currentParameterMatchers;
     }
