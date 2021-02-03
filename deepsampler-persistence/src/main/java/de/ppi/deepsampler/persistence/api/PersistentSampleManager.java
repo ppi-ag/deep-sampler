@@ -72,7 +72,7 @@ public class PersistentSampleManager {
         List<SampleDefinition> loadedSampledDefinitions = new ArrayList<>();
         for (final SourceManager sourceManager: sourceManagerList) {
             final Map<String, SampleDefinition> definedSamples = SampleRepository.getInstance().getSamples().stream()
-                    .collect(Collectors.toMap(SampleDefinition::getSampleId, (s) -> s));
+                    .collect(Collectors.toMap(SampleDefinition::getSampleId, s -> s));
             final PersistentModel persistentModel = sourceManager.load();
 
             final List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);

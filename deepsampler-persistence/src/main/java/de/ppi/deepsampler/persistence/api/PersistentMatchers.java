@@ -23,6 +23,10 @@ import java.util.Objects;
  */
 public class PersistentMatchers {
 
+    private PersistentMatchers() {
+        // static only
+    }
+
     /**
      * Create a {@link ComboMatcher} with respect of making it available for the current {@link de.ppi.deepsampler.core.model.SampleDefinition}.
      *

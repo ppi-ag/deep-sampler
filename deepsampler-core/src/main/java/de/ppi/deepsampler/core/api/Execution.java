@@ -15,6 +15,10 @@ import de.ppi.deepsampler.core.model.SampleRepository;
  */
 public class Execution {
 
+    private Execution() {
+        // static only
+    }
+
     /**
      * Makes deepsampler use a provided {@link SampleReturnProcessor} when returning arbitrary stubbed data.
      *

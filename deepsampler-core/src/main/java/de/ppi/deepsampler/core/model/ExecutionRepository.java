@@ -54,5 +54,6 @@ public class ExecutionRepository {
         executionInformation.clear();
         globalProcessors.clear();
         sampleDefinitionSampleReturnProcessorMap.clear();
+        myInstance.remove();
     }
 }

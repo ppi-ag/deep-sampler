@@ -12,6 +12,10 @@ import java.util.List;
 
 public class SampleHandling {
 
+    private SampleHandling() {
+        //static only
+    }
+
     @SuppressWarnings("unchecked")
     public static boolean argumentsMatch(final SampleDefinition sampleDefinition, final Object[] arguments) {
         final List<ParameterMatcher<?>> parameterMatchers = sampleDefinition.getParameterMatchers();
