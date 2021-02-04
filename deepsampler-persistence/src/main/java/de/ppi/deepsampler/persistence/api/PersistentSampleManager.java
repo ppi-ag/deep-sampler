@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * The {@link PersistentSampleManager} is used handle any provided {@link SourceManager} and to act
+ * The {@link PersistentSampleManager} is used to handle any provided {@link SourceManager} and to act
  * as a bridge between this manager and the DeepSampler repositories.
  */
 public class PersistentSampleManager {
@@ -55,7 +55,7 @@ public class PersistentSampleManager {
     }
 
     /**
-     * End of chain method: {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
+     * End of chain method: call {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
     public void record() {
         for (final SourceManager sourceManager: sourceManagerList) {
@@ -64,7 +64,7 @@ public class PersistentSampleManager {
     }
 
     /**
-     * End of chain method: Calls {@link SourceManager#load()} on all {@link SourceManager}s and write
+     * End of chain method: call {@link SourceManager#load()} on all {@link SourceManager}s and write
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {

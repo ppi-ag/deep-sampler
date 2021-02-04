@@ -16,10 +16,10 @@ import java.util.Map;
  * A SourceManager is responsible for interacting with the actual persistent source.
  * </p>
  *
- * will have to define two methods:
+ * When implementing you have to define two methods:
  * <ul>
  *     <li>save(...): Basically you have to write the provided data to your data source. There is no constraint on
- *     how you do it, you just should write it in a form so that you are able to load it correctly again.</li>
+ *     how you do it, but you should write it in a form so that you are able to load it correctly again.</li>
  *     <li>load(...): Load your data and transform your data to an implementation of {@link PersistentModel}</li>
  * </ul>
  */
@@ -35,7 +35,7 @@ public interface SourceManager {
 
     /**
      * Load the persistent data. You will also have to transform this (if not already happened by design) to an
-     * implementation of {@link PersistentModel}.
+     * implementation of {@link PersistentModel} and its subordinated interfaces.
      *
      * @return PersistentModel
      */
