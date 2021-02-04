@@ -69,6 +69,8 @@ class ScopeTest {
         //WHEN
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
+        assertNumberOfSamplers(0);
+
         Future<?> thread1 = executorService.submit(() -> {
             assertNumberOfSamplers(0);
 

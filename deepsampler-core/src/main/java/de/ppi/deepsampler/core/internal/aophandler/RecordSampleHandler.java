@@ -10,6 +10,14 @@ import de.ppi.deepsampler.core.model.SampleRepository;
 
 import java.lang.reflect.Method;
 
+/**
+ * A {@link javassist.util.proxy.MethodHandler} that taps into method calls and adds each method call as a {@link SampleDefinition}
+ * to the {@link SampleRepository}. This is trick how DeepSampler is able to define the stubbed methods by calling the methods
+ * that should be stubbed. (@see {@link de.ppi.deepsampler.core.api.Sampler}).
+ *
+ * Methods of the class {@link Object} are ignored. Otherwise strange effects might appear, e.g. if Object::finalize is
+ * called by the garbage collactor.
+ */
 public class RecordSampleHandler extends ReturningSampleHandler {
     private final Class<?> cls;
 
@@ -19,14 +27,13 @@ public class RecordSampleHandler extends ReturningSampleHandler {
 
     @Override
     public Object invoke(final Object self, final Method method, final Method proceed, final Object[] args) {
-        final SampleDefinition sampleDefinition = createSampleDefinition(cls, method, args);
-
-        SampleRepository.getInstance().add(sampleDefinition);
+        if (!Object.class.equals(method.getDeclaringClass())) {
+            final SampleDefinition sampleDefinition = createSampleDefinition(cls, method, args);
+            SampleRepository.getInstance().add(sampleDefinition);
+        }
 
         return createEmptyProxy(method.getReturnType());
     }
-
-
 
 
 }
