@@ -21,9 +21,6 @@ conveniently inside test classes. The API also comes with means to completely re
 
 DeepSampler is modularized to fit into various environments. The following modules are available by default. 
 
-> The selection of a module-tab is synchronized throughout the complete documentation
- 
-
 <!-- tabs:start -->
 
 #### ** JUnit5 & Spring **
@@ -56,6 +53,10 @@ JUnit 4 Rules will be used, and the stubbing is done using Spring-AOP.
 JUnit 4 Rules will be used, and the stubbing is done using Guice-AOP.
 
 <!-- tabs:end -->
+
+
+> The selection of a module-tab is synchronized throughout the complete documentation
+ 
 
 # License
 DeepSampler is made available under the terms of the __MIT License__ (see [LICENSE.md](./LICENSE.md)).
