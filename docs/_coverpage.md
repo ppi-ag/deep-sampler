@@ -8,4 +8,4 @@
 - Separate test logic from test data using JSON-files for your test data
 
 [GitHub](https://github.com/ppi-ag/deep-sampler/)
-[Get Started](#deepsampler)
+[Get Started](#deepsampler) 

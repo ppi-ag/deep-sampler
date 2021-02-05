@@ -1,0 +1,26 @@
+button:focus {outline:0;}
+
+:root {
+
+    /** Base*/
+    --theme-color     : #37abc8;
+    --base-background-color: #051017;
+    --base-color: #a7cbd8;
+
+    --mono-shade3     : var(--theme-color);
+    --mono-shade2     : #ff0000;
+    --mono-shade1     : #00ff00;
+    --mono-base       : #0000ff;
+    --mono-tint1      : #9999aa;
+    --mono-tint2      : var(--theme-color);
+    --mono-tint3      : #000910;
+
+    --sidebar-toggle-icon-color: var(--base-background-color);
+    --search-input-background-color: var(--theme-color);
+
+    /** Cover colors */
+
+    --cover-color: var(---base-color);
+    --cover-background-color: var(--base-background-color);
+    --cover-background-image: radial-gradient(ellipse at center 100%, #102545, transparent);
+}
