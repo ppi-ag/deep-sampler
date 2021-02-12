@@ -28,6 +28,10 @@ public class TestService {
         return param;
     }
 
+    public String anotherMethodThatReturnsStrings(final String param) {
+        return param;
+    }
+
 
     /**
      * A method that will always return -1 if it is not sampled
