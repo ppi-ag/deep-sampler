@@ -18,7 +18,7 @@ public class SampleRepository {
     private SampleDefinition lastSample;
     private List<ParameterMatcher<?>> currentParameterMatchers = new ArrayList<>();
 
-    private static Scope sampleRepositoryScope = new ThreadScope();
+    private static Scope<SampleRepository> sampleRepositoryScope = new ThreadScope<>();
 
     /**
      * Singleton Constructor.
@@ -36,10 +36,9 @@ public class SampleRepository {
      *
      * @param sampleRepositoryScope The {@link Scope} that should be used by the {@link SampleRepository}.
      */
-    public static synchronized void setScope(Scope sampleRepositoryScope) {
+    public static synchronized void setScope(Scope<SampleRepository> sampleRepositoryScope) {
         Objects.requireNonNull(sampleRepositoryScope, "The SampleRepositoryScope must not be null.");
 
-        SampleRepository.sampleRepositoryScope.cleanUp();
         SampleRepository.sampleRepositoryScope = sampleRepositoryScope;
     }
 
@@ -57,8 +56,8 @@ public class SampleRepository {
     /**
      * Checks whether both methods are the same or not
      *
-     * @param wantedSampledMethod
-     * @param sampledMethod
+     * @param wantedSampledMethod the sampled method defined by the user
+     * @param sampledMethod the actual method the provider came across
      * @return true if both methods are the same
      */
     private boolean methodMatches(SampledMethod wantedSampledMethod, SampledMethod sampledMethod) {
@@ -69,9 +68,9 @@ public class SampleRepository {
      * Returns true if the declaring types of wantedSampledMethod and sampledMethod are the same, or  if the declaring
      * type of wantedSampleMethod extends the declaring type of sampledMethod.
      *
-     * @param wantedSampledMethod
-     * @param sampledMethod
-     * @return
+     * @param wantedSampledMethod the sampled method defined by the user
+     * @param sampledMethod the actual method the provider came across
+     * @return true if the type in which the wanted method has been defined matches with the actual method
      */
     private boolean wantedTypeExtendsSampledType(SampledMethod wantedSampledMethod, SampledMethod sampledMethod) {
         return sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());

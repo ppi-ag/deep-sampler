@@ -5,16 +5,12 @@
 
 package de.ppi.deepsampler.provider.common;
 
-import de.ppi.deepsampler.core.api.Execution;
-import de.ppi.deepsampler.core.api.Matchers;
-import de.ppi.deepsampler.core.api.Sample;
-import de.ppi.deepsampler.core.api.Sampler;
+import de.ppi.deepsampler.core.api.*;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.VerifyException;
 import de.ppi.deepsampler.core.internal.FixedQuantity;
+import de.ppi.deepsampler.core.model.ExecutionRepository;
 import de.ppi.deepsampler.core.model.SampleRepository;
-import de.ppi.deepsampler.core.model.SingletonScope;
-import de.ppi.deepsampler.core.model.ThreadScope;
 import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
@@ -676,7 +672,7 @@ public abstract class SamplerAspectTest {
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
 
         // GIVEN
-        SampleRepository.setScope(new ThreadScope());
+        Execution.setScope(ScopeType.THREAD);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -687,6 +683,7 @@ public abstract class SamplerAspectTest {
             Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
             assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+            assertFalse(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
         });
 
         Future<?> findsNoSampler = executorService.submit(() -> {
@@ -698,6 +695,7 @@ public abstract class SamplerAspectTest {
 
             // THEN
             assertEquals(VALUE_B, getTestService().echoParameter(VALUE_B));
+            assertTrue(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
         });
 
         createsASampler.get();
@@ -705,7 +703,7 @@ public abstract class SamplerAspectTest {
 
         // THEN
         assertEquals(VALUE_B, getTestService().echoParameter(VALUE_B));
-
+        assertTrue(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
     }
 
     @Test
@@ -717,7 +715,7 @@ public abstract class SamplerAspectTest {
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
 
         // GIVEN
-        SampleRepository.setScope(new SingletonScope());
+        Execution.setScope(ScopeType.SINGLETON);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -728,6 +726,7 @@ public abstract class SamplerAspectTest {
             Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
             assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+            assertFalse(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
         });
 
         Future<?> findsNoSampler = executorService.submit(() -> {
@@ -739,6 +738,7 @@ public abstract class SamplerAspectTest {
 
             // THEN
             assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+            assertFalse(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
         });
 
         createsASampler.get();
@@ -746,7 +746,7 @@ public abstract class SamplerAspectTest {
 
         // THEN
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
-
+        assertFalse(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
     }
 
     @Test
