@@ -66,7 +66,7 @@ public class TestService {
     /**
      * This method is needed to test whether calls of void methods can be verified or not.
      *
-     * @param someInt
+     * @param someInt int value
      */
     @SuppressWarnings("unused")
     public void noReturnValue(final int someInt) {
@@ -82,6 +82,11 @@ public class TestService {
     @SuppressWarnings("unused")
     public String methodWithTwoParameter(final String parameterOne, final String parameterTwo) {
         return HARD_CODED_RETURN_VALUE;
+    }
+
+    @SuppressWarnings("unused")
+    public String methodWithThreeParametersReturningLast(final String parameterOne, final String parameterTwo, final String parameterThree) {
+        return parameterThree;
     }
 
     public LocalDateTime testLocalDateTime() {

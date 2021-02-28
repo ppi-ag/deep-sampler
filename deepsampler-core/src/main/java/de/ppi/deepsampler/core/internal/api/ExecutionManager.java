@@ -5,7 +5,11 @@
 
 package de.ppi.deepsampler.core.internal.api;
 
+import de.ppi.deepsampler.core.api.SampleReturnProcessor;
 import de.ppi.deepsampler.core.model.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExecutionManager {
 
@@ -25,6 +29,30 @@ public class ExecutionManager {
         final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(sampleDefinition.getSampledMethod().getTarget());
 
         return executionInformation.getOrCreateBySample(sampleDefinition);
+    }
+
+    public static Object execute(final SampleDefinition sampleDefinition, final StubMethodInvocation stubMethodInvocation) throws Exception {
+        Object callReturnValue = null;
+        try {
+            callReturnValue = sampleDefinition.getAnswer().call(stubMethodInvocation);
+        } finally {
+            for (SampleReturnProcessor sampleReturnProcessor : getApplicableReturnProcessors(sampleDefinition)) {
+                callReturnValue = sampleReturnProcessor.onReturn(sampleDefinition, stubMethodInvocation, callReturnValue);
+            }
+        }
+        return callReturnValue;
+    }
+
+    private static List<SampleReturnProcessor> getApplicableReturnProcessors(final SampleDefinition sampleDefinition) {
+        final List<SampleReturnProcessor> allSampleReturnProcessors = new ArrayList<>();
+
+        final List<SampleReturnProcessor> globalSampleReturnProcessors = ExecutionRepository.getInstance().getGlobalProcessors();
+        final List<SampleReturnProcessor> localSampleReturnProcessors = ExecutionRepository.getInstance().getSampleReturnProcessorsFor(sampleDefinition);
+
+        allSampleReturnProcessors.addAll(globalSampleReturnProcessors);
+        allSampleReturnProcessors.addAll(localSampleReturnProcessors);
+
+        return allSampleReturnProcessors;
     }
 
 }

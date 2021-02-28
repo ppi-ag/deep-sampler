@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.provider.common;
 
+import de.ppi.deepsampler.core.api.Execution;
 import de.ppi.deepsampler.core.api.Matchers;
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
@@ -35,6 +36,7 @@ import java.util.concurrent.Future;
 
 import static de.ppi.deepsampler.core.api.Matchers.*;
 import static de.ppi.deepsampler.core.internal.FixedQuantity.*;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -744,6 +746,105 @@ public abstract class SamplerAspectTest {
 
         // THEN
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_B));
+
+    }
+
+    @Test
+    void testPostProcessSampleReturnGlobal() {
+        // GIVEN
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A)).is(VALUE_B);
+        Sample.of(testServiceSampler.testLocalDateTime()).is(LocalDateTime.MIN);
+        Execution.useGlobal((a, b, c) -> null);
+
+        // WHEN
+        String resultEcho = getTestService().echoParameter(VALUE_A);
+        LocalDateTime localDateTime = getTestService().testLocalDateTime();
+
+        // THEN
+        assertNull(resultEcho);
+        assertNull(localDateTime);
+    }
+
+    @Test
+    void testPostProcessSampleReturnLocal() {
+        // GIVEN
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A)).is(VALUE_B);
+        Sample.of(testServiceSampler.testLocalDateTime()).is(LocalDateTime.MIN);
+        Execution.useForLastSample((a, b, c) -> {
+            // THEN
+            assertEquals("public java.time.LocalDateTime de.ppi.deepsampler.provider.common.TestService.testLocalDateTime()", a.getSampleId());
+            assertEquals(getTestService(), b.getStubInstance());
+            assertEquals(LocalDateTime.MIN, c);
+            return null;
+        });
+
+        // WHEN
+        String resultEcho = getTestService().echoParameter(VALUE_A);
+        LocalDateTime localDateTime = getTestService().testLocalDateTime();
+
+        // THEN
+        assertEquals(VALUE_B, resultEcho);
+        assertNull(localDateTime);
+    }
+
+    @Test
+    void testComboMatcherLoadAllButAcceptOnlyA() throws IOException {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(anyString())).hasId(MY_ECHO_PARAMS);
+
+        getTestService().echoParameter("ABC");
+        final String pathToFile = "./record/comboMatcherSingleArgument.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+        Sampler.clear();
+        Sample.of(testServiceSampler.echoParameter(combo(anyString(), (f, s) -> f.equals("A")))).hasId(MY_ECHO_PARAMS);
+
+        source.load();
+
+        // WHEN
+        String result = getTestService().echoParameter("A");
+        String secondCallResult = getTestService().echoParameter("A");
+        String wrongParameter = getTestService().echoParameter("B");
+
+        // THEN
+        assertEquals("ABC", result);
+        assertEquals("ABC", secondCallResult);
+        assertEquals("B", wrongParameter);
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    void testComboMatcherSecondArgument() throws IOException {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
+
+        getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "R1");
+        getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "R2");
+        getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "R3");
+        final String pathToFile = "./record/comboMatcherTwoArguments.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+        Sampler.clear();
+        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
+
+        source.load();
+
+        // WHEN
+        String resultFirst = getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1");
+        String resultSecond = getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
+        String resultThird = getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "ABC3");
+
+        // THEN
+        assertEquals("ABC1", resultFirst);
+        assertEquals("R1", resultSecond);
+        assertEquals("ABC3", resultThird);
+        Files.delete(Paths.get(pathToFile));
     }
 
 }

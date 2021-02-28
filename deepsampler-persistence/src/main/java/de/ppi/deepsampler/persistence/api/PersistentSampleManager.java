@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.persistence.api;
 
 import de.ppi.deepsampler.core.api.Matchers;
+import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
 import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
@@ -68,20 +69,20 @@ public class PersistentSampleManager {
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {
+        List<SampleDefinition> loadedSampledDefinitions = new ArrayList<>();
         for (final SourceManager sourceManager: sourceManagerList) {
-            final Map<String, SampledMethod> definedSamples = SampleRepository.getInstance().getSamples().stream()
-                    .collect(Collectors.toMap(SampleDefinition::getSampleId, SampleDefinition::getSampledMethod));
+            final Map<String, SampleDefinition> definedSamples = SampleRepository.getInstance().getSamples().stream()
+                    .collect(Collectors.toMap(SampleDefinition::getSampleId, s -> s));
             final PersistentModel persistentModel = sourceManager.load();
 
             final List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
+            loadedSampledDefinitions.addAll(filteredMappedSample);
+        }
 
-            // TODO jas 23.10.2020: Imagine we have more then one sourcemanager, would'nt the following clear() drop all Samples that have been loaded before?
-            // Is this intended?
-            SampleRepository.getInstance().clear();
+        SampleRepository.getInstance().clear();
 
-            for (final SampleDefinition sample : filteredMappedSample) {
-                SampleRepository.getInstance().add(sample);
-            }
+        for (final SampleDefinition sample : loadedSampledDefinitions) {
+            SampleRepository.getInstance().add(sample);
         }
 
         if (SampleRepository.getInstance().isEmpty()) {
@@ -90,37 +91,40 @@ public class PersistentSampleManager {
         }
     }
 
-    private List<SampleDefinition> toSample(final PersistentModel model, final Map<String, SampledMethod> idToSampleMethodMapping) {
+    private List<SampleDefinition> toSample(final PersistentModel model, final Map<String, SampleDefinition> idToSampleMethodMapping) {
         final List<SampleDefinition> samples = new ArrayList<>();
 
         for (final Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getSampleMethodToSampleMap().entrySet()) {
             final PersistentSampleMethod persistentSampleMethod = joinPointBehaviorEntry.getKey();
             final PersistentActualSample persistentActualSample = joinPointBehaviorEntry.getValue();
-            final SampledMethod matchingSample = idToSampleMethodMapping.get(persistentSampleMethod.getSampleMethodId());
+            final SampleDefinition matchingSample = idToSampleMethodMapping.get(persistentSampleMethod.getSampleMethodId());
 
             // When there is no matching JointPoint, the persistentJoinPointEntity will be discarded
             if (matchingSample != null) {
                 for (final PersistentMethodCall call : persistentActualSample.getAllCalls()) {
                     final SampleDefinition behavior = mapToSample(matchingSample, persistentSampleMethod, call);
-                    samples.add(behavior);
+                    if (SampleHandling.argumentsMatch(matchingSample, behavior.getParameterValues().toArray(new Object[0]))) {
+                        samples.add(behavior);
+                    }
                 }
             }
         }
         return samples;
     }
 
-    private SampleDefinition mapToSample(final SampledMethod matchingJointPoint, final PersistentSampleMethod persistentSampleMethod,
+    private SampleDefinition mapToSample(final SampleDefinition matchingSample, final PersistentSampleMethod persistentSampleMethod,
                                          final PersistentMethodCall call) {
         final List<Object> parameterEnvelopes = call.getPersistentParameter().getParameter();
         final Object returnValueEnvelope = call.getPersistentReturnValue();
-        final Class<?>[] parameterTypes = matchingJointPoint.getMethod().getParameterTypes();
-        final Class<?> returnType = matchingJointPoint.getMethod().getReturnType();
+        final SampledMethod sampledMethod = matchingSample.getSampledMethod();
+        final Class<?>[] parameterTypes = sampledMethod.getMethod().getParameterTypes();
+        final Class<?> returnType = sampledMethod.getMethod().getReturnType();
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
         final List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
-        final List<ParameterMatcher<?>> parameterMatchers = toMatcher(parameterValues);
+        final List<ParameterMatcher<?>> parameterMatchers = toMatcher(parameterValues, matchingSample.getParameterMatchers());
 
-        final SampleDefinition sample = new SampleDefinition(matchingJointPoint);
+        final SampleDefinition sample = new SampleDefinition(sampledMethod);
         sample.setSampleId(joinPointId);
         sample.setParameterMatchers(parameterMatchers);
         sample.setParameterValues(parameterValues);
@@ -150,10 +154,20 @@ public class PersistentSampleManager {
         return persistentSamplerContext.getPersistentBeanFactory().convertValueFromPersistentBeanIfNecessary(persistentBean, type);
     }
 
-    private List<ParameterMatcher<?>> toMatcher(final List<Object> params) {
-        return params.stream()
-                .map(Matchers.EqualsMatcher::new)
-                .collect(Collectors.toList());
+    @SuppressWarnings("unchecked")
+    private List<ParameterMatcher<?>> toMatcher(final List<Object> params, List<ParameterMatcher<?>> parameterMatchers) {
+        List<ParameterMatcher<?>> resultingParameterMatcher = new ArrayList<>();
+        for (int i = 0; i < params.size(); ++i) {
+            Object param = params.get(i);
+            ParameterMatcher<?> parameterMatcher  = parameterMatchers.get(i);
+
+            if (parameterMatcher instanceof ComboMatcher) {
+                resultingParameterMatcher.add(s -> ((ComboMatcher<Object>) parameterMatcher).getPersistentMatcher().matches(s, param));
+            } else {
+                resultingParameterMatcher.add(new Matchers.EqualsMatcher<>(param));
+            }
+        }
+        return resultingParameterMatcher;
     }
 
     private void addSourceProvider(final SourceManager sourceManager) {

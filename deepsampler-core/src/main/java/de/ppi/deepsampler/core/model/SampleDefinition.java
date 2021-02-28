@@ -92,4 +92,15 @@ public class SampleDefinition {
     public int hashCode() {
         return Objects.hash(sampledMethod.getMethod(), parameterValues, sampleId);
     }
+
+    @Override
+    public String toString() {
+        return "SampleDefinition{" +
+                "sampledMethod=" + sampledMethod +
+                ", parameterValues=" + parameterValues +
+                ", parameterMatchers=" + parameterMatchers +
+                ", answer=" + answer +
+                ", sampleId='" + sampleId + '\'' +
+                '}';
+    }
 }
