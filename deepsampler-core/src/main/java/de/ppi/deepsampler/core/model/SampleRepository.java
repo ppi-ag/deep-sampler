@@ -23,7 +23,8 @@ public class SampleRepository {
     /**
      * Singleton Constructor.
      */
-    private SampleRepository() {}
+    private SampleRepository() {
+    }
 
     public static synchronized SampleRepository getInstance() {
         return sampleRepositoryScope.getOrCreate(SampleRepository::new);
@@ -53,14 +54,36 @@ public class SampleRepository {
         samples.add(sampleDefinition);
     }
 
+    /**
+     * Checks whether both methods are the same or not
+     *
+     * @param wantedSampledMethod
+     * @param sampledMethod
+     * @return true if both methods are the same
+     */
+    private boolean methodMatches(SampledMethod wantedSampledMethod, SampledMethod sampledMethod) {
+        return sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
+    }
+
+    /**
+     * Returns true if the declaring types of wantedSampledMethod and sampledMethod are the same, or  if the declaring
+     * type of wantedSampleMethod extends the declaring type of sampledMethod.
+     *
+     * @param wantedSampledMethod
+     * @param sampledMethod
+     * @return
+     */
+    private boolean wantedTypeExtendsSampledType(SampledMethod wantedSampledMethod, SampledMethod sampledMethod) {
+        return sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
+    }
+
     public List<SampleDefinition> findAllForMethod(SampledMethod wantedSampledMethod) {
         List<SampleDefinition> sampleDefinitions = new ArrayList<>();
         for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
-            final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
-            final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
 
-            if (classMatches && methodMatches) {
+            if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
+                    && methodMatches(wantedSampledMethod, sampledMethod)) {
                 sampleDefinitions.add(sampleDefinition);
             }
         }
@@ -68,14 +91,15 @@ public class SampleRepository {
         return sampleDefinitions;
     }
 
+
     public SampleDefinition find(final SampledMethod wantedSampledMethod, final Object... args) {
         for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
-            final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
-            final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
-            final boolean argumentsMatches = argumentsMatch(sampleDefinition, args);
 
-            if (classMatches && methodMatches && argumentsMatches) {
+            if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
+                    && methodMatches(wantedSampledMethod, sampledMethod)
+                    && argumentsMatch(sampleDefinition, args)) {
+
                 return sampleDefinition;
             }
         }

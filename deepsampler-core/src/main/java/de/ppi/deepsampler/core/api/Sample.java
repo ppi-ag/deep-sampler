@@ -28,6 +28,9 @@ import java.util.Objects;
  * DeepSampler defines Samples on classes rather then on objects. This enables DeepSampler to change the behavior of all instances of these classes without the need to instantiate
  * the Sampler manually and to distribute the Sampler into the objects that will be tested. The distribution is done by a Dependency Injection Framework like Spring or Guice.
  *
+ * Methods of the class {@link Object} are ignored. Otherwise strange effects might appear, e.g. if Object::finalize is
+ * called by the garbage collactor.
+ *
  * @author Jan Schankin, Rico Schrage
  */
 public class Sample {
