@@ -1,11 +1,13 @@
 package de.ppi.deepsampler.core.api;
 
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.model.ExecutionRepository;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ExecutionTest {
 
@@ -33,5 +35,11 @@ class ExecutionTest {
 
         // THEN
         assertEquals(sampleReturnProcessor, ExecutionRepository.getInstance().getSampleReturnProcessorsFor(SampleRepository.getInstance().getLastSampleDefinition()).get(0));
+    }
+
+    @Test
+    void testNotSupported() {
+        // GIVEN WHEN THEN
+        assertThrows(InvalidConfigException.class, () -> Execution.setScope(null));
     }
 }
