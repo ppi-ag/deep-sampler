@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  * The default scope is {@link ThreadScope}, so Samples and all data associated with Samples are not
  * shared across different {@link Thread}s.
  */
-public interface Scope<T> {
+public interface Scope<T> extends AutoCloseable {
 
     /**
      * Retrieves the hold object, or creates a new one if no one exists yet. The implementation decides
@@ -30,4 +30,8 @@ public interface Scope<T> {
      */
     T getOrCreate(Supplier<T> supplier);
 
+    /**
+     * {@inheritDoc}
+     */
+    void close();
 }

@@ -38,4 +38,8 @@ public class ThreadScope<T> implements Scope<T> {
         return sampleRepository.get();
     }
 
+    @Override
+    public void close() {
+        sampleRepository.remove();
+    }
 }

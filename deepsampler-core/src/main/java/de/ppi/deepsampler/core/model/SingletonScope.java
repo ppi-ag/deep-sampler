@@ -36,4 +36,8 @@ public class SingletonScope<T> implements Scope<T> {
         return sampleRepository;
     }
 
+    @Override
+    public void close() {
+        // nothing to do
+    }
 }

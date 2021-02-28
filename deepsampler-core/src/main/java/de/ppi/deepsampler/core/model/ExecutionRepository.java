@@ -38,6 +38,7 @@ public class ExecutionRepository {
     public static synchronized void setScope(Scope<ExecutionRepository> executionRepositoryRepository) {
         Objects.requireNonNull(executionRepositoryRepository, "The ExecutionRepositoryRepository must not be null.");
 
+        ExecutionRepository.myInstance.close();
         ExecutionRepository.myInstance = executionRepositoryRepository;
     }
 
