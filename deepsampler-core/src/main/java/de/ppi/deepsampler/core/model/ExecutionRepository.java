@@ -14,7 +14,7 @@ public class ExecutionRepository {
     private final List<SampleReturnProcessor> globalProcessors = new ArrayList<>();
     private final Map<SampleDefinition, List<SampleReturnProcessor>> sampleDefinitionSampleReturnProcessorMap = new HashMap<>();
 
-    private static final ThreadLocal<ExecutionRepository> myInstance = ThreadLocal.withInitial(ExecutionRepository::new);
+    private static Scope<ExecutionRepository> myInstance = new ThreadScope<>();
 
     /**
      * Singleton Constructor.
@@ -22,11 +22,24 @@ public class ExecutionRepository {
     private ExecutionRepository() {}
 
     public static synchronized ExecutionRepository getInstance() {
-        return myInstance.get();
+        return myInstance.getOrCreate(ExecutionRepository::new);
     }
 
     public Map<Class<?>, ExecutionInformation> getAll() {
         return Collections.unmodifiableMap(executionInformation);
+    }
+
+    /**
+     * Sets the scope of the {@link SampleRepository} end defines the visibility limits of Samples.
+     * The default {@link Scope} is {@link ThreadScope}, so by default Samples are not shared across {@link Thread}s.
+     *
+     * @param executionRepositoryRepository The {@link Scope} that should be used by the {@link SampleRepository}.
+     */
+    public static synchronized void setScope(Scope<ExecutionRepository> executionRepositoryRepository) {
+        Objects.requireNonNull(executionRepositoryRepository, "The ExecutionRepositoryRepository must not be null.");
+
+        ExecutionRepository.myInstance.close();
+        ExecutionRepository.myInstance = executionRepositoryRepository;
     }
 
     public ExecutionInformation getOrCreate(final Class<?> cls) {
@@ -54,6 +67,5 @@ public class ExecutionRepository {
         executionInformation.clear();
         globalProcessors.clear();
         sampleDefinitionSampleReturnProcessorMap.clear();
-        myInstance.remove();
     }
 }
