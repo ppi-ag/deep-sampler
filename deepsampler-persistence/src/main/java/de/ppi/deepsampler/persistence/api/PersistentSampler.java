@@ -22,11 +22,11 @@ package de.ppi.deepsampler.persistence.api;
  * </p>
  *
  * <p>
- *     Example using a json-SourceManager:<br><br>
+ *     Example of using a json-SourceManager:<br><br>
  *     <code>
  *         PersistentSampleManager.source(JsonSourceManager.builder("file.json")).record();
  *     </code><br>
- *     Its also possible to define multiple sources:
+ *     It's also possible to define multiple sources to record/load to/from multiple targets:
  *     <code>
  *         PersistentSampleManager.source(JsonSourceManager.builder("file.json"))
  *              .source(JsonSourceManager.builder("file-copy.json"))
@@ -34,8 +34,10 @@ package de.ppi.deepsampler.persistence.api;
  *     </code>
  * </p>
  *
- * Currently there is one SourceManager: JsonSourceManager (you will need to include persistence-json as maven dependency).
- * If you need to write/load your samples to other data-sources you cant implement your own {@link SourceManager}.
+ * With the JsonSourceManager deepsampler provides a reference implementation of a {@link SourceManager} which is capable of writing/loading to/from *.json files. To use it just include the project
+ * persistence-json as maven dependency.
+ * <br>
+ * If you need to write/load your samples to other data-sources you can implement your own {@link SourceManager}.
  */
 public class PersistentSampler {
 
@@ -45,7 +47,7 @@ public class PersistentSampler {
 
     /**
      * Entry method to load/record some samples. You have to build a {@link SourceManager}, responsible
-     * for interacting with the persistent data source (file, database, whatever you like=.
+     * for interacting with the persistent data source (file, database, whatever you like).
      *
      * @param sourceManager the {@link SourceManager}
      * @return A new {@link PersistentSampleManager}

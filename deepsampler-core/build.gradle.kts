@@ -10,4 +10,5 @@ plugins {
 dependencies {
     implementation("org.javassist:javassist:3.27.0-GA")
     implementation("org.objenesis:objenesis:3.1")
+    testImplementation("org.awaitility:awaitility:4.0.3")
 }

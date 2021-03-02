@@ -11,19 +11,23 @@ import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-public class ScopeTest {
+import static org.awaitility.Awaitility.*;
+
+class ScopeTest {
 
     @Test
     void singletonScopeSharesSamplesAcrossThreads() throws InterruptedException, ExecutionException {
         // WHEN UNCHANGED
         Sampler.clear();
         assertNumberOfSamplers(0);
+
 
         //GIVEN
         SampleRepository.setScope(new SingletonScope());
@@ -35,18 +39,11 @@ public class ScopeTest {
             TestService sampler = Sampler.prepare(TestService.class);
             Sample.of(sampler.first()).is("The first will be the last");
 
-            assertNumberOfSamplers(1);
-
-            sleep();
-            sleep();
-
-            assertNumberOfSamplers(2);
+            await().atMost(2, SECONDS).until(() -> numberOfSamplersIsReached(2));
         });
 
         Future<?> thread2 = executorService.submit(() -> {
-            sleep();
-
-            assertNumberOfSamplers(1);
+            await().atMost(2, SECONDS).until(() -> numberOfSamplersIsReached(1));
 
             TestService sampler = Sampler.prepare(TestService.class);
             Sample.of(sampler.second()).is("The second will be the first");
@@ -67,9 +64,12 @@ public class ScopeTest {
 
         //GIVEN
         SampleRepository.setScope(new ThreadScope());
+        List<String> threadLog = new ArrayList<>();
 
         //WHEN
         ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        assertNumberOfSamplers(0);
 
         Future<?> thread1 = executorService.submit(() -> {
             assertNumberOfSamplers(0);
@@ -78,11 +78,9 @@ public class ScopeTest {
             Sample.of(sampler.first()).is("The first will be the last");
 
             assertNumberOfSamplers(1);
+            threadLog.add("First new Sampler");
 
-            sleep();
-            sleep();
-            sleep();
-            sleep();
+            await().atMost(2, SECONDS).until(() -> threadLog.contains("Second new Sampler"));
 
             assertNumberOfSamplers(1);
         });
@@ -90,13 +88,14 @@ public class ScopeTest {
         Future<?> thread2 = executorService.submit(() -> {
             assertNumberOfSamplers(0);
 
-            sleep();
-            sleep();
-
+            await().atMost(2, SECONDS).until(() -> threadLog.contains("First new Sampler"));
             assertNumberOfSamplers(0);
+
 
             TestService sampler = Sampler.prepare(TestService.class);
             Sample.of(sampler.second()).is("The first will be the last");
+
+            threadLog.add("Second new Sampler");
 
             assertNumberOfSamplers(1);
         });
@@ -108,18 +107,50 @@ public class ScopeTest {
         assertNumberOfSamplers(0);
     }
 
+    @Test
+    void singletonScopeIsCleanedUp() {
+        // GIVEN
+        SampleRepository.setScope(new SingletonScope());
+
+        TestService sampler = Sampler.prepare(TestService.class);
+        Sample.of(sampler.first()).is("The first will be the last");
+
+        assertNumberOfSamplers(1);
+
+        // WHEN
+        SampleRepository.setScope(new ThreadScope());
+
+        // THEN
+        assertNumberOfSamplers(0);
+    }
+
+    @Test
+    void threadScopeIsCleanedUp() {
+        // GIVEN
+        SampleRepository.setScope(new ThreadScope());
+
+        TestService sampler = Sampler.prepare(TestService.class);
+        Sample.of(sampler.first()).is("The first will be the last");
+
+        assertNumberOfSamplers(1);
+
+        // WHEN
+        SampleRepository.setScope(new SingletonScope());
+
+        // THEN
+        assertNumberOfSamplers(0);
+    }
+
     private void assertNumberOfSamplers(int expectedSamplers) {
         List<SampleDefinition> samples = SampleRepository.getInstance().getSamples();
         assertEquals(expectedSamplers, samples.size());
     }
 
-    private void sleep() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        }
+    private boolean numberOfSamplersIsReached(int expectedSamplers) {
+        List<SampleDefinition> samples = SampleRepository.getInstance().getSamples();
+        return expectedSamplers <= samples.size();
     }
+
 
     private static class TestService {
         String first() {

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static de.ppi.deepsampler.core.internal.SampleHandling.argumentsMatch;
+
 public class SampleRepository {
 
     private List<SampleDefinition> samples = new ArrayList<>();
@@ -16,12 +18,13 @@ public class SampleRepository {
     private SampleDefinition lastSample;
     private List<ParameterMatcher<?>> currentParameterMatchers = new ArrayList<>();
 
-    private static Scope sampleRepositoryScope = new ThreadScope();
+    private static Scope<SampleRepository> sampleRepositoryScope = new ThreadScope<>();
 
     /**
      * Singleton Constructor.
      */
-    private SampleRepository() {}
+    private SampleRepository() {
+    }
 
     public static synchronized SampleRepository getInstance() {
         return sampleRepositoryScope.getOrCreate(SampleRepository::new);
@@ -33,9 +36,10 @@ public class SampleRepository {
      *
      * @param sampleRepositoryScope The {@link Scope} that should be used by the {@link SampleRepository}.
      */
-    public static synchronized void setScope(Scope sampleRepositoryScope) {
+    public static synchronized void setScope(Scope<SampleRepository> sampleRepositoryScope) {
         Objects.requireNonNull(sampleRepositoryScope, "The SampleRepositoryScope must not be null.");
 
+        SampleRepository.sampleRepositoryScope.close();
         SampleRepository.sampleRepositoryScope = sampleRepositoryScope;
     }
 
@@ -50,14 +54,36 @@ public class SampleRepository {
         samples.add(sampleDefinition);
     }
 
+    /**
+     * Checks whether both methods are the same or not
+     *
+     * @param wantedSampledMethod the sampled method defined by the user
+     * @param sampledMethod the actual method the provider came across
+     * @return true if both methods are the same
+     */
+    private boolean methodMatches(SampledMethod wantedSampledMethod, SampledMethod sampledMethod) {
+        return sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
+    }
+
+    /**
+     * Returns true if the declaring types of wantedSampledMethod and sampledMethod are the same, or  if the declaring
+     * type of wantedSampleMethod extends the declaring type of sampledMethod.
+     *
+     * @param wantedSampledMethod the sampled method defined by the user
+     * @param sampledMethod the actual method the provider came across
+     * @return true if the type in which the wanted method has been defined matches with the actual method
+     */
+    private boolean wantedTypeExtendsSampledType(SampledMethod wantedSampledMethod, SampledMethod sampledMethod) {
+        return sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
+    }
+
     public List<SampleDefinition> findAllForMethod(SampledMethod wantedSampledMethod) {
         List<SampleDefinition> sampleDefinitions = new ArrayList<>();
         for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
-            final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
-            final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
 
-            if (classMatches && methodMatches) {
+            if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
+                    && methodMatches(wantedSampledMethod, sampledMethod)) {
                 sampleDefinitions.add(sampleDefinition);
             }
         }
@@ -65,37 +91,20 @@ public class SampleRepository {
         return sampleDefinitions;
     }
 
+
     public SampleDefinition find(final SampledMethod wantedSampledMethod, final Object... args) {
         for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
-            final boolean classMatches = sampledMethod.getTarget().isAssignableFrom(wantedSampledMethod.getTarget());
-            final boolean methodMatches = sampledMethod.getMethod().equals(wantedSampledMethod.getMethod());
-            final boolean argumentsMatches = argumentsMatch(sampleDefinition, args);
 
-            if (classMatches && methodMatches && argumentsMatches) {
+            if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
+                    && methodMatches(wantedSampledMethod, sampledMethod)
+                    && argumentsMatch(sampleDefinition, args)) {
+
                 return sampleDefinition;
             }
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private boolean argumentsMatch(final SampleDefinition sampleDefinition, final Object[] arguments) {
-        final List<ParameterMatcher<?>> parameterMatchers = sampleDefinition.getParameterMatchers();
-
-        if (parameterMatchers.size() != arguments.length) {
-            return false;
-        }
-
-        for (int i = 0; i < arguments.length; i++) {
-            final ParameterMatcher<Object> parameterMatcher = (ParameterMatcher<Object>) parameterMatchers.get(i);
-            if (!parameterMatcher.matches(arguments[i])) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void setCurrentSample(final SampleDefinition sampleDefinition) {
@@ -124,6 +133,14 @@ public class SampleRepository {
 
     public void addCurrentParameterMatchers(ParameterMatcher<?> parameterMatcher) {
         currentParameterMatchers.add(parameterMatcher);
+    }
+
+    public void setCurrentParameterMatchers(ParameterMatcher<?> parameterMatcher) {
+        currentParameterMatchers.set(currentParameterMatchers.size() - 1, parameterMatcher);
+    }
+
+    public ParameterMatcher<?> getLastParameterMatcher() {
+        return currentParameterMatchers.get(currentParameterMatchers.size() - 1);
     }
 
     public List<ParameterMatcher<?>> getCurrentParameterMatchers() {

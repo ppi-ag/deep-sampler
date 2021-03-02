@@ -10,25 +10,25 @@ package de.ppi.deepsampler.core.model;
 import java.util.function.Supplier;
 
 /**
- * A singleton scope for the {@link SampleRepository}. If this scope is used,  Samples and all associated data are
+ * A singleton scope for the repositories in deepsampler. If this scope is used,  Samples and all associated data are
  * shared across separated {@link Thread}s.
  *
  * The default scope is {@link ThreadScope}.
  *
- * The scope can be changed using {@link SampleRepository#setScope(Scope)}.
+ * The scope can be changed using {@link de.ppi.deepsampler.core.api.Execution#setScope(de.ppi.deepsampler.core.api.ScopeType)}.
  */
-public class SingletonScope implements Scope {
+public class SingletonScope<T> implements Scope<T> {
 
-    private static SampleRepository sampleRepository;
+    private T sampleRepository;
 
     /**
-     * Delivers the global SampleRepository or creates a new one if none exists yet.
+     * Delivers the global object hold by the scope or creates a new one if none exists yet.
      *
-     * @param supplier A Supplier that is used to create a new {@link SampleRepository} if non exists yet.
+     * @param supplier A Supplier that is used to create a new object of the hold class if non exists yet.
      * @return The global {@link SampleRepository}.
      */
     @Override
-    public synchronized SampleRepository getOrCreate(Supplier<SampleRepository> supplier) {
+    public synchronized T getOrCreate(Supplier<T> supplier) {
         if (sampleRepository == null) {
             sampleRepository = supplier.get();
         }
@@ -37,7 +37,7 @@ public class SingletonScope implements Scope {
     }
 
     @Override
-    public void cleanUp() {
-        sampleRepository = null;
+    public void close() {
+        // nothing to do
     }
 }

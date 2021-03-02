@@ -77,9 +77,9 @@ public class PersistentBeanFactory {
 
         } catch (final NoSuchMethodException | InstantiationException
                 | IllegalAccessException | InvocationTargetException e) {
-            throw new PersistenceException("While the type %s has final fields, it was " +
-                    "tried to use a matching constructor for all field-values. Because this" +
-                    "was not possbile, please provide a BeanFactoryExtension.", e, type);
+            throw new PersistenceException("The type %s includes at least one final field. Therefore we tried to automatically detect a " +
+                    "constructor accepting all field values, but weren't able to find any. If you still want to transform the bean you have to implement a BeanFactoryExtension" +
+                    " which is able to construct the desired type %s.", e, type, type);
         }
     }
 
