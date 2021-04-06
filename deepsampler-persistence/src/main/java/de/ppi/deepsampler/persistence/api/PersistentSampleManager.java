@@ -79,7 +79,14 @@ public class PersistentSampleManager {
             loadedSampledDefinitions.addAll(filteredMappedSample);
         }
 
-        SampleRepository.getInstance().clear();
+        List<SampleDefinition> currentSampleDefinitions = SampleRepository.getInstance().getSamples();
+        for (int i = currentSampleDefinitions.size() - 1; i >= 0; --i) {
+            SampleDefinition definition = currentSampleDefinitions.get(i);
+            // we only remove definitions made for the persistence -> definitions without answers
+            if (definition.getAnswer() == null) {
+                SampleRepository.getInstance().remove(i);
+            }
+        }
 
         for (final SampleDefinition sample : loadedSampledDefinitions) {
             SampleRepository.getInstance().add(sample);

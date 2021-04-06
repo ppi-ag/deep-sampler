@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.core.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,6 +53,19 @@ public class SampleRepository {
     public void add(final SampleDefinition sampleDefinition) {
         setCurrentSample(sampleDefinition);
         samples.add(sampleDefinition);
+    }
+
+    /**
+     * <p>Removes the SampleDefinition at the given index.</p>
+     *
+     * <p>Its not possible to remove a given SampleDefinition by
+     * equality as a definition do not need to be unique plus the technical equality won't recognize all attributes
+     * of the sample.</p>
+     *
+     * @param index the index at which you want to remove the sample
+     */
+    public void remove(int index) {
+        samples.remove(index);
     }
 
     /**
@@ -124,7 +138,7 @@ public class SampleRepository {
     }
 
     public List<SampleDefinition> getSamples() {
-        return samples;
+        return Collections.unmodifiableList(samples);
     }
 
     public void clearCurrentParameterMatchers() {
@@ -144,7 +158,7 @@ public class SampleRepository {
     }
 
     public List<ParameterMatcher<?>> getCurrentParameterMatchers() {
-        return currentParameterMatchers;
+        return Collections.unmodifiableList(currentParameterMatchers);
     }
 
     /**

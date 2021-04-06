@@ -847,4 +847,31 @@ public abstract class SamplerAspectTest {
         Files.delete(Paths.get(pathToFile));
     }
 
+    @Test
+    public void mixPureJavaApiAndPersistenceApi() throws IOException {
+        Sampler.clear();
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.testLocalDateTime());
+
+        getTestService().testLocalDateTime();
+
+        final String pathToFile = "./record/localDateTimeCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        // MIX persistence definition and pure java definition
+        Sample.of(testServiceSampler.testLocalDateTime());
+        Sample.of(testServiceSampler.echoParameter("ABC")).is("CBD");
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(LocalDateTime.of(2020, 10, 29, 10, 10, 10), getTestService().testLocalDateTime());
+        assertEquals("CBD", getTestService().echoParameter("ABC"));
+        Files.delete(Paths.get(pathToFile));
+    }
+
 }
