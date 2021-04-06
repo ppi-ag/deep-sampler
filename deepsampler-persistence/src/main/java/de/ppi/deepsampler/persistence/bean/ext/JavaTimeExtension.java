@@ -7,12 +7,14 @@ package de.ppi.deepsampler.persistence.bean.ext;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class JavaTimeExtension extends StandardBeanFactoryExtension {
 
     @Override
     public boolean isProcessable(Class<?> beanCls) {
-        return LocalDateTime.class.isAssignableFrom(beanCls) || LocalDate.class.isAssignableFrom(beanCls);
+        return LocalDateTime.class.isAssignableFrom(beanCls) || LocalDate.class.isAssignableFrom(beanCls)
+                || Date.class.isAssignableFrom(beanCls);
     }
 
     @Override
