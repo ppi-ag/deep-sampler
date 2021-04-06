@@ -3,6 +3,7 @@ package de.ppi.deepsampler.persistence;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,24 @@ class SamplerBeanFactoryTest {
 
         // THEN
         assertEquals(bean.collectionOfStrings, persistentBean.getValue("0$collectionOfStrings"));
+    }
+
+    @Test
+    void testTimestampSql() {
+        // GIVEN
+        Timestamp ts =  new Timestamp(1L);
+        final TimestampBean timestampBean = new TimestampBean();
+        timestampBean.timestamp = ts;
+
+        // WHEN
+        PersistentBean persistentBean = SamplerBeanFactory.create().toBean(timestampBean);
+
+        // THEN
+        assertEquals(ts, persistentBean.getValue("0$timestamp"));
+    }
+
+    private static class TimestampBean {
+        Timestamp timestamp;
     }
 
     private static class CollectionBean {
