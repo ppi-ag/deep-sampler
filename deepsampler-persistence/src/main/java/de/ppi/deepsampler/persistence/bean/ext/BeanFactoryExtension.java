@@ -6,7 +6,10 @@
 package de.ppi.deepsampler.persistence.bean.ext;
 
 
+import de.ppi.deepsampler.persistence.model.Persistable;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
+
+import java.util.List;
 
 /**
  * <p>
@@ -69,7 +72,7 @@ public interface BeanFactoryExtension {
      * @param bean the bean
      * @return the generic data-structure for the bean
      */
-    PersistentBean toBean(Object bean);
+    <T extends Persistable> T toBean(Object bean);
 
     /**
      * Conversion logic for the generic data-structure to the processed bean type.
@@ -79,5 +82,5 @@ public interface BeanFactoryExtension {
      * @param <T> type of the original bean
      * @return original bean
      */
-    <T> T ofBean(PersistentBean bean, Class<T> target);
+    <T> T ofBean(Persistable bean, Class<T> target);
 }

@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.bean.ext.StandardBeanFactoryExtension;
+import de.ppi.deepsampler.persistence.model.Persistable;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
@@ -161,11 +162,11 @@ class PersistentBeanFactoryTest {
         testBean.def = "456";
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
+        final List<PersistentBean> bean  = new PersistentBeanFactory().toBean(testBean);
 
         // THEN
-        assertEquals("123", bean.getValue("0$abc"));
-        assertEquals("456", bean.getValue("0$def"));
+        assertEquals("123", bean.get(0).getValue("0$abc"));
+        assertEquals("456", bean.get(0).getValue("0$def"));
     }
 
     @Test
@@ -268,7 +269,7 @@ class PersistentBeanFactoryTest {
         }
 
         @Override
-        public PersistentBean toBean(Object bean) {
+        public DefaultPersistentBean toBean(Object bean) {
             return new DefaultPersistentBean();
         }
 
@@ -314,16 +315,17 @@ class PersistentBeanFactoryTest {
     @Test
     void testCharacterToAndOf() {
         // GIVEN
-        Cs cs = new Cs();
-        cs.character = '2';
-        PersistentBean b = new PersistentBeanFactory().toBean(cs);
+        CharacterBean characterBean = new CharacterBean();
+        characterBean.character = '2';
+        PersistentBean b = new PersistentBeanFactory().toBean(characterBean);
 
         // WHEN
-        Cs[] result = new PersistentBeanFactory().ofBean(new PersistentBean[] {b}, Cs.class);
+        CharacterBean[] result = new PersistentBeanFactory().ofBean(new PersistentBean[] {b}, CharacterBean.class);
 
         // THEN
-        assertEquals(cs.character, result[0].character);
+        assertEquals(characterBean.character, result[0].character);
     }
+
 
     private static class CollectionBean {
         Collection<String> collectionOfStrings;
@@ -369,7 +371,7 @@ class PersistentBeanFactoryTest {
         protected String str;
     }
 
-    private static class Cs {
+    private static class CharacterBean {
         Character character = '2';
     }
 

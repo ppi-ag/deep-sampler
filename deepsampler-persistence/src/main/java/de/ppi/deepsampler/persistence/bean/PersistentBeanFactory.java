@@ -7,6 +7,7 @@ package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
+import de.ppi.deepsampler.persistence.model.Persistable;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -37,14 +38,14 @@ public class PersistentBeanFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T convertValueFromPersistentBeanIfNecessary(final Object value, final Class<T> type) {
-        if (value instanceof PersistentBean) {
-            return createValueFromPersistentBean((PersistentBean) value, type);
+        public <T> T convertValueFromPersistentBeanIfNecessary(final Object value, final Class<T> type) {
+        if (value instanceof Persistable) {
+            return createValueFromPersistentBean((Persistable) value, type);
         }
         return (T) value;
     }
 
-    public <T> T createValueFromPersistentBean(final PersistentBean value, final Class<T> type) {
+    public <T> T createValueFromPersistentBean(final Persistable value, final Class<T> type) {
         final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(type);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
@@ -55,7 +56,7 @@ public class PersistentBeanFactory {
         final Map<Field, String> fields = getAllFields(type);
 
         if (hasFinalFields(fields)) {
-            instance = instantiateUsingMatchingConstructor(type, value, fields);
+            instance = instantiateUsingMatchingConstructor(type, (PersistentBean) value, fields);
         } else {
             instance = instantiate(type);
 
@@ -63,7 +64,7 @@ public class PersistentBeanFactory {
                 final Field field = entry.getKey();
                 final String key = entry.getValue();
 
-                transferFromBean(value, instance, field, key);
+                transferFromBean((PersistentBean) value, instance, field, key);
             }
         }
         return instance;
@@ -132,7 +133,7 @@ public class PersistentBeanFactory {
         return instantiatorOf.newInstance();
     }
 
-    public PersistentBean toBean(final Object obj) {
+    public <T extends Persistable> T toBean(final Object obj) {
         final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(obj.getClass());
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
@@ -148,16 +149,16 @@ public class PersistentBeanFactory {
             Object fieldValue = retrieveValue(obj, field);
 
             if (fieldValue != null) {
-                if (isObjectArray(field.getType())) {
+                if (isPrimitiveOrWrapperArray(field.getType())) {
                     fieldValue = toBeanIfNecessary((Object[]) fieldValue);
-                } else if (!isPrimitive(field.getType()) && !field.getType().isArray()) {
+                } else if (!isPrimitiveOrWrapper(field.getType()) && !field.getType().isArray()) {
                     fieldValue = toBeanIfNecessary(fieldValue);
                 }
             }
             valuesForBean.put(keyForField, fieldValue);
         }
 
-        return new DefaultPersistentBean(valuesForBean);
+        return (T) new DefaultPersistentBean(valuesForBean);
     }
 
     @SuppressWarnings("java:S3011") // We need the possibility to set the values of private fields for deserialization.
@@ -182,7 +183,7 @@ public class PersistentBeanFactory {
         return fieldValue;
     }
 
-    private boolean isObjectArray(final Class<?> cls) {
+    private boolean isPrimitiveOrWrapperArray(final Class<?> cls) {
         return cls.isArray() && !(cls == int[].class
                 || cls == Integer[].class
                 || cls == boolean[].class
@@ -202,7 +203,7 @@ public class PersistentBeanFactory {
                 || cls == double[].class);
     }
 
-    private boolean isPrimitive(final Class<?> cls) {
+    private boolean isPrimitiveOrWrapper(final Class<?> cls) {
         return cls.isPrimitive()
                 || cls == Integer.class
                 || cls == Boolean.class
@@ -232,7 +233,11 @@ public class PersistentBeanFactory {
     }
 
     public Object toBeanIfNecessary(final Object obj) {
-        return isTransformationNotNecessary(obj) ? obj : toBean(obj);
+        if (isTransformationNotNecessary(obj)) {
+            return obj;
+        }
+
+        return toBean(obj);
     }
 
     private List<BeanFactoryExtension> findApplicableExtensions(final Class<?> cls) {
@@ -241,7 +246,7 @@ public class PersistentBeanFactory {
 
     private boolean isTransformationNotNecessary(final Object obj) {
 
-        return obj == null || isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray())
+        return obj == null || isPrimitiveOrWrapper(obj.getClass()) || (!isPrimitiveOrWrapperArray(obj.getClass()) && obj.getClass().isArray())
                 || findApplicableExtensions(obj.getClass()).stream().anyMatch(ext -> ext.skip(obj.getClass()));
     }
 
