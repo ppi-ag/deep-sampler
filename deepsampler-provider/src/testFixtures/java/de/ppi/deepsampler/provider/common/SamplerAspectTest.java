@@ -535,7 +535,7 @@ public abstract class SamplerAspectTest {
         assertNotNull(getTestService().echoParameter(TEST_BEAN_A));
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
 
-        //Files.delete(Paths.get(pathToFile));
+        Files.delete(Paths.get(pathToFile));
     }
 
     @Test
@@ -567,7 +567,7 @@ public abstract class SamplerAspectTest {
         assertNotNull(getTestService().getGenericTestBeanWithSubBean().getValue());
         assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getGenericTestBeanWithString().getValue());
 
-        //Files.delete(Paths.get(pathToFile));
+        Files.delete(Paths.get(pathToFile));
     }
 
     @Test
@@ -641,8 +641,9 @@ public abstract class SamplerAspectTest {
 
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertEquals(1, getTestService().getListOfTestBeans().size());
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getListOfTestBeans().get(0).getValue());
 
-        //Files.delete(Paths.get(pathToFile));
+        Files.delete(Paths.get(pathToFile));
     }
 
     @Test
@@ -678,7 +679,7 @@ public abstract class SamplerAspectTest {
         Sample.of(testServiceSampler.getArrayOfTestBeans());
 
         getTestService().getArrayOfTestBeans();
-        final String pathToFile = "./record/arrayReturnValuesCanBeRecordedAndLoaded.json";
+        final String pathToFile = "./record/arrayOfTestBeansReturnValueCanBeRecordedAndLoaded.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
 

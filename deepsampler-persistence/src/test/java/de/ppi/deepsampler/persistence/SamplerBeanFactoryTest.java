@@ -23,7 +23,7 @@ class SamplerBeanFactoryTest {
         bean.collectionOfStrings = Collections.unmodifiableList(listOfStrings);
 
         // WHEN
-        PersistentBean persistentBean = SamplerBeanFactory.create().toBean(bean);
+        PersistentBean persistentBean = SamplerBeanFactory.create().toBean(bean, bean.getClass());
 
         // THEN
         assertEquals(bean.collectionOfStrings, persistentBean.getValue("0$collectionOfStrings"));
@@ -37,7 +37,7 @@ class SamplerBeanFactoryTest {
         timestampBean.timestamp = ts;
 
         // WHEN
-        PersistentBean persistentBean = SamplerBeanFactory.create().toBean(timestampBean);
+        PersistentBean persistentBean = SamplerBeanFactory.create().toBean(timestampBean, timestampBean.getClass());
 
         // THEN
         assertEquals(ts, persistentBean.getValue("0$timestamp"));

@@ -21,6 +21,8 @@ import de.ppi.deepsampler.persistence.json.model.JsonSampleModel;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -88,9 +90,12 @@ public class JsonRecorder extends JsonOperator {
         final JsonPersistentSampleMethod persistentSampleMethod = new JsonPersistentSampleMethod(sample.getSampleId());
         final JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
+        Method method = sample.getSampledMethod().getMethod();
+        Type returnType = method.getGenericReturnType();
+
         for (final MethodCall call : calls) {
             final List<Object> argsAsPersistentBeans = persistentSamplerContext.getPersistentBeanFactory().toBeanIfNecessary(call.getArgs());
-            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanFactory().toBeanIfNecessary(call.getReturnValue());
+            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanFactory().toBeanIfNecessary(call.getReturnValue(), returnType);
             final JsonPersistentParameter newParameters = new JsonPersistentParameter(argsAsPersistentBeans);
 
             if (!callWithSameParametersExists(jsonPersistentActualSample, newParameters)) {

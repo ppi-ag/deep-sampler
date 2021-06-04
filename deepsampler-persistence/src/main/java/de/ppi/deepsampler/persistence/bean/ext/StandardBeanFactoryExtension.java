@@ -5,26 +5,26 @@
 
 package de.ppi.deepsampler.persistence.bean.ext;
 
-import de.ppi.deepsampler.persistence.model.Persistable;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import de.ppi.deepsampler.persistence.bean.PersistentBeanFactory;
 
-import java.util.List;
+import java.lang.reflect.Type;
 
 public abstract class StandardBeanFactoryExtension implements BeanFactoryExtension {
 
     @Override
-    public boolean skip(Class<?> beanCls) {
+    public boolean skip(Type beanType) {
         return false;
     }
 
     @Override
-    public Persistable toBean(Object bean) {
-        return new PersistentBeanFactory().toBean(bean);
+    @SuppressWarnings("unchecked")
+    public Object toBean(Object targetBean, Type targetBeanType) {
+        return new PersistentBeanFactory().toBean(targetBean, targetBeanType);
     }
 
     @Override
-    public <T> T ofBean(Persistable bean, Class<T> cls) {
-        return new PersistentBeanFactory().createValueFromPersistentBean((PersistentBean) bean, cls);
+    public <T> T ofBean(Object persistentBean, Type targetBeanType) {
+        return new PersistentBeanFactory().createValueFromPersistentBean(persistentBean, targetBeanType);
     }
 }

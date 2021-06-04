@@ -16,6 +16,7 @@ import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,9 @@ public class PersistentSampleManager {
         final Object returnValueEnvelope = call.getPersistentReturnValue();
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
         final Class<?>[] parameterTypes = sampledMethod.getMethod().getParameterTypes();
-        final Class<?> returnType = sampledMethod.getMethod().getReturnType();
+
+        final Type returnType = sampledMethod.getMethod().getGenericReturnType();
+
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
         final List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
@@ -157,7 +160,7 @@ public class PersistentSampleManager {
         return params;
     }
 
-    private Object unwrapValue(final Class<?> type, final Object persistentBean) {
+    private Object unwrapValue(final Type type, final Object persistentBean) {
         return persistentSamplerContext.getPersistentBeanFactory().convertValueFromPersistentBeanIfNecessary(persistentBean, type);
     }
 

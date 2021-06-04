@@ -142,7 +142,7 @@ public class TestService {
 
 
     public List<TestBean> getListOfTestBeans() {
-        return Arrays.asList(new TestBean());
+        return Arrays.asList(new TestBean(HARD_CODED_RETURN_VALUE));
     }
 
     public List<String> getListOfStrings() {

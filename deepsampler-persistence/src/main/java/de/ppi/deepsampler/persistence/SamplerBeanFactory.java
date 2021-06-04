@@ -5,10 +5,10 @@
 
 package de.ppi.deepsampler.persistence;
 
-import de.ppi.deepsampler.persistence.bean.ext.CollectionMapExtension;
+import de.ppi.deepsampler.persistence.bean.ext.ArrayExtension;
 import de.ppi.deepsampler.persistence.bean.ext.JavaTimeExtension;
 import de.ppi.deepsampler.persistence.bean.PersistentBeanFactory;
-import de.ppi.deepsampler.persistence.bean.ext.ListExtension;
+import de.ppi.deepsampler.persistence.bean.ext.CollectionExtension;
 
 public class SamplerBeanFactory {
 
@@ -19,7 +19,8 @@ public class SamplerBeanFactory {
     static PersistentBeanFactory create() {
         PersistentBeanFactory persistentBeanFactory = new PersistentBeanFactory();
         persistentBeanFactory.addExtension(new JavaTimeExtension());
-        persistentBeanFactory.addExtension(new ListExtension());
+        persistentBeanFactory.addExtension(new CollectionExtension());
+        persistentBeanFactory.addExtension(new ArrayExtension());
         //persistentBeanFactory.addExtension(new CollectionMapExtension());
         return persistentBeanFactory;
     }

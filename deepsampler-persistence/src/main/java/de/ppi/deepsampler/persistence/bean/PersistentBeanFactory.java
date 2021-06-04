@@ -7,16 +7,12 @@ package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
-import de.ppi.deepsampler.persistence.model.Persistable;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,14 +34,15 @@ public class PersistentBeanFactory {
     }
 
     @SuppressWarnings("unchecked")
-        public <T> T convertValueFromPersistentBeanIfNecessary(final Object value, final Class<T> type) {
-        if (value instanceof Persistable) {
-            return createValueFromPersistentBean((Persistable) value, type);
+    public <T> T convertValueFromPersistentBeanIfNecessary(final Object value, final Type type) {
+        if (value instanceof PersistentBean || value instanceof List) {
+            return createValueFromPersistentBean(value, type);
         }
         return (T) value;
     }
 
-    public <T> T createValueFromPersistentBean(final Persistable value, final Class<T> type) {
+    @SuppressWarnings("unchecked")
+    public <T> T createValueFromPersistentBean(final Object value, final Type type) {
         final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(type);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
@@ -53,12 +50,13 @@ public class PersistentBeanFactory {
         }
 
         final T instance;
-        final Map<Field, String> fields = getAllFields(type);
+        Class<T> targetClass = type instanceof Class ? (Class<T>) type : (Class<T>) ((ParameterizedType) type).getRawType();
+        final Map<Field, String> fields = getAllFields(targetClass);
 
         if (hasFinalFields(fields)) {
-            instance = instantiateUsingMatchingConstructor(type, (PersistentBean) value, fields);
+            instance = instantiateUsingMatchingConstructor(targetClass, (PersistentBean) value, fields);
         } else {
-            instance = instantiate(type);
+            instance = instantiate(targetClass);
 
             for (final Map.Entry<Field, String> entry : fields.entrySet()) {
                 final Field field = entry.getKey();
@@ -104,7 +102,7 @@ public class PersistentBeanFactory {
 
             Object lookedUpValueInBean = persistentBean.getValue(key);
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
+                lookedUpValueInBean = createValueFromPersistentBean(lookedUpValueInBean, field.getType());
             }
             values.add(lookedUpValueInBean);
         }
@@ -121,7 +119,7 @@ public class PersistentBeanFactory {
         Object lookedUpValueInBean = persistentBean.getValue(key);
         if (lookedUpValueInBean != null) {
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
+                lookedUpValueInBean = createValueFromPersistentBean(lookedUpValueInBean, field.getType());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -133,11 +131,12 @@ public class PersistentBeanFactory {
         return instantiatorOf.newInstance();
     }
 
-    public <T extends Persistable> T toBean(final Object obj) {
-        final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(obj.getClass());
+    @SuppressWarnings("unchecked")
+    public <T> T toBean(final Object obj, Type beanType) {
+        final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(beanType);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
-            return applicableExtensions.get(0).toBean(obj);
+            return applicableExtensions.get(0).toBean(obj, beanType);
         }
 
         final Map<Field, String> fieldStringMap = getAllFields(obj.getClass());
@@ -147,14 +146,12 @@ public class PersistentBeanFactory {
             final String keyForField = entry.getValue();
             final Field field = entry.getKey();
             Object fieldValue = retrieveValue(obj, field);
+            Type fieldType = field.getGenericType();
 
             if (fieldValue != null) {
-                if (isPrimitiveOrWrapperArray(field.getType())) {
-                    fieldValue = toBeanIfNecessary((Object[]) fieldValue);
-                } else if (!isPrimitiveOrWrapper(field.getType()) && !field.getType().isArray()) {
-                    fieldValue = toBeanIfNecessary(fieldValue);
-                }
+                fieldValue = toBeanIfNecessary(fieldValue, fieldType);
             }
+
             valuesForBean.put(keyForField, fieldValue);
         }
 
@@ -183,7 +180,7 @@ public class PersistentBeanFactory {
         return fieldValue;
     }
 
-    private boolean isPrimitiveOrWrapperArray(final Class<?> cls) {
+    public static boolean isPrimitiveOrWrapperArray(final Class<?> cls) {
         return cls.isArray() && !(cls == int[].class
                 || cls == Integer[].class
                 || cls == boolean[].class
@@ -203,7 +200,25 @@ public class PersistentBeanFactory {
                 || cls == double[].class);
     }
 
-    private boolean isPrimitiveOrWrapper(final Class<?> cls) {
+    public static boolean isPrimitiveOrWrapperList(Type type) {
+        if (type instanceof ParameterizedType) {
+            // Lists must always be a generic type...
+            Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
+
+            if (typeArguments.length == 1) {
+                // a List<> has only one parameter...
+                Type typeArgument = typeArguments[0];
+                if (typeArgument instanceof Class<?>) {
+                    // if typeArgument is was not a Class<> it is not a primitve or wrapper...
+                    return isPrimitiveOrWrapper((Class<?>) typeArgument);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isPrimitiveOrWrapper(final Class<?> cls) {
         return cls.isPrimitive()
                 || cls == Integer.class
                 || cls == Boolean.class
@@ -232,34 +247,37 @@ public class PersistentBeanFactory {
         return fields;
     }
 
-    public Object toBeanIfNecessary(final Object obj) {
-        if (isTransformationNotNecessary(obj)) {
+    public Object toBeanIfNecessary(final Object obj, Type objType) {
+        if (isTransformationNotNecessary(obj, objType)) {
             return obj;
         }
 
-        return toBean(obj);
+        return toBean(obj, objType);
     }
 
-    private List<BeanFactoryExtension> findApplicableExtensions(final Class<?> cls) {
-        return beanFactoryExtensions.stream().filter(ext -> ext.isProcessable(cls)).collect(Collectors.toList());
+    private List<BeanFactoryExtension> findApplicableExtensions(final Type beanType) {
+        return beanFactoryExtensions.stream()
+                .filter(ext -> ext.isProcessable(beanType))
+                .collect(Collectors.toList());
     }
 
-    private boolean isTransformationNotNecessary(final Object obj) {
+    private boolean isTransformationNotNecessary(final Object obj, Type objType) {
 
         return obj == null || isPrimitiveOrWrapper(obj.getClass()) || (!isPrimitiveOrWrapperArray(obj.getClass()) && obj.getClass().isArray())
-                || findApplicableExtensions(obj.getClass()).stream().anyMatch(ext -> ext.skip(obj.getClass()));
+                || findApplicableExtensions(objType).stream().anyMatch(ext -> ext.skip(objType));
     }
 
     public List<Object> toBeanIfNecessary(final List<Object> objectList) {
         return objectList.stream()
-                .map(this::toBeanIfNecessary)
+                .map(obj -> toBeanIfNecessary(obj, obj.getClass()))
                 .collect(Collectors.toList());
     }
 
     public Object[] toBeanIfNecessary(final Object[] objects) {
+        Class<?> componentType = objects.getClass().getComponentType();
         final Object[] persistentBeans = new Object[objects.length];
         for (int i = 0; i < objects.length; ++i) {
-            persistentBeans[i] = toBeanIfNecessary(objects[i]);
+            persistentBeans[i] = toBeanIfNecessary(objects[i], componentType);
         }
         return persistentBeans;
     }

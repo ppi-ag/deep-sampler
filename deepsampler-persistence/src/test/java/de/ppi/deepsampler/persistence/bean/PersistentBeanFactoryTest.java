@@ -6,10 +6,10 @@
 package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.bean.ext.StandardBeanFactoryExtension;
-import de.ppi.deepsampler.persistence.model.Persistable;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -162,11 +162,11 @@ class PersistentBeanFactoryTest {
         testBean.def = "456";
 
         // WHEN
-        final List<PersistentBean> bean  = new PersistentBeanFactory().toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean, testBean.getClass());
 
         // THEN
-        assertEquals("123", bean.get(0).getValue("0$abc"));
-        assertEquals("456", bean.get(0).getValue("0$def"));
+        assertEquals("123", bean.getValue("0$abc"));
+        assertEquals("456", bean.getValue("0$def"));
     }
 
     @Test
@@ -178,7 +178,7 @@ class PersistentBeanFactoryTest {
         testBean.str = "ABC";
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean, testBean.getClass());
         SimpleTestBeanRec[] beanRec = new PersistentBeanFactory().ofBean(new PersistentBean[] {bean}, SimpleTestBeanRec.class);
 
         // THEN
@@ -195,7 +195,7 @@ class PersistentBeanFactoryTest {
         testBean.longArray = new long[] {21};
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean, testBean.getClass());
 
         // THEN
         assertEquals(2, bean.getValue("0$simpleInt"));
@@ -212,7 +212,7 @@ class PersistentBeanFactoryTest {
         testBean.setAbcSuperClass("SUPER");
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean);
+        final PersistentBean bean  = new PersistentBeanFactory().toBean(testBean, testBean.getClass());
 
         // THEN
         assertEquals("abc", bean.getValue("0$abc"));
@@ -232,8 +232,8 @@ class PersistentBeanFactoryTest {
         simpleTestBeanWithPrimitive.simpleInt = 3;
 
         // WHEN
-        PersistentBean bean = persistentBeanFactory.toBean(simpleTestBean);
-        PersistentBean beanWithPrim = persistentBeanFactory.toBean(simpleTestBeanWithPrimitive);
+        PersistentBean bean = persistentBeanFactory.toBean(simpleTestBean, simpleTestBean.getClass());
+        PersistentBean beanWithPrim = persistentBeanFactory.toBean(simpleTestBeanWithPrimitive, simpleTestBeanWithPrimitive.getClass());
 
         // THEN
         assertEquals(0, bean.getValues().size());
@@ -264,18 +264,18 @@ class PersistentBeanFactoryTest {
     private static class SimpleTestExtension extends StandardBeanFactoryExtension {
 
         @Override
-        public boolean isProcessable(Class<?> beanCls) {
-            return SimpleTestBean.class.isAssignableFrom(beanCls);
+        public boolean isProcessable(Type targetType) {
+            return SimpleTestBean.class.isAssignableFrom((Class<?>) targetType);
         }
 
         @Override
-        public DefaultPersistentBean toBean(Object bean) {
+        public DefaultPersistentBean toBean(Object targetBean, Type targetBeanType) {
             return new DefaultPersistentBean();
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T ofBean(PersistentBean bean, Class<T> cls) {
+        public <T> T ofBean(Object persistentBean, Type targetBeanType) {
             return (T) new SimpleTestBean();
         }
     }
@@ -306,7 +306,7 @@ class PersistentBeanFactoryTest {
         bean.collectionOfStrings = Arrays.asList("AB", "CD");
 
         // WHEN
-        PersistentBean persistentBean = new PersistentBeanFactory().toBean(bean);
+        PersistentBean persistentBean = new PersistentBeanFactory().toBean(bean, bean.getClass());
 
         // THEN
         assertNotNull(persistentBean.getValue("0$collectionOfStrings"));
@@ -317,7 +317,7 @@ class PersistentBeanFactoryTest {
         // GIVEN
         CharacterBean characterBean = new CharacterBean();
         characterBean.character = '2';
-        PersistentBean b = new PersistentBeanFactory().toBean(characterBean);
+        PersistentBean b = new PersistentBeanFactory().toBean(characterBean, characterBean.getClass());
 
         // WHEN
         CharacterBean[] result = new PersistentBeanFactory().ofBean(new PersistentBean[] {b}, CharacterBean.class);
