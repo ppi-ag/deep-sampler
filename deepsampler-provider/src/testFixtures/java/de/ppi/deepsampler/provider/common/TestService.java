@@ -8,7 +8,9 @@ package de.ppi.deepsampler.provider.common;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Service that will be instrumented to test the interceptors.
@@ -63,6 +65,10 @@ public class TestService {
      */
     public TestBeanWithoutEquals echoParameter(final TestBeanWithoutEquals someObjectWithoutEquals) {
         return someObjectWithoutEquals;
+    }
+
+    public AbstractTestBean getAbstractTestBean() {
+        return new TestBean(HARD_CODED_RETURN_VALUE);
     }
 
     /**
@@ -121,7 +127,7 @@ public class TestService {
     }
 
     public TestBean[] getArrayOfTestBeans() {
-        return new TestBean[]{new TestBean()};
+        return new TestBean[]{new TestBean(HARD_CODED_RETURN_VALUE)};
     }
 
     public TestInterface[] getArrayOfInterfaces() {
@@ -147,6 +153,28 @@ public class TestService {
 
     public List<String> getListOfStrings() {
         return Arrays.asList(HARD_CODED_RETURN_VALUE);
+    }
+
+    public Map<String, String> getMapOfStrings() {
+        Map<String, String> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, HARD_CODED_RETURN_VALUE);
+
+        return map;
+    }
+
+    public Map<String, TestBean> getMapOfStringsToTestBeans() {
+        Map<String, TestBean> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
+    }
+
+    public Map<TestBean, TestBean> getComplexMap() {
+        Map<TestBean, TestBean> map = new HashMap<>();
+
+        map.put(new TestBean(HARD_CODED_RETURN_VALUE), new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
     }
 
 }

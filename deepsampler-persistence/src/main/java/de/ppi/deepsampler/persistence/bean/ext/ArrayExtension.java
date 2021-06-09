@@ -2,6 +2,10 @@ package de.ppi.deepsampler.persistence.bean.ext;
 
 import de.ppi.deepsampler.persistence.bean.PersistentBeanFactory;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
+import de.ppi.deepsampler.persistence.model.PersistentBean;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
+import org.objenesis.instantiator.ObjectInstantiator;
 
 import java.lang.reflect.*;
 import java.util.Arrays;
@@ -40,16 +44,25 @@ public class ArrayExtension extends StandardBeanFactoryExtension {
     }
 
 
+    /**
+     * Converts the original object to the generic {@link de.ppi.deepsampler.persistence.model.PersistentBean} for persistence
+     * if necessary.
+     *
+     * @param targetBean
+     * @param targetBeanType
+     * @return
+     */
     @Override
     public Object toBean(Object targetBean, Type targetBeanType) {
         PersistentBeanFactory beanFactory = new PersistentBeanFactory();
-        Type componentType = ((Class<?>) targetBeanType).getComponentType();
+        Class<?> componentType = ((Class<?>) targetBeanType).getComponentType();
 
-        return Stream.of(targetBean)
+        return Stream.of((Object[]) targetBean)
                 .map(entry -> beanFactory.toBean(entry, componentType))
                 .collect(Collectors.toList())
-                .toArray();
+                .toArray(new PersistentBean[((Object[]) targetBean).length]);
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -57,10 +70,11 @@ public class ArrayExtension extends StandardBeanFactoryExtension {
         PersistentBeanFactory beanFactory = new PersistentBeanFactory();
 
         Class<?> arrayType = ((Class<?>) targetBeanType).getComponentType();
+        Object[] array = (Object[]) Array.newInstance(arrayType, ((Object[]) persistentBean).length);
 
-        return (T) ((List<Object>) persistentBean).stream()
+        return (T) Stream.of((Object[]) persistentBean)
                 .map(o -> beanFactory.convertValueFromPersistentBeanIfNecessary(o, arrayType))
                 .collect(Collectors.toList())
-                .toArray();
+                .toArray(array);
     }
 }

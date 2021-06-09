@@ -10,6 +10,7 @@ import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -326,10 +327,43 @@ class PersistentBeanFactoryTest {
         assertEquals(characterBean.character, result[0].character);
     }
 
+    @Test
+    void createValueFromPersistentBeanArray() {
+        PersistentBeanFactory factory = new PersistentBeanFactory();
+
+        PersistentBean bean = new DefaultPersistentBean();
+        bean.setValues(Collections.emptyMap());
+
+        PersistentBean[] persistentBeanArray = new PersistentBean[1];
+        persistentBeanArray[0] = bean;
+
+        assertDoesNotThrow(() -> factory.createValueFromPersistentBean(persistentBeanArray, SimpleTestBean[].class));
+    }
+
+
+
+    @Test
+    void testTimestampSql() {
+        // GIVEN
+        Timestamp ts =  new Timestamp(1L);
+        final TimestampBean timestampBean = new TimestampBean();
+        timestampBean.timestamp = ts;
+
+        // WHEN
+        PersistentBean persistentBean = new PersistentBeanFactory().toBean(timestampBean, timestampBean.getClass());
+
+        // THEN
+        assertEquals(ts, persistentBean.getValue("0$timestamp"));
+    }
+
+    private static class TimestampBean {
+        Timestamp timestamp;
+    }
 
     private static class CollectionBean {
         Collection<String> collectionOfStrings;
     }
+
 
     private static class ImmutableSimpleTestBean {
         private final String abc;

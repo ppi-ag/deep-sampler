@@ -692,6 +692,8 @@ public abstract class SamplerAspectTest {
 
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertEquals(1, getTestService().getArrayOfTestBeans().length);
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getArrayOfTestBeans()[0].getValue());
+
 
         Files.delete(Paths.get(pathToFile));
     }
@@ -722,6 +724,63 @@ public abstract class SamplerAspectTest {
         Files.delete(Paths.get(pathToFile));
     }
 
+    @Test
+    public void mapOfStringsReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getMapOfStrings());
+
+        getTestService().getMapOfStrings();
+        final String pathToFile = "./record/mapOfStringsReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getMapOfStrings());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getMapOfStrings().size());
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getMapOfStrings().get(TestService.HARD_CODED_RETURN_VALUE));
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void mapOfStringsToTestBeansReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getMapOfStringsToTestBeans());
+
+        getTestService().getMapOfStringsToTestBeans();
+        final String pathToFile = "./record/mapOfStringsToTestBeansReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getMapOfStringsToTestBeans());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getMapOfStringsToTestBeans().size());
+        assertNotNull(getTestService().getMapOfStringsToTestBeans().get(TestService.HARD_CODED_RETURN_VALUE));
+
+        TestBean loadedTestBean = getTestService().getMapOfStringsToTestBeans().get(TestService.HARD_CODED_RETURN_VALUE);
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, loadedTestBean.getValue());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+
+
 
 
     @Test
@@ -745,6 +804,7 @@ public abstract class SamplerAspectTest {
                 source::load);
 
         assertTrue(SampleRepository.getInstance().isEmpty());
+
         Files.delete(Paths.get(pathToFile));
     }
 

@@ -60,7 +60,11 @@ public interface BeanFactoryExtension {
     boolean isProcessable(Type beanType);
 
     /**
-     * Skip the conversion of all target beans of the given type.
+     * Skip the conversion of all target beans of the given type to the generic data-structure
+     * {@link PersistentBean}.
+     *
+     * skip() is used only while recording, not while loading data, so {@link BeanFactoryExtension#ofBean(Object, Type)}
+     * is never skpped.
      *
      * @param beanType the type you might want to skip
      * @return true if the class should get skipped

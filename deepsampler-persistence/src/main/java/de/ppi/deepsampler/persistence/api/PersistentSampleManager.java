@@ -139,7 +139,7 @@ public class PersistentSampleManager {
         sample.setParameterMatchers(parameterMatchers);
         sample.setParameterValues(parameterValues);
 
-        final Object returnValue = unwrapValue(returnType, returnValueEnvelope);
+            final Object returnValue = unwrapValue(returnType, returnValueEnvelope);
         sample.setAnswer(invocation -> returnValue);
 
         return sample;

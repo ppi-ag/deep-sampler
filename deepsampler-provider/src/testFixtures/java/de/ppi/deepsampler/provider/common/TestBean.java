@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * A very simple Bean that represents non primitive types in TestCases.
  */
-public class TestBean {
+public class TestBean extends AbstractTestBean {
 
     private String value;
 

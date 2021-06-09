@@ -9,7 +9,7 @@ import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
 import de.ppi.deepsampler.persistence.bean.PersistentBeanFactory;
 
 public class PersistentSamplerContext {
-    private final PersistentBeanFactory persistentBeanFactory = SamplerBeanFactory.create();
+    private final PersistentBeanFactory persistentBeanFactory = new PersistentBeanFactory();
 
     public void addBeanFactoryExtension(BeanFactoryExtension beanFactoryExtension) {
         persistentBeanFactory.addExtension(beanFactoryExtension);
