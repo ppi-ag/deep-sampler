@@ -114,4 +114,11 @@ public class TestService {
         this.counter = counter;
     }
 
+    public String[] getArrayOfStrings() {
+        return new String[]{HARD_CODED_RETURN_VALUE};
+    }
+
+    public TestBean[] getArrayOfTestBeans() {
+        return new TestBean[]{new TestBean(HARD_CODED_RETURN_VALUE)};
+    }
 }

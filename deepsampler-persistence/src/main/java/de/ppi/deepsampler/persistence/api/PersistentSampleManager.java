@@ -158,7 +158,7 @@ public class PersistentSampleManager {
     }
 
     private Object unwrapValue(final Class<?> type, final Object persistentBean) {
-        return persistentSamplerContext.getPersistentBeanFactory().convertValueFromPersistentBeanIfNecessary(persistentBean, type);
+        return persistentSamplerContext.getPersistentBeanFactory().toOriginalBean(persistentBean, type);
     }
 
     @SuppressWarnings("unchecked")
