@@ -121,6 +121,8 @@ public class PersistentBeanFactory {
         if (lookedUpValueInBean != null) {
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
                 lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
+            } else if (lookedUpValueInBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(lookedUpValueInBean.getClass().getComponentType())) {
+                lookedUpValueInBean = ofBean((PersistentBean[]) lookedUpValueInBean, field.getType().getComponentType());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -252,9 +254,12 @@ public class PersistentBeanFactory {
     }
 
     public Object[] toBeanIfNecessary(final Object[] objects) {
-        final Object[] persistentBeans = new Object[objects.length];
+        if (isTransformationNotNecessary(objects)) {
+            return objects;
+        }
+        final PersistentBean[] persistentBeans = new PersistentBean[objects.length];
         for (int i = 0; i < objects.length; ++i) {
-            persistentBeans[i] = toBeanIfNecessary(objects[i]);
+            persistentBeans[i] = (PersistentBean) toBeanIfNecessary(objects[i]);
         }
         return persistentBeans;
     }
