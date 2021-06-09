@@ -30,7 +30,7 @@ class ScopeTest {
 
 
         //GIVEN
-        SampleRepository.setScope(new SingletonScope());
+        SampleRepository.setScope(new SingletonScope<>());
 
         //WHEN
         ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -63,7 +63,7 @@ class ScopeTest {
         assertNumberOfSamplers(0);
 
         //GIVEN
-        SampleRepository.setScope(new ThreadScope());
+        SampleRepository.setScope(new ThreadScope<>());
         List<String> threadLog = new ArrayList<>();
 
         //WHEN
@@ -110,7 +110,7 @@ class ScopeTest {
     @Test
     void singletonScopeIsCleanedUp() {
         // GIVEN
-        SampleRepository.setScope(new SingletonScope());
+        SampleRepository.setScope(new SingletonScope<>());
 
         TestService sampler = Sampler.prepare(TestService.class);
         Sample.of(sampler.first()).is("The first will be the last");
@@ -118,7 +118,7 @@ class ScopeTest {
         assertNumberOfSamplers(1);
 
         // WHEN
-        SampleRepository.setScope(new ThreadScope());
+        SampleRepository.setScope(new ThreadScope<>());
 
         // THEN
         assertNumberOfSamplers(0);
@@ -127,7 +127,7 @@ class ScopeTest {
     @Test
     void threadScopeIsCleanedUp() {
         // GIVEN
-        SampleRepository.setScope(new ThreadScope());
+        SampleRepository.setScope(new ThreadScope<>());
 
         TestService sampler = Sampler.prepare(TestService.class);
         Sample.of(sampler.first()).is("The first will be the last");
@@ -135,7 +135,7 @@ class ScopeTest {
         assertNumberOfSamplers(1);
 
         // WHEN
-        SampleRepository.setScope(new SingletonScope());
+        SampleRepository.setScope(new SingletonScope<>());
 
         // THEN
         assertNumberOfSamplers(0);

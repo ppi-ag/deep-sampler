@@ -7,6 +7,7 @@ package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.bean.ext.StandardBeanFactoryExtension;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -323,6 +324,24 @@ class PersistentBeanFactoryTest {
 
         // THEN
         assertEquals(cs.character, result[0].character);
+    }
+
+    @Test
+    void createWithObjectArray() {
+        TestBeanWithBeanArray testBeanRef = new TestBeanWithBeanArray();
+        SimpleTestBean[] containingBeans = new SimpleTestBean[1];
+        containingBeans[0] = new SimpleTestBean();
+        testBeanRef.testBean = containingBeans;
+
+        PersistentBeanFactory factory = new PersistentBeanFactory();
+        PersistentBean bean = factory.toBean(testBeanRef);
+
+        Assertions.assertDoesNotThrow(() -> factory.createValueFromPersistentBean(bean, TestBeanWithBeanArray.class));
+    }
+
+    private static class TestBeanWithBeanArray {
+        protected int simpleInt;
+        protected SimpleTestBean[] testBean;
     }
 
     private static class CollectionBean {
