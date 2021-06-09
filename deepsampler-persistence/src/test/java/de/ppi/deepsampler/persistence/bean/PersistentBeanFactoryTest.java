@@ -328,15 +328,15 @@ class PersistentBeanFactoryTest {
     @Test
     void createWithObjectContainerThatContainsAnArray() {
         // GIVEN
-        TestBeanWithBeanArray testBeanRef = new TestBeanWithBeanArray();
+        TestBeanWithBeanArray testBeanContainer = new TestBeanWithBeanArray();
         SimpleTestBean[] testBeanArray = new SimpleTestBean[1];
         testBeanArray[0] = new SimpleTestBean();
         testBeanArray[0].abc = "make it so";
-        testBeanRef.testBeanArray = testBeanArray;
+        testBeanContainer.testBeanArray = testBeanArray;
 
         // FROM
         PersistentBeanFactory factory = new PersistentBeanFactory();
-        PersistentBean bean = factory.toPersistentBean(testBeanRef);
+        PersistentBean bean = factory.toPersistentBean(testBeanContainer);
 
         // TO
         TestBeanWithBeanArray resultBeanRef = factory.toOriginalBean(bean, TestBeanWithBeanArray.class);
@@ -358,13 +358,10 @@ class PersistentBeanFactoryTest {
 
         // FROM
         PersistentBeanFactory factory = new PersistentBeanFactory();
-        PersistentBean bean = factory.toPersistentBean(testBeanArray[0]);
-
-        PersistentBean[] array = new PersistentBean[1];
-        array[0] = bean;
+        PersistentBean[] persistentBean = factory.toPersistentBean(testBeanArray);
 
         // TO
-        SimpleTestBean[] resultBean = factory.toOriginalBean(array, SimpleTestBean[].class);
+        SimpleTestBean[] resultBean = factory.toOriginalBean(persistentBean, SimpleTestBean[].class);
 
         // THEN
         assertNotNull(resultBean);
