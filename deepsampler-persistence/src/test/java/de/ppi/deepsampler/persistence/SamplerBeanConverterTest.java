@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SamplerBeanFactoryTest {
+class SamplerBeanConverterTest {
 
     @Test
     void testImmutableCollectionBean() {
@@ -23,7 +23,7 @@ class SamplerBeanFactoryTest {
         bean.collectionOfStrings = Collections.unmodifiableList(listOfStrings);
 
         // WHEN
-        PersistentBean persistentBean = SamplerBeanFactory.create().toBean(bean);
+        PersistentBean persistentBean = SamplerBeanConverter.create().convert(bean);
 
         // THEN
         assertEquals(bean.collectionOfStrings, persistentBean.getValue("0$collectionOfStrings"));
@@ -37,7 +37,7 @@ class SamplerBeanFactoryTest {
         timestampBean.timestamp = ts;
 
         // WHEN
-        PersistentBean persistentBean = SamplerBeanFactory.create().toBean(timestampBean);
+        PersistentBean persistentBean = SamplerBeanConverter.create().convert(timestampBean);
 
         // THEN
         assertEquals(ts, persistentBean.getValue("0$timestamp"));

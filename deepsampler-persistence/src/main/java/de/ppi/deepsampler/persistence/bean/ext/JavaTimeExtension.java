@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class JavaTimeExtension extends StandardBeanFactoryExtension {
+public class JavaTimeExtension extends StandardBeanConverterExtension {
 
     @Override
     public boolean isProcessable(Class<?> beanCls) {

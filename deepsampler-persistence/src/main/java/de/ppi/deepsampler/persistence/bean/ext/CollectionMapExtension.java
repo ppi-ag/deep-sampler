@@ -3,7 +3,7 @@ package de.ppi.deepsampler.persistence.bean.ext;
 import java.util.Collection;
 import java.util.Map;
 
-public class CollectionMapExtension extends StandardBeanFactoryExtension {
+public class CollectionMapExtension extends StandardBeanConverterExtension {
 
     @Override
     public boolean isProcessable(Class<?> beanCls) {
