@@ -6,11 +6,12 @@
 package de.ppi.deepsampler.persistence.bean.ext;
 
 
+import de.ppi.deepsampler.persistence.bean.PersistentBeanConverter;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 
 /**
  * <p>
- * Interface for extensions of the {@link de.ppi.deepsampler.persistence.bean.PersistentBeanFactory}.
+ * Interface for extensions of the {@link PersistentBeanConverter}.
  * The PersistentBeanFactory is responsible for creating a generic data-structure for
  * java beans. Also it will convert back this data-structures to the original objects.
  * The reason for this is to omit the type information when serializing objects.
@@ -20,9 +21,9 @@ import de.ppi.deepsampler.persistence.model.PersistentBean;
  *
  * <p>
  * As this is a highly generic and complicated process deepsampler offers extensions
- * for this BeanFactory the {@link BeanFactoryExtension}. To add an extension you have
+ * for this BeanFactory the {@link BeanConverterExtension}. To add an extension you have
  * to specifiy it when recording/loading samples with {@link de.ppi.deepsampler.persistence.api.PersistentSampler}
- * ({@link de.ppi.deepsampler.persistence.api.PersistentSampleManager#addBeanExtension(BeanFactoryExtension)}.
+ * ({@link de.ppi.deepsampler.persistence.api.PersistentSampleManager#addBeanExtension(BeanConverterExtension)}.
  * </p>
  * <br>
  * <p>
@@ -37,7 +38,7 @@ import de.ppi.deepsampler.persistence.model.PersistentBean;
  * <p>
  * After this every bean with the specified type will be processed within the extension. Now
  * you can implement custom conversion logic yourBean -> generic data-structure (
- * {@link #toBean(Object)} and generic data-structure -> yourBean ({@link #ofBean(PersistentBean, Class)}).
+ * {@link #convert(Object)} and generic data-structure -> yourBean ({@link #revert(PersistentBean, Class)}).
  * </p>
  * <p>
  * Besides this you can also make the BeanFactory skip the processing of all types for which
@@ -45,7 +46,7 @@ import de.ppi.deepsampler.persistence.model.PersistentBean;
  * some types from being processed by the factory.
  * </p>
  */
-public interface BeanFactoryExtension {
+public interface BeanConverterExtension {
 
     /**
      * Describe the target types you want to process withing this extension.
@@ -65,19 +66,22 @@ public interface BeanFactoryExtension {
 
     /**
      * Conversion logic for the type you defined to process and not to skip.
+     * Converts an original bean to the {@link PersistentBean} which will be sent to the persistence api.
      *
      * @param bean the bean
      * @return the generic data-structure for the bean
      */
-    PersistentBean toBean(Object bean);
+    PersistentBean convert(Object bean);
 
     /**
      * Conversion logic for the generic data-structure to the processed bean type.
+     * Reverts to the original Bean by converting the {@link PersistentBean}, which was deserialized by the underlying
+     * persitence api , to the original object.
      *
      * @param bean the generic bean
      * @param target the target class
      * @param <T> type of the original bean
      * @return original bean
      */
-    <T> T ofBean(PersistentBean bean, Class<T> target);
+    <T> T revert(PersistentBean bean, Class<T> target);
 }

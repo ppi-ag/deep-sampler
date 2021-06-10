@@ -5,7 +5,7 @@
 
 package de.ppi.deepsampler.persistence.bean;
 
-import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
+import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.objenesis.Objenesis;
@@ -25,17 +25,17 @@ import java.util.stream.Collectors;
  * if classes are renamed during refactorings.
  *
  */
-public class PersistentBeanFactory {
+public class PersistentBeanConverter {
 
-    private final List<BeanFactoryExtension> beanFactoryExtensions = new ArrayList<>();
+    private final List<BeanConverterExtension> beanConverterExtensions = new ArrayList<>();
 
-    public void addExtension(final BeanFactoryExtension extension) {
-        beanFactoryExtensions.add(extension);
+    public void addExtension(final BeanConverterExtension extension) {
+        beanConverterExtensions.add(extension);
     }
 
 
     /**
-     * Converts an abstract model from the persistence to the original bean.
+     * Reverts an abstract model from the persistence to the original bean.
      *
      * @param persistentBean an object that has been deserialized from a persistence api (e.g. some JSON-API). This object
      *                       might already be the original bean it the persistence api was able to deserialize it. Otherwise
@@ -45,66 +45,66 @@ public class PersistentBeanFactory {
      * @return the original deserialized bean.
      */
     @SuppressWarnings("unchecked")
-    public <T> T toOriginalBean(final Object persistentBean, final Class<T> type) {
+    public <T> T revert(final Object persistentBean, final Class<T> type) {
         if (persistentBean == null) {
             return null;
         }
 
         if (persistentBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(persistentBean.getClass().getComponentType())) {
-            return (T) toOriginalBeanArray((PersistentBean[]) persistentBean, type.getComponentType());
+            return (T) revertPersistentBeanArray((PersistentBean[]) persistentBean, type.getComponentType());
         }
 
         if (persistentBean instanceof PersistentBean) {
-            return createValueFromPersistentBean((PersistentBean) persistentBean, type);
+            return revertPersistentBean((PersistentBean) persistentBean, type);
         }
 
         return (T) persistentBean;
     }
 
     /**
-     * Converts an original bean to the asbtract model (most likely {@link PersistentBean} that is used to save the original bean to e.g. JSON.
-     * @param originalBean The original Bean is is supposed to be persisted.
+     * Converts an original bean to the abstract model (most likely {@link PersistentBean} that is used to save the original bean to e.g. JSON.
+     * @param originalBean The original Bean that is supposed to be persisted.
      * @param <T> The type of the persistent bean.
      * @return The object that will be sent to the underlying persistence api. This might be a {@link PersistentBean} or the original bean if
      * the persistence api is expected to be able to serialize the original bean directly.
      */
     @SuppressWarnings("unchecked")
-    public <T> T toPersistentBean(final Object originalBean) {
+    public <T> T convert(final Object originalBean) {
         if (isTransformationNotNecessary(originalBean)) {
             return (T) originalBean;
         }
 
         if (List.class.isAssignableFrom(originalBean.getClass())) {
-            return (T) toBeanList((List<Object>) originalBean);
+            return (T) convertList((List<Object>) originalBean);
         }
 
         if (originalBean.getClass().isArray()) {
-            return (T) toBeanArray((Object[]) originalBean);
+            return (T) convertArray((Object[]) originalBean);
         }
 
-        final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass());
+        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass());
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
-            return (T) applicableExtensions.get(0).toBean(originalBean);
+            return (T) applicableExtensions.get(0).convert(originalBean);
         }
 
-        return (T) toBean(originalBean);
+        return (T) convertToPersistentBean(originalBean);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T[] toOriginalBeanArray(final PersistentBean[] persistentBean, final Class<T> cls) {
+    private <T> T[] revertPersistentBeanArray(final PersistentBean[] persistentBean, final Class<T> cls) {
         final T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
         for (int i = 0; i < persistentBean.length; ++i) {
-            instances[i] = createValueFromPersistentBean(persistentBean[i], cls);
+            instances[i] = revertPersistentBean(persistentBean[i], cls);
         }
         return instances;
     }
 
-    private <T> T createValueFromPersistentBean(final PersistentBean value, final Class<T> type) {
-        final List<BeanFactoryExtension> applicableExtensions = findApplicableExtensions(type);
+    private <T> T revertPersistentBean(final PersistentBean value, final Class<T> type) {
+        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(type);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
-            return applicableExtensions.get(0).ofBean(value, type);
+            return applicableExtensions.get(0).revert(value, type);
         }
 
         final T instance;
@@ -159,7 +159,7 @@ public class PersistentBeanFactory {
 
             Object lookedUpValueInBean = persistentBean.getValue(key);
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
+                lookedUpValueInBean = revertPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
             }
             values.add(lookedUpValueInBean);
         }
@@ -176,9 +176,9 @@ public class PersistentBeanFactory {
         Object lookedUpValueInBean = persistentBean.getValue(key);
         if (lookedUpValueInBean != null) {
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
-                lookedUpValueInBean = createValueFromPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
+                lookedUpValueInBean = revertPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
             } else if (lookedUpValueInBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(lookedUpValueInBean.getClass().getComponentType())) {
-                lookedUpValueInBean = toOriginalBeanArray((PersistentBean[]) lookedUpValueInBean, field.getType().getComponentType());
+                lookedUpValueInBean = revertPersistentBeanArray((PersistentBean[]) lookedUpValueInBean, field.getType().getComponentType());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -192,21 +192,21 @@ public class PersistentBeanFactory {
 
 
 
-    private Object[] toBeanArray(final Object[] objects) {
+    private Object[] convertArray(final Object[] objects) {
         final PersistentBean[] persistentBeans = new PersistentBean[objects.length];
         for (int i = 0; i < objects.length; ++i) {
-            persistentBeans[i] = toPersistentBean(objects[i]);
+            persistentBeans[i] = convert(objects[i]);
         }
         return persistentBeans;
     }
 
-    public List<Object> toBeanList(final List<Object> objectList) {
+    public List<Object> convertList(final List<Object> objectList) {
         return objectList.stream()
-                .map(this::toPersistentBean)
+                .map(this::convert)
                 .collect(Collectors.toList());
     }
 
-    private PersistentBean toBean(final Object obj) {
+    private PersistentBean convertToPersistentBean(final Object obj) {
         final Map<Field, String> fieldStringMap = getAllFields(obj.getClass());
 
         final Map<String, Object> valuesForBean = new HashMap<>();
@@ -216,7 +216,7 @@ public class PersistentBeanFactory {
             Object fieldValue = retrieveValue(obj, field);
 
             if (fieldValue != null) {
-                fieldValue = toPersistentBean(fieldValue);
+                fieldValue = convert(fieldValue);
             }
 
             valuesForBean.put(keyForField, fieldValue);
@@ -298,8 +298,8 @@ public class PersistentBeanFactory {
 
 
 
-    private List<BeanFactoryExtension> findApplicableExtensions(final Class<?> cls) {
-        return beanFactoryExtensions.stream().filter(ext -> ext.isProcessable(cls)).collect(Collectors.toList());
+    private List<BeanConverterExtension> findApplicableExtensions(final Class<?> cls) {
+        return beanConverterExtensions.stream().filter(ext -> ext.isProcessable(cls)).collect(Collectors.toList());
     }
 
     private boolean isTransformationNotNecessary(final Object obj) {

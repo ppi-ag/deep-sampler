@@ -9,7 +9,7 @@ import de.ppi.deepsampler.core.api.Matchers;
 import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
-import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
+import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.model.PersistentActualSample;
 import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
@@ -45,13 +45,13 @@ public class PersistentSampleManager {
     }
 
     /**
-     * Add a {@link BeanFactoryExtension} to the sample manager.
+     * Add a {@link BeanConverterExtension} to the sample manager.
      *
-     * @param beanFactoryExtension {@link BeanFactoryExtension}
+     * @param beanConverterExtension {@link BeanConverterExtension}
      * @return this
      */
-    public PersistentSampleManager addBeanExtension(final BeanFactoryExtension beanFactoryExtension) {
-        persistentSamplerContext.addBeanFactoryExtension(beanFactoryExtension);
+    public PersistentSampleManager addBeanExtension(final BeanConverterExtension beanConverterExtension) {
+        persistentSamplerContext.addBeanConverterExtension(beanConverterExtension);
         return this;
     }
 
@@ -158,7 +158,7 @@ public class PersistentSampleManager {
     }
 
     private Object unwrapValue(final Class<?> type, final Object persistentBean) {
-        return persistentSamplerContext.getPersistentBeanFactory().toOriginalBean(persistentBean, type);
+        return persistentSamplerContext.getPersistentBeanConverter().revert(persistentBean, type);
     }
 
     @SuppressWarnings("unchecked")

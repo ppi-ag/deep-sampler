@@ -13,7 +13,7 @@ class CollectionMapExtensionTest {
     @Test
     void testArrayListProcessableAndSkipped() {
         // GIVEN
-        BeanFactoryExtension extension = new CollectionMapExtension();
+        BeanConverterExtension extension = new CollectionMapExtension();
         final Class<ArrayList> beanCls = ArrayList.class;
 
         // WHEN
@@ -28,7 +28,7 @@ class CollectionMapExtensionTest {
     @Test
     void testHashSetProcessableAndSkipped() {
         // GIVEN
-        BeanFactoryExtension extension = new CollectionMapExtension();
+        BeanConverterExtension extension = new CollectionMapExtension();
         final Class<HashSet> beanCls = HashSet.class;
 
         // WHEN
@@ -43,7 +43,7 @@ class CollectionMapExtensionTest {
     @Test
     void testStringProcessableAndSkipped() {
         // GIVEN
-        BeanFactoryExtension extension = new CollectionMapExtension();
+        BeanConverterExtension extension = new CollectionMapExtension();
         final Class<String> beanCls = String.class;
 
         // WHEN
@@ -58,7 +58,7 @@ class CollectionMapExtensionTest {
     @Test
     void testMapProcessableAndSkipped() {
         // GIVEN
-        BeanFactoryExtension extension = new CollectionMapExtension();
+        BeanConverterExtension extension = new CollectionMapExtension();
         final Class<HashMap> beanCls = HashMap.class;
 
         // WHEN
