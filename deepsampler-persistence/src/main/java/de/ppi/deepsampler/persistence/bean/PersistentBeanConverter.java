@@ -12,10 +12,7 @@ import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +20,10 @@ import java.util.stream.Collectors;
  * DeepSampler saves Beans by converting them in an abstract model that enables DeepSampler to omit type information in persistent files.
  * This approach makes persistent beans less vulnerable to refactorings. E.g. it is not necessary to rename classes in persistent Sample-files
  * if classes are renamed during refactorings.
+ *
+ * The concrete serialization / Deserialization is done by an underlying persistence api. PersistentBeanConverter is only responsible to
+ * to create an intermediate data structures for cases where the persistence api is not capable to serialize / deserialize the original
+ * data on its own.
  *
  */
 public class PersistentBeanConverter {
@@ -45,13 +46,20 @@ public class PersistentBeanConverter {
      * @return the original deserialized bean.
      */
     @SuppressWarnings("unchecked")
-    public <T> T revert(final Object persistentBean, final Class<T> type) {
+    public <T> T revert(final Object persistentBean, final Type type) {
         if (persistentBean == null) {
             return null;
         }
 
         if (persistentBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(persistentBean.getClass().getComponentType())) {
-            return (T) revertPersistentBeanArray((PersistentBean[]) persistentBean, type.getComponentType());
+            final Class<T> componentType =  (Class<T>) ReflectionTools.getClass(type).getComponentType();
+            return (T) revertPersistentBeanArray((PersistentBean[]) persistentBean, componentType);
+        }
+
+        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(type);
+        if (!applicableExtensions.isEmpty()) {
+            // Only use the first one!
+            return applicableExtensions.get(0).revert(persistentBean, type, this);
         }
 
         if (persistentBean instanceof PersistentBean) {
@@ -74,10 +82,6 @@ public class PersistentBeanConverter {
             return (T) originalBean;
         }
 
-        if (List.class.isAssignableFrom(originalBean.getClass())) {
-            return (T) convertList((List<Object>) originalBean);
-        }
-
         if (originalBean.getClass().isArray()) {
             return (T) convertArray((Object[]) originalBean);
         }
@@ -85,7 +89,7 @@ public class PersistentBeanConverter {
         final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass());
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
-            return (T) applicableExtensions.get(0).convert(originalBean);
+            return (T) applicableExtensions.get(0).convert(originalBean, this);
         }
 
         return (T) convertToPersistentBean(originalBean);
@@ -100,20 +104,15 @@ public class PersistentBeanConverter {
         return instances;
     }
 
-    private <T> T revertPersistentBean(final PersistentBean value, final Class<T> type) {
-        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(type);
-        if (!applicableExtensions.isEmpty()) {
-            // Only use the first one!
-            return applicableExtensions.get(0).revert(value, type);
-        }
-
+    private <T> T revertPersistentBean(final PersistentBean value, final Type type) {
         final T instance;
-        final Map<Field, String> fields = getAllFields(type);
+        final Class<T> rawClass = ReflectionTools.getClass(type);
+        final Map<Field, String> fields = getAllFields(rawClass);
 
         if (hasFinalFields(fields)) {
-            instance = instantiateUsingMatchingConstructor(type, value, fields);
+            instance = instantiateUsingMatchingConstructor(rawClass, value, fields);
         } else {
-            instance = instantiate(type);
+            instance = instantiate(rawClass);
 
             for (final Map.Entry<Field, String> entry : fields.entrySet()) {
                 final Field field = entry.getKey();
@@ -200,11 +199,6 @@ public class PersistentBeanConverter {
         return persistentBeans;
     }
 
-    public List<Object> convertList(final List<Object> objectList) {
-        return objectList.stream()
-                .map(this::convert)
-                .collect(Collectors.toList());
-    }
 
     private PersistentBean convertToPersistentBean(final Object obj) {
         final Map<Field, String> fieldStringMap = getAllFields(obj.getClass());
@@ -247,38 +241,7 @@ public class PersistentBeanConverter {
         return fieldValue;
     }
 
-    private boolean isObjectArray(final Class<?> cls) {
-        return cls.isArray() && !(cls == int[].class
-                || cls == Integer[].class
-                || cls == boolean[].class
-                || cls == Boolean[].class
-                || cls == byte[].class
-                || cls == Byte[].class
-                || cls == short[].class
-                || cls == Short[].class
-                || cls == long[].class
-                || cls == Long[].class
-                || cls == char[].class
-                || cls == String[].class
-                || cls == Character[].class
-                || cls == Float[].class
-                || cls == float[].class
-                || cls == Double[].class
-                || cls == double[].class);
-    }
 
-    private boolean isPrimitive(final Class<?> cls) {
-        return cls.isPrimitive()
-                || cls == Integer.class
-                || cls == Boolean.class
-                || cls == Byte.class
-                || cls == Short.class
-                || cls == Long.class
-                || cls == String.class
-                || cls == Character.class
-                || cls == Float.class
-                || cls == Double.class;
-    }
 
     private Map<Field, String> getAllFields(final Class<?> cls) {
         final Map<Field, String> fields = new LinkedHashMap<>();
@@ -298,13 +261,13 @@ public class PersistentBeanConverter {
 
 
 
-    private List<BeanConverterExtension> findApplicableExtensions(final Class<?> cls) {
-        return beanConverterExtensions.stream().filter(ext -> ext.isProcessable(cls)).collect(Collectors.toList());
+    private List<BeanConverterExtension> findApplicableExtensions(final Type type) {
+        return beanConverterExtensions.stream().filter(ext -> ext.isProcessable(type)).collect(Collectors.toList());
     }
 
     private boolean isTransformationNotNecessary(final Object obj) {
 
-        return obj == null || isPrimitive(obj.getClass()) || (!isObjectArray(obj.getClass()) && obj.getClass().isArray())
+        return obj == null || ReflectionTools.isPrimitiveOrWrapper(obj.getClass()) || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
                 || findApplicableExtensions(obj.getClass()).stream().anyMatch(ext -> ext.skip(obj.getClass()));
     }
 

@@ -579,6 +579,57 @@ public abstract class SamplerAspectTest {
     }
 
     @Test
+    public void listOfTestBeansReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getListOfTestBeans());
+
+        getTestService().getListOfTestBeans();
+        final String pathToFile = "./record/listOfTestBeansReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getListOfTestBeans());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getListOfTestBeans().size());
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getListOfTestBeans().get(0).getValue());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void listOfStringsReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getListOfStrings());
+
+        getTestService().getListOfStrings();
+        final String pathToFile = "./record/listOfStringsReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getListOfStrings());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getListOfStrings().size());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
     public void arrayOfTestBeansReturnValueCanBeRecordedAndLoaded() throws IOException {
         Sampler.clear();
 

@@ -5,23 +5,25 @@
 
 package de.ppi.deepsampler.persistence.bean.ext;
 
-import de.ppi.deepsampler.persistence.model.PersistentBean;
 import de.ppi.deepsampler.persistence.bean.PersistentBeanConverter;
+
+import java.lang.reflect.Type;
 
 public abstract class StandardBeanConverterExtension implements BeanConverterExtension {
 
+
     @Override
-    public boolean skip(Class<?> beanCls) {
+    public boolean skip(Type beanType) {
         return false;
     }
 
     @Override
-    public PersistentBean convert(Object bean) {
-        return new PersistentBeanConverter().convert(bean);
+    public Object convert(Object originalBean, PersistentBeanConverter persistentBeanConverter) {
+        return originalBean;
     }
 
     @Override
-    public <T> T revert(PersistentBean bean, Class<T> cls) {
-        return new PersistentBeanConverter().revert(bean, cls);
+    public <T> T revert(Object persistentBean, Type type, PersistentBeanConverter persistentBeanConverter) {
+        return (T) persistentBean;
     }
 }

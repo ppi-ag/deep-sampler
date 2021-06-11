@@ -5,6 +5,9 @@
 
 package de.ppi.deepsampler.persistence.bean.ext;
 
+import de.ppi.deepsampler.persistence.bean.ReflectionTools;
+
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -12,13 +15,14 @@ import java.util.Date;
 public class JavaTimeExtension extends StandardBeanConverterExtension {
 
     @Override
-    public boolean isProcessable(Class<?> beanCls) {
-        return LocalDateTime.class.isAssignableFrom(beanCls) || LocalDate.class.isAssignableFrom(beanCls)
-                || Date.class.isAssignableFrom(beanCls);
+    public boolean isProcessable(Type beanType) {
+        Class<?> rawClass = ReflectionTools.getClass(beanType);
+        return LocalDateTime.class.isAssignableFrom(rawClass) || LocalDate.class.isAssignableFrom(rawClass)
+                || Date.class.isAssignableFrom(rawClass);
     }
 
     @Override
-    public boolean skip(Class<?> beanCls) {
+    public boolean skip(Type beanType) {
         return true;
     }
 }

@@ -9,6 +9,7 @@ import de.ppi.deepsampler.persistence.bean.ext.StandardBeanConverterExtension;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -263,18 +264,18 @@ class PersistentBeanConverterTest {
     private static class SimpleTestExtension extends StandardBeanConverterExtension {
 
         @Override
-        public boolean isProcessable(Class<?> beanCls) {
-            return SimpleTestBean.class.isAssignableFrom(beanCls);
+        public boolean isProcessable(Type beanType) {
+            return SimpleTestBean.class.isAssignableFrom(ReflectionTools.getClass(beanType));
         }
 
         @Override
-        public PersistentBean convert(Object bean) {
+        public PersistentBean convert(Object originalBean, PersistentBeanConverter persistentBeanConverter) {
             return new DefaultPersistentBean();
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T revert(PersistentBean bean, Class<T> cls) {
+        public <T> T revert(Object bean, Type type, PersistentBeanConverter persistentBeanConverter) {
             return (T) new SimpleTestBean();
         }
     }
