@@ -8,8 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * A {@link BeanConverterExtension} that is able to convert {@link Collection}s from the original objects to the generic persistent
@@ -17,6 +16,10 @@ import java.util.stream.Collectors;
  * <p>
  * Only {@link java.util.Collections}s with elements of non primitive types (i.e. their wrapper) are processed by this extension, since
  * the underlying persistence api is expected to be fully capable of dealing with simple Collections that contain only primitive values.
+ * <p>
+ * The original type of the Collection will we preserved in most cases. If this is not possible, the original Collection is replaced by
+ * an {@link ArrayList} or a {@link java.util.HashSet} depending on the original Collection. E.G. this happens for Lists that have been
+ * created by {@link Collections#unmodifiableCollection(Collection)} or {@link Arrays#asList(Object[])}.
  * <p>
  * This is a default {@link BeanConverterExtension} that is always enabled.
  */
@@ -42,14 +45,43 @@ public class CollectionExtension extends StandardBeanConverterExtension {
 
     @Override
     public Object convert(Object originalBean, PersistentBeanConverter persistentBeanConverter) {
-        return ((Collection<?>) originalBean).stream()
-                .map(entry -> persistentBeanConverter.convert(entry))
-                .collect(Collectors.toList());
+        if (!(originalBean instanceof Collection)) {
+            throw new PersistenceException("The type %s is not a Collection but we tried to apply the %s on it.",
+                    originalBean.getClass().getName(),
+                    getClass().getName());
+        }
+
+        Collection<Object> convertedCollection;
+
+        try {
+            convertedCollection = instantiateCollection(originalBean);
+        } catch (PersistenceException e) {
+            // isProcessable() should limit this extension to objects that implement the Collection interface.
+            // In some special cases the concrete Collection cannot be instantiated without complex problems.
+            // E.G. this is the case if originalBean has been created by Collections.unmodifiableCollection() or Arrays.asList(..).
+            // Both methods return objects of inner classes that are invisible (private class) or don't have a default constructor,
+            // so there is no simple way to instantiate them here. In cases like this, we fall back to a normal ArrayList, even though
+            // this changes the persisted Bean.
+
+            if (originalBean instanceof Set) {
+                convertedCollection = new HashSet<>();
+            } else {
+                convertedCollection = new ArrayList<>();
+            }
+        }
+
+        ((Collection<?>) originalBean).stream()
+                .map(persistentBeanConverter::convert)
+                .forEach(convertedCollection::add);
+
+        return convertedCollection;
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T revert(Object persistentBean, Type targetBeanType, PersistentBeanConverter persistentBeanConverter) {
+    public <T> T
+    revert(Object persistentBean, Type targetBeanType, PersistentBeanConverter persistentBeanConverter) {
         Type[] genericParameterTypes = ((ParameterizedType) targetBeanType).getActualTypeArguments();
 
         if (genericParameterTypes.length != 1) {
@@ -60,20 +92,24 @@ public class CollectionExtension extends StandardBeanConverterExtension {
 
         Class<T> collectionElementClass = (Class<T>) genericParameterTypes[0];
 
-        Constructor<Collection<Object>> defaultConstructor;
-        Collection<Object> valueListCollection;
-
-        try {
-            defaultConstructor = (Constructor<Collection<Object>>) persistentBean.getClass().getConstructor();
-            valueListCollection = defaultConstructor.newInstance();
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new PersistenceException("The targetType %s cannot be instantiated.", e, persistentBean.getClass());
-        }
+        Collection<Object> originalCollection = instantiateCollection(persistentBean);
 
         ((Collection<Object>) persistentBean).stream()
                 .map(o -> persistentBeanConverter.revert(o, collectionElementClass))
-                .forEach(valueListCollection::add);
+                .forEach(originalCollection::add);
 
-        return (T) valueListCollection;
+        return (T) originalCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Collection<Object> instantiateCollection(Object persistentBean) {
+        Constructor<Collection<Object>> defaultConstructor;
+
+        try {
+            defaultConstructor = (Constructor<Collection<Object>>) persistentBean.getClass().getConstructor();
+            return defaultConstructor.newInstance();
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new PersistenceException("The targetType %s cannot be instantiated.", e, persistentBean.getClass());
+        }
     }
 }

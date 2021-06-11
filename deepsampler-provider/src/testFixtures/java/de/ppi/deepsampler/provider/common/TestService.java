@@ -8,7 +8,9 @@ package de.ppi.deepsampler.provider.common;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A Service that will be instrumented to test the interceptors.
@@ -130,5 +132,19 @@ public class TestService {
 
     public List<String> getListOfStrings() {
         return Arrays.asList(HARD_CODED_RETURN_VALUE);
+    }
+
+    public Set<String> getSetOfStrings() {
+        Set<String> set = new HashSet<>();
+        set.add(HARD_CODED_RETURN_VALUE);
+
+        return set;
+    }
+
+    public Set<TestBean> getSetOfTestBeans() {
+        Set<TestBean> set = new HashSet<>();
+        set.add(new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return set;
     }
 }
