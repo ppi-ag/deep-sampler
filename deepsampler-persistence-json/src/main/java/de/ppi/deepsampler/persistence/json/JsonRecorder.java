@@ -21,6 +21,8 @@ import de.ppi.deepsampler.persistence.json.model.JsonSampleModel;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -88,9 +90,13 @@ public class JsonRecorder extends JsonOperator {
         final JsonPersistentSampleMethod persistentSampleMethod = new JsonPersistentSampleMethod(sample.getSampleId());
         final JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
+        final Type returnType = sample.getSampledMethod().getMethod().getGenericReturnType();
+        final ParameterizedType parameterizedReturnType = returnType instanceof ParameterizedType ? (ParameterizedType) returnType : null;
+        final Type[] argumentTypes = sample.getSampledMethod().getMethod().getGenericParameterTypes();
+
         for (final MethodCall call : calls) {
-            final List<Object> argsAsPersistentBeans = persistentSamplerContext.getPersistentBeanConverter().convert(call.getArgs());
-            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanConverter().convert(call.getReturnValue());
+            final List<Object> argsAsPersistentBeans = convertArguments(call.getArgs(), argumentTypes, persistentSamplerContext);
+            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanConverter().convert(call.getReturnValue(), parameterizedReturnType);
             final JsonPersistentParameter newParameters = new JsonPersistentParameter(argsAsPersistentBeans);
 
             if (!callWithSameParametersExists(jsonPersistentActualSample, newParameters)) {
@@ -99,6 +105,18 @@ public class JsonRecorder extends JsonOperator {
             }
         }
         sampleMethodJsonPersistentActualSampleMap.put(persistentSampleMethod, jsonPersistentActualSample);
+    }
+
+    private List<Object> convertArguments(List<Object> arguments, Type[] argumentTypes, PersistentSamplerContext persistentSamplerContext) {
+        List<Object> argumentPersistentBeans = new ArrayList<>();
+
+        for (int i = 0; i < arguments.size(); i++) {
+            final ParameterizedType parameterizedType = argumentTypes[i] instanceof ParameterizedType ? (ParameterizedType) argumentTypes[i] : null;
+            final Object argumentPersistentBean = persistentSamplerContext.getPersistentBeanConverter().convert(arguments.get(i), parameterizedType);
+            argumentPersistentBeans.add(argumentPersistentBean);
+        }
+
+        return argumentPersistentBeans;
     }
 
     private boolean callWithSameParametersExists(JsonPersistentActualSample jsonPersistentActualSample, JsonPersistentParameter parameter) {

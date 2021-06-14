@@ -26,8 +26,8 @@ import java.util.*;
 public class CollectionExtension extends StandardBeanConverterExtension {
 
     @Override
-    public boolean isProcessable(Type beanType) {
-        return Collection.class.isAssignableFrom(ReflectionTools.getClass(beanType));
+    public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
+        return Collection.class.isAssignableFrom(beanClass);
     }
 
     /**
@@ -38,13 +38,13 @@ public class CollectionExtension extends StandardBeanConverterExtension {
      * @return true if beanType is a primitive {@link Collection}
      */
     @Override
-    public boolean skip(Type beanType) {
+    public boolean skip(Class<?> beanClass, ParameterizedType beanType) {
         return ReflectionTools.isPrimitiveWrapperCollection(beanType);
     }
 
 
     @Override
-    public Object convert(Object originalBean, PersistentBeanConverter persistentBeanConverter) {
+    public Object convert(Object originalBean, ParameterizedType beanType, PersistentBeanConverter persistentBeanConverter) {
         if (!(originalBean instanceof Collection)) {
             throw new PersistenceException("The type %s is not a Collection but we tried to apply the %s on it.",
                     originalBean.getClass().getName(),
@@ -70,8 +70,16 @@ public class CollectionExtension extends StandardBeanConverterExtension {
             }
         }
 
+        ParameterizedType entryType;
+
+        if (beanType.getActualTypeArguments()[0] instanceof ParameterizedType) {
+            entryType = (ParameterizedType) beanType.getActualTypeArguments()[0];
+        } else {
+            entryType = null;
+        }
+
         ((Collection<?>) originalBean).stream()
-                .map(persistentBeanConverter::convert)
+                .map(entry -> persistentBeanConverter.convert(entry, entryType))
                 .forEach(convertedCollection::add);
 
         return convertedCollection;
@@ -80,9 +88,8 @@ public class CollectionExtension extends StandardBeanConverterExtension {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T
-    revert(Object persistentBean, Type targetBeanType, PersistentBeanConverter persistentBeanConverter) {
-        Type[] genericParameterTypes = ((ParameterizedType) targetBeanType).getActualTypeArguments();
+    public <T> T revert(Object persistentBean, Class<T> targetBeanClass, ParameterizedType targetBeanType, PersistentBeanConverter persistentBeanConverter) {
+        Type[] genericParameterTypes = targetBeanType.getActualTypeArguments();
 
         if (genericParameterTypes.length != 1) {
             throw new PersistenceException("%s is only able to deserialize to Collection<T>. But we try to deserialize %s",
@@ -90,12 +97,20 @@ public class CollectionExtension extends StandardBeanConverterExtension {
                     targetBeanType.getTypeName());
         }
 
-        Class<T> collectionElementClass = (Class<T>) genericParameterTypes[0];
+        ParameterizedType collectionElementType;
+        Class<?> collectionElementClass;
+        if (genericParameterTypes[0] instanceof ParameterizedType) {
+            collectionElementType = (ParameterizedType) genericParameterTypes[0];
+            collectionElementClass = (Class<?>) collectionElementType.getRawType();
+        } else {
+            collectionElementType = null;
+            collectionElementClass = (Class<?>) genericParameterTypes[0];
+        }
 
         Collection<Object> originalCollection = instantiateCollection(persistentBean);
 
         ((Collection<Object>) persistentBean).stream()
-                .map(o -> persistentBeanConverter.revert(o, collectionElementClass))
+                .map(o -> persistentBeanConverter.revert(o, collectionElementClass, collectionElementType))
                 .forEach(originalCollection::add);
 
         return (T) originalCollection;

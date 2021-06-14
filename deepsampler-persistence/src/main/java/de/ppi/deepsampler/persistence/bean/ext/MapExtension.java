@@ -2,18 +2,18 @@ package de.ppi.deepsampler.persistence.bean.ext;
 
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 
-import java.lang.reflect.Type;
+import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
 public class MapExtension extends StandardBeanConverterExtension {
 
     @Override
-    public boolean isProcessable(Type beanType) {
-        return Map.class.isAssignableFrom(ReflectionTools.getClass(beanType));
+    public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
+        return Map.class.isAssignableFrom(ReflectionTools.getClass(beanClass));
     }
 
     @Override
-    public boolean skip(Type beanType) {
-        return isProcessable(beanType);
+    public boolean skip(Class<?> beanClass, ParameterizedType beanType) {
+        return isProcessable(beanClass, beanType);
     }
 }

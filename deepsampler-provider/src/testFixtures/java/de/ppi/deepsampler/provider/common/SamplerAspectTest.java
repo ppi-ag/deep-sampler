@@ -539,6 +539,8 @@ public abstract class SamplerAspectTest {
         getTestService().noReturnValue(3);
         final String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+
+
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());

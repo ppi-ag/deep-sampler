@@ -2,9 +2,7 @@ package de.ppi.deepsampler.persistence.bean.ext;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,8 +15,8 @@ class MapExtensionTest {
         final Class<String> beanCls = String.class;
 
         // WHEN
-        boolean isProcessable = extension.isProcessable(beanCls);
-        boolean isSkip = extension.skip(beanCls);
+        boolean isProcessable = extension.isProcessable(beanCls, null);
+        boolean isSkip = extension.skip(beanCls, null);
 
         // THEN
         assertFalse(isProcessable);
@@ -32,8 +30,8 @@ class MapExtensionTest {
         final Class<HashMap> beanCls = HashMap.class;
 
         // WHEN
-        boolean isProcessable = extension.isProcessable(beanCls);
-        boolean isSkip = extension.skip(beanCls);
+        boolean isProcessable = extension.isProcessable(beanCls, null);
+        boolean isSkip = extension.skip(beanCls, null);
 
         // THEN
         assertTrue(isProcessable);

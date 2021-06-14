@@ -41,33 +41,34 @@ public class PersistentBeanConverter {
      * @param persistentBean an object that has been deserialized from a persistence api (e.g. some JSON-API). This object
      *                       might already be the original bean it the persistence api was able to deserialize it. Otherwise
      *                       it is the abstract model represented by {@link PersistentBean}
-     * @param type The Type of the original bean
+     * @param parameterizedType The Type of the original bean
      * @param <T> the original bean.
      * @return the original deserialized bean.
      */
     @SuppressWarnings("unchecked")
-    public <T> T revert(final Object persistentBean, final Type type) {
+    public <T> T revert(final Object persistentBean, final Class<T> originalBeanClass, final ParameterizedType parameterizedType) {
         if (persistentBean == null) {
             return null;
         }
 
         if (persistentBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(persistentBean.getClass().getComponentType())) {
-            final Class<T> componentType =  (Class<T>) ReflectionTools.getClass(type).getComponentType();
-            return (T) revertPersistentBeanArray((PersistentBean[]) persistentBean, componentType);
+            final Class<T> originalBeanComponentType =  (Class<T>) originalBeanClass.getComponentType();
+            return (T) revertPersistentBeanArray((PersistentBean[]) persistentBean, originalBeanComponentType);
         }
 
-        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(type);
+        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBeanClass, parameterizedType);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
-            return applicableExtensions.get(0).revert(persistentBean, type, this);
+            return applicableExtensions.get(0).revert(persistentBean, originalBeanClass, parameterizedType, this);
         }
 
         if (persistentBean instanceof PersistentBean) {
-            return revertPersistentBean((PersistentBean) persistentBean, type);
+            return revertPersistentBean((PersistentBean) persistentBean, originalBeanClass);
         }
 
         return (T) persistentBean;
     }
+
 
     /**
      * Converts an original bean to the abstract model (most likely {@link PersistentBean} that is used to save the original bean to e.g. JSON.
@@ -77,8 +78,8 @@ public class PersistentBeanConverter {
      * the persistence api is expected to be able to serialize the original bean directly.
      */
     @SuppressWarnings("unchecked")
-    public <T> T convert(final Object originalBean) {
-        if (isTransformationNotNecessary(originalBean)) {
+    public <T> T convert(final Object originalBean, ParameterizedType parameterizedType) {
+        if (isTransformationNotNecessary(originalBean, parameterizedType)) {
             return (T) originalBean;
         }
 
@@ -86,10 +87,10 @@ public class PersistentBeanConverter {
             return (T) convertArray((Object[]) originalBean);
         }
 
-        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass());
+        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass(), parameterizedType);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
-            return (T) applicableExtensions.get(0).convert(originalBean, this);
+            return (T) applicableExtensions.get(0).convert(originalBean, parameterizedType, this);
         }
 
         return (T) convertToPersistentBean(originalBean);
@@ -104,15 +105,14 @@ public class PersistentBeanConverter {
         return instances;
     }
 
-    private <T> T revertPersistentBean(final PersistentBean value, final Type type) {
+    private <T> T revertPersistentBean(final PersistentBean value, final Class<T> originalBeanClass) {
         final T instance;
-        final Class<T> rawClass = ReflectionTools.getClass(type);
-        final Map<Field, String> fields = getAllFields(rawClass);
+        final Map<Field, String> fields = getAllFields(originalBeanClass);
 
         if (hasFinalFields(fields)) {
-            instance = instantiateUsingMatchingConstructor(rawClass, value, fields);
+            instance = instantiateUsingMatchingConstructor(originalBeanClass, value, fields);
         } else {
-            instance = instantiate(rawClass);
+            instance = instantiate(originalBeanClass);
 
             for (final Map.Entry<Field, String> entry : fields.entrySet()) {
                 final Field field = entry.getKey();
@@ -193,8 +193,9 @@ public class PersistentBeanConverter {
 
     private Object[] convertArray(final Object[] objects) {
         final PersistentBean[] persistentBeans = new PersistentBean[objects.length];
+
         for (int i = 0; i < objects.length; ++i) {
-            persistentBeans[i] = convert(objects[i]);
+            persistentBeans[i] = convert(objects[i], null);
         }
         return persistentBeans;
     }
@@ -209,8 +210,11 @@ public class PersistentBeanConverter {
             final Field field = entry.getKey();
             Object fieldValue = retrieveValue(obj, field);
 
+            final Type fieldType = field.getGenericType();
+            final ParameterizedType parameterizedFieldType = fieldType instanceof ParameterizedType ? (ParameterizedType) fieldType : null;
+
             if (fieldValue != null) {
-                fieldValue = convert(fieldValue);
+                fieldValue = convert(fieldValue, parameterizedFieldType);
             }
 
             valuesForBean.put(keyForField, fieldValue);
@@ -261,14 +265,15 @@ public class PersistentBeanConverter {
 
 
 
-    private List<BeanConverterExtension> findApplicableExtensions(final Type type) {
-        return beanConverterExtensions.stream().filter(ext -> ext.isProcessable(type)).collect(Collectors.toList());
+    private List<BeanConverterExtension> findApplicableExtensions(final Class<?> beanClass, final ParameterizedType parameterizedType) {
+        return beanConverterExtensions.stream().filter(ext -> ext.isProcessable(beanClass, parameterizedType)).collect(Collectors.toList());
     }
 
-    private boolean isTransformationNotNecessary(final Object obj) {
+    private boolean isTransformationNotNecessary(final Object obj, final ParameterizedType parameterizedType) {
 
         return obj == null || ReflectionTools.isPrimitiveOrWrapper(obj.getClass()) || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
-                || findApplicableExtensions(obj.getClass()).stream().anyMatch(ext -> ext.skip(obj.getClass()));
+                || findApplicableExtensions(obj.getClass(), parameterizedType).stream()
+                    .anyMatch(ext -> ext.skip(obj.getClass(), parameterizedType));
     }
 
 

@@ -1,5 +1,7 @@
 package de.ppi.deepsampler.persistence.bean;
 
+import de.ppi.deepsampler.persistence.error.PersistenceException;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -70,9 +72,21 @@ public class ReflectionTools {
 
         ParameterizedType parameterizedType = (ParameterizedType) type;
 
-        return  parameterizedType.getRawType() instanceof Class<?>
-                && Collection.class.isAssignableFrom((Class<?>)parameterizedType.getRawType())
-                && isPrimitiveOrWrapper((Class<?>) (parameterizedType.getActualTypeArguments()[0]));
+        if (parameterizedType.getRawType() instanceof Class<?>
+                && Collection.class.isAssignableFrom((Class<?>)parameterizedType.getRawType())) {
+
+            if (parameterizedType.getActualTypeArguments()[0] instanceof Class) {
+                return  isPrimitiveOrWrapper((Class<?>) (parameterizedType.getActualTypeArguments()[0]));
+            } else if (parameterizedType.getActualTypeArguments()[0] instanceof  ParameterizedType) {
+                return false;
+            } else {
+                throw new PersistenceException("We cannot determine the generic type parameter of %s because the actualTypeArgument is %s. Instead, we need a %s." +
+                        " This can be achieved e.g. by retrieving the type from Class::getMethod()::getGenericReturnType()",
+                        type.getTypeName(), parameterizedType.getActualTypeArguments()[0].getTypeName(), Class.class.getTypeName());
+            }
+        }
+
+        return false;
     }
 
     /**

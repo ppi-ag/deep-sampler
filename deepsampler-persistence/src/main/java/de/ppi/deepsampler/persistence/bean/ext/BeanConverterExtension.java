@@ -6,10 +6,10 @@
 package de.ppi.deepsampler.persistence.bean.ext;
 
 
-import com.sun.imageio.plugins.jpeg.JPEGImageReaderSpi;
 import de.ppi.deepsampler.persistence.bean.PersistentBeanConverter;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
@@ -34,19 +34,20 @@ import java.lang.reflect.Type;
  * </p>
  * <br>
  * <p>
- * When you write an extension you firstly have to define which for which typed you
+ * When you write an extension you firstly have to define for which type you
  * want to extend the behavior of the original BeanFactory. For this purpose you
- * can use {@link #isProcessable(Type)}.
+ * can use {@link #isProcessable(Class, ParameterizedType)}.
  * </p>
  * <p>
- * After this every bean with the specified type will be processed within the extension. Now
+ * After this, every bean with the specified type will be processed within the extension. Now
  * you can implement custom conversion logic yourBean -> generic data-structure (
- * {@link #convert(Object, PersistentBeanConverter)} and generic data-structure -> yourBean ({@link #revert(Object, Type, PersistentBeanConverter)}).
+ * {@link #convert(Object, ParameterizedType, PersistentBeanConverter)}
+ * and generic data-structure -> yourBean ({@link #revert(Object, Class, ParameterizedType, PersistentBeanConverter)}).
  * </p>
  * <p>
- * Besides this you can also make the BeanFactory skip the processing of all types for which
- * your implementation {@link #isProcessable(Type)} will return true. So you can exclude
- * some types from being processed by the factory.
+ * It is also possible to skip the processing of all types for which
+ * your implementation of {@link #isProcessable(Class, ParameterizedType)} will return true. This is done by implementing
+ * {@link #skip(Class, ParameterizedType)} So you can exclude some types from being processed by the {@link PersistentBeanConverter}.
  * </p>
  */
 public interface BeanConverterExtension {
@@ -54,20 +55,24 @@ public interface BeanConverterExtension {
     /**
      * Checks it this extension is responsible for objects of the type beanType.
      *
-     * @param beanType the {@link Type} which might be converted by this extension. beanType could be an ordinary {@link Class} or
-     *                 a {@link java.lang.reflect.ParameterizedType} for generic Types.
+     * @param beanClass the {@link Class} of the type that will be processed by this extension.
+     * @param beanType the {@link ParameterizedType} of the type that will be processed by this extension. This parameter can only be supplied
+     *                 if the type is actually a generic type. If this is not the case, beanType is null.
      * @return true if the {@link Type} should be processed within this extension, false otherwise
      */
-    boolean isProcessable(Type beanType);
+
+    boolean isProcessable(Class<?> beanClass, ParameterizedType beanType);
 
     /**
      * Skip the conversion of all beans of the given type. Skipped objects will be sent directly to the underlying
      * persistence api. Therefore the persistence api must be able to handle the serialization / deserialization.
      *
-     * @param beanType the type you might want to skip
+     * @param beanClass the {@link Class}of the type that will be skipped by this extension.
+     * @param beanType the {@link ParameterizedType} that will be skipped by this extension. This parameter can only be supplied
+     *                 if the type is actually a generic type. If this is not the case, beanType is null.
      * @return true if the Type should be skipped
      */
-    boolean skip(Type beanType);
+    boolean skip(Class<?> beanClass, ParameterizedType beanType);
 
     /**
      * Conversion logic for the type you defined to process and not to skip.
@@ -77,10 +82,12 @@ public interface BeanConverterExtension {
      * handling the data structure on its own.
      *
      * @param originalBean the original bean that is supposed to be converted to a serializable data structure, most likely a {@link PersistentBean}.
+     * @param beanType the {@link ParameterizedType} that will be used for the conversion. This parameter can only be supplied
+     *                 if the type is actually a generic type. If this is not the case, beanType is null.
      * @param persistentBeanConverter the current {@link PersistentBeanConverter} that may be used to convert sub objects of bean.
      * @return the generic data-structure for the bean
      */
-    Object convert(Object originalBean, PersistentBeanConverter persistentBeanConverter);
+    Object convert(Object originalBean, ParameterizedType beanType, PersistentBeanConverter persistentBeanConverter);
 
     /**
      * Conversion logic for the generic data-structure to the processed bean type.
@@ -93,10 +100,12 @@ public interface BeanConverterExtension {
      * Jackson to deserialize the List, but it would iterate over that List to revert the {@link PersistentBean}s inside of that list.
      *
      * @param persistentBean the generic bean
-     * @param target the target class
+     * @param targetClass the {@link Class} of the type that will created from the persistentBean.
+     * @param targetType the {@link ParameterizedType}  fo the type that will be created from persistentBean, This parameter can only be supplied
+     *                   if the type is actually a generic type. If this is not the case, beanType is null.
      * @param persistentBeanConverter the current {@link PersistentBeanConverter} that may be used to revert sub objects of persistentBean.
      * @param <T> type of the original bean
      * @return original bean
      */
-    <T> T revert(Object persistentBean, Type target, PersistentBeanConverter persistentBeanConverter);
+    <T> T revert(Object persistentBean, Class<T> targetClass, ParameterizedType targetType, PersistentBeanConverter persistentBeanConverter);
 }

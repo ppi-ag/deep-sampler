@@ -34,7 +34,7 @@ class JsonRecorderTest {
         // GIVEN
         final Path path = Paths.get("./record/testTemp.json");
 
-        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod", Object.class)));
         sample.setSampleId("TestMethodForRecord");
         ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList("Args1")));
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
@@ -53,7 +53,7 @@ class JsonRecorderTest {
         // GIVEN
         final Path path = Paths.get("./record/testTemp.json");
 
-        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod", Object.class)));
         sample.setSampleId("TestMethodForRecord");
         ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList("Args1")));
         ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList("Args1")));
@@ -78,7 +78,7 @@ class JsonRecorderTest {
     void testRecordLocalDateTime() throws Exception {
         // GIVEN
         final Path path = Paths.get("./record/testTimeTemp.json");
-        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod", Object.class)));
         sample.setSampleId("TestMethodForRecord");
         ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList(LocalDateTime.now())));
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
@@ -95,7 +95,7 @@ class JsonRecorderTest {
     void testRecordLocalDateTimeWithoutParent() throws Exception {
         // GIVEN
         final Path path = Paths.get("testTimeTemp.json");
-        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod", Object.class)));
         sample.setSampleId("TestMethodForRecord");
         ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList(LocalDateTime.now())));
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
@@ -115,7 +115,7 @@ class JsonRecorderTest {
         bean.stringCollection = new ArrayList<>();
         bean.stringCollection.add("AC");
         final Path path = Paths.get("testTimeTemp.json");
-        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod")));
+        final SampleDefinition sample = new SampleDefinition(new SampledMethod(Bean.class, Bean.class.getMethod("testMethod", Object.class)));
         sample.setSampleId("TestMethodForRecord");
         ExecutionManager.record(sample, new MethodCall("ABC", Collections.singletonList(bean)));
         ExecutionManager.record(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
@@ -153,8 +153,9 @@ class JsonRecorderTest {
         }
 
         @SuppressWarnings("unused")
-        public void testMethod() {
+        public Object testMethod(Object obj) {
             // Is used by reflection only is not intended to do anything.
+            return null;
         }
     }
 }
