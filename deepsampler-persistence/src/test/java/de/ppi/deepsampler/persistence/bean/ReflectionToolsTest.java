@@ -102,7 +102,9 @@ class ReflectionToolsTest {
         assertFalse(ReflectionTools.isPrimitiveWrapperCollection(notACollection.getClass()));
         assertTrue(ReflectionTools.isPrimitiveWrapperCollection(stringCollection));
         assertFalse(ReflectionTools.isPrimitiveWrapperCollection(collectionWithGenericType));
-        assertThrows(PersistenceException.class, () -> ReflectionTools.isPrimitiveWrapperCollection(stringList.getClass().getGenericSuperclass()));
+        Type stringListType = stringList.getClass().getGenericSuperclass();
+
+        assertThrows(PersistenceException.class, () -> ReflectionTools.isPrimitiveWrapperCollection(stringListType));
     }
 
     @Test

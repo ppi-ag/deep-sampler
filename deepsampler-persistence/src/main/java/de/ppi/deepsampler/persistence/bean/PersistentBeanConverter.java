@@ -8,7 +8,6 @@ package de.ppi.deepsampler.persistence.bean;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
-import jdk.internal.vm.annotation.ForceInline;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
