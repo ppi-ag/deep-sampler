@@ -8,6 +8,7 @@ package de.ppi.deepsampler.persistence.bean;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
+import jdk.internal.vm.annotation.ForceInline;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
@@ -51,9 +52,11 @@ public class PersistentBeanConverter {
             return null;
         }
 
-        if (persistentBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(persistentBean.getClass().getComponentType())) {
-            final Class<T> originalBeanComponentType =  (Class<T>) originalBeanClass.getComponentType();
-            return (T) revertPersistentBeanArray((PersistentBean[]) persistentBean, originalBeanComponentType);
+        Class<?> persistentBeanClass = persistentBean.getClass();
+        Class<?> persistentBeanComponentType = ReflectionTools.getRootComponentType(persistentBeanClass);
+
+        if (persistentBeanClass.isArray() && PersistentBean.class.isAssignableFrom(persistentBeanComponentType)) {
+            return (T) revertPersistentBeanArray(persistentBean, originalBeanClass);
         }
 
         final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBeanClass, parameterizedType);
@@ -97,12 +100,22 @@ public class PersistentBeanConverter {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T[] revertPersistentBeanArray(final PersistentBean[] persistentBean, final Class<T> cls) {
-        final T[] instances = (T[]) Array.newInstance(cls, persistentBean.length);
-        for (int i = 0; i < persistentBean.length; ++i) {
-            instances[i] = revertPersistentBean(persistentBean[i], cls);
+    private <T> T[] revertPersistentBeanArray(final Object persistentBeanArray, final Class<T> componentType) {
+        Object originalBeansArray = ReflectionTools.createEmptyArray(persistentBeanArray, componentType);
+
+        for (int i = 0; i < Array.getLength(persistentBeanArray); ++i) {
+            Object persistentEntry = Array.get(persistentBeanArray, i);
+
+            Object entry;
+            if (persistentEntry.getClass().isArray()) {
+                entry = revertPersistentBeanArray(persistentEntry, componentType.getComponentType());
+            } else {
+                entry = revertPersistentBean((PersistentBean) persistentEntry, componentType.getComponentType());
+            }
+            Array.set(originalBeansArray, i, entry);
         }
-        return instances;
+
+        return (T[]) originalBeansArray;
     }
 
     private <T> T revertPersistentBean(final PersistentBean value, final Class<T> originalBeanClass) {
@@ -177,7 +190,7 @@ public class PersistentBeanConverter {
             if (lookedUpValueInBean instanceof DefaultPersistentBean) {
                 lookedUpValueInBean = revertPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
             } else if (lookedUpValueInBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(lookedUpValueInBean.getClass().getComponentType())) {
-                lookedUpValueInBean = revertPersistentBeanArray((PersistentBean[]) lookedUpValueInBean, field.getType().getComponentType());
+                lookedUpValueInBean = revertPersistentBeanArray(lookedUpValueInBean, field.getType());
             }
             setValue(instance, field, lookedUpValueInBean);
         }
@@ -191,12 +204,16 @@ public class PersistentBeanConverter {
 
 
 
-    private Object[] convertArray(final Object[] objects) {
-        final PersistentBean[] persistentBeans = new PersistentBean[objects.length];
+    private Object convertArray(final Object[] objects) {
+        int[] dimensions = ReflectionTools.getArrayDimensions(objects);
+        Class<?> componentType = Array.newInstance(PersistentBean.class, dimensions).getClass();
+        Object persistentBeans = ReflectionTools.createEmptyArray(objects, componentType);
 
         for (int i = 0; i < objects.length; ++i) {
-            persistentBeans[i] = convert(objects[i], null);
+            Object subElement = convert(objects[i], null);
+            Array.set(persistentBeans, i, subElement);
         }
+
         return persistentBeans;
     }
 

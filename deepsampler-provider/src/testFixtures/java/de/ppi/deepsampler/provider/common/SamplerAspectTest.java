@@ -737,6 +737,70 @@ public abstract class SamplerAspectTest {
         Files.delete(Paths.get(pathToFile));
     }
 
+    @Test
+    void multidimensionalArrayOfStringsCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getArrayOfStrings2d());
+
+        getTestService().getArrayOfStrings2d();
+        final String pathToFile = "./record/multidimensionalArrayCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getArrayOfStrings2d());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+
+        // WHEN
+        String[][] result = getTestService().getArrayOfStrings2d();
+
+        // THEN
+        assertEquals(1, result.length);
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, result[0][0]);
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    void multidimensionalArrayOfTestBeansCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getArrayOfTestBeans3d());
+
+        getTestService().getArrayOfTestBeans3d();
+        final String pathToFile = "./record/multidimensionalArrayOfTestBeansCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getArrayOfTestBeans3d());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+
+        // WHEN
+        TestBean[][][] result = getTestService().getArrayOfTestBeans3d();
+
+        // THEN
+        assertEquals(1, result.length);
+        assertEquals(2, result[0].length);
+        assertEquals(1, result[0][0].length);
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, result[0][0][0].getValue());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
 
     @Test
     public void manualIdSetForRecordingAndLoadingNoCorrectDef() throws IOException {

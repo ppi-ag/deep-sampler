@@ -336,11 +336,11 @@ class PersistentBeanConverterTest {
         testBeanContainer.testBeanArray = testBeanArray;
 
         // FROM
-        PersistentBeanConverter factory = new PersistentBeanConverter();
-        PersistentBean bean = factory.convert(testBeanContainer, null);
+        PersistentBeanConverter converter = new PersistentBeanConverter();
+        PersistentBean bean = converter.convert(testBeanContainer, null);
 
         // TO
-        TestBeanWithBeanArray resultBeanRef = factory.revert(bean, TestBeanWithBeanArray.class, null);
+        TestBeanWithBeanArray resultBeanRef = converter.revert(bean, TestBeanWithBeanArray.class, null);
 
         // THEN
         assertNotNull(resultBeanRef);
@@ -358,11 +358,11 @@ class PersistentBeanConverterTest {
         testBeanArray[0].abc = "make it so";
 
         // FROM
-        PersistentBeanConverter factory = new PersistentBeanConverter();
-        PersistentBean[] persistentBean = factory.convert(testBeanArray, null);
+        PersistentBeanConverter converter = new PersistentBeanConverter();
+        PersistentBean[] persistentBean = converter.convert(testBeanArray, null);
 
         // TO
-        SimpleTestBean[] resultBean = factory.revert(persistentBean, SimpleTestBean[].class, null);
+        SimpleTestBean[] resultBean = converter.revert(persistentBean, SimpleTestBean[].class, null);
 
         // THEN
         assertNotNull(resultBean);
@@ -370,6 +370,8 @@ class PersistentBeanConverterTest {
         assertNotNull(resultBean[0]);
         assertEquals("make it so", resultBean[0].abc);
     }
+
+
 
     private static class TestBeanWithBeanArray {
         protected SimpleTestBean[] testBeanArray;

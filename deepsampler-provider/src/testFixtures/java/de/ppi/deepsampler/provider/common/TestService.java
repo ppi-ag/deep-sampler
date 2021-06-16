@@ -122,6 +122,14 @@ public class TestService {
         return new String[]{HARD_CODED_RETURN_VALUE};
     }
 
+    public String[][] getArrayOfStrings2d() {
+        return new String[][]{new String[]{HARD_CODED_RETURN_VALUE}};
+    }
+
+    public TestBean[][][] getArrayOfTestBeans3d() {
+        return new TestBean[][][] {{{new TestBean(HARD_CODED_RETURN_VALUE)}, {new TestBean(HARD_CODED_RETURN_VALUE)}}};
+    }
+
     public TestBean[] getArrayOfTestBeans() {
         return new TestBean[]{new TestBean(HARD_CODED_RETURN_VALUE)};
     }

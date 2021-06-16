@@ -71,9 +71,10 @@ class CollectionExtensionTest {
     void convertShouldAcceptOnlyCollections() {
         // GIVEN
         CollectionExtension extension = new CollectionExtension();
+        Date now = new Date();
 
         // THEN
-        assertThrows(PersistenceException.class, () ->extension.convert(new Date(), null, null));
+        assertThrows(PersistenceException.class, () -> extension.convert(now, null, null));
     }
 
     @Test
