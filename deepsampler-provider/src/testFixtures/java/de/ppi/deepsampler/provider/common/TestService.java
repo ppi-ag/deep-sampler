@@ -7,10 +7,7 @@ package de.ppi.deepsampler.provider.common;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A Service that will be instrumented to test the interceptors.
@@ -154,5 +151,34 @@ public class TestService {
         set.add(new TestBean(HARD_CODED_RETURN_VALUE));
 
         return set;
+    }
+
+    public Map<String, String> getMapOfStrings() {
+        Map<String, String> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, HARD_CODED_RETURN_VALUE);
+
+        return map;
+    }
+
+    public Map<String, TestBean> getMapOfStringsToTestBeans() {
+        Map<String, TestBean> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
+    }
+
+    public Map<TestBean, TestBean> getComplexMap() {
+        Map<TestBean, TestBean> map = new HashMap<>();
+
+        map.put(new TestBean(HARD_CODED_RETURN_VALUE), new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
+    }
+
+    public Map<Integer, Integer> getMapOfIntegers() {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(1, 2);
+
+        return map;
     }
 }

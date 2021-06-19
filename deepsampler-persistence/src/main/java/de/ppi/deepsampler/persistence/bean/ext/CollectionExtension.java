@@ -39,7 +39,7 @@ public class CollectionExtension extends StandardBeanConverterExtension {
      */
     @Override
     public boolean skip(Class<?> beanClass, ParameterizedType beanType) {
-        return ReflectionTools.isPrimitiveWrapperCollection(beanType);
+        return ReflectionTools.hasPrimitiveTypeParameters(beanType);
     }
 
 

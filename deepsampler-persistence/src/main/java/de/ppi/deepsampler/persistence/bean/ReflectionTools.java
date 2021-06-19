@@ -2,12 +2,9 @@ package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -75,34 +72,61 @@ public class ReflectionTools {
     }
 
     /**
-     * Checks if type is a {@link Collection} with a primitive type wrapper like {@link Integer} as generic type parameter.
+     * Checks if type has a generic type parameter which is a primitive or its wrapper like {@link Integer}.
      * (Real primitives cannot occur here, because primitives are not allowed as generic type parameters.)
      *
-     * @param type The class of the suspected Collection
-     * @return true if cls is an Collection with elements that have a wrapper type.
+     * @param type The generic class that should be checked.
+     * @return true if cls has a generic type parameter that is a wrapper type.
      */
-    public static boolean isPrimitiveWrapperCollection(Type type) {
+    public static boolean hasPrimitiveTypeParameters(Type type) {
+        return hasPrimitiveTypeParameters(type, 1);
+    }
+
+    /**
+     * Checks if type has generic type parameters which are a primitive or its wrapper like {@link Integer}.
+     * (Real primitives cannot occur here, because primitives are not allowed as generic type parameters.)
+     *
+     * @param type                      The generic class that should be checked.
+     * @param numberOfParametersToCheck The number of the first generic parameters that should be chekced.
+     * @return true if cls has generic type parameters that are wrapper types.
+     */
+    public static boolean hasPrimitiveTypeParameters(Type type, int numberOfParametersToCheck) {
         if (!(type instanceof ParameterizedType)) {
             return false;
         }
 
         ParameterizedType parameterizedType = (ParameterizedType) type;
 
-        if (parameterizedType.getRawType() instanceof Class<?>) {
+        if (numberOfParametersToCheck > parameterizedType.getActualTypeArguments().length) {
+            throw new PersistenceException("We tried to check if the first %d generic type parameter of %s were primitive wrappers, but we have only %d parameters",
+                    numberOfParametersToCheck, type.getTypeName(), parameterizedType.getActualTypeArguments().length);
+        }
 
-            if (parameterizedType.getActualTypeArguments()[0] instanceof Class) {
-                return isPrimitiveOrWrapper((Class<?>) (parameterizedType.getActualTypeArguments()[0]));
-            } else if (parameterizedType.getActualTypeArguments()[0] instanceof ParameterizedType) {
-                return false;
-            } else {
-                throw new PersistenceException("We cannot determine the generic type parameter of %s because the actualTypeArgument is %s. Instead, we need a %s." +
-                        " This can be achieved e.g. by retrieving the type from Class::getMethod()::getGenericReturnType()",
-                        type.getTypeName(), parameterizedType.getActualTypeArguments()[0].getTypeName(), Class.class.getTypeName());
+        if (numberOfParametersToCheck == 0) {
+            throw new PersistenceException("numberOfParameterToCheck must be > 0. It is not the index, but the number of the first parameters that should be checked.");
+        }
+
+        if (parameterizedType.getRawType() instanceof Class<?>) {
+            for (int i = 0; i < numberOfParametersToCheck; i++) {
+                Type parameter = parameterizedType.getActualTypeArguments()[i];
+
+                if (parameter instanceof Class) {
+                    if (!isPrimitiveOrWrapper((Class<?>) parameter)) {
+                        return false;
+                    }
+                } else if (parameter instanceof ParameterizedType) {
+                    return false;
+                } else {
+                    throw new PersistenceException("We cannot determine the generic type parameter of %s because the actualTypeArgument is %s. Instead, we need a %s." +
+                            " This can be achieved e.g. by retrieving the type from Class::getMethod()::getGenericReturnType()",
+                            type.getTypeName(), parameterizedType.getActualTypeArguments()[0].getTypeName(), Class.class.getTypeName());
+                }
             }
         }
 
-        return false;
+        return true;
     }
+
 
     /**
      * Returns the {@link Class} behind type.
@@ -126,8 +150,8 @@ public class ReflectionTools {
      * new array will be newArrayType.
      *
      * @param templateArray A template array that is used as an example for the deimensions of the new array.
-     * @param newArrayType the componentType of the new array
-     * @param <T> the componentType of the new array
+     * @param newArrayType  the componentType of the new array
+     * @param <T>           the componentType of the new array
      * @return the new array formed after templateArray and newArrayType.
      */
     @SuppressWarnings("unchecked")
@@ -146,6 +170,7 @@ public class ReflectionTools {
 
     /**
      * Finds the dimensions of the array array.
+     *
      * @param array the array of which the dimensions should be retrieved
      * @return the dimensions of the array. Each entry in the returned array is the size of one dimension. The length of the array is the number of dimensions.
      */
@@ -191,5 +216,29 @@ public class ReflectionTools {
         return componentType;
     }
 
+    /**
+     * Converts the String source into a primitive wrapper object using the supplied wrapperType.
+     *
+     * @param source The String that should be converted to a wrapperType. The String must be formatted in a way that complies with
+     *               the parser of the desired wrapper type.
+     * @param wrapperType A wrapper type. This must be a Class of any Wrapper type otherwise an Exception will be thrown.
+     * @param <T> The target type.
+     * @return returns an instance of wrapperType containing the parsed value of source.
+     */
+    public static <T> T parseString(String source, Class<T> wrapperType) {
+        Constructor<T> constructor;
+
+        try {
+            if (Character.class == wrapperType) {
+                constructor = wrapperType.getConstructor(char.class);
+                return constructor.newInstance(source.charAt(0));
+            } else {
+                constructor = wrapperType.getConstructor(String.class);
+                return constructor.newInstance(source);
+            }
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new PersistenceException("We were unable to parse %s from %s", e, wrapperType.getTypeName(), source);
+        }
+    }
 
 }

@@ -133,7 +133,7 @@ class CollectionExtensionTest {
         // WHEN
         List<Date> result = converter.convert(unmodifiableList, returnType);
 
-        // TEHN
+        // THEN
         assertNotNull(result);
         assertTrue(result instanceof ArrayList);
         assertFalse(unmodifiableList instanceof ArrayList);

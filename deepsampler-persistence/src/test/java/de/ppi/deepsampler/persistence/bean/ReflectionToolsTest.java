@@ -3,12 +3,11 @@ package de.ppi.deepsampler.persistence.bean;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -91,7 +90,7 @@ class ReflectionToolsTest {
     }
 
     @Test
-    void primitiveWrapperCollectionIsDetected() throws NoSuchMethodException {
+    void primitiveWrapperInCollectionIsDetected() throws NoSuchMethodException {
         // GIVEN
         String notACollection = "";
         ArrayList<String> stringList = new ArrayList<>();
@@ -99,12 +98,32 @@ class ReflectionToolsTest {
         Type collectionWithGenericType = getGenericReturnType("getCollectionOfCollections");
 
         // THEN
-        assertFalse(ReflectionTools.isPrimitiveWrapperCollection(notACollection.getClass()));
-        assertTrue(ReflectionTools.isPrimitiveWrapperCollection(stringCollection));
-        assertFalse(ReflectionTools.isPrimitiveWrapperCollection(collectionWithGenericType));
-        Type stringListType = stringList.getClass().getGenericSuperclass();
+        assertFalse(ReflectionTools.hasPrimitiveTypeParameters(notACollection.getClass()));
+        assertTrue(ReflectionTools.hasPrimitiveTypeParameters(stringCollection));
+        assertFalse(ReflectionTools.hasPrimitiveTypeParameters(collectionWithGenericType));
 
-        assertThrows(PersistenceException.class, () -> ReflectionTools.isPrimitiveWrapperCollection(stringListType));
+        Type stringListType = stringList.getClass().getGenericSuperclass();
+        assertThrows(PersistenceException.class, () -> ReflectionTools.hasPrimitiveTypeParameters(stringListType));
+    }
+
+    @Test
+    void primitiveWrappersInMapAreDetected() throws NoSuchMethodException {
+        // GIVEN
+        String notAMap = "";
+        HashMap<String, String> stringHashMap = new HashMap<>();
+        Type stringMap = getGenericReturnType("getStringMap");
+        Type mapWithGenericType = getGenericReturnType("getDateMap");
+
+        // THEN
+        assertFalse(ReflectionTools.hasPrimitiveTypeParameters(notAMap.getClass(), 2));
+        assertTrue(ReflectionTools.hasPrimitiveTypeParameters(stringMap, 2));
+        assertFalse(ReflectionTools.hasPrimitiveTypeParameters(mapWithGenericType, 2));
+
+        Type hashMapType = stringHashMap.getClass().getGenericSuperclass();
+        assertThrows(PersistenceException.class, () -> ReflectionTools.hasPrimitiveTypeParameters(hashMapType));
+
+        assertThrows(PersistenceException.class, () -> ReflectionTools.hasPrimitiveTypeParameters(stringMap, 3));
+        assertThrows(PersistenceException.class, () -> ReflectionTools.hasPrimitiveTypeParameters(stringMap, 0));
     }
 
     @Test
@@ -180,6 +199,29 @@ class ReflectionToolsTest {
         assertEquals(int.class, ReflectionTools.getRootComponentType(ints1d.getClass()));
     }
 
+
+    @Test
+    void primitivesCanBeParsedFromString() {
+        // GIVEN
+        String intString = Integer.toString(1);
+        String longString = Long.toString(1L);
+        String floatString = Float.toString(1.0f);
+        String doubleString = Double.toString(1.0);
+        String shortString = Short.toString((short) 1);
+        String byteString = Byte.toString((byte) 1);
+        String charString = Character.toString('1');
+
+        // THEN
+        assertEquals(1, (int) ReflectionTools.parseString(intString, Integer.class));
+        assertEquals(1L, ReflectionTools.parseString(longString, Long.class));
+        assertEquals(1.0f, ReflectionTools.parseString(floatString, Float.class));
+        assertEquals(1.0, ReflectionTools.parseString(doubleString, Double.class));
+        assertEquals((short) 1, ReflectionTools.parseString(shortString, Short.class));
+        assertEquals((byte) 1, ReflectionTools.parseString(byteString, Byte.class));
+        assertEquals('1', ReflectionTools.parseString(charString, Character.class));
+        assertEquals("1", ReflectionTools.parseString("1", String.class));
+    }
+
     /**
      * A Help-Method that is used to retrieve a {@link Class} from primitives using autoboxing.
      * @param obj The Object of which the Class is wanted
@@ -202,6 +244,14 @@ class ReflectionToolsTest {
 
         public Collection<Collection<String>> getCollectionOfCollections() {
             return new ArrayList<>();
+        }
+
+        public Map<String, String> getStringMap() {
+            return new HashMap<>();
+        }
+
+        public Map<Date, Date> getDateMap() {
+            return new HashMap<>();
         }
     }
 }
