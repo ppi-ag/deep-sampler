@@ -9,22 +9,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This {@link BeanConverterExtension} is able to convert {@link Map}s into a persistable model that can be sent to
  * the underlying persistence api and vice versa.
- *
+ * <p>
  * This extension is limited to {@link Map}s that have a primitive key (i.e. wrapper types of primitives, since {@link Map}s can't
  * hold primitives directly)
- *
+ * <p>
  * The values of the {@link Map} can either be primitives (i.e. wrappers) or complex objects. In the first case, the values will be
  * sent directly to the persistence api. In the latter case, the values will be converted to {@link de.ppi.deepsampler.persistence.model.PersistentBean}s
  * during the serialization process.
- *
+ * <p>
  * The original {@link Map}-types are preserved in most cases. But in some rare cases this is not possible because the original {@link Map}s
  * are not visible, or don't provide a adequate constructor. This is i.e. the case for {@link Map}s that have been created using
  * {@link Collections#unmodifiableMap(Map)}. In cases like this, the original {@link Map} is replaced by a common {@link HashMap}.
- *
+ * <p>
  * This is a default extension that is always active.
  */
 public class MapPrimitiveKeyExtension extends StandardBeanConverterExtension {
@@ -56,14 +57,11 @@ public class MapPrimitiveKeyExtension extends StandardBeanConverterExtension {
             entryType = null;
         }
 
-        ((Map<Object, Object>) originalBean).entrySet().stream()
-                .map(entry -> {
-                    Object value = persistentBeanConverter.convert(entry.getValue(), entryType);
-                    String key = entry.getKey() != null ? entry.getKey().toString() : "null";
-
-                    return new Object[]{key, value};
-                })
-                .forEach(pair -> convertedMap.put(pair[0], pair[1]));
+        for (Entry<Object, Object> entry : ((Map<Object, Object>) originalBean).entrySet()) {
+            Object value = persistentBeanConverter.convert(entry.getValue(), entryType);
+            String key = entry.getKey() != null ? entry.getKey().toString() : "null";
+            convertedMap.put(key, value);
+        }
 
         return convertedMap;
     }
@@ -79,7 +77,7 @@ public class MapPrimitiveKeyExtension extends StandardBeanConverterExtension {
             // so there is no simple way to instantiate them here. In cases like this, we fall back to a normal HashMap, even though
             // this changes the persisted Bean.
 
-           return new HashMap<>();
+            return new HashMap<>();
         }
     }
 
@@ -118,13 +116,11 @@ public class MapPrimitiveKeyExtension extends StandardBeanConverterExtension {
 
         Map<Object, Object> valueMap = instantiateMap(persistentBean.getClass());
 
-        ((Map<String, Object>) persistentBean).entrySet().stream()
-                .map(entry -> {
-                    Object key = ReflectionTools.parseString(entry.getKey(), keyClass);
-                    Object value = persistentBeanConverter.revert(entry.getValue(), valueClass, valueType);
-                    return new Object[]{key, value};
-                })
-                .forEach(pair -> valueMap.put(pair[0], pair[1]));
+        for (Entry<String, Object> entry : ((Map<String, Object>) persistentBean).entrySet()) {
+            Object key = ReflectionTools.parseString(entry.getKey(), keyClass);
+            Object value = persistentBeanConverter.revert(entry.getValue(), valueClass, valueType);
+            valueMap.put(key, value);
+        }
 
         return (T) valueMap;
     }
