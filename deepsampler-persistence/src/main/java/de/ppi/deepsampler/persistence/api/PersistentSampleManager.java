@@ -9,6 +9,7 @@ import de.ppi.deepsampler.core.api.Matchers;
 import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
+import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.model.PersistentActualSample;
@@ -16,6 +17,8 @@ import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -124,8 +127,10 @@ public class PersistentSampleManager {
         final List<Object> parameterEnvelopes = call.getPersistentParameter().getParameter();
         final Object returnValueEnvelope = call.getPersistentReturnValue();
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
-        final Class<?>[] parameterTypes = sampledMethod.getMethod().getParameterTypes();
-        final Class<?> returnType = sampledMethod.getMethod().getReturnType();
+        final Type[] parameterTypes = sampledMethod.getMethod().getGenericParameterTypes();
+        final Type genericReturnType = sampledMethod.getMethod().getGenericReturnType();
+        final ParameterizedType parameterizedReturnType = genericReturnType instanceof ParameterizedType ? (ParameterizedType) genericReturnType : null;
+        final Class<?> returnClass = sampledMethod.getMethod().getReturnType();
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
         final List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
@@ -136,13 +141,14 @@ public class PersistentSampleManager {
         sample.setParameterMatchers(parameterMatchers);
         sample.setParameterValues(parameterValues);
 
-        final Object returnValue = unwrapValue(returnType, returnValueEnvelope);
+
+        final Object returnValue = unwrapValue(returnClass, parameterizedReturnType, returnValueEnvelope);
         sample.setAnswer(invocation -> returnValue);
 
         return sample;
     }
 
-    private List<Object> unwrapValue(final String id, final Class<?>[] parameterTypes, final List<Object> parameterPersistentBeans) {
+    private List<Object> unwrapValue(final String id, final Type[] parameterTypes, final List<Object> parameterPersistentBeans) {
         final List<Object> params = new ArrayList<>();
 
         if (parameterTypes.length != parameterPersistentBeans.size()) {
@@ -150,15 +156,19 @@ public class PersistentSampleManager {
                     "not match the number of persistent parameters (%s:%s)!", id, parameterTypes, parameterPersistentBeans);
         }
         for (int i = 0; i < parameterPersistentBeans.size(); ++i) {
-            final Class<?> parameterType = parameterTypes[i];
+            final ParameterizedType parameterType = parameterTypes[i] instanceof  ParameterizedType ? (ParameterizedType) parameterTypes[i] : null;
+            final Class<?> parameterClass = ReflectionTools.getClass(parameterTypes[i]);
             final Object persistentBean = parameterPersistentBeans.get(i);
-            params.add(unwrapValue(parameterType, persistentBean));
+
+            params.add(unwrapValue(parameterClass, parameterType, persistentBean));
         }
         return params;
     }
 
-    private Object unwrapValue(final Class<?> type, final Object persistentBean) {
-        return persistentSamplerContext.getPersistentBeanConverter().revert(persistentBean, type);
+
+
+    private Object unwrapValue(final Class<?> targetClass, final ParameterizedType type, final Object persistentBean) {
+        return persistentSamplerContext.getPersistentBeanConverter().revert(persistentBean, targetClass, type);
     }
 
     @SuppressWarnings("unchecked")

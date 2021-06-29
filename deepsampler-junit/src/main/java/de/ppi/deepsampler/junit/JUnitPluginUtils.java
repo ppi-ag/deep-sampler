@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
- * Provides utilities for dealing with reflection in order to find prepare Sampler in Testcases using the Annotation {@link PrepareSampler}.
+ * Provides utilities for dealing with reflection in order to prepare Sampler in Testcases using the Annotation {@link PrepareSampler}.
  */
 public class JUnitPluginUtils {
 

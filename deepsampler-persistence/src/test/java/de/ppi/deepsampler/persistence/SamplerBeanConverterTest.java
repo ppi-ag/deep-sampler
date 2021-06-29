@@ -23,7 +23,7 @@ class SamplerBeanConverterTest {
         bean.collectionOfStrings = Collections.unmodifiableList(listOfStrings);
 
         // WHEN
-        PersistentBean persistentBean = SamplerBeanConverter.create().convert(bean);
+        PersistentBean persistentBean = SamplerBeanConverter.create().convert(bean, null);
 
         // THEN
         assertEquals(bean.collectionOfStrings, persistentBean.getValue("0$collectionOfStrings"));
@@ -37,7 +37,7 @@ class SamplerBeanConverterTest {
         timestampBean.timestamp = ts;
 
         // WHEN
-        PersistentBean persistentBean = SamplerBeanConverter.create().convert(timestampBean);
+        PersistentBean persistentBean = SamplerBeanConverter.create().convert(timestampBean, null);
 
         // THEN
         assertEquals(ts, persistentBean.getValue("0$timestamp"));

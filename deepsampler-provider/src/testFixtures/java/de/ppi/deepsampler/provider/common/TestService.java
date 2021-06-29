@@ -7,6 +7,7 @@ package de.ppi.deepsampler.provider.common;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * A Service that will be instrumented to test the interceptors.
@@ -118,7 +119,66 @@ public class TestService {
         return new String[]{HARD_CODED_RETURN_VALUE};
     }
 
+    public String[][] getArrayOfStrings2d() {
+        return new String[][]{new String[]{HARD_CODED_RETURN_VALUE}};
+    }
+
+    public TestBean[][][] getArrayOfTestBeans3d() {
+        return new TestBean[][][] {{{new TestBean(HARD_CODED_RETURN_VALUE)}, {new TestBean(HARD_CODED_RETURN_VALUE)}}};
+    }
+
     public TestBean[] getArrayOfTestBeans() {
         return new TestBean[]{new TestBean(HARD_CODED_RETURN_VALUE)};
+    }
+
+    public List<TestBean> getListOfTestBeans() {
+        return Arrays.asList(new TestBean(HARD_CODED_RETURN_VALUE));
+    }
+
+    public List<String> getListOfStrings() {
+        return Arrays.asList(HARD_CODED_RETURN_VALUE);
+    }
+
+    public Set<String> getSetOfStrings() {
+        Set<String> set = new HashSet<>();
+        set.add(HARD_CODED_RETURN_VALUE);
+
+        return set;
+    }
+
+    public Set<TestBean> getSetOfTestBeans() {
+        Set<TestBean> set = new HashSet<>();
+        set.add(new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return set;
+    }
+
+    public Map<String, String> getMapOfStrings() {
+        Map<String, String> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, HARD_CODED_RETURN_VALUE);
+
+        return map;
+    }
+
+    public Map<String, TestBean> getMapOfStringsToTestBeans() {
+        Map<String, TestBean> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
+    }
+
+    public Map<TestBean, TestBean> getComplexMap() {
+        Map<TestBean, TestBean> map = new HashMap<>();
+
+        map.put(new TestBean(HARD_CODED_RETURN_VALUE), new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
+    }
+
+    public Map<Integer, Integer> getMapOfIntegers() {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(1, 2);
+
+        return map;
     }
 }

@@ -539,6 +539,8 @@ public abstract class SamplerAspectTest {
         getTestService().noReturnValue(3);
         final String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+
+
         source.record();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -575,6 +577,110 @@ public abstract class SamplerAspectTest {
 
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertEquals(new Date(1), getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void listOfTestBeansReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getListOfTestBeans());
+
+        getTestService().getListOfTestBeans();
+        final String pathToFile = "./record/listOfTestBeansReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getListOfTestBeans());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getListOfTestBeans().size());
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getListOfTestBeans().get(0).getValue());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void listOfStringsReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getListOfStrings());
+
+        getTestService().getListOfStrings();
+        final String pathToFile = "./record/listOfStringsReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getListOfStrings());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getListOfStrings().size());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void setOfStringsReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getSetOfStrings());
+
+        getTestService().getSetOfStrings();
+        final String pathToFile = "./record/setOfStringsReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getSetOfStrings());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getSetOfStrings().size());
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getSetOfStrings().toArray()[0]);
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void setOfTestBeansReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getSetOfTestBeans());
+
+        getTestService().getSetOfTestBeans();
+        final String pathToFile = "./record/setOfTestBeansReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getSetOfTestBeans());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getSetOfTestBeans().size());
+        TestBean testBean = getTestService().getSetOfTestBeans().stream().findFirst().get();
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, testBean.getValue());
+
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -630,6 +736,152 @@ public abstract class SamplerAspectTest {
 
         Files.delete(Paths.get(pathToFile));
     }
+
+    @Test
+    void multidimensionalArrayOfStringsCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getArrayOfStrings2d());
+
+        getTestService().getArrayOfStrings2d();
+        final String pathToFile = "./record/multidimensionalArrayCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getArrayOfStrings2d());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+
+        // WHEN
+        String[][] result = getTestService().getArrayOfStrings2d();
+
+        // THEN
+        assertEquals(1, result.length);
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, result[0][0]);
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    void multidimensionalArrayOfTestBeansCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getArrayOfTestBeans3d());
+
+        getTestService().getArrayOfTestBeans3d();
+        final String pathToFile = "./record/multidimensionalArrayOfTestBeansCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getArrayOfTestBeans3d());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+
+        // WHEN
+        TestBean[][][] result = getTestService().getArrayOfTestBeans3d();
+
+        // THEN
+        assertEquals(1, result.length);
+        assertEquals(2, result[0].length);
+        assertEquals(1, result[0][0].length);
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, result[0][0][0].getValue());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void mapOfStringsReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getMapOfStrings());
+
+        getTestService().getMapOfStrings();
+        final String pathToFile = "./record/mapOfStringsReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getMapOfStrings());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getMapOfStrings().size());
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getMapOfStrings().get(TestService.HARD_CODED_RETURN_VALUE));
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void mapOfStringsToTestBeansReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getMapOfStringsToTestBeans());
+
+        getTestService().getMapOfStringsToTestBeans();
+        final String pathToFile = "./record/mapOfStringsToTestBeansReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getMapOfStringsToTestBeans());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getMapOfStringsToTestBeans().size());
+        assertNotNull(getTestService().getMapOfStringsToTestBeans().get(TestService.HARD_CODED_RETURN_VALUE));
+
+        TestBean loadedTestBean = getTestService().getMapOfStringsToTestBeans().get(TestService.HARD_CODED_RETURN_VALUE);
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, loadedTestBean.getValue());
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void mapOfIntegersReturnValueCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getMapOfIntegers());
+
+        getTestService().getMapOfIntegers();
+        final String pathToFile = "./record/mapOfIntegersReturnValueCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getMapOfIntegers());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getMapOfIntegers().size());
+        assertEquals(2, getTestService().getMapOfIntegers().get(1));
+
+        Files.delete(Paths.get(pathToFile));
+    }
+
 
 
     @Test
