@@ -1,0 +1,18 @@
+{
+  "id" : "6ff9ee24-f86a-4b8e-becc-7e3c46dd6e45",
+  "sampleMethodToSampleMap" : {
+    "public de.ppi.deepsampler.provider.common.Animal de.ppi.deepsampler.provider.common.TestService.getAnimal()" : {
+      "callMap" : [ {
+        "parameter" : {
+          "args" : [ ]
+        },
+        "returnValue" : {
+          "@type" : "de.ppi.deepsampler.persistence.bean.DefaultPersistentBean",
+          "values" : {
+            "0$name" : "Porthos"
+          }
+        }
+      } ]
+    }
+  }
+}
