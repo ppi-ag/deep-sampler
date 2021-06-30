@@ -181,4 +181,8 @@ public class TestService {
 
         return map;
     }
+
+    public Animal getAnimal() {
+        return new Dog("Porthos");
+    }
 }
