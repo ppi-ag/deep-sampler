@@ -65,6 +65,17 @@ public class TestService {
     }
 
     /**
+     * This method returns a non primitive parameter containing a byte[] if the method is not mocked.
+     * This Method is intended to be used in positive and negative tests.
+     *
+     * @param someObject The parameter that will be returned unchanged
+     * @return the unchanged parameter value
+     */
+    public TestBeanWithBytes echoParameter(final TestBeanWithBytes someObject) {
+        return someObject;
+    }
+
+    /**
      * This method is needed to test whether calls of void methods can be verified or not.
      *
      * @param someInt int value
@@ -181,4 +192,6 @@ public class TestService {
 
         return map;
     }
+
+
 }

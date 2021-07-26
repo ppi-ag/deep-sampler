@@ -50,6 +50,7 @@ public abstract class SamplerAspectTest {
     private static final TestBean TEST_BEAN_B = new TestBean();
     public static final String MY_ECHO_PARAMS = "MY ECHO PARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
+    public static final byte[] SOME_BYTES = {1, 2, 3, 4};
 
 
     /**
@@ -525,6 +526,30 @@ public abstract class SamplerAspectTest {
         assertNotNull(getTestService().echoParameter(VALUE_A));
         assertNotNull(getTestService().echoParameter(TEST_BEAN_A));
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+        Files.delete(Paths.get(pathToFile));
+    }
+
+    @Test
+    public void byteArrayCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(any(TestBeanWithBytes.class)));
+
+        getTestService().echoParameter(new TestBeanWithBytes(SOME_BYTES));
+        final String pathToFile = "./record/byteArrayCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.echoParameter(any(TestBeanWithBytes.class)));
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertArrayEquals(SOME_BYTES , getTestService().echoParameter(new TestBeanWithBytes(SOME_BYTES)).getSomeBytes());
         Files.delete(Paths.get(pathToFile));
     }
 
