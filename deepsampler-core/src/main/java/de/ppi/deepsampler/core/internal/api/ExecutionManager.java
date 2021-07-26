@@ -6,8 +6,10 @@
 package de.ppi.deepsampler.core.internal.api;
 
 import de.ppi.deepsampler.core.api.SampleReturnProcessor;
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.model.*;
 
+import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.List;
 

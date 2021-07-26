@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
  * that should be stubbed. (@see {@link de.ppi.deepsampler.core.api.Sampler}).
  *
  * Methods of the class {@link Object} are ignored. Otherwise strange effects might appear, e.g. if Object::finalize is
- * called by the garbage collactor.
+ * called by the garbage collector.
  */
 public class RecordSampleHandler extends ReturningSampleHandler {
     private final Class<?> cls;

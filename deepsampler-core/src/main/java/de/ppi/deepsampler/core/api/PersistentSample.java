@@ -29,13 +29,13 @@ import java.util.Objects;
  * the Sampler manually and to distribute the Sampler into the objects that will be tested. The distribution is done by a Dependency Injection Framework like Spring or Guice.
  *
  * Methods of the class {@link Object} are ignored. Otherwise strange effects might appear, e.g. if Object::finalize is
- * called by the garbage collactor.
+ * called by the garbage collector.
  *
  * @author Jan Schankin, Rico Schrage
  */
-public class Sample {
+public class PersistentSample {
 
-    private Sample() {
+    private PersistentSample() {
         // This class is meant to be used as a frontend for a static fluent API and should never be instantiated.
     }
 
@@ -49,7 +49,7 @@ public class Sample {
      * @return A {@link SampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */
-    public static <T> SampleBuilder<T> of(final T sampledMethodCall) {
+    public static <T> PersistentSampleBuilder<T> of(final T sampledMethodCall) {
         SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         SampleDefinition lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
 
@@ -57,56 +57,43 @@ public class Sample {
             throw new NotASamplerException("sampledMethodCall is not a Sampler. Did you prepare the Sampler using Sampler.prepare() or @PrepareSampler?");
         }
 
+        currentSampleDefinition.setPersistent(true);
+
         SampleRepository.getInstance().setLastSampleDefinition(currentSampleDefinition);
-
-        return new SampleBuilder<>(sampledMethodCall, currentSampleDefinition);
-    }
-
-
-    /**
-     * Along with the subsequent method call you can assert that this method call has been called
-     * <code>quantity</code>-times. If the quantity doesn't match exactly this method
-     * will throw a {@link VerifyException}. If it does match nothing will happen.
-     *
-     * @param cls the class of which you want to assert a specific method invocation
-     * @param quantity the quantity you expect this invocation to happen
-     * @param <T> the type of the class you want assert
-     * @return Proxy to subsequently define the method which invocation you want to assert
-     */
-    public static <T> T verifyCallQuantity(final Class<T> cls, final Quantity quantity) {
-        return ProxyFactory.createProxy(cls, new VerifySampleHandler(quantity, cls));
+        return new PersistentSampleBuilder<>(sampledMethodCall, currentSampleDefinition);
     }
 
     /**
-     * Defines a stubbed void method by calling the method inside of a lambda. The returned {@link VoidSampleBuilder} will then offer possibilities to define the Sample,
-     * or in other words, it offers possibilities to override the default behavior or the stubbed method.
+     * Along with the subsequent method call it defines a Sample for which the framework should start to track
+     * how often this Sample is used in the component. This is necessary to be able to verify the invocation
+     * of a specific method.
      *
-     * @param sampledMethodCall The method call as a lambda expression, that will be sampled.
-     * @param <E> If the stubbed method (called by the functional interface {@link VoidCall}) throws an {@link Exception}, E defines the type of that {@link Exception}
-     *           E may be a caught or an uncaught (i.e. {@link RuntimeException} Exception.
-     * @return A {@link VoidSampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
-     * fluent API only.
+     * @param sampler the sampler for which you want to activate a method call
+     * @param <T> the type of the target Class/sampler
+     * @return the sampler itself
      */
-    public static <E extends Exception> VoidSampleBuilder of(final VoidCall<E> sampledMethodCall) {
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
+    public static <T> T forVerification(final T sampler) {
+        Objects.requireNonNull(sampler);
 
-        final SampleDefinition lastSampleDefinition = sampleRepository.getCurrentSampleDefinition();
-
-        try {
-            sampledMethodCall.call();
-        } catch (final Exception e) {
-            throw new NotASamplerException("The VoidCall did throw an Exception. Did you call an unstubbed method inside of the lambda, " +
-                    "instead of a method on a Sampler?", e);
+        if (!ProxyFactory.isProxyClass(sampler.getClass())) {
+            throw new NotASamplerException(sampler.getClass());
         }
 
-        final SampleDefinition newSampleDefinition = sampleRepository.getCurrentSampleDefinition();
+        return sampler;
+    }
 
-        if (lastSampleDefinition == newSampleDefinition) {
-            throw new NotASamplerException("sampledMethodCall did not call a method on a Sampler. Did you use a " +
-                    "sampled object created by @PrepareSampler or Sampler.prepare()?");
-        }
 
-        return new VoidSampleBuilder(newSampleDefinition);
+
+    /**
+     * This method will set the <code>sampleId</code> of the last defined sampleDefinition. Mostly you
+     * want to set the sampleId with the Method {@link PersistentSampleBuilder#hasId(String)}. But in case of
+     * void-returning methods, it is not possible to create a {@link SampleBuilder}. As a consequence
+     * you will need to set the id with this method.
+     *
+     * @param id the id you want to set.
+     */
+    public static void setIdToLastMethodCall(final String id) {
+        SampleRepository.getInstance().getCurrentSampleDefinition().setSampleId(id);
     }
 
 }

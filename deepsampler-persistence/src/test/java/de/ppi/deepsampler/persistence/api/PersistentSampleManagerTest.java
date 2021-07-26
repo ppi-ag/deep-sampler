@@ -1,6 +1,7 @@
 package de.ppi.deepsampler.persistence.api;
 
 
+import de.ppi.deepsampler.core.api.PersistentSample;
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.model.SampleDefinition;
@@ -40,7 +41,7 @@ class PersistentSampleManagerTest {
         addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
 
         PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
-        Sample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), sameMatcher()),
+        PersistentSample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), sameMatcher()),
                 equalTo(1))).hasId("SampleId");
 
         // WHEN
@@ -77,7 +78,7 @@ class PersistentSampleManagerTest {
         addMethodCall(persistentMethodCallList, Arrays.asList(new TestBean(), 1), false);
 
         PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
-        Sample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), equalsMatcher()),
+        PersistentSample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), equalsMatcher()),
                 combo(equalTo(1), sameMatcher()))).hasId("SampleId");
 
         // WHEN

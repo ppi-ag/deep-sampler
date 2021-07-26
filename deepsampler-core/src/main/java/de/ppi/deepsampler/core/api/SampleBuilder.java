@@ -69,18 +69,4 @@ public class SampleBuilder<T> extends VoidSampleBuilder {
         getSampleDefinition().setAnswer((Answer<Exception>) answer);
     }
 
-
-
-    /**
-     * Set an id for the current SampleDefinition.
-     *
-     * @param sampleId the sampleId you want to set
-     * @return this
-     */
-    public SampleBuilder<T> hasId(final String sampleId) {
-        getSampleDefinition().setSampleId(sampleId);
-        return this;
-    }
-
-
 }

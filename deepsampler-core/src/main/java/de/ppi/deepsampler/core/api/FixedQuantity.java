@@ -3,9 +3,7 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.core.internal;
-
-import de.ppi.deepsampler.core.api.Quantity;
+package de.ppi.deepsampler.core.api;
 
 public class FixedQuantity implements Quantity {
 

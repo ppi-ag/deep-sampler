@@ -16,6 +16,7 @@ public class SampleDefinition {
     private List<ParameterMatcher<?>> parameterMatchers = new ArrayList<>();
     private Answer<Exception> answer;
     private String sampleId;
+    private boolean isPersistent;
 
     public SampleDefinition(final SampledMethod sampledMethod) {
         this.sampledMethod = sampledMethod;
@@ -74,6 +75,15 @@ public class SampleDefinition {
         return this.parameterValues;
     }
 
+
+    public boolean isPersistent() {
+        return isPersistent;
+    }
+
+    public void setPersistent(boolean persistent) {
+        isPersistent = persistent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -88,6 +98,8 @@ public class SampleDefinition {
                 Objects.equals(sampleId, that.sampleId);
     }
 
+
+
     @Override
     public int hashCode() {
         return Objects.hash(sampledMethod.getMethod(), parameterValues, sampleId);
@@ -101,6 +113,7 @@ public class SampleDefinition {
                 ", parameterMatchers=" + parameterMatchers +
                 ", answer=" + answer +
                 ", sampleId='" + sampleId + '\'' +
+                ", isPersistent=" + isPersistent +
                 '}';
     }
 }
