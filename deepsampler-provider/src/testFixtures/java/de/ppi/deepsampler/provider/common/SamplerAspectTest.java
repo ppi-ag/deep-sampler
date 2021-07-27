@@ -904,7 +904,6 @@ public abstract class SamplerAspectTest {
         assertThrows(PersistenceException.class,
                 source::load);
 
-        assertTrue(SampleRepository.getInstance().isEmpty());
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -1147,25 +1146,23 @@ public abstract class SamplerAspectTest {
         Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
 
         getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "R1");
-        getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "R2");
         getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "R3");
+
         final String pathToFile = "./record/comboMatcherTwoArguments.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
         Sampler.clear();
-        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
 
+        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
         source.load();
 
         // WHEN
         String resultFirst = getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1");
         String resultSecond = getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
-        String resultThird = getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "ABC3");
 
         // THEN
         assertEquals("ABC1", resultFirst);
         assertEquals("R1", resultSecond);
-        assertEquals("ABC3", resultThird);
         Files.delete(Paths.get(pathToFile));
     }
 

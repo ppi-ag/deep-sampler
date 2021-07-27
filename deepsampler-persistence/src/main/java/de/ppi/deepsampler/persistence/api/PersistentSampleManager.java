@@ -12,6 +12,8 @@ import de.ppi.deepsampler.persistence.PersistentSamplerContext;
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
+import de.ppi.deepsampler.persistence.error.UnusedSampleParameterMatchersException;
+import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
 import de.ppi.deepsampler.persistence.model.PersistentActualSample;
 import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
@@ -19,9 +21,7 @@ import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -101,24 +101,39 @@ public class PersistentSampleManager {
         }
     }
 
-    private List<SampleDefinition> toSample(final PersistentModel model, final Map<String, SampleDefinition> idToSampleMethodMapping) {
+    private List<SampleDefinition> toSample(final PersistentModel persistentModel, final Map<String, SampleDefinition> idToSampleMethodMapping) {
         final List<SampleDefinition> samples = new ArrayList<>();
+        final Set<SampleDefinition> missedSampleDefinitions = new HashSet<SampleDefinition>();
 
-        for (final Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getSampleMethodToSampleMap().entrySet()) {
-            final PersistentSampleMethod persistentSampleMethod = joinPointBehaviorEntry.getKey();
-            final PersistentActualSample persistentActualSample = joinPointBehaviorEntry.getValue();
+        for (final Map.Entry<PersistentSampleMethod, PersistentActualSample> persistentSample : persistentModel.getSampleMethodToSampleMap().entrySet()) {
+            final PersistentSampleMethod persistentSampleMethod = persistentSample.getKey();
+            final PersistentActualSample persistentActualSample = persistentSample.getValue();
+
             final SampleDefinition matchingSample = idToSampleMethodMapping.get(persistentSampleMethod.getSampleMethodId());
 
-            // When there is no matching JointPoint, the persistentJoinPointEntity will be discarded
             if (matchingSample != null) {
                 for (final PersistentMethodCall call : persistentActualSample.getAllCalls()) {
-                    final SampleDefinition behavior = mapToSample(matchingSample, persistentSampleMethod, call);
-                    if (SampleHandling.argumentsMatch(matchingSample, behavior.getParameterValues().toArray(new Object[0]))) {
-                        samples.add(behavior);
+                    final SampleDefinition sampleDefinition = mapToSample(matchingSample, persistentSampleMethod, call);
+
+                    // We collect all sampleDefinitions in a Set and remove only those sampleDefinitions from this Set, which have a matching Sampler
+                    // If the Set is not empty in the end, we know that the persistent SamplerFile (e.g. JSON) contains some unused and most likely changed
+                    // Samples. To inform the user about this, we throw an Exception.
+                    missedSampleDefinitions.add(sampleDefinition);
+
+                    if (SampleHandling.argumentsMatch(matchingSample, sampleDefinition.getParameterValues().toArray(new Object[0]))) {
+                        samples.add(sampleDefinition);
+                        missedSampleDefinitions.remove(sampleDefinition);
                     }
                 }
+            } else {
+                throw new NoMatchingSamplerFoundException(persistentSampleMethod.getSampleMethodId());
             }
         }
+
+        if (!missedSampleDefinitions.isEmpty()) {
+            throw new UnusedSampleParameterMatchersException(missedSampleDefinitions);
+        }
+
         return samples;
     }
 
