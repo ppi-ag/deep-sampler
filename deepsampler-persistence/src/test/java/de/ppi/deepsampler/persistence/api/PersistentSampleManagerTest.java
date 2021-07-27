@@ -6,7 +6,7 @@ import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.core.model.SampledMethod;
-import de.ppi.deepsampler.persistence.error.UnusedSampleParameterMatchersException;
+import de.ppi.deepsampler.persistence.error.ParametersAreNotMatchedException;
 import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
 import de.ppi.deepsampler.persistence.model.*;
 import org.junit.jupiter.api.AfterEach;
@@ -122,7 +122,7 @@ class PersistentSampleManagerTest {
         Sample.of(sampler.call(givenBean, 4)).hasId("SampleId");
 
         // WHEN
-        assertThrows(UnusedSampleParameterMatchersException.class, () -> persistentSampleManager.load());
+        assertThrows(ParametersAreNotMatchedException.class, () -> persistentSampleManager.load());
     }
 
     @Test

@@ -12,7 +12,7 @@ import de.ppi.deepsampler.persistence.PersistentSamplerContext;
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
-import de.ppi.deepsampler.persistence.error.UnusedSampleParameterMatchersException;
+import de.ppi.deepsampler.persistence.error.ParametersAreNotMatchedException;
 import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
 import de.ppi.deepsampler.persistence.model.PersistentActualSample;
 import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
@@ -131,7 +131,7 @@ public class PersistentSampleManager {
         }
 
         if (!missedSampleDefinitions.isEmpty()) {
-            throw new UnusedSampleParameterMatchersException(missedSampleDefinitions);
+            throw new ParametersAreNotMatchedException(missedSampleDefinitions);
         }
 
         return samples;

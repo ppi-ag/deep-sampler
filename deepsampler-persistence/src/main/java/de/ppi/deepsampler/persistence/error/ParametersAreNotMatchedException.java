@@ -6,13 +6,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * The {@link UnusedSampleParameterMatchersException} is thrown if a JSON-file (or any other persistent Sampler) contains
+ * The {@link ParametersAreNotMatchedException} is thrown if a JSON-file (or any other persistent Sample) contains
  * Samples that need parameter matchers which were not defined using the {@link de.ppi.deepsampler.core.api.Sample#of(Object)} API.
  * To be more specific: The stubbed method of a Sampler has been found, but the parameters don't fit.
  */
-public class UnusedSampleParameterMatchersException extends PersistenceException {
+public class ParametersAreNotMatchedException extends PersistenceException {
 
-    public UnusedSampleParameterMatchersException(Set<SampleDefinition> missedSampleDefinitions) {
+    public ParametersAreNotMatchedException(Set<SampleDefinition> missedSampleDefinitions) {
         super("The following persistent Samples have a Sampler (defined using Sampler.of(...)) " +
                         "but the parameter matchers used don't fit to the persistent parameters:\n%s",
                 formatErrorMessage(missedSampleDefinitions));
@@ -20,7 +20,7 @@ public class UnusedSampleParameterMatchersException extends PersistenceException
 
     private static String formatErrorMessage(Set<SampleDefinition> missedSampleDefinitions) {
         return missedSampleDefinitions.stream()
-                .map(UnusedSampleParameterMatchersException::formatSampleDefinition)
+                .map(ParametersAreNotMatchedException::formatSampleDefinition)
                 .collect(Collectors.joining("\n\n"));
     }
 
