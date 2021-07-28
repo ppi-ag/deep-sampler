@@ -18,14 +18,14 @@ public class ExecutionManager {
     }
 
     public static void notify(final SampleDefinition sampleDefinition) {
-        getSampleInformation(sampleDefinition).increaseTimesInvoked();
+        getSampleExecutionInformation(sampleDefinition).increaseTimesInvoked();
     }
 
     public static void record(final SampleDefinition sampleDefinition, final MethodCall actualMethodCall) {
-        getSampleInformation(sampleDefinition).addMethodCall(actualMethodCall);
+        getSampleExecutionInformation(sampleDefinition).addMethodCall(actualMethodCall);
     }
 
-    private static SampleExecutionInformation getSampleInformation(final SampleDefinition sampleDefinition) {
+    private static SampleExecutionInformation getSampleExecutionInformation(final SampleDefinition sampleDefinition) {
         final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(sampleDefinition.getSampledMethod().getTarget());
 
         return executionInformation.getOrCreateBySample(sampleDefinition);
