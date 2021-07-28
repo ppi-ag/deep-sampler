@@ -103,7 +103,7 @@ public abstract class SpringSamplerAspect {
         // generic Proxy-class. Using the signature doesn't have this problem.
         final SampledMethod sampledMethod = new SampledMethod(signature.getDeclaringType(), signature.getMethod());
 
-        return SampleRepository.getInstance().find(sampledMethod, proceedingJoinPoint.getArgs());
+        return SampleRepository.getInstance().findValidated(sampledMethod, proceedingJoinPoint.getArgs());
     }
 
 

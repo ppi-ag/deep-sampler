@@ -64,6 +64,6 @@ public class GuiceSamplerAspect implements MethodInterceptor {
      */
     private SampleDefinition findSampleDefinition(final MethodInvocation invocation) {
         final SampledMethod sampledMethod = new SampledMethod(invocation.getThis().getClass(), invocation.getMethod());
-        return SampleRepository.getInstance().find(sampledMethod, invocation.getArguments());
+        return SampleRepository.getInstance().findValidated(sampledMethod, invocation.getArguments());
     }
 }

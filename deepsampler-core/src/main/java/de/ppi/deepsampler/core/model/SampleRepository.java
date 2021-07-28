@@ -5,6 +5,8 @@
 
 package de.ppi.deepsampler.core.model;
 
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -106,16 +108,33 @@ public class SampleRepository {
     }
 
 
-    public SampleDefinition find(final SampledMethod wantedSampledMethod, final Object... args) {
+    public SampleDefinition findValidated(final SampledMethod wantedSampledMethod, final Object... args) {
+        return find(true, wantedSampledMethod, args);
+    }
+
+    public SampleDefinition findUnvalidated(final SampledMethod wantedSampledMethod, final Object... args) {
+        return find(false, wantedSampledMethod, args);
+    }
+
+    private SampleDefinition find(final boolean validate, final SampledMethod wantedSampledMethod, final Object... args) {
+        boolean matchingMethodFound = false;
+
         for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
 
             if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
-                    && methodMatches(wantedSampledMethod, sampledMethod)
-                    && argumentsMatch(sampleDefinition, args)) {
+                    && methodMatches(wantedSampledMethod, sampledMethod)) {
 
-                return sampleDefinition;
+                matchingMethodFound = true;
+
+                if (argumentsMatch(sampleDefinition, args)) {
+                    return sampleDefinition;
+                }
             }
+        }
+
+        if (matchingMethodFound && validate) {
+            throw new NoMatchingParametersFoundException(wantedSampledMethod, args);
         }
 
         return null;
