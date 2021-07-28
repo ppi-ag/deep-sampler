@@ -318,6 +318,23 @@ public abstract class SamplerAspectTest {
     }
 
     @Test
+    public void verifyTwoCallsOnSameMethodWithDifferentParameters() {
+        // CHANGE
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_A))).is(TEST_BEAN_B);
+        Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_B))).is(TEST_BEAN_A);
+
+        // CALL
+        getTestService().echoParameter(TEST_BEAN_B);
+        getTestService().echoParameter(TEST_BEAN_A);
+
+        //THEN
+        Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_B);
+        Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_A);
+        Sample.verifyCallQuantity(TestService.class, NEVER).getMinusOne();
+    }
+
+    @Test
     public void verifyMethodCalledOnce() {
         // CHANGE
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
