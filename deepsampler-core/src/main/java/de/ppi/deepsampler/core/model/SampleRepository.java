@@ -58,16 +58,14 @@ public class SampleRepository {
     }
 
     /**
-     * Adds the given {@link SampleDefinition} to the {@link SampleRepository#samples}
-     * and sets also the {@link SampleRepository#currentSample}.
-     *
-     * @param index The position where the {@link SampleDefinition} will be inserted in the list of {@link SampleDefinition}s. The {@link SampleDefinition}
-     *              at index and all following {@link SampleDefinition}s will be shifted one index to the right.
-     * @param sampleDefinition The new SampleDefinition.
+     * Replces the {@link SampleDefinition} and index i with the {@link SampleDefinition}s from mergedPersistentSamples. If
+     * the {@link List} is longer then 1 all {@link SampleDefinition}s after i are moved to the right.
+     * @param i The index of the {@link SampleDefinition} that should be replaced.
+     * @param mergedPersistentSamples The {@link SampleDefinition}s that are inserted at i.
      */
-    public void add(final int index, final SampleDefinition sampleDefinition) {
-        setCurrentSample(sampleDefinition);
-        samples.add(index, sampleDefinition);
+    public void replace(int i, List<SampleDefinition> mergedPersistentSamples) {
+        samples.addAll(i + 1, mergedPersistentSamples);
+        samples.remove(i);
     }
 
     /**
@@ -224,5 +222,6 @@ public class SampleRepository {
     public boolean isEmpty() {
         return samples.isEmpty();
     }
+
 
 }

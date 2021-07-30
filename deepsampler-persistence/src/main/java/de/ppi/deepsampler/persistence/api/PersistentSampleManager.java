@@ -14,7 +14,6 @@ import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.error.ParametersAreNotMatchedException;
 import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
-import de.ppi.deepsampler.persistence.model.PersistentActualSample;
 import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
@@ -97,57 +96,76 @@ public class PersistentSampleManager {
     private void mergeSamplesFromPersistenceIntoSampleRepository(final PersistentModel persistentSamples) {
         SampleRepository sampleRepository = SampleRepository.getInstance();
 
-        // PersistentSampleMethods will be removed from this Set if they could be matched to a Sampler. The Set must be a copy, so that
-        // the contents are not deleted from the original Map.
-        Set<PersistentSampleMethod> unusedPersistentSamples = new HashSet<>(persistentSamples.getSampleMethodToSampleMap().keySet());
-        Set<SampleDefinition> unusedPersistentCalls = new HashSet<>();
+        // This is a Set of all SampleIds from the persistence. Everytime, when a SampleId could be matched to a Sampler from the SampleRepository,
+        // the SampleId will be removed from this Set. The remaining SampleIds are unmatched and will be reported by an Exception.
+        Set<String> unusedPersistentSampleIds = getPersistentSampleIds(persistentSamples);
 
         for (int i = 0; i < sampleRepository.size(); i++) {
             SampleDefinition sampler = sampleRepository.get(i);
 
             if (sampler.getAnswer() != null) {
+                // It is not necessary to merge a Sampler, that already has an Answer.
                 continue;
             }
 
-            for(Map.Entry<PersistentSampleMethod, PersistentActualSample> persistentSample : persistentSamples.getSampleMethodToSampleMap().entrySet()) {
-                PersistentSampleMethod persistentSampleMethod = persistentSample.getKey();
-                PersistentActualSample persistentCalls = persistentSample.getValue();
+            List<SampleDefinition> mergedPersistentSamples = createSampleDefinitionForEachPersistentSample(persistentSamples, sampler);
 
-                if (persistentSampleMethod.getSampleMethodId().equals(sampler.getSampleId())) {
-                    unusedPersistentSamples.remove(persistentSampleMethod);
+            sampleRepository.replace(i, mergedPersistentSamples);
 
-                    boolean removeNonPersistentSampler = true;
-
-                    for (PersistentMethodCall call : persistentCalls.getAllCalls()) {
-                        SampleDefinition combinedSampleDefinition = combinePersistentSampleAndDefinedSampler(sampler, persistentSampleMethod, call);
-                        // We use the parameter values from combinedSampleDefinition because combinePersistentSampleAndDefinedSampler() unwraps the
-                        // parameters from persistence containers.
-                        Object[] actualParameterValues = combinedSampleDefinition.getParameterValues().toArray();
-
-                        unusedPersistentCalls.add(combinedSampleDefinition);
-
-                        if (SampleHandling.argumentsMatch(sampler, actualParameterValues )) {
-                            sampleRepository.add(i + 1, combinedSampleDefinition);
-                            if(removeNonPersistentSampler) {
-                                sampleRepository.remove(i);
-                                removeNonPersistentSampler = false;
-                            }
-
-                            unusedPersistentCalls.remove(combinedSampleDefinition);
-                        }
-                    }
-                }
-            }
+            unusedPersistentSampleIds = filterUsedSampleIds(unusedPersistentSampleIds, mergedPersistentSamples);
         }
 
-        if (!unusedPersistentSamples.isEmpty()) {
-            List<String> missingIds = unusedPersistentSamples.stream().map(PersistentSampleMethod::getSampleMethodId).collect(Collectors.toList());
-            throw new NoMatchingSamplerFoundException(missingIds);
+        if (!unusedPersistentSampleIds.isEmpty()) {
+            throw new NoMatchingSamplerFoundException(unusedPersistentSampleIds);
+        }
+
+    }
+
+    private Set<String> filterUsedSampleIds(Set<String> unusedPersistentSampleIds, List<SampleDefinition> mergedPersistentCalls) {
+        List<String> mergedSampleIds = mergedPersistentCalls.stream().map(SampleDefinition::getSampleId).collect(Collectors.toList());
+
+        return unusedPersistentSampleIds.stream()
+                .filter(s -> !mergedSampleIds.contains(s))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> getPersistentSampleIds(PersistentModel persistentSamples) {
+        return persistentSamples.getSampleMethodToSampleMap().keySet().stream()
+                .map(PersistentSampleMethod::getSampleMethodId)
+                .collect(Collectors.toSet());
+    }
+
+    private List<SampleDefinition> createSampleDefinitionForEachPersistentSample(PersistentModel persistentSamples, SampleDefinition sampler) {
+        List<SampleDefinition> usedPersistentCalls = new ArrayList<>();
+        Set<SampleDefinition> unusedPersistentCalls = new HashSet<>();
+
+        for(PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
+
+            if (persistentSampleMethod.getSampleMethodId().equals(sampler.getSampleId())) {
+                List<PersistentMethodCall> calls = persistentSamples.getSampleMethodToSampleMap().get(persistentSampleMethod).getAllCalls();
+
+                for (PersistentMethodCall call : calls) {
+                    SampleDefinition combinedSampleDefinition = combinePersistentSampleAndDefinedSampler(sampler, persistentSampleMethod, call);
+                    // We use the parameter values from combinedSampleDefinition because combinePersistentSampleAndDefinedSampler() unwraps the
+                    // parameters from persistence containers.
+                    Object[] actualParameterValues = combinedSampleDefinition.getParameterValues().toArray();
+
+                    unusedPersistentCalls.add(combinedSampleDefinition);
+
+                    if (SampleHandling.argumentsMatch(sampler, actualParameterValues)) {
+                        usedPersistentCalls.add(combinedSampleDefinition);
+                        unusedPersistentCalls.remove(combinedSampleDefinition);
+                    }
+                }
+
+            }
         }
 
         if (!unusedPersistentCalls.isEmpty()) {
             throw new ParametersAreNotMatchedException(unusedPersistentCalls);
         }
+
+        return usedPersistentCalls;
     }
 
 
