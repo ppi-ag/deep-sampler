@@ -6,22 +6,21 @@
 package de.ppi.deepsampler.persistence.api;
 
 import de.ppi.deepsampler.core.api.Matchers;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
-import de.ppi.deepsampler.persistence.model.PersistentActualSample;
+import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
 import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,27 +71,10 @@ public class PersistentSampleManager {
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {
-        List<SampleDefinition> loadedSampledDefinitions = new ArrayList<>();
         for (final SourceManager sourceManager: sourceManagerList) {
-            final Map<String, SampleDefinition> definedSamples = SampleRepository.getInstance().getSamples().stream()
-                    .collect(Collectors.toMap(SampleDefinition::getSampleId, s -> s));
             final PersistentModel persistentModel = sourceManager.load();
 
-            final List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
-            loadedSampledDefinitions.addAll(filteredMappedSample);
-        }
-
-        List<SampleDefinition> currentSampleDefinitions = SampleRepository.getInstance().getSamples();
-        for (int i = currentSampleDefinitions.size() - 1; i >= 0; --i) {
-            SampleDefinition definition = currentSampleDefinitions.get(i);
-            // we only remove definitions made for the persistence -> definitions without answers
-            if (definition.getAnswer() == null) {
-                SampleRepository.getInstance().remove(i);
-            }
-        }
-
-        for (final SampleDefinition sample : loadedSampledDefinitions) {
-            SampleRepository.getInstance().add(sample);
+            mergeSamplesFromPersistenceIntoSampleRepository(persistentModel);
         }
 
         if (SampleRepository.getInstance().isEmpty()) {
@@ -101,29 +83,95 @@ public class PersistentSampleManager {
         }
     }
 
-    private List<SampleDefinition> toSample(final PersistentModel model, final Map<String, SampleDefinition> idToSampleMethodMapping) {
-        final List<SampleDefinition> samples = new ArrayList<>();
+    /**
+     * This method merges the samples from the persistence (e.g. JSON-File) into manually defined Samplers and Samples. The order of the
+     * Samplers is defined by the Samplers in the test class or the compound. Samples from the file will be inserted in the list of Samples
+     * at the position where the matching samplers have been defined.
+     *
+     * E.G. Someone could now first define a matcher that matches only on a particular parameter of the value
+     * "Picard". The second matcher could then by anyString(). The first Sample would then be used only if the correct parameter is supplied and in all
+     * other cases the second sampler would be used.
+     *
+     * @param persistentSamples Contains the Samples from the persistence i.e. JSON
+     */
+    private void mergeSamplesFromPersistenceIntoSampleRepository(final PersistentModel persistentSamples) {
+        SampleRepository sampleRepository = SampleRepository.getInstance();
 
-        for (final Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getSampleMethodToSampleMap().entrySet()) {
-            final PersistentSampleMethod persistentSampleMethod = joinPointBehaviorEntry.getKey();
-            final PersistentActualSample persistentActualSample = joinPointBehaviorEntry.getValue();
-            final SampleDefinition matchingSample = idToSampleMethodMapping.get(persistentSampleMethod.getSampleMethodId());
+        // This is a Set of all SampleIds from the persistence. Everytime, when a SampleId could be matched to a Sampler from the SampleRepository,
+        // the SampleId will be removed from this Set. The remaining SampleIds are unmatched and will be reported by an Exception.
+        Set<String> unusedPersistentSampleIds = getPersistentSampleIds(persistentSamples);
 
-            // When there is no matching JointPoint, the persistentJoinPointEntity will be discarded
-            if (matchingSample != null) {
-                for (final PersistentMethodCall call : persistentActualSample.getAllCalls()) {
-                    final SampleDefinition behavior = mapToSample(matchingSample, persistentSampleMethod, call);
-                    if (SampleHandling.argumentsMatch(matchingSample, behavior.getParameterValues().toArray(new Object[0]))) {
-                        samples.add(behavior);
-                    }
-                }
+        for (int i = 0; i < sampleRepository.size(); i++) {
+            SampleDefinition sampler = sampleRepository.get(i);
+
+            if (sampler.getAnswer() != null) {
+                // It is not necessary to merge a Sampler, that already has an Answer.
+                continue;
             }
+
+            List<SampleDefinition> mergedPersistentSamples = createSampleDefinitionForEachPersistentSample(persistentSamples, sampler);
+
+            sampleRepository.replace(i, mergedPersistentSamples);
+
+            unusedPersistentSampleIds = filterUsedSampleIds(unusedPersistentSampleIds, mergedPersistentSamples);
         }
-        return samples;
+
+        if (!unusedPersistentSampleIds.isEmpty()) {
+            throw new NoMatchingSamplerFoundException(unusedPersistentSampleIds);
+        }
+
     }
 
-    private SampleDefinition mapToSample(final SampleDefinition matchingSample, final PersistentSampleMethod persistentSampleMethod,
-                                         final PersistentMethodCall call) {
+    private Set<String> filterUsedSampleIds(Set<String> unusedPersistentSampleIds, List<SampleDefinition> mergedPersistentCalls) {
+        List<String> mergedSampleIds = mergedPersistentCalls.stream().map(SampleDefinition::getSampleId).collect(Collectors.toList());
+
+        return unusedPersistentSampleIds.stream()
+                .filter(s -> !mergedSampleIds.contains(s))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> getPersistentSampleIds(PersistentModel persistentSamples) {
+        return persistentSamples.getSampleMethodToSampleMap().keySet().stream()
+                .map(PersistentSampleMethod::getSampleMethodId)
+                .collect(Collectors.toSet());
+    }
+
+    private List<SampleDefinition> createSampleDefinitionForEachPersistentSample(PersistentModel persistentSamples, SampleDefinition sampler) {
+        List<SampleDefinition> usedPersistentCalls = new ArrayList<>();
+        List<SampleDefinition> unusedPersistentCalls = new ArrayList<>();
+
+        for(PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
+
+            if (persistentSampleMethod.getSampleMethodId().equals(sampler.getSampleId())) {
+                List<PersistentMethodCall> calls = persistentSamples.getSampleMethodToSampleMap().get(persistentSampleMethod).getAllCalls();
+
+                for (PersistentMethodCall call : calls) {
+                    SampleDefinition combinedSampleDefinition = combinePersistentSampleAndDefinedSampler(sampler, persistentSampleMethod, call);
+                    // We use the parameter values from combinedSampleDefinition because combinePersistentSampleAndDefinedSampler() unwraps the
+                    // parameters from persistence containers.
+                    Object[] actualParameterValues = combinedSampleDefinition.getParameterValues().toArray();
+
+                    unusedPersistentCalls.add(combinedSampleDefinition);
+
+                    if (SampleHandling.argumentsMatch(sampler, actualParameterValues)) {
+                        usedPersistentCalls.add(combinedSampleDefinition);
+                        unusedPersistentCalls.remove(combinedSampleDefinition);
+                    }
+                }
+
+            }
+        }
+
+        if (!unusedPersistentCalls.isEmpty()) {
+            throw new NoMatchingParametersFoundException(unusedPersistentCalls);
+        }
+
+        return usedPersistentCalls;
+    }
+
+
+    private SampleDefinition combinePersistentSampleAndDefinedSampler(final SampleDefinition matchingSample, final PersistentSampleMethod persistentSampleMethod,
+                                                                      final PersistentMethodCall call) {
         final List<Object> parameterEnvelopes = call.getPersistentParameter().getParameter();
         final Object returnValueEnvelope = call.getPersistentReturnValue();
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
@@ -140,7 +188,6 @@ public class PersistentSampleManager {
         sample.setSampleId(joinPointId);
         sample.setParameterMatchers(parameterMatchers);
         sample.setParameterValues(parameterValues);
-
 
         final Object returnValue = unwrapValue(returnClass, parameterizedReturnType, returnValueEnvelope);
         sample.setAnswer(invocation -> returnValue);

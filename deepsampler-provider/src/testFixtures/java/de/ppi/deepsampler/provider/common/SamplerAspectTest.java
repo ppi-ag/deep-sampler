@@ -7,6 +7,7 @@ package de.ppi.deepsampler.provider.common;
 
 import de.ppi.deepsampler.core.api.*;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.error.VerifyException;
 import de.ppi.deepsampler.core.internal.FixedQuantity;
 import de.ppi.deepsampler.core.model.ExecutionRepository;
@@ -140,13 +141,14 @@ public abstract class SamplerAspectTest {
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
         //THEN
-        assertNull(getTestService().echoParameter((String) null));
+        final TestService testService = getTestService();
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter((String) null));
 
         //GIVEN WHEN
         Sample.of(testServiceSampler.echoParameter((String) null)).is(VALUE_A);
 
         //THEN
-        assertEquals(VALUE_A, getTestService().echoParameter((String) null));
+        assertEquals(VALUE_A, testService.echoParameter((String) null));
     }
 
     @Test
@@ -202,7 +204,8 @@ public abstract class SamplerAspectTest {
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
         //THEN
-        assertEquals(VALUE_C, getTestService().echoParameter(VALUE_C));
+        final TestService testService = getTestService();
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter(VALUE_C));
     }
 
     @Test
@@ -272,9 +275,11 @@ public abstract class SamplerAspectTest {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.methodWithTwoParameter("a", "b")).is(VALUE_A);
 
-        assertEquals(VALUE_A, getTestService().methodWithTwoParameter("a", "b"));
-        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("x", "b"));
-        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("a", "x"));
+        // THEN
+        final TestService testService = getTestService();
+        assertEquals(VALUE_A, testService.methodWithTwoParameter("a", "b"));
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithTwoParameter("x", "b"));
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithTwoParameter("a", "x"));
 
     }
 
@@ -285,8 +290,9 @@ public abstract class SamplerAspectTest {
         Sample.of(testServiceSampler.methodWithTwoParameter(anyString(), equalTo("Expected parameter value"))).is(VALUE_A);
 
         //THEN
-        assertEquals(VALUE_A, getTestService().methodWithTwoParameter("Some uninspired random value", "Expected parameter value"));
-        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().methodWithTwoParameter("Some uninspired random value", "wrong"));
+        final TestService testService = getTestService();
+        assertEquals(VALUE_A, testService.methodWithTwoParameter("Some uninspired random value", "Expected parameter value"));
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithTwoParameter("Some uninspired random value", "wrong"));
     }
 
     @Test
@@ -302,6 +308,28 @@ public abstract class SamplerAspectTest {
         assertEquals(2, getTestService().getArrayOfTestBeans().length);
     }
 
+    @Test
+    public void originalMethodCanBeCalled() {
+        // WHEN UNCHANGED
+        assertEquals(TEST_BEAN_A, getTestService().echoParameter(TEST_BEAN_A));
+
+        // CHANGE
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A)).is(VALUE_B);
+
+        //THEN
+        final TestService testService = getTestService();
+        assertEquals(VALUE_B, testService.echoParameter(VALUE_A));
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter(VALUE_C));
+
+        // WHEN
+        Sample.of(testServiceSampler.echoParameter(anyString())).callsOriginalMethod();
+
+        // THEN
+        assertEquals(VALUE_B, testService.echoParameter(VALUE_A));
+        assertEquals(VALUE_C, getTestService().echoParameter(VALUE_C));
+    }
+
 
     @Test
     public void verifyMethodNotCalled() {
@@ -310,10 +338,10 @@ public abstract class SamplerAspectTest {
         Sample.of(testServiceSampler.echoParameter(sameAs(TEST_BEAN_A))).is(TEST_BEAN_B);
 
         // CALL
-        getTestService().echoParameter(TEST_BEAN_B);
+        getTestService().echoParameter(TEST_BEAN_A);
 
         //THEN
-        Sample.verifyCallQuantity(TestService.class, NEVER).echoParameter(TEST_BEAN_A);
+        Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_A);
         Sample.verifyCallQuantity(TestService.class, NEVER).getMinusOne();
     }
 
@@ -533,7 +561,7 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        testServiceSampler.noReturnValue(2);
+        testServiceSampler.noReturnValue(anyInt());
 
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
@@ -547,12 +575,13 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        testServiceSampler.noReturnValue(2);
+        testServiceSampler.noReturnValue(anyInt());
         source.load();
         getTestService().noReturnValue(2);
+        getTestService().noReturnValue(3);
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
+        Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2);
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -883,6 +912,33 @@ public abstract class SamplerAspectTest {
     }
 
 
+    @Test
+    public void callsWithNotMatchingParametersAreRoutedToOriginalMethod() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getRandom(VALUE_A));
+
+        String hopefullyRecordedValue = getTestService().getRandom(VALUE_A);
+
+        final String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getRandom(VALUE_A));
+        Sample.of(testServiceSampler.getRandom(anyString())).callsOriginalMethod();
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertNotNull(getTestService().getRandom(VALUE_A));
+        assertEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_A));
+        assertNotEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_B));
+        Files.delete(Paths.get(pathToFile));
+    }
 
     @Test
     public void manualIdSetForRecordingAndLoadingNoCorrectDef() throws IOException {
@@ -904,7 +960,6 @@ public abstract class SamplerAspectTest {
         assertThrows(PersistenceException.class,
                 source::load);
 
-        assertTrue(SampleRepository.getInstance().isEmpty());
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -1129,14 +1184,15 @@ public abstract class SamplerAspectTest {
         source.load();
 
         // WHEN
-        String result = getTestService().echoParameter("A");
-        String secondCallResult = getTestService().echoParameter("A");
-        String wrongParameter = getTestService().echoParameter("B");
+        final TestService testService = getTestService();
+        String result = testService.echoParameter("A");
+        String secondCallResult = testService.echoParameter("A");
 
         // THEN
         assertEquals("ABC", result);
         assertEquals("ABC", secondCallResult);
-        assertEquals("B", wrongParameter);
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter("B"));
+
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -1147,25 +1203,23 @@ public abstract class SamplerAspectTest {
         Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
 
         getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "R1");
-        getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "R2");
         getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "R3");
+
         final String pathToFile = "./record/comboMatcherTwoArguments.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
         Sampler.clear();
-        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
 
+        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
         source.load();
 
         // WHEN
-        String resultFirst = getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1");
-        String resultSecond = getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
-        String resultThird = getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "ABC3");
+        final TestService testService = getTestService();
+        String result = testService.methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
 
         // THEN
-        assertEquals("ABC1", resultFirst);
-        assertEquals("R1", resultSecond);
-        assertEquals("ABC3", resultThird);
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1"));
+        assertEquals("R1", result);
         Files.delete(Paths.get(pathToFile));
     }
 

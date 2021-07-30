@@ -5,6 +5,8 @@
 
 package de.ppi.deepsampler.core.model;
 
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +58,17 @@ public class SampleRepository {
     }
 
     /**
+     * Replaces the {@link SampleDefinition} at index i with the {@link SampleDefinition}s from mergedPersistentSamples. If
+     * the {@link List} is longer then 1 all {@link SampleDefinition}s after i are moved to the right.
+     * @param i The index of the {@link SampleDefinition} that should be replaced.
+     * @param mergedPersistentSamples The {@link SampleDefinition}s that are inserted at i.
+     */
+    public void replace(int i, List<SampleDefinition> mergedPersistentSamples) {
+        samples.addAll(i + 1, mergedPersistentSamples);
+        samples.remove(i);
+    }
+
+    /**
      * <p>Removes the SampleDefinition at the given index.</p>
      *
      * <p>Its not possible to remove a given SampleDefinition by
@@ -67,6 +80,24 @@ public class SampleRepository {
     public void remove(int index) {
         samples.remove(index);
     }
+
+    /**
+     * Returns the number of samples in this {@link SampleRepository}
+     * @return Returns the number of samples in this {@link SampleRepository}
+     */
+    public int size() {
+        return samples.size();
+    }
+
+    /**
+     * Returns the {@link SampleDefinition} and index.
+     * @param index The index of the requested {@link SampleDefinition}.
+     * @return The {@link SampleDefinition} and index.
+     */
+    public SampleDefinition get(int index) {
+        return samples.get(index);
+    }
+
 
     /**
      * Checks whether both methods are the same or not
@@ -106,16 +137,52 @@ public class SampleRepository {
     }
 
 
-    public SampleDefinition find(final SampledMethod wantedSampledMethod, final Object... args) {
+    /**
+     * Searches for a {@link SampleDefinition} that matches to wantedSampleMethod and the parameters args
+     * The search is validated, which means, that an {@link NoMatchingParametersFoundException} is thrown if no {@link SampleDefinition}
+     * could be found.
+     *
+     * @param wantedSampledMethod Describes the method for which a {@link SampleDefinition} is searched
+     * @param args the actual parameter values that should match to the matchers of a SampleDefinition.
+     * @return A matching {@link SampleDefinition} if one was found. Otherwise a {@link NoMatchingParametersFoundException} is thrown.
+     * @throws NoMatchingParametersFoundException if no matching {@link SampleDefinition} was found.
+     */
+    public SampleDefinition findValidated(final SampledMethod wantedSampledMethod, final Object... args) {
+        return find(true, wantedSampledMethod, args);
+    }
+
+    /**
+     * Searches for a {@link SampleDefinition} that matches to wantedSampleMethod and the parameters args
+     * The search is not validated, which means, that null is returned if no {@link SampleDefinition}
+     * could be found.
+     *
+     * @param wantedSampledMethod Describes the method for which a {@link SampleDefinition} is searched
+     * @param args the actual parameter values that should match to the matchers of a SampleDefinition.
+     * @return A matching {@link SampleDefinition} if one was found. Otherwise null.
+     */
+    public SampleDefinition findUnvalidated(final SampledMethod wantedSampledMethod, final Object... args) {
+        return find(false, wantedSampledMethod, args);
+    }
+
+    private SampleDefinition find(final boolean validate, final SampledMethod wantedSampledMethod, final Object... args) {
+        boolean matchingMethodFound = false;
+
         for (final SampleDefinition sampleDefinition : samples) {
             final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
 
             if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
-                    && methodMatches(wantedSampledMethod, sampledMethod)
-                    && argumentsMatch(sampleDefinition, args)) {
+                    && methodMatches(wantedSampledMethod, sampledMethod)) {
 
-                return sampleDefinition;
+                matchingMethodFound = true;
+
+                if (argumentsMatch(sampleDefinition, args)) {
+                    return sampleDefinition;
+                }
             }
+        }
+
+        if (matchingMethodFound && validate) {
+            throw new NoMatchingParametersFoundException(wantedSampledMethod, args);
         }
 
         return null;
@@ -174,5 +241,6 @@ public class SampleRepository {
     public boolean isEmpty() {
         return samples.isEmpty();
     }
+
 
 }

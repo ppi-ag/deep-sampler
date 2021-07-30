@@ -34,6 +34,11 @@ public class TestService {
     }
 
 
+    public String getRandom(String param) {
+        return Double.toString(Math.random());
+    }
+
+
     /**
      * A method that will always return -1 if it is not sampled
      * @return always -1

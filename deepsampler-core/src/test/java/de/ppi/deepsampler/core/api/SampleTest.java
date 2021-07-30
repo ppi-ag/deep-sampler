@@ -33,7 +33,7 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithoutParam() throws Exception {
+    void testSampleDefinitionWithoutParam() throws Throwable {
         // GIVEN WHEN
         final TestService serviceSampler = Sampler.prepare(TestService.class);
         Sample.of(serviceSampler.noParameter()).is(STRING_SAMPLE);
@@ -156,7 +156,7 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithArrayReturnValue() throws Exception {
+    void testSampleDefinitionWithArrayReturnValue() throws Throwable {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.getArray()).is(new String[] {STRING_SAMPLE});
@@ -170,7 +170,7 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithPrimitiveReturnValues() throws Exception {
+    void testSampleDefinitionWithPrimitiveReturnValues() throws Throwable {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
 
@@ -277,7 +277,7 @@ class SampleTest {
     }
 
     @Test
-    void voidMethodsCanBeReplacedByVoidAnswers() throws Exception {
+    void voidMethodsCanBeReplacedByVoidAnswers() throws Throwable {
         //GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
 

@@ -39,7 +39,9 @@ public class GuiceSamplerAspect implements MethodInterceptor {
             final Answer<?> answer = sampleDefinition.getAnswer();
 
             if (answer != null) {
-                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(invocation.getArguments()), invocation.getThis());
+                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(invocation.getArguments()),
+                        invocation.getThis(),
+                        invocation::proceed);
                 return ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
@@ -64,6 +66,6 @@ public class GuiceSamplerAspect implements MethodInterceptor {
      */
     private SampleDefinition findSampleDefinition(final MethodInvocation invocation) {
         final SampledMethod sampledMethod = new SampledMethod(invocation.getThis().getClass(), invocation.getMethod());
-        return SampleRepository.getInstance().find(sampledMethod, invocation.getArguments());
+        return SampleRepository.getInstance().findValidated(sampledMethod, invocation.getArguments());
     }
 }
