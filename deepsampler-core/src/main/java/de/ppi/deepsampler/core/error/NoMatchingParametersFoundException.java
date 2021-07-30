@@ -16,7 +16,7 @@ public class NoMatchingParametersFoundException extends BaseException {
 
     public NoMatchingParametersFoundException(SampledMethod unmatchedMethod, Object[] args) {
         super("The method %s should be stubbed, but it has been called with unexpected parameters: %s" +
-                        "Either the SampleDefinition (i.g. %s) defines wrong parameter, " +
+                        "Either the SampleDefinition (e.g. %s) defines wrong parameter, " +
                         "or the tested compound has changed.",
                 unmatchedMethod.getMethod().toString(),
                 formatArgs(args),
