@@ -31,7 +31,7 @@ public class ExecutionManager {
         return executionInformation.getOrCreateBySample(sampleDefinition);
     }
 
-    public static Object execute(final SampleDefinition sampleDefinition, final StubMethodInvocation stubMethodInvocation) throws Exception {
+    public static Object execute(final SampleDefinition sampleDefinition, final StubMethodInvocation stubMethodInvocation) throws Throwable {
         Object callReturnValue = null;
         try {
             callReturnValue = sampleDefinition.getAnswer().call(stubMethodInvocation);

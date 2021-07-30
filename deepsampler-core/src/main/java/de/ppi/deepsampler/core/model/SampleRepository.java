@@ -58,6 +58,19 @@ public class SampleRepository {
     }
 
     /**
+     * Adds the given {@link SampleDefinition} to the {@link SampleRepository#samples}
+     * and sets also the {@link SampleRepository#currentSample}.
+     *
+     * @param index The position where the {@link SampleDefinition} will be inserted in the list of {@link SampleDefinition}s. The {@link SampleDefinition}
+     *              at index and all following {@link SampleDefinition}s will be shifted one index to the right.
+     * @param sampleDefinition The new SampleDefinition.
+     */
+    public void add(final int index, final SampleDefinition sampleDefinition) {
+        setCurrentSample(sampleDefinition);
+        samples.add(index, sampleDefinition);
+    }
+
+    /**
      * <p>Removes the SampleDefinition at the given index.</p>
      *
      * <p>Its not possible to remove a given SampleDefinition by
@@ -69,6 +82,24 @@ public class SampleRepository {
     public void remove(int index) {
         samples.remove(index);
     }
+
+    /**
+     * Returns the number of samples in this {@link SampleRepository}
+     * @return Returns the number of samples in this {@link SampleRepository}
+     */
+    public int size() {
+        return samples.size();
+    }
+
+    /**
+     * Returns the {@link SampleDefinition} and index.
+     * @param index The index of the reqeusted {@link SampleDefinition}.
+     * @return The {@link SampleDefinition} and index.
+     */
+    public SampleDefinition get(int index) {
+        return samples.get(index);
+    }
+
 
     /**
      * Checks whether both methods are the same or not

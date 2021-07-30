@@ -308,6 +308,28 @@ public abstract class SamplerAspectTest {
         assertEquals(2, getTestService().getArrayOfTestBeans().length);
     }
 
+    @Test
+    public void originalMethodCanBeCalled() {
+        // WHEN UNCHANGED
+        assertEquals(TEST_BEAN_A, getTestService().echoParameter(TEST_BEAN_A));
+
+        // CHANGE
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoParameter(VALUE_A)).is(VALUE_B);
+
+        //THEN
+        final TestService testService = getTestService();
+        assertEquals(VALUE_B, testService.echoParameter(VALUE_A));
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter(VALUE_C));
+
+        // WHEN
+        Sample.of(testServiceSampler.echoParameter(anyString())).callsOriginalMethod();
+
+        // THEN
+        assertEquals(VALUE_B, testService.echoParameter(VALUE_A));
+        assertEquals(VALUE_C, getTestService().echoParameter(VALUE_C));
+    }
+
 
     @Test
     public void verifyMethodNotCalled() {
@@ -890,6 +912,33 @@ public abstract class SamplerAspectTest {
     }
 
 
+    @Test
+    public void callsWithNotMatchingParametersAreRoutedToOriginalMethod() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.getRandom(VALUE_A));
+
+        String hopefullyRecordedValue = getTestService().getRandom(VALUE_A);
+
+        final String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        Sample.of(testServiceSampler.getRandom(VALUE_A));
+        Sample.of(testServiceSampler.getRandom(anyString())).callsOriginalMethod();
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertNotNull(getTestService().getRandom(VALUE_A));
+        assertEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_A));
+        assertNotEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_B));
+        Files.delete(Paths.get(pathToFile));
+    }
 
     @Test
     public void manualIdSetForRecordingAndLoadingNoCorrectDef() throws IOException {

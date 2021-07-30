@@ -26,17 +26,21 @@ class PersistentSampleManagerTest {
     void testLoadWithComboMatcher() throws NoSuchMethodException {
         // GIVEN
         SourceManager mockedSourceManager = mock(SourceManager.class);
-        PersistentModel persistentModel = mock(PersistentModel.class);
-        when(persistentModel.getId()).thenReturn("ID");
+        PersistentModel mockedPersistentModel = mock(PersistentModel.class);
+
+        when(mockedPersistentModel.getId()).thenReturn("ID");
+
         Map<PersistentSampleMethod, PersistentActualSample> sampleMap = new HashMap<>();
-        PersistentSampleMethod method = mock(PersistentSampleMethod.class);
-        PersistentActualSample sample = mock(PersistentActualSample.class);
+        PersistentSampleMethod mockedMethod = mock(PersistentSampleMethod.class);
+        PersistentActualSample mockedSample = mock(PersistentActualSample.class);
+
         List<PersistentMethodCall> persistentMethodCallList = new ArrayList<>();
-        sampleMap.put(method, sample);
-        when(method.getSampleMethodId()).thenReturn("SampleId");
-        when(sample.getAllCalls()).thenReturn(persistentMethodCallList);
-        when(persistentModel.getSampleMethodToSampleMap()).thenReturn(sampleMap);
-        when(mockedSourceManager.load()).thenReturn(persistentModel);
+        sampleMap.put(mockedMethod, mockedSample);
+
+        when(mockedMethod.getSampleMethodId()).thenReturn("SampleId");
+        when(mockedSample.getAllCalls()).thenReturn(persistentMethodCallList);
+        when(mockedPersistentModel.getSampleMethodToSampleMap()).thenReturn(sampleMap);
+        when(mockedSourceManager.load()).thenReturn(mockedPersistentModel);
 
         TestBean givenBean = new TestBean();
         addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
@@ -61,7 +65,7 @@ class PersistentSampleManagerTest {
     }
 
     @Test
-    void detectsCompletelyMissingSample() throws NoSuchMethodException {
+    void detectsCompletelyMissingSample() {
         // GIVEN
         SourceManager mockedSourceManager = mock(SourceManager.class);
         PersistentModel persistentModel = mock(PersistentModel.class);
@@ -91,11 +95,11 @@ class PersistentSampleManagerTest {
         Sample.of(Sampler.prepare(TestService.class).call(any(TestBean.class), any(Integer.class))).hasId("SampleId");
 
         // WHEN
-        assertThrows(NoMatchingSamplerFoundException.class, () -> persistentSampleManager.load());
+        assertThrows(NoMatchingSamplerFoundException.class, persistentSampleManager::load);
     }
 
     @Test
-    void detectsMissingSampleMatchers() throws NoSuchMethodException {
+    void detectsMissingSampleMatchers() {
         // GIVEN
         SourceManager mockedSourceManager = mock(SourceManager.class);
         PersistentModel persistentModel = mock(PersistentModel.class);
@@ -122,7 +126,7 @@ class PersistentSampleManagerTest {
         Sample.of(sampler.call(givenBean, 4)).hasId("SampleId");
 
         // WHEN
-        assertThrows(ParametersAreNotMatchedException.class, () -> persistentSampleManager.load());
+        assertThrows(ParametersAreNotMatchedException.class, persistentSampleManager::load);
     }
 
     @Test

@@ -1,5 +1,8 @@
 package de.ppi.deepsampler.persistence.error;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 /**
  * The {@link NoMatchingSamplerFoundException} is thrown if a JSON file (or any other source of persistent Samples)
  * contains Samples that don't have a matching Sampler. A Sampler is defined using {@link de.ppi.deepsampler.core.api.Sample#of(Object)}.
@@ -18,4 +21,14 @@ public class NoMatchingSamplerFoundException extends PersistenceException {
                 "Please define a Sampler using Sampler.of(...)", unusedSamplerId);
     }
 
+    public NoMatchingSamplerFoundException(Collection<String> unusedSamplerIds) {
+        super("The following persistent Samples don't have a corresponding Sampler. " +
+                "Please define a Sampler using Sampler.of(...):\n%s", formatMissingSamplerIds(unusedSamplerIds));
+    }
+
+    private static String formatMissingSamplerIds(Collection<String> unusedSamplerIds) {
+        return unusedSamplerIds.stream()
+                .map(id -> "\t" + id)
+                .collect(Collectors.joining("\n"));
+    }
 }
