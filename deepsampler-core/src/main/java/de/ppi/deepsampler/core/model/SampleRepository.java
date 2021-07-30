@@ -137,10 +137,29 @@ public class SampleRepository {
     }
 
 
+    /**
+     * Searches for a {@link SampleDefinition} that matches to wantedSampleMethod and the parameters args
+     * The search is validated, which means, that an {@link NoMatchingParametersFoundException} is thrown if no {@link SampleDefinition}
+     * could be found.
+     *
+     * @param wantedSampledMethod Describes the method for which a {@link SampleDefinition} is searched
+     * @param args the actual parameter values that should match to the matchers of a SampleDefinition.
+     * @return A matching {@link SampleDefinition} if one was found. Otherwise a {@link NoMatchingParametersFoundException} is thrown.
+     * @throws NoMatchingParametersFoundException if no matching {@link SampleDefinition} was found.
+     */
     public SampleDefinition findValidated(final SampledMethod wantedSampledMethod, final Object... args) {
         return find(true, wantedSampledMethod, args);
     }
 
+    /**
+     * Searches for a {@link SampleDefinition} that matches to wantedSampleMethod and the parameters args
+     * The search is not validated, which means, that null is returned if no {@link SampleDefinition}
+     * could be found.
+     *
+     * @param wantedSampledMethod Describes the method for which a {@link SampleDefinition} is searched
+     * @param args the actual parameter values that should match to the matchers of a SampleDefinition.
+     * @return A matching {@link SampleDefinition} if one was found. Otherwise null.
+     */
     public SampleDefinition findUnvalidated(final SampledMethod wantedSampledMethod, final Object... args) {
         return find(false, wantedSampledMethod, args);
     }
