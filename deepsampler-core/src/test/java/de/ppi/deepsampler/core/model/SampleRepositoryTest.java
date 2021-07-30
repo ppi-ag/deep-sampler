@@ -81,9 +81,8 @@ class SampleRepositoryTest {
         );
         SampleRepository.getInstance().add(sampleDefinition);
         final SampleRepository sampleRepository = SampleRepository.getInstance();
-
-        assertThrows(NoMatchingParametersFoundException.class, ()-> sampleRepository.findValidated(
-                createSampledMethod(TestObject.class, "someMethod"), "someArg"));
+        final SampledMethod sampledMethod = createSampledMethod(TestObject.class, "someMethod");
+        assertThrows(NoMatchingParametersFoundException.class, ()-> sampleRepository.findValidated(sampledMethod, "someArg"));
     }
 
     /**
