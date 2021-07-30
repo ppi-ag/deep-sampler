@@ -1,8 +1,11 @@
 package de.ppi.deepsampler.core.error;
 
+import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampledMethod;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -16,11 +19,22 @@ public class NoMatchingParametersFoundException extends BaseException {
 
     public NoMatchingParametersFoundException(SampledMethod unmatchedMethod, Object[] args) {
         super("The method %s should be stubbed, but it has been called with unexpected parameters: %s" +
-                        "Either the SampleDefinition (e.g. %s) defines wrong parameter, " +
+                        "Either the SampleDefinition (e.g. %s) defines wrong parameters, " +
                         "or the tested compound has changed.",
                 unmatchedMethod.getMethod().toString(),
                 formatArgs(args),
                 formatExampleSampler(unmatchedMethod));
+    }
+
+    public NoMatchingParametersFoundException(List<SampleDefinition> sampleDefinitions) {
+        super("The method %s should be stubbed, but it has been called with unexpected parameters: %s" +
+                        "Either the SampleDefinition (e.g. %s) defines wrong parameters, " +
+                        "or the tested compound has changed.\"" +
+                        "There are %d further issues.",
+                sampleDefinitions.get(0).getSampledMethod().getMethod().toString(),
+                formatArgs(sampleDefinitions.get(0).getParameterValues().toArray()),
+                formatExampleSampler(sampleDefinitions.get(0).getSampledMethod()),
+                sampleDefinitions.size() - 1);
     }
 
     private static String formatArgs(Object[] args) {

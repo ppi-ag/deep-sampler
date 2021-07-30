@@ -6,13 +6,13 @@
 package de.ppi.deepsampler.persistence.api;
 
 import de.ppi.deepsampler.core.api.Matchers;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
-import de.ppi.deepsampler.persistence.error.ParametersAreNotMatchedException;
 import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
 import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
@@ -84,11 +84,12 @@ public class PersistentSampleManager {
     }
 
     /**
-     * This method merges the samples from the persistence (e.g. JSON-File) into manually defined samplers and samples. The order of the
-     * samplers is defined by the samplers in the test class or the compound. Samples from the file will be inserted in the list of samples
-     * at the position where the matching samplers have been defined. This way users can start by defining very specific matchers followed by
-     * broader matchers that can serve als alternatives. I.G. someone could first define a matcher that matches only on a parameter of the value
-     * "Picard". The second matcher could then by anyString(). The first sample would then be used only if the correct parameter is supplied and in all
+     * This method merges the samples from the persistence (e.g. JSON-File) into manually defined Samplers and Samples. The order of the
+     * Samplers is defined by the Samplers in the test class or the compound. Samples from the file will be inserted in the list of Samples
+     * at the position where the matching samplers have been defined.
+     *
+     * E.G. Someone could now first define a matcher that matches only on a particular parameter of the value
+     * "Picard". The second matcher could then by anyString(). The first Sample would then be used only if the correct parameter is supplied and in all
      * other cases the second sampler would be used.
      *
      * @param persistentSamples Contains the Samples from the persistence i.e. JSON
@@ -137,7 +138,7 @@ public class PersistentSampleManager {
 
     private List<SampleDefinition> createSampleDefinitionForEachPersistentSample(PersistentModel persistentSamples, SampleDefinition sampler) {
         List<SampleDefinition> usedPersistentCalls = new ArrayList<>();
-        Set<SampleDefinition> unusedPersistentCalls = new HashSet<>();
+        List<SampleDefinition> unusedPersistentCalls = new ArrayList<>();
 
         for(PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
 
@@ -162,7 +163,7 @@ public class PersistentSampleManager {
         }
 
         if (!unusedPersistentCalls.isEmpty()) {
-            throw new ParametersAreNotMatchedException(unusedPersistentCalls);
+            throw new NoMatchingParametersFoundException(unusedPersistentCalls);
         }
 
         return usedPersistentCalls;

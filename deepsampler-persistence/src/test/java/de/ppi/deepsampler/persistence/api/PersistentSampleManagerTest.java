@@ -3,10 +3,10 @@ package de.ppi.deepsampler.persistence.api;
 
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.core.model.SampledMethod;
-import de.ppi.deepsampler.persistence.error.ParametersAreNotMatchedException;
 import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
 import de.ppi.deepsampler.persistence.model.*;
 import org.junit.jupiter.api.AfterEach;
@@ -87,19 +87,19 @@ class PersistentSampleManagerTest {
         when(unexpectedMethod.getSampleMethodId()).thenReturn("UnexpectedSampleId");
         when(unexpectedSample.getAllCalls()).thenReturn(persistentMethodCallList);
 
-
+        // WHEN
         TestBean givenBean = new TestBean();
         addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
 
         PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
         Sample.of(Sampler.prepare(TestService.class).call(any(TestBean.class), any(Integer.class))).hasId("SampleId");
 
-        // WHEN
+        // THEN
         assertThrows(NoMatchingSamplerFoundException.class, persistentSampleManager::load);
     }
 
     @Test
-    void detectsMissingSampleMatchers() {
+    void detectsMissingWrongParameters() {
         // GIVEN
         SourceManager mockedSourceManager = mock(SourceManager.class);
         PersistentModel persistentModel = mock(PersistentModel.class);
@@ -117,7 +117,7 @@ class PersistentSampleManagerTest {
         when(method.getSampleMethodId()).thenReturn("SampleId");
         when(sample.getAllCalls()).thenReturn(persistentMethodCallList);
 
-
+        // WHEN
         TestBean givenBean = new TestBean();
         addMethodCall(persistentMethodCallList, Arrays.asList(null, 2), true);
 
@@ -125,8 +125,8 @@ class PersistentSampleManagerTest {
         TestService sampler = Sampler.prepare(TestService.class);
         Sample.of(sampler.call(givenBean, 4)).hasId("SampleId");
 
-        // WHEN
-        assertThrows(ParametersAreNotMatchedException.class, persistentSampleManager::load);
+        // THEN
+        assertThrows(NoMatchingParametersFoundException.class, persistentSampleManager::load);
     }
 
     @Test
