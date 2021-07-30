@@ -58,7 +58,7 @@ public class SampleRepository {
     }
 
     /**
-     * Replces the {@link SampleDefinition} and index i with the {@link SampleDefinition}s from mergedPersistentSamples. If
+     * Replaces the {@link SampleDefinition} at index i with the {@link SampleDefinition}s from mergedPersistentSamples. If
      * the {@link List} is longer then 1 all {@link SampleDefinition}s after i are moved to the right.
      * @param i The index of the {@link SampleDefinition} that should be replaced.
      * @param mergedPersistentSamples The {@link SampleDefinition}s that are inserted at i.
