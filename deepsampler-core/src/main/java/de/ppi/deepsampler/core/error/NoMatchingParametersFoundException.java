@@ -24,15 +24,15 @@ public class NoMatchingParametersFoundException extends BaseException {
     }
 
     private static String formatArgs(Object[] args) {
-        String argsFormatted = "\n";
+        StringBuilder argsFormatted = new StringBuilder("\n");
 
         for (Object arg : args) {
-            argsFormatted += "\t";
-            argsFormatted += arg != null ? arg.toString() : "null";
-            argsFormatted += "\n";
+            argsFormatted.append("\t");
+            argsFormatted.append(arg != null ? arg.toString() : "null");
+            argsFormatted.append("\n");
         }
 
-        return argsFormatted;
+        return argsFormatted.toString();
     }
 
     private static String formatExampleSampler(SampledMethod unmatchedMethod) {
