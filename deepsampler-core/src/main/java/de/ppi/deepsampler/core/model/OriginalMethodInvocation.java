@@ -14,6 +14,7 @@ public interface OriginalMethodInvocation {
      * @throws Throwable The underlying AOP-Libraries will most likely declare {@link Throwable} on the method that calls the original method. At least
      *        this is the case with spring and guice-aop. This is why we have to relay {@link Throwable} here, even though this might appear most unusual.
      */
+    @SuppressWarnings("java:S112") // Ignore complaints about throws Throwable since this is the result of the AOP APIs which are called by this Method
     Object call() throws Throwable;
 
 }
