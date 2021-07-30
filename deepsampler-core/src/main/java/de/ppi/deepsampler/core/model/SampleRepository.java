@@ -91,7 +91,7 @@ public class SampleRepository {
 
     /**
      * Returns the {@link SampleDefinition} and index.
-     * @param index The index of the reqeusted {@link SampleDefinition}.
+     * @param index The index of the requested {@link SampleDefinition}.
      * @return The {@link SampleDefinition} and index.
      */
     public SampleDefinition get(int index) {
