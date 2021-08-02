@@ -31,7 +31,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
 
         sampleDefinition.setParameterMatchers(parameterMatchers);
         sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));
-        sampleDefinition.setPersistent(SampleRepository.getInstance().getMarkNextVoidSamplerForPersistence());
+        sampleDefinition.setMarkedForPersistent(SampleRepository.getInstance().getMarkNextVoidSamplerForPersistence());
 
         return sampleDefinition;
     }

@@ -16,7 +16,7 @@ public class SampleDefinition {
     private List<ParameterMatcher<?>> parameterMatchers = new ArrayList<>();
     private Answer<Throwable> answer;
     private String sampleId;
-    private boolean isPersistent;
+    private boolean isMarkedForPersistent;
 
     public SampleDefinition(final SampledMethod sampledMethod) {
         this.sampledMethod = sampledMethod;
@@ -76,12 +76,12 @@ public class SampleDefinition {
     }
 
 
-    public boolean isPersistent() {
-        return isPersistent;
+    public boolean isMarkedForPersistent() {
+        return isMarkedForPersistent;
     }
 
-    public void setPersistent(boolean persistent) {
-        isPersistent = persistent;
+    public void setMarkedForPersistent(boolean markedForPersistent) {
+        isMarkedForPersistent = markedForPersistent;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class SampleDefinition {
                 ", parameterMatchers=" + parameterMatchers +
                 ", answer=" + answer +
                 ", sampleId='" + sampleId + '\'' +
-                ", isPersistent=" + isPersistent +
+                ", isPersistent=" + isMarkedForPersistent +
                 '}';
     }
 }

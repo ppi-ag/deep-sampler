@@ -55,7 +55,7 @@ public class PersistentSample {
             throw new NotASamplerException("sampledMethodCall is not a Sampler. Did you prepare the Sampler using Sampler.prepare() or @PrepareSampler?");
         }
 
-        currentSampleDefinition.setPersistent(true);
+        currentSampleDefinition.setMarkedForPersistent(true);
 
         SampleRepository.getInstance().setLastSampleDefinition(currentSampleDefinition);
         return new PersistentSampleBuilder<>(sampledMethodCall, currentSampleDefinition);

@@ -104,7 +104,7 @@ public class PersistentSampleManager {
         for (int i = 0; i < sampleRepository.size(); i++) {
             SampleDefinition sampler = sampleRepository.get(i);
 
-            if (!sampler.isPersistent()) {
+            if (!sampler.isMarkedForPersistent()) {
                 continue;
             }
 
