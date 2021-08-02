@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.provider.common;
 
 import de.ppi.deepsampler.core.api.*;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import static de.ppi.deepsampler.core.api.Matchers.*;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
 import static org.junit.jupiter.api.Assertions.*;
+import static de.ppi.deepsampler.core.api.FixedQuantity.*;
 
 /**
  * This TestClass must be be used to test all aop-provider in order to ensure that all providers would support the same
@@ -32,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class PersistentSamplerAspectTest {
 
     public static final String VALUE_A = "Value A";
+    public static final String VALUE_B = "Value B";
     private static final TestBean TEST_BEAN_A = new TestBean();
     public static final String MY_ECHO_PARAMS = "MY ECHO PARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
@@ -83,7 +86,7 @@ public abstract class PersistentSamplerAspectTest {
     @Test
     public void voidMethodsCanBeRecordedAndLoaded() throws IOException {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        testServiceSampler.noReturnValue(2);
+        testServiceSampler.noReturnValue(anyInt());
 
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
@@ -97,12 +100,13 @@ public abstract class PersistentSamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        testServiceSampler.noReturnValue(2);
+        testServiceSampler.noReturnValue(anyInt());
         source.load();
         getTestService().noReturnValue(2);
+        getTestService().noReturnValue(3);
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
+        Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2);
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -409,6 +413,31 @@ public abstract class PersistentSamplerAspectTest {
     }
 
 
+    @Test
+    public void callsWithNotMatchingParametersAreRoutedToOriginalMethod() throws IOException {
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getRandom(VALUE_A));
+
+        String hopefullyRecordedValue = getTestService().getRandom(VALUE_A);
+
+        final String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+        PersistentSample.of(testServiceSampler.getRandom(VALUE_A));
+        PersistentSample.of(testServiceSampler.getRandom(anyString())).callsOriginalMethod();
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertNotNull(getTestService().getRandom(VALUE_A));
+        assertEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_A));
+        assertNotEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_B));
+        Files.delete(Paths.get(pathToFile));
+    }
 
     @Test
     public void manualIdSetForRecordingAndLoadingNoCorrectDef() throws IOException {
@@ -428,7 +457,6 @@ public abstract class PersistentSamplerAspectTest {
         assertThrows(PersistenceException.class,
                 source::load);
 
-        assertTrue(SampleRepository.getInstance().isEmpty());
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -523,14 +551,15 @@ public abstract class PersistentSamplerAspectTest {
         source.load();
 
         // WHEN
-        String result = getTestService().echoParameter("A");
-        String secondCallResult = getTestService().echoParameter("A");
-        String wrongParameter = getTestService().echoParameter("B");
+        final TestService testService = getTestService();
+        String result = testService.echoParameter("A");
+        String secondCallResult = testService.echoParameter("A");
 
         // THEN
         assertEquals("ABC", result);
         assertEquals("ABC", secondCallResult);
-        assertEquals("B", wrongParameter);
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter("B"));
+
         Files.delete(Paths.get(pathToFile));
     }
 
@@ -541,25 +570,23 @@ public abstract class PersistentSamplerAspectTest {
         PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
 
         getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "R1");
-        getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "R2");
         getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "R3");
+
         final String pathToFile = "./record/comboMatcherTwoArguments.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
         Sampler.clear();
-        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
 
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
         source.load();
 
         // WHEN
-        String resultFirst = getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1");
-        String resultSecond = getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
-        String resultThird = getTestService().methodWithThreeParametersReturningLast("NOBLOCK", "A", "ABC3");
+        final TestService testService = getTestService();
+        String result = testService.methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
 
         // THEN
-        assertEquals("ABC1", resultFirst);
-        assertEquals("R1", resultSecond);
-        assertEquals("ABC3", resultThird);
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1"));
+        assertEquals("R1", result);
         Files.delete(Paths.get(pathToFile));
     }
 

@@ -7,8 +7,8 @@ package de.ppi.deepsampler.provider.common;
 
 import de.ppi.deepsampler.core.api.*;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.error.VerifyException;
-import de.ppi.deepsampler.core.internal.FixedQuantity;
 import de.ppi.deepsampler.core.model.ExecutionRepository;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
@@ -31,9 +31,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static de.ppi.deepsampler.core.api.Matchers.*;
-import static de.ppi.deepsampler.core.internal.FixedQuantity.*;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
 import static org.junit.jupiter.api.Assertions.*;
+import static de.ppi.deepsampler.core.api.FixedQuantity.*;
 
 /**
  * This TestClass must be be used to test all aop-provider in order to ensure that all providers would support the same
@@ -939,105 +939,6 @@ public abstract class SamplerAspectTest {
         Files.delete(Paths.get(pathToFile));
     }
 
-    @Test
-    public void manualIdSetForRecordingAndLoadingNoCorrectDef() throws IOException {
-        Sampler.clear();
-
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
-
-        getTestService().echoParameter("ABC");
-        final String pathToFile = "./record/manualIdSetForRecordingAndLoading.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId("MY WRONG ECHO PARAMS");
-        assertThrows(PersistenceException.class,
-                source::load);
-
-        Files.delete(Paths.get(pathToFile));
-    }
-
-    @Test
-    public void manualIdSetForRecordingAndLoadingCorrectDef() throws IOException {
-        Sampler.clear();
-
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
-
-        getTestService().echoParameter("ABC");
-        final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-
-        Sample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
-        source.load();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals("ABC", getTestService().echoParameter("ABC"));
-        Files.delete(Paths.get(pathToFile));
-    }
-
-    @Test
-    public void manualIdSetForRecordingAndLoadingCorrectDefVoidMethod() throws IOException {
-        Sampler.clear();
-
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        testServiceSampler.noReturnValue(2);
-        Sample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
-
-        getTestService().noReturnValue(2);
-
-        final String pathToFile = "./record/manualIdSetForRecordingAndLoadingCorrectDef.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-
-        testServiceSampler.noReturnValue(2);
-        Sample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
-        source.load();
-        getTestService().noReturnValue(2);
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals(NO_RETURN_VALUE_SAMPLE_ID, SampleRepository.getInstance().getSamples().get(0).getSampleId());
-        Sample.verifyCallQuantity(TestService.class, new FixedQuantity(1)).noReturnValue(2);
-        Files.delete(Paths.get(pathToFile));
-    }
-
-    @Test
-    public void localDateTimeCanBeRecordedAndLoaded() throws IOException {
-        Sampler.clear();
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.testLocalDateTime());
-
-        getTestService().testLocalDateTime();
-
-        final String pathToFile = "./record/localDateTimeCanBeRecordedAndLoaded.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-
-        Sample.of(testServiceSampler.testLocalDateTime());
-        source.load();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals(LocalDateTime.of(2020, 10, 29, 10, 10, 10), getTestService().testLocalDateTime());
-        Files.delete(Paths.get(pathToFile));
-    }
 
     @Test
     public void threadScopeWorks() throws ExecutionException, InterruptedException {
@@ -1166,87 +1067,4 @@ public abstract class SamplerAspectTest {
         assertEquals(VALUE_B, resultEcho);
         assertNull(localDateTime);
     }
-
-    @Test
-    void testComboMatcherLoadAllButAcceptOnlyA() throws IOException {
-        // GIVEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(anyString())).hasId(MY_ECHO_PARAMS);
-
-        getTestService().echoParameter("ABC");
-        final String pathToFile = "./record/comboMatcherSingleArgument.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-        Sampler.clear();
-        Sample.of(testServiceSampler.echoParameter(combo(anyString(), (f, s) -> f.equals("A")))).hasId(MY_ECHO_PARAMS);
-
-        source.load();
-
-        // WHEN
-        final TestService testService = getTestService();
-        String result = testService.echoParameter("A");
-        String secondCallResult = testService.echoParameter("A");
-
-        // THEN
-        assertEquals("ABC", result);
-        assertEquals("ABC", secondCallResult);
-        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter("B"));
-
-        Files.delete(Paths.get(pathToFile));
-    }
-
-    @Test
-    void testComboMatcherSecondArgument() throws IOException {
-        // GIVEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
-
-        getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "R1");
-        getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "R3");
-
-        final String pathToFile = "./record/comboMatcherTwoArguments.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-        Sampler.clear();
-
-        Sample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
-        source.load();
-
-        // WHEN
-        final TestService testService = getTestService();
-        String result = testService.methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
-
-        // THEN
-        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1"));
-        assertEquals("R1", result);
-        Files.delete(Paths.get(pathToFile));
-    }
-
-    @Test
-    public void mixPureJavaApiAndPersistenceApi() throws IOException {
-        Sampler.clear();
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.testLocalDateTime());
-
-        getTestService().testLocalDateTime();
-
-        final String pathToFile = "./record/localDateTimeCanBeRecordedAndLoaded.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-
-        // MIX persistence definition and pure java definition
-        Sample.of(testServiceSampler.testLocalDateTime());
-        Sample.of(testServiceSampler.echoParameter("ABC")).is("CBD");
-        source.load();
-
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals(LocalDateTime.of(2020, 10, 29, 10, 10, 10), getTestService().testLocalDateTime());
-        assertEquals("CBD", getTestService().echoParameter("ABC"));
-        Files.delete(Paths.get(pathToFile));
-    }
-
 }
