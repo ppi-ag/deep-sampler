@@ -86,13 +86,13 @@ public abstract class PersistentSamplerAspectTest {
     @Test
     public void voidMethodsCanBeRecordedAndLoaded() throws IOException {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        testServiceSampler.noReturnValue(anyInt());
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyInt());
 
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
+
         final String pathToFile = "./record/voidMethodsCanBeRecordedAndLoaded.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-
 
         source.record();
 
@@ -100,8 +100,9 @@ public abstract class PersistentSamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        testServiceSampler.noReturnValue(anyInt());
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyInt());
         source.load();
+
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
 
@@ -113,9 +114,10 @@ public abstract class PersistentSamplerAspectTest {
     @Test
     public void sqlDateCanBeRecordedAndLoaded() throws IOException {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        PersistentSample.of(testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
 
         getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+
         final String pathToFile = "./record/sqlDateCanBeRecordedAndLoaded.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
@@ -124,7 +126,7 @@ public abstract class PersistentSamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        PersistentSample.of(testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -420,7 +422,7 @@ public abstract class PersistentSamplerAspectTest {
 
         String hopefullyRecordedValue = getTestService().getRandom(VALUE_A);
 
-        final String pathToFile = "./record/samplesCanBeRecordedAndLoaded.json";
+        final String pathToFile = "./record/callsWithNotMatchingParametersAreRoutedToOriginalMethod.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
 
@@ -429,11 +431,10 @@ public abstract class PersistentSamplerAspectTest {
         assertTrue(SampleRepository.getInstance().isEmpty());
 
         PersistentSample.of(testServiceSampler.getRandom(VALUE_A));
-        PersistentSample.of(testServiceSampler.getRandom(anyString())).callsOriginalMethod();
+        Sample.of(testServiceSampler.getRandom(anyString())).callsOriginalMethod();
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        assertNotNull(getTestService().getRandom(VALUE_A));
         assertEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_A));
         assertNotEquals(hopefullyRecordedValue, getTestService().getRandom(VALUE_B));
         Files.delete(Paths.get(pathToFile));
@@ -485,7 +486,7 @@ public abstract class PersistentSamplerAspectTest {
     @Test
     public void manualIdSetForRecordingAndLoadingCorrectDefVoidMethod() throws IOException {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        testServiceSampler.noReturnValue(2);
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(2);
         PersistentSample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
 
         getTestService().noReturnValue(2);
@@ -498,7 +499,7 @@ public abstract class PersistentSamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        testServiceSampler.noReturnValue(2);
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(2);
         PersistentSample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
         source.load();
         getTestService().noReturnValue(2);

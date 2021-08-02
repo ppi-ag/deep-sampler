@@ -5,30 +5,24 @@
 
 package de.ppi.deepsampler.core.api;
 
-import de.ppi.deepsampler.core.model.Answer;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 
 /**
  * <p>
- * Provides a fluent API for creating a {@link SampleDefinition}. You should never create a {@link PersistentSampleBuilder} by
- * yourself instead you should use {@link Sample#of(Object)}.
+ * Provides a fluent API for creating a {@link SampleDefinition} for persistent Samples that are loaded from a file or any other DataSource.
+ * The persistence (i.e. recording and loading samples) is managed by PersistentSampleManager.
  * </p>
  *
  * <p>
- * With the sampleBuilder you are able to define:
- *   <ul>
- *       <li>A return value or returnValueSupplier</li>
- *       <li>A sampleId</li>
- *   </ul>
- * <p>
- *   The return value will be used (and evaluated) when the stubbed method will be invoked.
- *   The sampleId is a possibility to assign an id to the sampleDefinition. This id will be used
- *   in the persistence to identify the stubbed method.
+ * With the sampleBuilder you are able to define a sampleId, that is used to identify a Sample in the persistence. By default
+ * DeepSampler creates a sampleId from the signature of the stubbed method. If this signature is changed, maybe because of a future
+ * refactoring, the sample cannot be loaded from the persistence anymore. Defining manual sampleIds can be used to avoid this situation.
+ *
  * </p>
  *
  * @param <T> type of the class you want stub
  */
-public class PersistentSampleBuilder<T> extends VoidSampleBuilder {
+public class PersistentSampleBuilder<T> extends SampleBuilder {
 
     /**
      * Create a {@link PersistentSampleBuilder} with a sampler of the class you want to build a sample for, and the sampleDefinition
@@ -43,7 +37,9 @@ public class PersistentSampleBuilder<T> extends VoidSampleBuilder {
     }
 
     /**
-     * Set an id for the current SampleDefinition.
+     * Set an id for the current SampleDefinition. The Id is used to find a Sample for a stubbed method. By default
+     * sampleIds are generated from the signature of the sampled method. Therefore a change of the signature would mean, that
+     * DeepSample isn't able anymore to find the Sample for the method. To prevent this situation, manual sampleIds can be used.
      *
      * @param sampleId the sampleId you want to set
      * @return this

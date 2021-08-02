@@ -104,14 +104,14 @@ public class PersistentSampleManager {
         for (int i = 0; i < sampleRepository.size(); i++) {
             SampleDefinition sampler = sampleRepository.get(i);
 
-            if (sampler.getAnswer() != null) {
-                // It is not necessary to merge a Sampler, that already has an Answer.
+            if (!sampler.isPersistent()) {
                 continue;
             }
 
             List<SampleDefinition> mergedPersistentSamples = createSampleDefinitionForEachPersistentSample(persistentSamples, sampler);
 
             sampleRepository.replace(i, mergedPersistentSamples);
+            i += mergedPersistentSamples.size() - 1;
 
             unusedPersistentSampleIds = filterUsedSampleIds(unusedPersistentSampleIds, mergedPersistentSamples);
         }

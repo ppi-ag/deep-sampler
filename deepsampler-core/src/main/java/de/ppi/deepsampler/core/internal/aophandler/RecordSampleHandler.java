@@ -30,6 +30,7 @@ public class RecordSampleHandler extends ReturningSampleHandler {
         if (!Object.class.equals(method.getDeclaringClass())) {
             final SampleDefinition sampleDefinition = createSampleDefinition(cls, method, args);
             SampleRepository.getInstance().add(sampleDefinition);
+            SampleRepository.getInstance().setMarkNextVoidSamplerForPersistence(false);
         }
 
         return createEmptyProxy(method.getReturnType());

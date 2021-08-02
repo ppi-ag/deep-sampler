@@ -12,8 +12,6 @@ import de.ppi.deepsampler.core.internal.aophandler.VerifySampleHandler;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 
-import java.util.Objects;
-
 /**
  * This is the starting point for the definition of Samples in test classes.
  *
@@ -41,15 +39,15 @@ public class Sample {
 
 
     /**
-     * Defines a sampled method by calling the method inside of the parameter. The returned {@link SampleBuilder} will then offer possibilities to define the Sample,
+     * Defines a sampled method by calling the method inside of the parameter. The returned {@link FunctionalSampleBuilder} will then offer possibilities to define the Sample,
      * or in other words, it offers possibilities to override the default behavior or the return value of a method.
      *
      * @param sampledMethodCall The method call that will be sampled.
      * @param <T> The type of the return value and therefore the type of the Sample.
-     * @return A {@link SampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
+     * @return A {@link FunctionalSampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */
-    public static <T> SampleBuilder<T> of(final T sampledMethodCall) {
+    public static <T> FunctionalSampleBuilder<T> of(final T sampledMethodCall) {
         SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         SampleDefinition lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
 
@@ -59,7 +57,7 @@ public class Sample {
 
         SampleRepository.getInstance().setLastSampleDefinition(currentSampleDefinition);
 
-        return new SampleBuilder<>(sampledMethodCall, currentSampleDefinition);
+        return new FunctionalSampleBuilder<>(sampledMethodCall, currentSampleDefinition);
     }
 
 

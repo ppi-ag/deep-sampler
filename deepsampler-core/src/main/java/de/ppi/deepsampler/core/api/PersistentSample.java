@@ -6,9 +6,7 @@
 package de.ppi.deepsampler.core.api;
 
 import de.ppi.deepsampler.core.error.NotASamplerException;
-import de.ppi.deepsampler.core.error.VerifyException;
 import de.ppi.deepsampler.core.internal.ProxyFactory;
-import de.ppi.deepsampler.core.internal.aophandler.VerifySampleHandler;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 
@@ -41,12 +39,12 @@ public class PersistentSample {
 
 
     /**
-     * Defines a sampled method by calling the method inside of the parameter. The returned {@link SampleBuilder} will then offer possibilities to define the Sample,
+     * Defines a sampled method by calling the method inside of the parameter. The returned {@link FunctionalSampleBuilder} will then offer possibilities to define the Sample,
      * or in other words, it offers possibilities to override the default behavior or the return value of a method.
      *
      * @param sampledMethodCall The method call that will be sampled.
      * @param <T> The type of the return value and therefore the type of the Sample.
-     * @return A {@link SampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
+     * @return A {@link FunctionalSampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */
     public static <T> PersistentSampleBuilder<T> of(final T sampledMethodCall) {
@@ -79,6 +77,8 @@ public class PersistentSample {
             throw new NotASamplerException(sampler.getClass());
         }
 
+        SampleRepository.getInstance().setMarkNextVoidSamplerForPersistence(true);
+
         return sampler;
     }
 
@@ -87,7 +87,7 @@ public class PersistentSample {
     /**
      * This method will set the <code>sampleId</code> of the last defined sampleDefinition. Mostly you
      * want to set the sampleId with the Method {@link PersistentSampleBuilder#hasId(String)}. But in case of
-     * void-returning methods, it is not possible to create a {@link SampleBuilder}. As a consequence
+     * void-returning methods, it is not possible to create a {@link FunctionalSampleBuilder}. As a consequence
      * you will need to set the id with this method.
      *
      * @param id the id you want to set.
