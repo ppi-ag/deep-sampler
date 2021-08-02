@@ -57,7 +57,7 @@ class PersistentSamplerManagerTest {
     void testSimpleLoad() throws Throwable {
         // GIVEN
         final SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
-        saySample.setMarkedForPersistent(true);
+        saySample.setMarkedForPersistence(true);
         SampleRepository.getInstance().add(saySample);
 
         // WHEN
@@ -104,7 +104,7 @@ class PersistentSamplerManagerTest {
     void testDateLoad() throws Throwable {
         // GIVEN
         final SampleDefinition dateSample = new SampleDefinition(new SampledMethod(DateBean.class, DateBean.class.getDeclaredMethod("now")));
-        dateSample.setMarkedForPersistent(true);
+        dateSample.setMarkedForPersistence(true);
         SampleRepository.getInstance().add(dateSample);
 
         // WHEN
