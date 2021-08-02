@@ -65,8 +65,8 @@ public class SampleBuilder<T> extends VoidSampleBuilder {
      * @param answer supplier you want to get evaluated when the stubbed method get invoked
      */
     @SuppressWarnings("unchecked")
-    public void answers(final Answer<? extends Exception> answer) {
-        getSampleDefinition().setAnswer((Answer<Exception>) answer);
+    public void answers(final Answer<? extends Throwable> answer) {
+        getSampleDefinition().setAnswer((Answer<Throwable>) answer);
     }
 
 }

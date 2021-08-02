@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.core.api;
 
 import de.ppi.deepsampler.core.model.SampleDefinition;
+import de.ppi.deepsampler.core.model.StubMethodInvocation;
 import de.ppi.deepsampler.core.model.VoidAnswer;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -78,6 +79,14 @@ public class VoidSampleBuilder {
      */
     public void doesNothing() {
         sampleDefinition.setAnswer(invocation -> null);
+    }
+
+    /**
+     * Calls the original unstubbed method. This is useful in conjunction with other Samples that are only supposed to be used for particular
+     * parameter values while all other calls of the method with different parameter values should still call the original method.
+     */
+    public void callsOriginalMethod() {
+        sampleDefinition.setAnswer(StubMethodInvocation::callOriginalMethod);
     }
 
     /**
