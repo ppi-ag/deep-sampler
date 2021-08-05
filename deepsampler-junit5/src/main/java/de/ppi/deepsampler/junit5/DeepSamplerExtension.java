@@ -33,9 +33,8 @@ public class DeepSamplerExtension implements TestInstancePostProcessor, BeforeEa
     @Override
     public void beforeEach(final ExtensionContext context) {
         Sampler.clear();
-
         context.getTestMethod().ifPresent(testMethod -> {
-            JUnitPluginUtils.applyTestFixture(testMethod);
+            JUnitPluginUtils.applySamplerFixture(testMethod);
             JUnitPluginUtils.loadSamples(testMethod);
         });
     }

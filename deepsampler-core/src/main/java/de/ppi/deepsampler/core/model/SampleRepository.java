@@ -64,8 +64,8 @@ public class SampleRepository {
      * @param mergedPersistentSamples The {@link SampleDefinition}s that are inserted at i.
      */
     public void replace(int i, List<SampleDefinition> mergedPersistentSamples) {
-        samples.addAll(i + 1, mergedPersistentSamples);
-        samples.remove(i);
+        samples.addAll(i, mergedPersistentSamples);
+        samples.remove(i + mergedPersistentSamples.size());
     }
 
     /**

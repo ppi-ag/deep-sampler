@@ -11,9 +11,9 @@ public class FuzzySearchUtility {
      * Searches for wantedString in candidates. The search tries to find the String that has the most similarity,
      * perfect equality is not necessary.
      *
-     * @param wantedString The String that is seached in candidates
+     * @param wantedString The String that is searched in candidates
      * @param candidates A {@link List} of Strings that might be equal, or similar to wantedString.
-     * @return A Tupel containing the best matching candidate and a persentage value that shows the similarity.
+     * @return A pair containing the best matching candidate and a percentage value that shows the similarity.
      */
     public static Match findClosestString(String wantedString, List<String> candidates) {
 
@@ -31,14 +31,14 @@ public class FuzzySearchUtility {
 
 
     /**
-     * Calcualtes how different the two Strings left and right are.
+     * Calculates how different the two Strings left and right are.
      *
      * @see <a href="https://stackoverflow.com/questions/955110/similarity-string-comparison-in-java"/>
      *
      * @param left One of the two Strings that are compared.
      * @param right The other of two Strings that are compared.
      *
-     * @return A value between 0 and 1 where 0 means the Strings are completly different and 1 means, that both Strings are equal.
+     * @return A value between 0 and 1 where 0 means the Strings are completely different and 1 means, that both Strings are equal.
      */
     public static double calcEquality(String left, String right) {
         String longer = left;
