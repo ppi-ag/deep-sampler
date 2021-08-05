@@ -96,6 +96,7 @@ public class PersistentSampleManager {
      */
     private void mergeSamplesFromPersistenceIntoSampleRepository(final PersistentModel persistentSamples) {
         SampleRepository sampleRepository = SampleRepository.getInstance();
+        List<SampleDefinition> originallyDefinedSamplers = new ArrayList<>(sampleRepository.getSamples());
 
         // This is a Set of all SampleIds from the persistence. Everytime, when a SampleId could be matched to a Sampler from the SampleRepository,
         // the SampleId will be removed from this Set. The remaining SampleIds are unmatched and will be reported by an Exception.
@@ -117,7 +118,7 @@ public class PersistentSampleManager {
         }
 
         if (!unusedPersistentSampleIds.isEmpty()) {
-            throw new NoMatchingSamplerFoundException(unusedPersistentSampleIds);
+            throw new NoMatchingSamplerFoundException(unusedPersistentSampleIds, originallyDefinedSamplers);
         }
 
     }
