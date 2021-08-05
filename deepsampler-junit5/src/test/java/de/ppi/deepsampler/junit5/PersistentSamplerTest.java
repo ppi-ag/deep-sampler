@@ -18,17 +18,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenHasStubbedInt;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenHasStubbedString;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@UseSamplerFixture(GetSomeStringTestSampleFixture.class)
 class PersistentSamplerTest {
 
     public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("de", "ppi", "deepsampler", "junit5", "PersistentSamplerTest_samplerCanBeSaved.json");
     public static final String SAVED_IN_SPECIFIC_FILE_JSON = "de/ppi/deepsampler/junit5/samplerCanBeSavedInSpecificFile.json";
     public static final String LOAD_SPECIFIC_FILE_JSON = "src/test/resources/de/ppi/deepsampler/junit5/samplerCanBeLoadedFromSpecificFile.json";
     public static final String LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON = "samplerCanBeLoadedFromSpecificFile.json";
+
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
@@ -102,6 +105,12 @@ class PersistentSamplerTest {
         assertTestBeanHasBeenHasStubbedInt();
     }
 
+    @Test
+    @LoadSamples
+    @Order(9)
+    void sampleFixtureFromClassLevelShouldBeUsed() throws Throwable {
+        assertTestBeanHasBeenHasStubbedString();
+    }
 
 
 }
