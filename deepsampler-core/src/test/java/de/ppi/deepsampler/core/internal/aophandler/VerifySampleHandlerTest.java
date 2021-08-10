@@ -7,7 +7,7 @@ package de.ppi.deepsampler.core.internal.aophandler;
 
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.VerifyException;
-import de.ppi.deepsampler.core.internal.FixedQuantity;
+import de.ppi.deepsampler.core.api.FixedQuantity;
 import de.ppi.deepsampler.core.internal.api.ExecutionManager;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;

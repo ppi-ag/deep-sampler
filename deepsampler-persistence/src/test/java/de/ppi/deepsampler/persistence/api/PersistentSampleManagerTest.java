@@ -1,7 +1,7 @@
 package de.ppi.deepsampler.persistence.api;
 
 
-import de.ppi.deepsampler.core.api.Sample;
+import de.ppi.deepsampler.core.api.PersistentSample;
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.model.SampleDefinition;
@@ -46,7 +46,7 @@ class PersistentSampleManagerTest {
         addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
 
         PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
-        Sample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), sameMatcher()),
+        PersistentSample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), sameMatcher()),
                 equalTo(1))).hasId("SampleId");
 
         // WHEN
@@ -92,7 +92,7 @@ class PersistentSampleManagerTest {
         addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
 
         PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
-        Sample.of(Sampler.prepare(TestService.class).call(any(TestBean.class), any(Integer.class))).hasId("SampleId");
+        PersistentSample.of(Sampler.prepare(TestService.class).call(any(TestBean.class), any(Integer.class))).hasId("SampleId");
 
         // THEN
         assertThrows(NoMatchingSamplerFoundException.class, persistentSampleManager::load);
@@ -123,7 +123,7 @@ class PersistentSampleManagerTest {
 
         PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
         TestService sampler = Sampler.prepare(TestService.class);
-        Sample.of(sampler.call(givenBean, 4)).hasId("SampleId");
+        PersistentSample.of(sampler.call(givenBean, 4)).hasId("SampleId");
 
         // THEN
         assertThrows(NoMatchingParametersFoundException.class, persistentSampleManager::load);
@@ -148,7 +148,7 @@ class PersistentSampleManagerTest {
         addMethodCall(persistentMethodCallList, Arrays.asList(new TestBean(), 1), false);
 
         PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
-        Sample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), equalsMatcher()),
+        PersistentSample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), equalsMatcher()),
                 combo(equalTo(1), sameMatcher()))).hasId("SampleId");
 
         // WHEN

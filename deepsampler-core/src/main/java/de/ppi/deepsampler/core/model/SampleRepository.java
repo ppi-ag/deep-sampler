@@ -23,6 +23,8 @@ public class SampleRepository {
 
     private static Scope<SampleRepository> sampleRepositoryScope = new ThreadScope<>();
 
+    private boolean markNextVoidSamplerForPersistence = false;
+
     /**
      * Singleton Constructor.
      */
@@ -229,11 +231,36 @@ public class SampleRepository {
     }
 
     /**
+     * If the next newly created SampleDefinition should be marked for persistence, this getter would return true.
+     * This is used for void methods where the SampleDefinition is not reachable from PersistentSampler.
+     *
+     * @return true if the next SampleDefinition should be marked for persistence.
+     */
+    public boolean getMarkNextVoidSamplerForPersistence() {
+        return markNextVoidSamplerForPersistence;
+    }
+
+    /**
+     * If the next newly created SampleDefinition should be marked for persistence, markNextVoidSamplerForPersistence can be set to true.
+     * This is used for void methods where the SampleDefinition is not reachable from PersistentSampler.
+     *
+     * @param markNextVoidSamplerForPersistence true if the next SampleDefinition should be marked for persistence.
+     */
+    public void setMarkNextVoidSamplerForPersistence(boolean markNextVoidSamplerForPersistence) {
+        this.markNextVoidSamplerForPersistence = markNextVoidSamplerForPersistence;
+    }
+
+    public void clearMarkNextVoidSamplerForPersistence() {
+        this.markNextVoidSamplerForPersistence = false;
+    }
+
+    /**
      * Clears the actual set {@link SampleRepository#currentSample} and the {@link SampleRepository#samples}
      */
     public void clear() {
         samples = new ArrayList<>();
         clearCurrentParameterMatchers();
+        clearMarkNextVoidSamplerForPersistence();
         currentSample = null;
         lastSample = null;
     }

@@ -12,12 +12,9 @@ import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
 
-import java.util.Objects;
-
 /**
  * <p>
- * Provides a fluent API for creating a {@link SampleDefinition}. You should never create a {@link SampleBuilder} by
- * yourself instead you should use {@link Sample#of(Object)}.
+ * Provides a fluent API for creating a {@link SampleDefinition} for void methods.
  * </p>
  *
  * <p>
@@ -25,24 +22,19 @@ import java.util.Objects;
  *   <ul>
  *       <li>throw Exceptions when a stubbed method is called</li>
  *       <li>deactivate a method, so that a stubbed method does nothing when it is called</li>
+ *       <li>delegate to the original method, so that a stubbed method does the same as the original method when it is called</li>
  *   </ul>
  */
-public class VoidSampleBuilder {
+public class VoidSampleBuilder extends SampleBuilder {
 
-    private final SampleDefinition sampleDefinition;
 
     /**
      * Create a {@link VoidSampleBuilder} with a {@link SampleDefinition}
-     * you want to extend.
      *
      * @param sampleDefinition {@link SampleDefinition}
      */
-    public VoidSampleBuilder(final SampleDefinition sampleDefinition) {
-        this.sampleDefinition = Objects.requireNonNull(sampleDefinition, "the SampleDefinition must not be null.");
-    }
-
-    protected SampleDefinition getSampleDefinition() {
-        return sampleDefinition;
+    protected VoidSampleBuilder(SampleDefinition sampleDefinition) {
+        super(sampleDefinition);
     }
 
     /**
@@ -51,7 +43,7 @@ public class VoidSampleBuilder {
      * @param exception the Exception that will be thrown.
      */
     public void throwsException(final Exception exception) {
-        sampleDefinition.setAnswer(invocation -> {
+        getSampleDefinition().setAnswer(invocation -> {
             throw exception;
         });
     }
@@ -62,7 +54,7 @@ public class VoidSampleBuilder {
      * @param exceptionClass The type of the {@link Exception} that will be thrown. The Exception is instantiated at the time when the stubbed method is called.
      */
     public void throwsException(final Class<? extends Exception> exceptionClass) {
-        sampleDefinition.setAnswer(invocation -> {
+        getSampleDefinition().setAnswer(invocation -> {
             final Objenesis objenesis = new ObjenesisStd();
             final ObjectInstantiator<?> exceptionInstantiator = objenesis.getInstantiatorOf(exceptionClass);
 
@@ -75,18 +67,18 @@ public class VoidSampleBuilder {
      *
      * There are several situation where this might be useful. One example would be a
      * method that would attempt to write data in a database using values that do not comply to a foreign key, since the values are now Samples that
-     * don't exist in the real database. In another case it might simply be necessary to prevent a method from deleting data.
+     * don't exist in the real database. In another case, it might simply be necessary to prevent a method from deleting data.
      */
     public void doesNothing() {
-        sampleDefinition.setAnswer(invocation -> null);
+        getSampleDefinition().setAnswer(invocation -> null);
     }
 
     /**
      * Calls the original unstubbed method. This is useful in conjunction with other Samples that are only supposed to be used for particular
-     * parameter values while all other calls of the method with different parameter values should still call the original method.
+     * parameter values while all other calls of the method, with different parameter values, should still call the original method.
      */
     public void callsOriginalMethod() {
-        sampleDefinition.setAnswer(StubMethodInvocation::callOriginalMethod);
+        getSampleDefinition().setAnswer(StubMethodInvocation::callOriginalMethod);
     }
 
     /**
@@ -102,7 +94,7 @@ public class VoidSampleBuilder {
      * @param answer method you want to get evaluated when the stubbed method is invoked
      */
     public void answers(final VoidAnswer<?> answer) {
-        sampleDefinition.setAnswer(stubMethodInvocation -> {
+        getSampleDefinition().setAnswer(stubMethodInvocation -> {
             answer.call(stubMethodInvocation);
             return null;
         });

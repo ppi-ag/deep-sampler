@@ -12,8 +12,6 @@ import de.ppi.deepsampler.core.internal.aophandler.VerifySampleHandler;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 
-import java.util.Objects;
-
 /**
  * This is the starting point for the definition of Samples in test classes.
  *
@@ -41,15 +39,15 @@ public class Sample {
 
 
     /**
-     * Defines a sampled method by calling the method inside of the parameter. The returned {@link SampleBuilder} will then offer possibilities to define the Sample,
+     * Defines a sampled method by calling the method inside of the parameter. The returned {@link FunctionalSampleBuilder} will then offer possibilities to define the Sample,
      * or in other words, it offers possibilities to override the default behavior or the return value of a method.
      *
      * @param sampledMethodCall The method call that will be sampled.
      * @param <T> The type of the return value and therefore the type of the Sample.
-     * @return A {@link SampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
+     * @return A {@link FunctionalSampleBuilder} which can be used to define the concrete Sample. <b>Do not</b> keep references to this object, it is intended to be used as a
      * fluent API only.
      */
-    public static <T> SampleBuilder<T> of(final T sampledMethodCall) {
+    public static <T> FunctionalSampleBuilder<T> of(final T sampledMethodCall) {
         SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         SampleDefinition lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
 
@@ -59,27 +57,9 @@ public class Sample {
 
         SampleRepository.getInstance().setLastSampleDefinition(currentSampleDefinition);
 
-        return new SampleBuilder<>(sampledMethodCall, currentSampleDefinition);
+        return new FunctionalSampleBuilder<>(sampledMethodCall, currentSampleDefinition);
     }
 
-    /**
-     * Along with the subsequent method call it defines a Sample for which the framework should start to track
-     * how often this Sample is used in the component. This is necessary to be able to verify the invocation
-     * of a specific method.
-     *
-     * @param sampler the sampler for which you want to activate a method call
-     * @param <T> the type of the target Class/sampler
-     * @return the sampler itself
-     */
-    public static <T> T forVerification(final T sampler) {
-        Objects.requireNonNull(sampler);
-
-        if (!ProxyFactory.isProxyClass(sampler.getClass())) {
-            throw new NotASamplerException(sampler.getClass());
-        }
-
-        return sampler;
-    }
 
     /**
      * Along with the subsequent method call you can assert that this method call has been called
@@ -93,18 +73,6 @@ public class Sample {
      */
     public static <T> T verifyCallQuantity(final Class<T> cls, final Quantity quantity) {
         return ProxyFactory.createProxy(cls, new VerifySampleHandler(quantity, cls));
-    }
-
-    /**
-     * This method will set the <code>sampleId</code> of the last defined sampleDefinition. Mostly you
-     * want to set the sampleId with the Method {@link SampleBuilder#hasId(String)}. But in case of
-     * void-returning methods, it is not possible to create a {@link SampleBuilder}. As a consequence
-     * you will need to set the id with this method.
-     *
-     * @param id the id you want to set.
-     */
-    public static void setIdToLastMethodCall(final String id) {
-        SampleRepository.getInstance().getCurrentSampleDefinition().setSampleId(id);
     }
 
     /**
@@ -125,7 +93,7 @@ public class Sample {
         try {
             sampledMethodCall.call();
         } catch (final Exception e) {
-            throw new NotASamplerException("The VoidCall did throw an Exception. Did you call an unstubbed method inside of the lamda, " +
+            throw new NotASamplerException("The VoidCall did throw an Exception. Did you call an unstubbed method inside of the lambda, " +
                     "instead of a method on a Sampler?", e);
         }
 

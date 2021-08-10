@@ -294,18 +294,6 @@ class SampleTest {
         assertEquals(1, counter.get());
     }
 
-    @Test
-    void samplerForVerificationIsChecked() {
-        //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.forVerification(testServiceSampler);
-
-        // THEN
-        assertThrows(NotASamplerException.class, () -> Sample.forVerification("I'm not a Sampler."));
-        assertThrows(NullPointerException.class, () -> Sample.forVerification(null));
-    }
-
-
     public static class TestService {
 
         public String echoParameter(final String someParameter) {
