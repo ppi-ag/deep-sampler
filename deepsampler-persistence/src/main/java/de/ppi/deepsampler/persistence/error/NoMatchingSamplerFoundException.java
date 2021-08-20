@@ -25,12 +25,12 @@ public class NoMatchingSamplerFoundException extends PersistenceException {
 
     public NoMatchingSamplerFoundException(String unusedSamplerId, List<SampleDefinition> definedSampleDefinitions) {
         super("The persistent Sample with the id '%s' doesn't have a corresponding Sampler. %s" +
-                "Please define a Sampler using Sampler.of(...)", unusedSamplerId, guessCorrectSampler(unusedSamplerId, definedSampleDefinitions));
+                "Please define a Sampler using PersistentSampler.of(...)", unusedSamplerId, guessCorrectSampler(unusedSamplerId, definedSampleDefinitions));
     }
   
     public NoMatchingSamplerFoundException(Collection<String> unusedSamplerIds, List<SampleDefinition> definedSampleDefinitions) {
         super("The following persistent Samples don't have a corresponding Sampler. " +
-                "Please define a Sampler using Sampler.of(...):\n%s", formatMissingSamplerIds(unusedSamplerIds, definedSampleDefinitions));
+                "Please define a Sampler using PersistentSampler.of(...):\n%s", formatMissingSamplerIds(unusedSamplerIds, definedSampleDefinitions));
     }
 
     private static String formatMissingSamplerIds(Collection<String> unusedSamplerIds, List<SampleDefinition> definedSampleDefinitions) {
