@@ -77,7 +77,9 @@ public abstract class SpringSamplerAspect {
             final Answer<?> answer = sampleDefinition.getAnswer();
 
             if (answer != null) {
-                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(joinPoint.getArgs()), joinPoint.getThis());
+                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(joinPoint.getArgs()),
+                        joinPoint.getThis(),
+                        joinPoint::proceed);
                 return ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
@@ -103,7 +105,7 @@ public abstract class SpringSamplerAspect {
         // generic Proxy-class. Using the signature doesn't have this problem.
         final SampledMethod sampledMethod = new SampledMethod(signature.getDeclaringType(), signature.getMethod());
 
-        return SampleRepository.getInstance().find(sampledMethod, proceedingJoinPoint.getArgs());
+        return SampleRepository.getInstance().findValidated(sampledMethod, proceedingJoinPoint.getArgs());
     }
 
 
