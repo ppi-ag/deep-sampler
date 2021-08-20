@@ -7,7 +7,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
-
+/**
+ * This Deserializer deserialize a byte[] serialized as list of integer.
+ * This class is a bundle with {@link PlainByteArraySerializer}
+ *
+ */
 public class PlainByteArrayDeserializer extends JsonDeserializer<byte[]> {
     @Override
     public byte[] deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {

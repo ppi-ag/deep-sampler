@@ -52,7 +52,7 @@ public abstract class JsonOperator {
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
         objectMapper.registerModule(new JavaTimeModule());
-
+        objectMapper.registerModule(new DeepSamplerSpecificModule());
         //Hier muss StandardModule für unsere eigenen Serializer
 
         objectMapper.setDefaultTyping(new CustomTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS, objectMapper.getPolymorphicTypeValidator()));
@@ -75,8 +75,6 @@ public abstract class JsonOperator {
             final SerializationExtension<Object> serializationObjExtension = (SerializationExtension<Object>) serializationExtension;
             simpleModule.addSerializer(serializationObjExtension.getTypeToSerialize(), serializationObjExtension.getJsonSerializer());
         }
-        simpleModule.addSerializer(byte[].class, new PlainByteArraySerializer());
-        simpleModule.addDeserializer(byte[].class,new PlainByteArrayDeserializer());
         objectMapper.registerModule(simpleModule);
 
         for (final Module module : moduleList) {

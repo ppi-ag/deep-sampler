@@ -10,6 +10,11 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 
+/**
+ * This Serializer serialize byte[] in a list of integer for easier debugging.
+ * Jackson would otherwise serialize a byte[] as base64-String.
+ *  This class is a bundle with {@link PlainByteArrayDeserializer}
+ */
 public class PlainByteArraySerializer extends StdSerializer<byte[]> {
 
 
