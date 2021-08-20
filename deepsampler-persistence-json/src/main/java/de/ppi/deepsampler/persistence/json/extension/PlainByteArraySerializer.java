@@ -11,9 +11,9 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 
 /**
- * This Serializer serialize byte[] in a list of integer for easier debugging.
- * Jackson would otherwise serialize a byte[] as base64-String.
- *  This class is a bundle with {@link PlainByteArrayDeserializer}
+ * This Serializer serializes byte[] as a list of integers for easier debugging.
+ * Jackson would otherwise serialize a byte[] as a base64-String.
+ * This class comes in a bundle with {@link PlainByteArrayDeserializer}
  */
 public class PlainByteArraySerializer extends StdSerializer<byte[]> {
 
@@ -33,7 +33,6 @@ public class PlainByteArraySerializer extends StdSerializer<byte[]> {
 
     @Override
     public void serializeWithType(byte[] value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
-        // most likely scalar
         WritableTypeId typeIdDef = typeSer.writeTypePrefix(gen,
                 typeSer.typeId(value, JsonToken.VALUE_EMBEDDED_OBJECT));
         serialize(value,gen,serializers);
