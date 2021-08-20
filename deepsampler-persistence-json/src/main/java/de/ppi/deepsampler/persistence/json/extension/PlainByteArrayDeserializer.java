@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 /**
- * This Deserializer deserialize a byte[] serialized as list of integer.
- * This class is a bundle with {@link PlainByteArraySerializer}
+ * This Deserializer deserializes a byte[], that was serialized as a list of integers.
+ * This class comes in a bundle with {@link PlainByteArraySerializer}
  *
  */
 public class PlainByteArrayDeserializer extends JsonDeserializer<byte[]> {
