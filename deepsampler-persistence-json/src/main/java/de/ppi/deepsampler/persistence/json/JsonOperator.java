@@ -50,11 +50,11 @@ public abstract class JsonOperator {
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        
         objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.registerModule(new DeepSamplerSpecificModule());
-        //Hier muss StandardModule für unsere eigenen Serializer
-
+        
         objectMapper.setDefaultTyping(new CustomTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS, objectMapper.getPolymorphicTypeValidator()));
 
         applyCustomExtensions(objectMapper);
