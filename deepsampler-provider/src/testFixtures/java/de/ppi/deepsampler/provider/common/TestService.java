@@ -194,4 +194,12 @@ public class TestService {
     }
 
 
+    public byte[] getRandomByteArray(int size){
+
+        byte[] b = new byte[size];
+        new Random().nextBytes(b);
+        return b;
+
+    }
+
 }

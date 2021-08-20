@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import de.ppi.deepsampler.persistence.json.extension.PlainByteArrayDeserializer;
+import de.ppi.deepsampler.persistence.json.extension.PlainByteArraySerializer;
 import de.ppi.deepsampler.persistence.json.extension.DeserializationExtension;
 import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 
@@ -50,6 +52,9 @@ public abstract class JsonOperator {
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         objectMapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
         objectMapper.registerModule(new JavaTimeModule());
+
+        //Hier muss StandardModule für unsere eigenen Serializer
+
         objectMapper.setDefaultTyping(new CustomTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_CONCRETE_AND_ARRAYS, objectMapper.getPolymorphicTypeValidator()));
 
         applyCustomExtensions(objectMapper);
@@ -70,7 +75,8 @@ public abstract class JsonOperator {
             final SerializationExtension<Object> serializationObjExtension = (SerializationExtension<Object>) serializationExtension;
             simpleModule.addSerializer(serializationObjExtension.getTypeToSerialize(), serializationObjExtension.getJsonSerializer());
         }
-
+        simpleModule.addSerializer(byte[].class, new PlainByteArraySerializer());
+        simpleModule.addDeserializer(byte[].class,new PlainByteArrayDeserializer());
         objectMapper.registerModule(simpleModule);
 
         for (final Module module : moduleList) {

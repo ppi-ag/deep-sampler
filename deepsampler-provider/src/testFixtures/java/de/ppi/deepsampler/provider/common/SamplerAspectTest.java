@@ -15,6 +15,7 @@ import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
+import de.ppi.deepsampler.persistence.json.extension.PlainByteArraySerializer;
 import de.ppi.deepsampler.provider.testservices.DecoupledTestService;
 import de.ppi.deepsampler.provider.testservices.DecoupledTestServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,7 @@ public abstract class SamplerAspectTest {
     private static final TestBean TEST_BEAN_B = new TestBean();
     public static final String MY_ECHO_PARAMS = "MY ECHO PARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
-    public static final byte[] SOME_BYTES = {1, 2, 3, 4};
+    public static final byte[] SOME_BYTES = {1, 2, 33, 4};
 
 
     /**
@@ -534,9 +535,9 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.echoParameter(any(TestBeanWithBytes.class)));
+        Sample.of(testServiceSampler.getRandomByteArray(anyInt()));
 
-        getTestService().echoParameter(new TestBeanWithBytes(SOME_BYTES));
+        byte[] expectedArray = getTestService().getRandomByteArray(42);
         final String pathToFile = "./record/byteArrayCanBeRecordedAndLoaded.json";
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.record();
@@ -545,11 +546,14 @@ public abstract class SamplerAspectTest {
         Sampler.clear();
         assertTrue(SampleRepository.getInstance().isEmpty());
 
-        Sample.of(testServiceSampler.echoParameter(any(TestBeanWithBytes.class)));
+
+        Sample.of(testServiceSampler.getRandomByteArray(anyInt()));
+
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        assertArrayEquals(SOME_BYTES , getTestService().echoParameter(new TestBeanWithBytes(SOME_BYTES)).getSomeBytes());
+        byte[] valueStubbedMethod =  getTestService().getRandomByteArray(42);
+        assertArrayEquals(expectedArray ,valueStubbedMethod);
         Files.delete(Paths.get(pathToFile));
     }
 
