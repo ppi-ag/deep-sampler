@@ -5,7 +5,7 @@
 
 package de.ppi.deepsampler.junit;
 
-import de.ppi.deepsampler.core.api.Sample;
+import de.ppi.deepsampler.core.api.PersistentSample;
 
 @SuppressWarnings("unused")
 public class GetSomeStringTestSampleFixture implements SamplerFixture {
@@ -15,6 +15,6 @@ public class GetSomeStringTestSampleFixture implements SamplerFixture {
 
     @Override
     public void defineSamplers() {
-        Sample.of(testBeanSampler.getSomeString());
+        PersistentSample.of(testBeanSampler.getSomeString());
     }
 }
