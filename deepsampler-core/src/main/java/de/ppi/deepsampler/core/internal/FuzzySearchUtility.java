@@ -2,6 +2,7 @@ package de.ppi.deepsampler.core.internal;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FuzzySearchUtility {
@@ -12,18 +13,30 @@ public class FuzzySearchUtility {
      * perfect equality is not necessary.
      *
      * @param wantedString The String that is searched in candidates
-     * @param candidates A {@link List} of Strings that might be equal, or similar to wantedString.
+     * @param candidates   A {@link List} of Strings that might be equal, or similar to wantedString.
      * @return A pair containing the best matching candidate and a percentage value that shows the similarity.
      */
-    public static Match findClosestString(String wantedString, List<String> candidates) {
+    public static <T> Match<String> findClosestString(String wantedString, List<String> candidates) {
+        return findClosestString(wantedString, candidates, String::toString);
+    }
 
+    /**
+     * Searches for wantedString in candidates. candidateStringProvider() is used to get the String from each candidate, that is used for comparison.
+     * The search tries to find the String that has the most similarity, perfect equality is not necessary.
+     *
+     * @param wantedString The String that is searched in candidates
+     * @param candidates   A {@link List} of Objects that might have a String that is equal, or similar to wantedString.
+     * @param candidateStringProvider A functional interface, that should provide the String from a candidate, that is used for the comparison.
+     * @return A pair containing the best matching candidate and a percentage value that shows the similarity.
+     */
+    public static <T> Match<T> findClosestString(String wantedString, List<T> candidates, Function<T, String> candidateStringProvider) {
         if (candidates.size() == 0) {
             return null;
         }
 
-        List<Match> matchedCandidates = candidates.stream()
-                .map(candidate -> new Match(candidate, calcEquality(candidate, wantedString)))
-                .sorted(Comparator.comparingDouble(Match::getEquality))
+        List<Match<T>> matchedCandidates = candidates.stream()
+                .map(candidate -> new Match<>(candidate, calcEquality(candidateStringProvider.apply(candidate), wantedString)))
+                .sorted(Comparator.comparingDouble(Match<T>::getEquality))
                 .collect(Collectors.toList());
 
         return matchedCandidates.get(matchedCandidates.size() - 1);
@@ -33,12 +46,10 @@ public class FuzzySearchUtility {
     /**
      * Calculates how different the two Strings left and right are.
      *
-     * @see <a href="https://stackoverflow.com/questions/955110/similarity-string-comparison-in-java"/>
-     *
-     * @param left One of the two Strings that are compared.
+     * @param left  One of the two Strings that are compared.
      * @param right The other of two Strings that are compared.
-     *
      * @return A value between 0 and 1 where 0 means the Strings are completely different and 1 means, that both Strings are equal.
+     * @see <a href="https://stackoverflow.com/questions/955110/similarity-string-comparison-in-java"/>
      */
     public static double calcEquality(String left, String right) {
         String longer = left;
@@ -62,12 +73,10 @@ public class FuzzySearchUtility {
     /**
      * Calculates the difference between two Strings using the "Levenshtein Edit Distance" algorithm.
      *
-     * @see <a href="https://stackoverflow.com/questions/955110/similarity-string-comparison-in-java"/>
-     *
-     * @param left One of the two Strings that are compared.
+     * @param left  One of the two Strings that are compared.
      * @param right The other of two Strings that are compared.
-     *
      * @return the cost of converting left into right. This can be used to measure the difference between left and right.
+     * @see <a href="https://stackoverflow.com/questions/955110/similarity-string-comparison-in-java"/>
      */
     private static int calcEditDistance(String left, String right) {
         left = left.toLowerCase();
@@ -105,29 +114,26 @@ public class FuzzySearchUtility {
      * Describes a String that matches to another String. How similar the compared Strings are is expressed by
      * {@link Match#getEquality()}.
      */
-    public static class Match {
-        private final String matchedString;
+    public static class Match<T> {
         private final double equality;
+        private final T matchedObject;
 
-        public Match(String matchedString, double equality) {
-            this.matchedString = matchedString;
+        public Match(T matchedObject, double equality) {
             this.equality = equality;
-        }
-
-        /**
-         * The matched String.
-         * @return The matched String.
-         */
-        public String getMatchedString() {
-            return matchedString;
+            this.matchedObject = matchedObject;
         }
 
         /**
          * The extend of equality. A 0 means no equality at all and a 1 means perfect equality.
+         *
          * @return The extend of equality.
          */
         public double getEquality() {
             return equality;
+        }
+
+        public T getMatchedObject() {
+            return matchedObject;
         }
     }
 }

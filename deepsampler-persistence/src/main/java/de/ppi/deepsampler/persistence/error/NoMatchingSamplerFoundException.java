@@ -1,7 +1,5 @@
 package de.ppi.deepsampler.persistence.error;
 
-import com.sun.tools.jdeps.JdepsFilter;
-import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.internal.FuzzySearchUtility;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 
@@ -35,16 +33,20 @@ public class NoMatchingSamplerFoundException extends PersistenceException {
 
     private static String formatMissingSamplerIds(Collection<String> unusedSamplerIds, List<SampleDefinition> definedSampleDefinitions) {
         return unusedSamplerIds.stream()
-                .map(id -> "\t" + id + "\n\t\t" + guessCorrectSampler(id, definedSampleDefinitions))
+                .map(id -> "\t" + id + guessCorrectSampler(id, definedSampleDefinitions))
                 .collect(Collectors.joining("\n"));
     }
 
     private static String guessCorrectSampler(String unusedSamplerId, List<SampleDefinition> definedSampleDefinitions) {
-        List<String> definedSampleIds = definedSampleDefinitions.stream().map(SampleDefinition::getSampleId).collect(Collectors.toList());
-        FuzzySearchUtility.Match match = FuzzySearchUtility.findClosestString(unusedSamplerId, definedSampleIds);
+        FuzzySearchUtility.Match<SampleDefinition> match = FuzzySearchUtility.findClosestString(unusedSamplerId, definedSampleDefinitions, SampleDefinition::getSampleId);
 
         if (match != null && match.getEquality() > 0.5) {
-            return "did you mean " + match.getMatchedString() + "?";
+            if (!match.getMatchedObject().isMarkedForPersistence()) {
+                return "\n\t\t" + match.getMatchedObject().getSampleId() + " seems to be quite similar, but it was not marked for persistence. " +
+                        "Use PersistentSampler.of() instead of Sampler.of(), if the Sample should be provided from persistence.";
+            }
+
+            return "\n\t\t did you mean " + match.getMatchedObject().getSampleId() + "?";
         }
 
         return "";
