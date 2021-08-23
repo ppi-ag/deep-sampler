@@ -491,21 +491,16 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void byteArrayCanBeRecordedAndLoaded() throws IOException {
+    public void byteArrayCanBeRecordedAndLoaded(Path tempFile) throws IOException {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
 
         byte[] expectedArray = getTestService().getRandomByteArray(42);
-        final String pathToFile = "./record/byteArrayCanBeRecordedAndLoaded.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
 
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-
+        final PersistentSampleManager source = save(tempFile);
+        clearSampleRepositoryWithAssertion();
 
         PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
 
@@ -514,7 +509,6 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
         byte[] valueStubbedMethod =  getTestService().getRandomByteArray(42);
         assertArrayEquals(expectedArray ,valueStubbedMethod);
-        Files.delete(Paths.get(pathToFile));
     }
 
     @Test
