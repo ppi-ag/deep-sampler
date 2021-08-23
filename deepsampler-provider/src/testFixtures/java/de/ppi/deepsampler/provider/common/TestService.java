@@ -80,8 +80,8 @@ public class TestService {
     }
 
     @SuppressWarnings("unused")
-    public Date testSqlDate(final RecTestBean someObject) {
-        return new Date(1);
+    public Date testRandomSqlDate(final RecTestBean someObject) {
+        return new Date((long)(Math.random() * 100000000000L));
     }
 
 

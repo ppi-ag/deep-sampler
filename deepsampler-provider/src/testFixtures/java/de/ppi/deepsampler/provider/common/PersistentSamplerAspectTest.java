@@ -109,19 +109,21 @@ public abstract class PersistentSamplerAspectTest {
     @Test
     public void sqlDateCanBeRecordedAndLoaded(Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
 
-        getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        Date expectedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
 
         final PersistentSampleManager source = save(tempFile);
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        assertEquals(new Date(1), getTestService().testSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+
+        Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        assertEquals(expectedDate, stubbedDate);
     }
 
     @Test
