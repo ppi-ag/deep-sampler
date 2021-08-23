@@ -34,7 +34,7 @@ class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples
     @Order(0)
-    void samplerCanBeLoadedFromFile() throws Exception {
+    void samplerCanBeLoadedFromFile() throws Throwable {
         assertTestBeanHasBeenStubbed();
     }
 
@@ -90,7 +90,7 @@ class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples(file = LOAD_SPECIFIC_FILE_JSON)
     @Order(7)
-    void samplerCanBeLoadedFromSpecificFile() throws Exception {
+    void samplerCanBeLoadedFromSpecificFile() throws Throwable {
         assertTestBeanHasBeenStubbed();
     }
 
@@ -98,7 +98,7 @@ class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples(classPath = LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON)
     @Order(8)
-    void samplerCanBeLoadedFromSpecificClasspathResource() throws Exception {
+    void samplerCanBeLoadedFromSpecificClasspathResource() throws Throwable {
         assertTestBeanHasBeenStubbed();
     }
 

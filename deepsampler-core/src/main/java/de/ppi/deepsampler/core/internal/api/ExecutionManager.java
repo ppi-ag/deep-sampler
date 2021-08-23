@@ -6,8 +6,10 @@
 package de.ppi.deepsampler.core.internal.api;
 
 import de.ppi.deepsampler.core.api.SampleReturnProcessor;
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.model.*;
 
+import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,20 +20,20 @@ public class ExecutionManager {
     }
 
     public static void notify(final SampleDefinition sampleDefinition) {
-        getSampleInformation(sampleDefinition).increaseTimesInvoked();
+        getSampleExecutionInformation(sampleDefinition).increaseTimesInvoked();
     }
 
     public static void record(final SampleDefinition sampleDefinition, final MethodCall actualMethodCall) {
-        getSampleInformation(sampleDefinition).addMethodCall(actualMethodCall);
+        getSampleExecutionInformation(sampleDefinition).addMethodCall(actualMethodCall);
     }
 
-    private static SampleExecutionInformation getSampleInformation(final SampleDefinition sampleDefinition) {
+    private static SampleExecutionInformation getSampleExecutionInformation(final SampleDefinition sampleDefinition) {
         final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(sampleDefinition.getSampledMethod().getTarget());
 
         return executionInformation.getOrCreateBySample(sampleDefinition);
     }
 
-    public static Object execute(final SampleDefinition sampleDefinition, final StubMethodInvocation stubMethodInvocation) throws Exception {
+    public static Object execute(final SampleDefinition sampleDefinition, final StubMethodInvocation stubMethodInvocation) throws Throwable {
         Object callReturnValue = null;
         try {
             callReturnValue = sampleDefinition.getAnswer().call(stubMethodInvocation);

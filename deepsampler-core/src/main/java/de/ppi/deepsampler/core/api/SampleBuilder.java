@@ -1,86 +1,31 @@
-/*
- * Copyright 2020  PPI AG (Hamburg, Germany)
- * This program is made available under the terms of the MIT License.
- */
-
 package de.ppi.deepsampler.core.api;
 
-import de.ppi.deepsampler.core.model.Answer;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 
+import java.util.Objects;
+
 /**
- * <p>
- * Provides a fluent API for creating a {@link SampleDefinition}. You should never create a {@link SampleBuilder} by
- * yourself instead you should use {@link Sample#of(Object)}.
- * </p>
+ * Parent off all {@link SampleBuilder}s. A {@link SampleBuilder} is a Builder that is used to compose a {@link SampleDefinition} using a
+ * fluent API in conjunction with {@link Sample} and {@link PersistentSample}.
  *
- * <p>
- * With the sampleBuilder you are able to define:
- *   <ul>
- *       <li>A return value or returnValueSupplier</li>
- *       <li>A sampleId</li>
- *   </ul>
- * <p>
- *   The return value will be used (and evaluated) when the stubbed method will be invoked.
- *   The sampleId is a possibility to assign an id to the sampleDefinition. This id will be used
- *   in the persistence to identify the stubbed method.
- * </p>
- *
- * @param <T> type of the class you want stub
+ * DeepSampler defines different {@link SampleDefinition}s depending on the type of method that should be stubbed. For instance, different
+ * configurations are necessary for void methods and methods that return values.
  */
-public class SampleBuilder<T> extends VoidSampleBuilder {
+public abstract class SampleBuilder {
+
+    private final SampleDefinition sampleDefinition;
 
     /**
-     * Create a {@link SampleBuilder} with a sampler of the class you want to build a sample for, and the sampleDefinition
-     * you want to extend.
+     * Create a {@link SampleBuilder} with a {@link SampleDefinition}
      *
-     * @param sampler          the sampler {@link Sampler}
      * @param sampleDefinition {@link SampleDefinition}
      */
-    @SuppressWarnings("unused")
-    public SampleBuilder(final T sampler, final SampleDefinition sampleDefinition) {
-        super(sampleDefinition);
+    protected SampleBuilder(final SampleDefinition sampleDefinition) {
+        this.sampleDefinition = Objects.requireNonNull(sampleDefinition, "the SampleDefinition must not be null.");
     }
 
-    /**
-     * Makes the stubbed method return the given value when invoked.
-     *
-     * @param sampleReturnValue the return value you want to set for the sampleDefinition
-     */
-    public void is(final T sampleReturnValue) {
-        getSampleDefinition().setAnswer(stubInvocation -> sampleReturnValue);
+    protected SampleDefinition getSampleDefinition() {
+        return sampleDefinition;
     }
-
-    /**
-     * In most cases it will be sufficient to define a fixed Sample as a return value for a stubbed method, but sometimes it
-     * is necessary to execute some logic that would compute the return value or that would even change some additional state.
-     * This can be done by using an Answer like so:
-     *
-     * <code>
-     * Sample.of(sampler.echo(anyString())).answer(invocation -&gt; invocation.getParameters().get(0));
-     * </code>
-     * <p>
-     * In essence using Answers gives free control on what a stubbed method should do.
-     *
-     * @param answer supplier you want to get evaluated when the stubbed method get invoked
-     */
-    @SuppressWarnings("unchecked")
-    public void answers(final Answer<? extends Exception> answer) {
-        getSampleDefinition().setAnswer((Answer<Exception>) answer);
-    }
-
-
-
-    /**
-     * Set an id for the current SampleDefinition.
-     *
-     * @param sampleId the sampleId you want to set
-     * @return this
-     */
-    public SampleBuilder<T> hasId(final String sampleId) {
-        getSampleDefinition().setSampleId(sampleId);
-        return this;
-    }
-
 
 }
