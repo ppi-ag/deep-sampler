@@ -19,7 +19,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
@@ -485,6 +488,33 @@ public abstract class PersistentSamplerAspectTest {
         // THEN
         assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1"));
         assertEquals("R1", result);
+    }
+
+    @Test
+    public void byteArrayCanBeRecordedAndLoaded() throws IOException {
+        Sampler.clear();
+
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
+
+        byte[] expectedArray = getTestService().getRandomByteArray(42);
+        final String pathToFile = "./record/byteArrayCanBeRecordedAndLoaded.json";
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+
+
+        PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
+
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        byte[] valueStubbedMethod =  getTestService().getRandomByteArray(42);
+        assertArrayEquals(expectedArray ,valueStubbedMethod);
+        Files.delete(Paths.get(pathToFile));
     }
 
     @Test
