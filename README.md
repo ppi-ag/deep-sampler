@@ -169,7 +169,7 @@ For the sake of understandability, the tested compound in this example is fairly
 especially designed for complex compound tests with quite a lot of stubs which also might return extensive Samples. 
 In these cases we would not want
 to have big sets of test data (Samples) in JUnit Test classes, we would rather separate test data from test logic. And
-possibly more important, we would not want to write such extensive samples by hand. To ease this, DeepSampler 
+possibly more important, we would not want to write such extensive Samples by hand. To ease this, DeepSampler 
 can save and load Samples from JSON-files.
 
 ### Record a JSON-Sample
