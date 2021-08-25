@@ -183,7 +183,7 @@ PersistentSample.of(personDaoSampler.loadPerson(Matchers.anyInt()))     ;
 Persistent Samples are defined using `PersistentSample` and we don't need to define a concrete Sample using `is()` anymore, since this value
 will be provided by the JSON-File.
 __Second__ we we need to tell DeepSampler to record all Data, that flows through the stubbed methods. This is simply done by adding the annotation
-`@SaveSamples` to the testmethod. 
+`@SaveSamples` to the test method. 
 
 ```
 @Test
