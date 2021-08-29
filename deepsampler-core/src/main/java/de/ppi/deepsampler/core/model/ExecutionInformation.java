@@ -5,19 +5,25 @@
 
 package de.ppi.deepsampler.core.model;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ExecutionInformation {
 
-    private final Map<SampleDefinition, SampleExecutionInformation> behaviorExecutionInformationMap = new HashMap<>();
+    private final List<SampleExecutionInformation> executionInformation = new ArrayList<>();
 
     public SampleExecutionInformation getOrCreateBySample(final SampleDefinition sampleDefinition) {
-        return behaviorExecutionInformationMap.computeIfAbsent(sampleDefinition, b -> new SampleExecutionInformation(0));
+        for (SampleExecutionInformation execution : executionInformation) {
+            if (execution.getSampleDefinition() == sampleDefinition) {
+                return execution;
+            }
+        }
+
+        SampleExecutionInformation execution = new SampleExecutionInformation(sampleDefinition);
+        this.executionInformation.add(execution);
+        return execution;
     }
 
-    public Map<SampleDefinition, SampleExecutionInformation> getAll() {
-        return Collections.unmodifiableMap(behaviorExecutionInformationMap);
+    public List<SampleExecutionInformation> getAll() {
+        return executionInformation;
     }
 }
