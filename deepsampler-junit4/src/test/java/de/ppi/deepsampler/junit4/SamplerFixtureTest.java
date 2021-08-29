@@ -11,8 +11,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenHasStubbedInt;
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenHasStubbedString;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
 import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -25,13 +25,13 @@ public class SamplerFixtureTest {
     @Test
     @LoadSamples
     public void samplerFixtureAtClassLevelShouldBeUsed() throws Throwable {
-        assertTestBeanHasBeenHasStubbedInt();
+        assertTestBeanHasStubbedInt();
     }
 
     @Test
     @LoadSamples
     @UseSamplerFixture(GetSomeStringTestSampleFixture.class)
     public void samplerFixtureAtMethodLevelShouldBeUsed() throws Throwable {
-        assertTestBeanHasBeenHasStubbedString();
+        assertTestBeanHasStubbedString();
     }
 }

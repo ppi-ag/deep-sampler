@@ -17,8 +17,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenHasStubbedInt;
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenHasStubbedString;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,7 +38,7 @@ class PersistentSamplerTest {
     @LoadSamples
     @Order(0)
     void samplerCanBeLoadedFromFile() throws Throwable {
-        assertTestBeanHasBeenHasStubbedInt();
+        assertTestBeanHasStubbedInt();
     }
 
     @Test
@@ -94,7 +94,7 @@ class PersistentSamplerTest {
     @LoadSamples(file = LOAD_SPECIFIC_FILE_JSON)
     @Order(7)
     void samplerCanBeLoadedFromSpecificFile() throws Throwable {
-        assertTestBeanHasBeenHasStubbedInt();
+        assertTestBeanHasStubbedInt();
     }
 
     @Test
@@ -102,14 +102,14 @@ class PersistentSamplerTest {
     @LoadSamples(classPath = LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON)
     @Order(8)
     void samplerCanBeLoadedFromSpecificClasspathResource() throws Throwable {
-        assertTestBeanHasBeenHasStubbedInt();
+        assertTestBeanHasStubbedInt();
     }
 
     @Test
     @LoadSamples
     @Order(9)
     void sampleFixtureFromClassLevelShouldBeUsed() throws Throwable {
-        assertTestBeanHasBeenHasStubbedString();
+        assertTestBeanHasStubbedString();
     }
 
 

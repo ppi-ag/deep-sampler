@@ -34,7 +34,7 @@ public class JUnitTestUtility {
      * @throws Exception the generic call to an {@link Answer#call(StubMethodInvocation)} may yield an Exception of any kind if the concrete
      * implementation decides that this is necessary.
      */
-    public static void assertTestBeanHasBeenHasStubbedInt() throws Throwable {
+    public static void assertTestBeanHasStubbedInt() throws Throwable {
         final SampleRepository sampleRepository = SampleRepository.getInstance();
 
         assertFalse(sampleRepository.isEmpty());
@@ -52,7 +52,7 @@ public class JUnitTestUtility {
      * @throws Throwable the generic call to an {@link Answer#call(StubMethodInvocation)} may yield an {@link Throwable} of any kind if the concrete
      * implementation decides that this was necessary.
      */
-    public static void assertTestBeanHasBeenHasStubbedString() throws Throwable {
+    public static void assertTestBeanHasStubbedString() throws Throwable {
         final SampleRepository sampleRepository = SampleRepository.getInstance();
 
         assertFalse(sampleRepository.isEmpty());
