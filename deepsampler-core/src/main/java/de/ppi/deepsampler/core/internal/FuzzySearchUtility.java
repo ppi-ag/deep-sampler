@@ -9,33 +9,34 @@ public class FuzzySearchUtility {
 
 
     /**
-     * Searches for wantedString in candidates. The search tries to find the String that has the most similarity,
+     * Searches for wantedKey in candidates. The search tries to find the String that has the most similarity,
      * perfect equality is not necessary.
      *
-     * @param wantedString The String that is searched in candidates
-     * @param candidates   A {@link List} of Strings that might be equal, or similar to wantedString.
+     * @param wantedKey The String that is searched in candidates
+     * @param candidates   A {@link List} of Strings that might be equal, or similar to wantedKey.
      * @return A pair containing the best matching candidate and a percentage value that shows the similarity.
      */
-    public static <T> Match<String> findClosestString(String wantedString, List<String> candidates) {
-        return findClosestString(wantedString, candidates, String::toString);
+    public static <T> Match<String> findClosestString(String wantedKey, List<String> candidates) {
+        return findClosestObject(wantedKey, candidates, String::toString);
     }
 
     /**
-     * Searches for wantedString in candidates. candidateStringProvider() is used to get the String from each candidate, that is used for comparison.
+     * Searches for wantedKey in candidates. candidates may be a {@link List} of arbitrary objects. candidateKeyProvider()
+     * is used to get a searchable String from each candidate, that is used for comparison.
      * The search tries to find the String that has the most similarity, perfect equality is not necessary.
      *
-     * @param wantedString The String that is searched in candidates
-     * @param candidates   A {@link List} of Objects that might have a String that is equal, or similar to wantedString.
-     * @param candidateStringProvider A functional interface, that should provide the String from a candidate, that is used for the comparison.
-     * @return A pair containing the best matching candidate and a percentage value that shows the similarity.
+     * @param wantedKey The String that is searched in candidates
+     * @param candidates   A {@link List} of arbitrary Objects, that might have a String that is equal, or similar to wantedKey.
+     * @param candidateKeyProvider A functional interface, that should provide the String from a candidate, that is used for the comparison.
+     * @return A pair containing the best matching candidate and a percentage value that shows the similarity, or null if candidates is empty.
      */
-    public static <T> Match<T> findClosestString(String wantedString, List<T> candidates, Function<T, String> candidateStringProvider) {
+    public static <T> Match<T> findClosestObject(String wantedKey, List<T> candidates, Function<T, String> candidateKeyProvider) {
         if (candidates.size() == 0) {
             return null;
         }
 
         List<Match<T>> matchedCandidates = candidates.stream()
-                .map(candidate -> new Match<>(candidate, calcEquality(candidateStringProvider.apply(candidate), wantedString)))
+                .map(candidate -> new Match<>(candidate, calcEquality(candidateKeyProvider.apply(candidate), wantedKey)))
                 .sorted(Comparator.comparingDouble(Match<T>::getEquality))
                 .collect(Collectors.toList());
 
@@ -73,26 +74,26 @@ public class FuzzySearchUtility {
     /**
      * Calculates the difference between two Strings using the "Levenshtein Edit Distance" algorithm.
      *
-     * @param left  One of the two Strings that are compared.
-     * @param right The other of two Strings that are compared.
+     * @param longer  One of the two Strings that are compared.
+     * @param shorter The other of two Strings that are compared.
      * @return the cost of converting left into right. This can be used to measure the difference between left and right.
      * @see <a href="https://stackoverflow.com/questions/955110/similarity-string-comparison-in-java"/>
      */
-    private static int calcEditDistance(String left, String right) {
-        left = left.toLowerCase();
-        right = right.toLowerCase();
+    private static int calcEditDistance(String longer, String shorter) {
+        longer = longer.toLowerCase();
+        shorter = shorter.toLowerCase();
 
-        int[] costs = new int[right.length() + 1];
-        for (int i = 0; i <= left.length(); i++) {
+        int[] costs = new int[shorter.length() + 1];
+        for (int i = 0; i <= longer.length(); i++) {
             int lastValue = i;
-            for (int j = 0; j <= right.length(); j++) {
+            for (int j = 0; j <= shorter.length(); j++) {
                 if (i == 0) {
                     costs[j] = j;
                 } else {
                     if (j > 0) {
                         int newValue = costs[j - 1];
 
-                        if (left.charAt(i - 1) != right.charAt(j - 1)) {
+                        if (longer.charAt(i - 1) != shorter.charAt(j - 1)) {
                             newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
                         }
 
@@ -103,11 +104,11 @@ public class FuzzySearchUtility {
             }
 
             if (i > 0) {
-                costs[right.length()] = lastValue;
+                costs[shorter.length()] = lastValue;
             }
         }
 
-        return costs[right.length()];
+        return costs[shorter.length()];
     }
 
     /**

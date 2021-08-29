@@ -38,7 +38,7 @@ public class NoMatchingSamplerFoundException extends PersistenceException {
     }
 
     private static String guessCorrectSampler(String unusedSamplerId, List<SampleDefinition> definedSampleDefinitions) {
-        FuzzySearchUtility.Match<SampleDefinition> match = FuzzySearchUtility.findClosestString(unusedSamplerId, definedSampleDefinitions, SampleDefinition::getSampleId);
+        FuzzySearchUtility.Match<SampleDefinition> match = FuzzySearchUtility.findClosestObject(unusedSamplerId, definedSampleDefinitions, SampleDefinition::getSampleId);
 
         if (match != null && match.getEquality() > 0.5) {
             if (!match.getMatchedObject().isMarkedForPersistence()) {

@@ -13,16 +13,18 @@ class FuzzySearchUtilityTest {
     @Test
     void findClosestString() {
         // GIVEN
-        List<String> candidates = Arrays.asList("X", "ABAB", "C", "D");
+        List<String> candidates = Arrays.asList("X", "ABAB", "C", "D", "");
         List<String> emptyCandidates = new ArrayList<>();
 
         // WHEN
         FuzzySearchUtility.Match<String> match = FuzzySearchUtility.findClosestString("AB", candidates);
+        FuzzySearchUtility.Match<String> matchEmptyString = FuzzySearchUtility.findClosestString("", candidates);
         FuzzySearchUtility.Match<String> emptyMatch = FuzzySearchUtility.findClosestString("AB", emptyCandidates);
 
         // THEN
         assertNotNull(match);
         assertEquals("ABAB", match.getMatchedObject());
+        assertEquals("", matchEmptyString.getMatchedObject());
         assertNull(emptyMatch);
     }
 
