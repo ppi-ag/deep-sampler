@@ -7,16 +7,23 @@ import java.util.stream.Collectors;
 
 public class FuzzySearchUtility {
 
+    /**
+     * Private constructor to emphasize the utility-nature of this class. It is not meant to be instantiated.
+     */
+    private FuzzySearchUtility() {
+
+    }
+
 
     /**
      * Searches for wantedKey in candidates. The search tries to find the String that has the most similarity,
      * perfect equality is not necessary.
      *
-     * @param wantedKey The String that is searched in candidates
-     * @param candidates   A {@link List} of Strings that might be equal, or similar to wantedKey.
+     * @param wantedKey  The String that is searched in candidates
+     * @param candidates A {@link List} of Strings that might be equal, or similar to wantedKey.
      * @return A pair containing the best matching candidate and a percentage value that shows the similarity.
      */
-    public static <T> Match<String> findClosestString(String wantedKey, List<String> candidates) {
+    public static Match<String> findClosestString(String wantedKey, List<String> candidates) {
         return findClosestObject(wantedKey, candidates, String::toString);
     }
 
@@ -25,13 +32,13 @@ public class FuzzySearchUtility {
      * is used to get a searchable String from each candidate, that is used for comparison.
      * The search tries to find the String that has the most similarity, perfect equality is not necessary.
      *
-     * @param wantedKey The String that is searched in candidates
-     * @param candidates   A {@link List} of arbitrary Objects, that might have a String that is equal, or similar to wantedKey.
+     * @param wantedKey            The String that is searched in candidates
+     * @param candidates           A {@link List} of arbitrary Objects, that might have a String that is equal, or similar to wantedKey.
      * @param candidateKeyProvider A functional interface, that should provide the String from a candidate, that is used for the comparison.
      * @return A pair containing the best matching candidate and a percentage value that shows the similarity, or null if candidates is empty.
      */
     public static <T> Match<T> findClosestObject(String wantedKey, List<T> candidates, Function<T, String> candidateKeyProvider) {
-        if (candidates.size() == 0) {
+        if (candidates.isEmpty()) {
             return null;
         }
 
@@ -89,17 +96,15 @@ public class FuzzySearchUtility {
             for (int j = 0; j <= shorter.length(); j++) {
                 if (i == 0) {
                     costs[j] = j;
-                } else {
-                    if (j > 0) {
-                        int newValue = costs[j - 1];
+                } else if (j > 0) {
+                    int newValue = costs[j - 1];
 
-                        if (longer.charAt(i - 1) != shorter.charAt(j - 1)) {
-                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                        }
-
-                        costs[j - 1] = lastValue;
-                        lastValue = newValue;
+                    if (longer.charAt(i - 1) != shorter.charAt(j - 1)) {
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
                     }
+
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
                 }
             }
 
