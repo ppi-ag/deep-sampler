@@ -83,7 +83,7 @@ public class FuzzySearchUtility {
      *
      * @param longer  One of the two Strings that are compared.
      * @param shorter The other of two Strings that are compared.
-     * @return the cost of converting left into right. This can be used to measure the difference between left and right.
+     * @return the cost of converting shorter into longer. This can be used to measure the difference between shorter and longer.
      * @see <a href="https://stackoverflow.com/questions/955110/similarity-string-comparison-in-java"/>
      */
     private static int calcEditDistance(String longer, String shorter) {
