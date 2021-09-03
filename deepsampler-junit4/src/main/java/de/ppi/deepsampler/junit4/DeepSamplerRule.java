@@ -32,7 +32,7 @@ public class DeepSamplerRule implements MethodRule {
                 Sampler.clear();
 
                 JUnitPluginUtils.injectSamplers(target);
-                JUnitPluginUtils.applyTestFixture(method.getMethod());
+                JUnitPluginUtils.applySamplerFixture(method.getMethod());
                 JUnitPluginUtils.loadSamples(method.getMethod());
 
                 base.evaluate();
