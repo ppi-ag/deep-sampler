@@ -6,10 +6,8 @@
 package de.ppi.deepsampler.core.internal.api;
 
 import de.ppi.deepsampler.core.api.SampleReturnProcessor;
-import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.model.*;
 
-import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +15,6 @@ public class ExecutionManager {
 
     private ExecutionManager() {
         // This constructor is private since this class is not intended to be instantiated.
-    }
-
-    public static void notify(final SampleDefinition sampleDefinition) {
-        getSampleExecutionInformation(sampleDefinition).increaseTimesInvoked();
     }
 
     public static void record(final SampleDefinition sampleDefinition, final MethodCall actualMethodCall) {
