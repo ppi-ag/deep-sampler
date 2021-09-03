@@ -13,6 +13,8 @@ dependencies {
     implementation(project(":deepsampler-persistence-json"))
     implementation(project(":deepsampler-persistence"))
 
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
+
     testFixturesImplementation(project(":deepsampler-core"))
     testFixturesImplementation(project(":deepsampler-persistence-json"))
     testFixturesImplementation(project(":deepsampler-persistence"))
