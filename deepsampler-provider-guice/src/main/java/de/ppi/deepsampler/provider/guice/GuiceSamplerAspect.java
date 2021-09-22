@@ -32,21 +32,23 @@ public class GuiceSamplerAspect implements MethodInterceptor {
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         final SampleDefinition sampleDefinition = findSampleDefinition(invocation);
+        final List<Object> arguments = Arrays.asList(invocation.getArguments());
 
         if (sampleDefinition != null) {
-            ExecutionManager.notify(sampleDefinition);
-
             final Answer<?> answer = sampleDefinition.getAnswer();
 
             if (answer != null) {
                 final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(invocation.getArguments()),
                         invocation.getThis(),
                         invocation::proceed);
-                return ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
+                Object returnValue =  ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
+
+                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, arguments));
+
+                return returnValue;
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = invocation.proceed();
-                final List<Object> arguments = Arrays.asList(invocation.getArguments());
 
                 ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, arguments));
                 return returnValue;

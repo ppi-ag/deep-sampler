@@ -2,6 +2,7 @@ package de.ppi.deepsampler.persistence.api;
 
 
 import de.ppi.deepsampler.core.api.PersistentSample;
+import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.model.SampleDefinition;
@@ -95,7 +96,85 @@ class PersistentSampleManagerTest {
         PersistentSample.of(Sampler.prepare(TestService.class).call(any(TestBean.class), any(Integer.class))).hasId("SampleId");
 
         // THEN
-        assertThrows(NoMatchingSamplerFoundException.class, persistentSampleManager::load);
+        NoMatchingSamplerFoundException expectedException = assertThrows(NoMatchingSamplerFoundException.class, persistentSampleManager::load);
+        // There is no sampleid that has any similarity, so the Exception doesn't show a guess which sampleid could have been the correct one:
+        assertEquals("The following persistent Samples don't have a corresponding Sampler. Please define a Sampler using PersistentSampler.of(...):\n" +
+                "\tUnexpectedSampleId", expectedException.getMessage());
+    }
+
+    @Test
+    void detectsMissingSampleWithSlightlyWrongSampleId() {
+        // GIVEN
+        SourceManager mockedSourceManager = mock(SourceManager.class);
+        PersistentModel persistentModel = mock(PersistentModel.class);
+        when(persistentModel.getId()).thenReturn("ID");
+        when(mockedSourceManager.load()).thenReturn(persistentModel);
+
+        Map<PersistentSampleMethod, PersistentActualSample> sampleMap = new HashMap<>();
+        PersistentSampleMethod method = mock(PersistentSampleMethod.class);
+        PersistentActualSample sample = mock(PersistentActualSample.class);
+        PersistentSampleMethod unexpectedMethod = mock(PersistentSampleMethod.class);
+        PersistentActualSample unexpectedSample = mock(PersistentActualSample.class);
+        List<PersistentMethodCall> persistentMethodCallList = new ArrayList<>();
+        sampleMap.put(method, sample);
+        sampleMap.put(unexpectedMethod, unexpectedSample);
+        when(persistentModel.getSampleMethodToSampleMap()).thenReturn(sampleMap);
+
+        when(method.getSampleMethodId()).thenReturn("SampleId");
+        when(sample.getAllCalls()).thenReturn(persistentMethodCallList);
+        when(unexpectedMethod.getSampleMethodId()).thenReturn("ASampleId");
+        when(unexpectedSample.getAllCalls()).thenReturn(persistentMethodCallList);
+
+        // WHEN
+        TestBean givenBean = new TestBean();
+        addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
+
+        PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
+        PersistentSample.of(Sampler.prepare(TestService.class).call(any(TestBean.class), any(Integer.class))).hasId("SampleId");
+
+        // THEN
+        NoMatchingSamplerFoundException expectedException = assertThrows(NoMatchingSamplerFoundException.class, persistentSampleManager::load);
+        assertEquals("The following persistent Samples don't have a corresponding Sampler. Please define a Sampler using PersistentSampler.of(...):\n" +
+                "\tASampleId\n" +
+                "\t\t did you mean SampleId?", expectedException.getMessage());
+    }
+
+    @Test
+    void detectsMissingSampleThatIsNotMarkedForPersistence() {
+        // GIVEN
+        SourceManager mockedSourceManager = mock(SourceManager.class);
+        PersistentModel persistentModel = mock(PersistentModel.class);
+        when(persistentModel.getId()).thenReturn("ID");
+        when(mockedSourceManager.load()).thenReturn(persistentModel);
+
+        Map<PersistentSampleMethod, PersistentActualSample> sampleMap = new HashMap<>();
+        PersistentSampleMethod method = mock(PersistentSampleMethod.class);
+        PersistentActualSample sample = mock(PersistentActualSample.class);
+        PersistentSampleMethod unexpectedMethod = mock(PersistentSampleMethod.class);
+        PersistentActualSample unexpectedSample = mock(PersistentActualSample.class);
+        List<PersistentMethodCall> persistentMethodCallList = new ArrayList<>();
+        sampleMap.put(method, sample);
+        sampleMap.put(unexpectedMethod, unexpectedSample);
+        when(persistentModel.getSampleMethodToSampleMap()).thenReturn(sampleMap);
+
+        when(method.getSampleMethodId()).thenReturn("SampleId");
+        when(sample.getAllCalls()).thenReturn(persistentMethodCallList);
+        when(unexpectedMethod.getSampleMethodId()).thenReturn("boolean de.ppi.deepsampler.persistence.api.PersistentSampleManagerTest$TestService.call(de.ppi.deepsampler.persistence.api.PersistentSampleManagerTest$TestBean,java.lang.Integer)");
+        when(unexpectedSample.getAllCalls()).thenReturn(persistentMethodCallList);
+
+        // WHEN
+        TestBean givenBean = new TestBean();
+        addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
+
+        PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
+        Sample.of(Sampler.prepare(TestService.class).call(any(TestBean.class), any(Integer.class)));
+
+        // THEN
+        NoMatchingSamplerFoundException expectedException = assertThrows(NoMatchingSamplerFoundException.class, persistentSampleManager::load);
+        assertEquals("The following persistent Samples don't have a corresponding Sampler. Please define a Sampler using PersistentSampler.of(...):\n" +
+                "\tboolean de.ppi.deepsampler.persistence.api.PersistentSampleManagerTest$TestService.call(de.ppi.deepsampler.persistence.api.PersistentSampleManagerTest$TestBean,java.lang.Integer)\n" +
+                "\t\tboolean de.ppi.deepsampler.persistence.api.PersistentSampleManagerTest$TestService.call(de.ppi.deepsampler.persistence.api.PersistentSampleManagerTest$TestBean,java.lang.Integer) seems to be quite similar, but it was not marked for persistence. Use PersistentSampler.of() instead of Sampler.of(), if the Sample should be provided from persistence.\n" +
+                "\tSampleId", expectedException.getMessage());
     }
 
     @Test

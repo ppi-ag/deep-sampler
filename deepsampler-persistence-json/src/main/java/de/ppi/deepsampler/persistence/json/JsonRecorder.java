@@ -70,21 +70,19 @@ public class JsonRecorder extends JsonOperator {
 
         for (final Map.Entry<Class<?>, ExecutionInformation> informationEntry : executionInformationMap.entrySet()) {
             final ExecutionInformation information = informationEntry.getValue();
-            final Map<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationMap = information.getAll();
+            final List<SampleExecutionInformation> sampleExecutionInformationMapList = information.getAll();
 
-            for (final Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry : sampleExecutionInformationMap.entrySet()) {
-                addToPersistentMap(sampleMethodJsonPersistentActualSampleMap, sampleExecutionInformationEntry, persistentSamplerContext);
+            for (final SampleExecutionInformation sampleExecutionInformation : sampleExecutionInformationMapList) {
+                addToPersistentMap(sampleMethodJsonPersistentActualSampleMap, sampleExecutionInformation, persistentSamplerContext);
             }
         }
         return sampleMethodJsonPersistentActualSampleMap;
     }
 
     private void addToPersistentMap(final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodJsonPersistentActualSampleMap,
-                                    final Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry,
+                                    final SampleExecutionInformation sampleExecutionInformation,
                                     PersistentSamplerContext persistentSamplerContext) {
-        final SampleDefinition sample = sampleExecutionInformationEntry.getKey();
-        final SampleExecutionInformation sampleExecutionInformation = sampleExecutionInformationEntry.getValue();
-
+        final SampleDefinition sample = sampleExecutionInformation.getSampleDefinition();
         final List<MethodCall> calls = sampleExecutionInformation.getMethodCalls();
 
         final JsonPersistentSampleMethod persistentSampleMethod = new JsonPersistentSampleMethod(sample.getSampleId());

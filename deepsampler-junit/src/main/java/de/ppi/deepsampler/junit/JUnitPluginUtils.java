@@ -31,14 +31,29 @@ public class JUnitPluginUtils {
                 .forEach(field -> JUnitPluginUtils.assignNewSamplerToField(targetObject, field));
     }
 
-    public static void applyTestFixture(final Method testMethod) {
-        final UseSamplerFixture fixture = testMethod.getAnnotation(UseSamplerFixture.class);
+    /**
+     * The anntation {@link UseSamplerFixture} references a {@link SamplerFixture} that can be used to define Samplers in a
+     * reusable manner. A test can use a {@link SamplerFixture} if the testMethod or the class that declares testMethod is annotated
+     * with {@link UseSamplerFixture}. The annotation at method-level overrides the annotation at class-level.
+     *
+     * @param testMethod the test-method that should be initialized with a {@link SamplerFixture}
+     */
+    public static void applySamplerFixture(final Method testMethod) {
+        final UseSamplerFixture fixtureOnMethod = testMethod.getAnnotation(UseSamplerFixture.class);
+        final UseSamplerFixture fixtureOnClass = testMethod.getDeclaringClass().getAnnotation(UseSamplerFixture.class);
 
-        if (fixture == null) {
+        if (fixtureOnMethod == null && fixtureOnClass == null) {
             return;
         }
 
-        final Class<? extends SamplerFixture> samplerFixtureClass = fixture.value();
+
+        final Class<? extends SamplerFixture> samplerFixtureClass;
+
+        if (fixtureOnMethod != null) {
+            samplerFixtureClass = fixtureOnMethod.value();
+        } else {
+            samplerFixtureClass = fixtureOnClass.value();
+        }
 
         try {
             final Constructor<? extends SamplerFixture> samplerFixtureClassConstructor = samplerFixtureClass.getConstructor();
