@@ -49,6 +49,7 @@ public abstract class SpringSamplerAspect {
      *
      * </pre>
      */
+    @SuppressWarnings("unused") // Method is called generically by Spring, so the compiler believes it would be unused.
     public abstract void include();
 
 
@@ -68,17 +69,22 @@ public abstract class SpringSamplerAspect {
             + "&& !within(is(EnumType)) " // Exludes all Enums
             + "&& !within(is(FinalType)) " // Exludes all final classes
             + "&& include()") // Delegates to the custom Pointcut that must be defined by overriding the Method SpringSamplerAspect::include
+    @SuppressWarnings("unused") // Method is called generically by Spring, so the compiler believes it would be unused.
     public Object aroundMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
         final SampleDefinition sampleDefinition = findSampleDefinition(joinPoint);
 
         if (sampleDefinition != null) {
-            ExecutionManager.notify(sampleDefinition);
-
             final Answer<?> answer = sampleDefinition.getAnswer();
 
             if (answer != null) {
-                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(joinPoint.getArgs()), joinPoint.getThis());
-                return ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
+                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(joinPoint.getArgs()),
+                        joinPoint.getThis(),
+                        joinPoint::proceed);
+                Object returnValue = ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
+
+                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, Arrays.asList(joinPoint.getArgs())));
+
+                return returnValue;
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = joinPoint.proceed();
@@ -103,7 +109,7 @@ public abstract class SpringSamplerAspect {
         // generic Proxy-class. Using the signature doesn't have this problem.
         final SampledMethod sampledMethod = new SampledMethod(signature.getDeclaringType(), signature.getMethod());
 
-        return SampleRepository.getInstance().find(sampledMethod, proceedingJoinPoint.getArgs());
+        return SampleRepository.getInstance().findValidated(sampledMethod, proceedingJoinPoint.getArgs());
     }
 
 

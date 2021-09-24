@@ -17,12 +17,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasBeenStubbed;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@UseSamplerFixture(GetSomeStringTestSampleFixture.class)
 class PersistentSamplerTest {
 
     public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("de", "ppi", "deepsampler", "junit5", "PersistentSamplerTest_samplerCanBeSaved.json");
@@ -30,12 +32,13 @@ class PersistentSamplerTest {
     public static final String LOAD_SPECIFIC_FILE_JSON = "src/test/resources/de/ppi/deepsampler/junit5/samplerCanBeLoadedFromSpecificFile.json";
     public static final String LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON = "samplerCanBeLoadedFromSpecificFile.json";
 
+
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples
     @Order(0)
-    void samplerCanBeLoadedFromFile() throws Exception {
-        assertTestBeanHasBeenStubbed();
+    void samplerCanBeLoadedFromFile() throws Throwable {
+        assertTestBeanHasStubbedInt();
     }
 
     @Test
@@ -90,18 +93,24 @@ class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples(file = LOAD_SPECIFIC_FILE_JSON)
     @Order(7)
-    void samplerCanBeLoadedFromSpecificFile() throws Exception {
-        assertTestBeanHasBeenStubbed();
+    void samplerCanBeLoadedFromSpecificFile() throws Throwable {
+        assertTestBeanHasStubbedInt();
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
     @LoadSamples(classPath = LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON)
     @Order(8)
-    void samplerCanBeLoadedFromSpecificClasspathResource() throws Exception {
-        assertTestBeanHasBeenStubbed();
+    void samplerCanBeLoadedFromSpecificClasspathResource() throws Throwable {
+        assertTestBeanHasStubbedInt();
     }
 
+    @Test
+    @LoadSamples
+    @Order(9)
+    void sampleFixtureFromClassLevelShouldBeUsed() throws Throwable {
+        assertTestBeanHasStubbedString();
+    }
 
 
 }

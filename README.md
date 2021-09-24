@@ -1,6 +1,6 @@
 <img src="https://github.com/ppi-ag/deep-sampler/blob/main/docs/assets/logo.svg" alt="DeepSampler" width="33%"/>
 
-![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler)
+![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![CodeQL](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml)
 
 DeepSampler is a __stubbing framework__ for __compound tests__. A _compound_ is a net of objects. A compound can be isolated from an application 
 but its content is integrated.  
@@ -150,7 +150,7 @@ public class GreetingServiceCompound implements SamplerFixture {
 
    @Override
    public void defineSamplers() {
-      Sample.of(personDaoSampler.loadPerson(Matchers.anyInt()));
+      Sample.of(personDaoSampler.loadPerson(Matchers.anyInt())).is(new Person("Sarek"));
    }
 }
 ```
@@ -158,26 +158,32 @@ Once we have such a `SamplerFixture`, we can bind it to a test case using the an
 ```
 @Test
 @UseSamplerFixture(GreetingServiceCompound.class)
-void recordSamplesToJson() {
+void greetingShouldBeGenerated() {
    ...
 }
 ```
 The stubs, that are defined by the `SamplerFixture`, are now active for the time the method runs. 
 
-You might have noticed that the stub doesn't define a concrete Sample anymore. We have done this, because we
-rather want to read the Samples from a JSON-file now. How this can be achieved, is explained by the next chapter.
-
 ## Persistent Samples
 For the sake of understandability, the tested compound in this example is fairly simple, however DeepSampler was 
 especially designed for complex compound tests with quite a lot of stubs which also might return extensive Samples. 
 In these cases we would not want
-to have big sets of test data (Samples) in JUnit Test classes, we would rather separate test data from test logic. This
-can be done by saving and loading Samples from JSON-files.
+to have big sets of test data (Samples) in JUnit Test classes, we would rather separate test data from test logic. And
+possibly more important, we would not want to write such extensive Samples by hand. To ease this, DeepSampler 
+can save and load Samples from JSON-files.
 
 ### Record a JSON-Sample
-In order to save Samples in a JSON-file, we simply add the annotation 
-`@SaveSamples` to our method and call the method, which we want to test. The methods that should be stubbed are 
-defined by the `SamplerFixture` that we have introduced in the preceding chapter. 
+In order to save Samples in a JSON-file, we __first__ need to define which methods should be stubbed and which methods should be recorded.
+This is - again - done using `SamplerFixture`s. In contrast to the example above, we now need to define the Sampler slightly different:
+```
+     👇                                                              👇
+PersistentSample.of(personDaoSampler.loadPerson(Matchers.anyInt()))     ;
+```
+
+Persistent Samples are defined using `PersistentSample` and we don't need to define a concrete Sample using `is()` anymore, since this value
+will be provided by the JSON-File.
+__Second__ we we need to tell DeepSampler to record all Data, that flows through the stubbed methods. This is simply done by adding the annotation
+`@SaveSamples` to the test method. 
 
 ```
 @Test

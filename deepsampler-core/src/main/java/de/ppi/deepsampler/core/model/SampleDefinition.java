@@ -14,8 +14,9 @@ public class SampleDefinition {
 
     private List<Object> parameterValues = new ArrayList<>();
     private List<ParameterMatcher<?>> parameterMatchers = new ArrayList<>();
-    private Answer<Exception> answer;
+    private Answer<Throwable> answer;
     private String sampleId;
+    private boolean isMarkedForPersistence;
 
     public SampleDefinition(final SampledMethod sampledMethod) {
         this.sampledMethod = sampledMethod;
@@ -57,11 +58,11 @@ public class SampleDefinition {
         return sampleId;
     }
 
-    public void setAnswer(final Answer<Exception> answer) {
+    public void setAnswer(final Answer<Throwable> answer) {
         this.answer = answer;
     }
 
-    public Answer<Exception> getAnswer() {
+    public Answer<Throwable> getAnswer() {
         return answer;
     }
 
@@ -72,6 +73,15 @@ public class SampleDefinition {
 
     public List<Object> getParameterValues() {
         return this.parameterValues;
+    }
+
+
+    public boolean isMarkedForPersistence() {
+        return isMarkedForPersistence;
+    }
+
+    public void setMarkedForPersistence(boolean markedForPersistence) {
+        isMarkedForPersistence = markedForPersistence;
     }
 
     @Override
@@ -88,6 +98,8 @@ public class SampleDefinition {
                 Objects.equals(sampleId, that.sampleId);
     }
 
+
+
     @Override
     public int hashCode() {
         return Objects.hash(sampledMethod.getMethod(), parameterValues, sampleId);
@@ -101,6 +113,7 @@ public class SampleDefinition {
                 ", parameterMatchers=" + parameterMatchers +
                 ", answer=" + answer +
                 ", sampleId='" + sampleId + '\'' +
+                ", isPersistent=" + isMarkedForPersistence +
                 '}';
     }
 }
