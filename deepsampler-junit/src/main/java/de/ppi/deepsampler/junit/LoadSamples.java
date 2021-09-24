@@ -30,7 +30,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface LoadSamples {
 
-    Class<? extends PersistentSampleManagerProvider> persistenceManagerProvider() default DefaultPersistentSampleManagerProvider.class;
 
     /**
      * If this property is provided, the Sampler-file will be loaded from the local file system using the provided file name.

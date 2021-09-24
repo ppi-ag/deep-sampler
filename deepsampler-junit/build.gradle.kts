@@ -19,4 +19,5 @@ dependencies {
     testFixturesImplementation(project(":deepsampler-persistence-json"))
     testFixturesImplementation(project(":deepsampler-persistence"))
     testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
 }
