@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -19,7 +19,7 @@ class TestReflectionUtilsTest {
     @Test
     void declaredAndInheritedFieldsAreFound() {
         // DO
-        final Stream<Field> declaredAndInheritedFieldStream = JUnitPluginUtils.getDeclaredAndInheritedFields(SubTestBean.class);
+        final Stream<Field> declaredAndInheritedFieldStream = JUnitSamplerUtils.getDeclaredAndInheritedFields(SubTestBean.class);
 
         // Since the order in which reflection iterates over fields is not defined and may change, we sort the list
         // so selecting expected Fields using indexes is save. We also need to filter some proxy-fields that are introduced by jacoco
@@ -37,7 +37,7 @@ class TestReflectionUtilsTest {
     @Test
     void preparationAnnotationIsDetected() throws NoSuchFieldException {
         final Field field = TestBean.class.getDeclaredField("testBeanSampler");
-        assertTrue(JUnitPluginUtils.shouldBeSampled(field));
+        assertTrue(JUnitSamplerUtils.shouldBeSampled(field));
     }
 
     @Test
@@ -47,7 +47,7 @@ class TestReflectionUtilsTest {
         final TestBean bean = new TestBean();
 
         // DO
-        JUnitPluginUtils.assignNewSamplerToField(bean, field);
+        JUnitSamplerUtils.assignNewSamplerToField(bean, field);
 
         // THEN EXPECT
         assertNotNull(bean.testBeanSampler);

@@ -1,12 +1,13 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.junit5;
 
 import de.ppi.deepsampler.core.api.Sampler;
-import de.ppi.deepsampler.junit.JUnitPluginUtils;
+import de.ppi.deepsampler.junit.JUnitPersistenceUtils;
+import de.ppi.deepsampler.junit.JUnitSamplerUtils;
 import de.ppi.deepsampler.junit.PrepareSampler;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -27,21 +28,21 @@ public class DeepSamplerExtension implements TestInstancePostProcessor, BeforeEa
 
     @Override
     public void postProcessTestInstance(final Object testInstance, final ExtensionContext context) {
-        JUnitPluginUtils.injectSamplers(testInstance);
+        JUnitSamplerUtils.injectSamplers(testInstance);
     }
 
     @Override
     public void beforeEach(final ExtensionContext context) {
         Sampler.clear();
         context.getTestMethod().ifPresent(testMethod -> {
-            JUnitPluginUtils.applySamplesFromSamplerFixture(testMethod);
-            JUnitPluginUtils.loadSamples(testMethod);
+            JUnitSamplerUtils.applySamplesFromSamplerFixture(testMethod);
+            JUnitPersistenceUtils.loadSamples(testMethod);
         });
     }
 
 
     @Override
     public void afterEach(final ExtensionContext context) {
-        context.getTestMethod().ifPresent(JUnitPluginUtils::saveSamples);
+        context.getTestMethod().ifPresent(JUnitPersistenceUtils::saveSamples);
     }
 }

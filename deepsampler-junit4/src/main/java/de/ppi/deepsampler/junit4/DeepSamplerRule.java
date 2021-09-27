@@ -1,12 +1,13 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.junit4;
 
 import de.ppi.deepsampler.core.api.Sampler;
-import de.ppi.deepsampler.junit.JUnitPluginUtils;
+import de.ppi.deepsampler.junit.JUnitPersistenceUtils;
+import de.ppi.deepsampler.junit.JUnitSamplerUtils;
 import de.ppi.deepsampler.junit.PrepareSampler;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -31,13 +32,13 @@ public class DeepSamplerRule implements MethodRule {
             public void evaluate() throws Throwable {
                 Sampler.clear();
 
-                JUnitPluginUtils.injectSamplers(target);
-                JUnitPluginUtils.applySamplesFromSamplerFixture(method.getMethod());
-                JUnitPluginUtils.loadSamples(method.getMethod());
+                JUnitSamplerUtils.injectSamplers(target);
+                JUnitSamplerUtils.applySamplesFromSamplerFixture(method.getMethod());
+                JUnitPersistenceUtils.loadSamples(method.getMethod());
 
                 base.evaluate();
 
-                JUnitPluginUtils.saveSamples(method.getMethod());
+                JUnitPersistenceUtils.saveSamples(method.getMethod());
             }
         };
     }
