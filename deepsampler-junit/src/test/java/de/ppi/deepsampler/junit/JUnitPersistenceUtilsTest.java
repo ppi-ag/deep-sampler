@@ -17,7 +17,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class JUnitPersistenceUtilsTest {
+public class JUnitPersistenceUtilsTest {
 
     @Test
     void unmatchedSerializerTypesAreDetected() throws NoSuchMethodException {
