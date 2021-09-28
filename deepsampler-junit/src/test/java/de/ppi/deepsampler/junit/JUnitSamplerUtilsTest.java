@@ -5,16 +5,19 @@
 
 package de.ppi.deepsampler.junit;
 
+import de.ppi.deepsampler.core.api.Sampler;
+import de.ppi.deepsampler.core.model.SampleRepository;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestReflectionUtilsTest {
+class JUnitSamplerUtilsTest {
 
     @Test
     void declaredAndInheritedFieldsAreFound() {
@@ -53,6 +56,25 @@ class TestReflectionUtilsTest {
         assertNotNull(bean.testBeanSampler);
     }
 
+    @Test
+    void samplerFixtureFromTestMethodCanBeLoaded() throws NoSuchMethodException {
+        // WHEN
+        Optional<SamplerFixture> loadedFixture = JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(Example.class.getMethod("useSamplerFixture"));
+
+        // THEN
+        assertTrue(loadedFixture.isPresent());
+    }
+
+    @Test
+    void samplerFixtureWithoutDefaultConstructorCannotBeLoaded() {
+        // WHEN
+        JUnitPreparationException expectedException = assertThrows(JUnitPreparationException.class, () -> JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(Example.class.getMethod("useBrokenSamplerFixture")));
+
+        // THEN
+        assertEquals("The SamplerFixture de.ppi.deepsampler.junit.JUnitSamplerUtilsTest$SamplerFixtureWithoutDefaultConstructor " +
+                "must provide a default constructor.", expectedException.getMessage());
+    }
+
 
 
     private int sortByName(final Field left, final Field right) {
@@ -69,8 +91,36 @@ class TestReflectionUtilsTest {
     }
 
     @SuppressWarnings("unused")
-    private static class SubTestBean extends TestReflectionUtilsTest.TestBean {
+    private static class SubTestBean extends JUnitSamplerUtilsTest.TestBean {
         private final int aRandomIntField = 42;
+    }
+
+    private static class Example {
+
+        @UseSamplerFixture(JsonSerializerExtensionSamplerFixture.class)
+        public void useSamplerFixture() {
+            // nothing to do here because we only want to test loading the SamplerFixture.
+        }
+
+        @UseSamplerFixture(SamplerFixtureWithoutDefaultConstructor.class)
+        public void useBrokenSamplerFixture() {
+            // nothing to do here, we just want to test, that an Exception is thrown because this SamplerFixture doesn't have a
+            // default constructor.
+
+        }
+    }
+
+    private static class SamplerFixtureWithoutDefaultConstructor implements SamplerFixture {
+
+        public SamplerFixtureWithoutDefaultConstructor(String someParameter) {
+            // nothing to do here, we just want to test, that an Exception is thrown because this SamplerFixture doesn't have a
+        }
+
+
+        @Override
+        public void defineSamplers() {
+            // nothing to do here because we expect an error because of the missing default constructor.
+        }
     }
 
 }

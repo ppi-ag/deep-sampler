@@ -74,6 +74,7 @@ public class JUnitPersistenceUtils {
         try {
             return samplerFixture.getClass().getMethod("defineSamplers");
         } catch (final NoSuchMethodException e) {
+            // This would be an internal error since the requested method is part of the interface SamplerFixture.
             throw new BaseException("The SamplerFixture %s is missing a method.", e, samplerFixture.getClass().getName());
         }
     }
@@ -119,12 +120,13 @@ public class JUnitPersistenceUtils {
      * @param typeToSerialize the type of the classes that should be serialized by serializerClass
      */
     private static void validateTypesOfSerializerAndSerializable(final Class<? extends JsonSerializer<?>> serializerClass, final Class<?> typeToSerialize) {
-        final Type[] typeArguments = ((ParameterizedType) serializerClass.getGenericSuperclass()).getActualTypeArguments();
+        final Type[] typeArguments = getParameterizedParentType(serializerClass).getActualTypeArguments();
 
         if (!typeArguments[0].equals(typeToSerialize)) {
-            throw new InvalidConfigException("%s must have a parameter type of type %s since the serializer is registered for the latter type.",
+            throw new InvalidConfigException("%s must have a parameter type of type %s since the serializer is registered for the latter type. But it is %s",
                     serializerClass.getName(),
-                    typeToSerialize);
+                    typeToSerialize.getName(),
+                    typeArguments[0].getTypeName());
         }
     }
 
@@ -151,21 +153,40 @@ public class JUnitPersistenceUtils {
      * @param typeToDeserialize the type of the classes that should be deserialized by deserializerClass
      */
     private static void validateTypesOfDeserializerAndDeserializable(final Class<? extends JsonDeserializer<?>> deserializerClass, final Class<?> typeToDeserialize) {
-        final Type[] typeArguments = ((ParameterizedType) deserializerClass.getGenericSuperclass()).getActualTypeArguments();
+        final Type[] typeArguments = getParameterizedParentType(deserializerClass).getActualTypeArguments();
 
         if (!typeArguments[0].equals(typeToDeserialize)) {
-            throw new InvalidConfigException("%s must have a parameter type of type %s since the deserializer is registered for the latter type.",
+            throw new InvalidConfigException("%s must have a parameter type of type %s since the deserializer is registered for the latter type. But it is %s",
                     deserializerClass.getName(),
-                    typeToDeserialize);
+                    typeToDeserialize.getName(),
+                    typeArguments[0].getTypeName());
         }
     }
 
-    private static <T> T instantiate(final Class<T> clazz) {
-        if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {
-            throw new JUnitPreparationException("%s is an inner class, but it is not declared as static.", clazz.getName());
+    /**
+     * If clazz is a subclass that does not declare a generic type parameter on its own and relies on the type parameter of a
+     * parent class, we have to search the type hierarchy for the first parameterized type.
+     *
+     * @param clazz the class for which we want to find the first parameterized superclass.
+     * @return the first parameterized superclass
+     */
+    private static  ParameterizedType getParameterizedParentType(final Class<?> clazz) {
+        if (clazz.getGenericSuperclass() instanceof ParameterizedType) {
+            return (ParameterizedType) clazz.getGenericSuperclass();
         }
 
+        return getParameterizedParentType((Class<?>) clazz.getGenericSuperclass());
+    }
+
+    private static <T> T instantiate(final Class<T> clazz) {
         try {
+            if (clazz.isMemberClass()) {
+                Object declaringObject = instantiate(clazz.getDeclaringClass());
+
+                final Constructor<T> constructor = clazz.getDeclaredConstructor(clazz.getDeclaringClass());
+                return constructor.newInstance(declaringObject);
+            }
+
             final Constructor<T> constructor = clazz.getConstructor();
             return constructor.newInstance();
         } catch (final NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {

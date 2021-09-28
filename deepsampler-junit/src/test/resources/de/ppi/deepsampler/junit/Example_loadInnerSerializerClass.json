@@ -1,0 +1,13 @@
+{
+  "id" : "435abf60-ecf9-4033-a012-4a5c3de0a4a6",
+  "sampleMethodToSampleMap" : {
+    "public java.time.Instant de.ppi.deepsampler.junit.TestService.getInstant()" : {
+      "callMap" : [ {
+        "parameter" : {
+          "args" : [ ]
+        },
+        "returnValue" : [ "java.time.Instant", "2021-09-28T18:30:21.0402182_Test" ]
+      } ]
+    }
+  }
+}
