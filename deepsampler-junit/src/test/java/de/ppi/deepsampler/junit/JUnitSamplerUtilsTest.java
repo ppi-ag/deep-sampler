@@ -10,6 +10,7 @@ import de.ppi.deepsampler.core.model.SampleRepository;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,9 +67,10 @@ class JUnitSamplerUtilsTest {
     }
 
     @Test
-    void samplerFixtureWithoutDefaultConstructorCannotBeLoaded() {
+    void samplerFixtureWithoutDefaultConstructorCannotBeLoaded() throws NoSuchMethodException {
         // WHEN
-        JUnitPreparationException expectedException = assertThrows(JUnitPreparationException.class, () -> JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(Example.class.getMethod("useBrokenSamplerFixture")));
+        Method brokenMethod = Example.class.getMethod("useBrokenSamplerFixture");
+        JUnitPreparationException expectedException = assertThrows(JUnitPreparationException.class, () -> JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(brokenMethod));
 
         // THEN
         assertEquals("The SamplerFixture de.ppi.deepsampler.junit.JUnitSamplerUtilsTest$SamplerFixtureWithoutDefaultConstructor " +
