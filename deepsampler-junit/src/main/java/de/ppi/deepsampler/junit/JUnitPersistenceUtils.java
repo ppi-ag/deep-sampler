@@ -178,6 +178,14 @@ public class JUnitPersistenceUtils {
         return getParameterizedParentType((Class<?>) clazz.getGenericSuperclass());
     }
 
+    /**
+     * Instantiates clazz using a default constructor. If the class is a inner class, the top declaring outer class is
+     * recursively searched and used to initialize the inner class.
+     *
+     * @param clazz the class that should be instantiated. Inner classes are allowed.
+     * @param <T> The type of the class and the returned instance.
+     * @return the new instance of clazz.
+     */
     private static <T> T instantiate(final Class<T> clazz) {
         try {
             if (clazz.isMemberClass()) {
