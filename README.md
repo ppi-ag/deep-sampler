@@ -2,7 +2,7 @@
 
 ![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![CodeQL](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml)
 
-DeepSampler is a __stubbing framework__ for __integration tests__. The design is similar to Mockito, but while Mocktio is perfect for small unit tests, DeepSampler aims for vast integrated components. 
+DeepSampler is a __stubbing framework__ for __integration tests__. The design is similar to Mockito, but while Mocktio is perfect for small unit tests, DeepSampler aims for vast integrated compounds of units. 
 
 The API is able to _stub_ methods anywhere _deep_ inside of a compound of any size without the need to manually move a stubbed instance 
 from a test case into the compound. 
