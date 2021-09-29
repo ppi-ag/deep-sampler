@@ -195,7 +195,7 @@ public class JUnitPersistenceUtils {
                 return constructor.newInstance(declaringObject);
             }
 
-            final Constructor<T> constructor = clazz.getConstructor();
+            final Constructor<T> constructor = clazz.getDeclaredConstructor();
             return constructor.newInstance();
         } catch (final NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new JUnitPreparationException("%s could not be instantiated.", e, clazz.getName());

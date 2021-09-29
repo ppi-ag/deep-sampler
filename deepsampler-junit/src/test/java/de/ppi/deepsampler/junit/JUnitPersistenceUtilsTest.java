@@ -1,23 +1,18 @@
 package de.ppi.deepsampler.junit;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.core.model.SampledMethod;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JUnitPersistenceUtilsTest {
+class JUnitPersistenceUtilsTest {
 
     @Test
     void unmatchedSerializerTypesAreDetected() throws NoSuchMethodException {
