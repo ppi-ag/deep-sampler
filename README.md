@@ -11,6 +11,7 @@ using well known principles from Mockito, augmented by two additional core featu
    * __Sample Recorder__: The data, that is returned by stubs can be recorded and saved to a JSON-file from a live runtime example. 
      This is useful, because compounds usually have a great number of stubs, with vast amounts of data, which would be 
      cumbersome to write manually. We call this big stub data _samples_.
+     
    * __Deep Stub Injection__: DeepSampler has an API, that defines, which methods on which classes should be stubbed. 
      This information is then used to replace every instance of these classes within the compound by a stub, no matter 
      where the instance inside the compound occurs. This is useful, because the stubbed objects are often located deep 
