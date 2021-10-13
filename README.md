@@ -2,15 +2,12 @@
 
 ![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![CodeQL](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml)
 
-DeepSampler is a __stubbing framework__ for __integration tests__. The design is similar to Mockito, but while Mocktio is perfect for small unit tests, DeepSampler aims for vast integrated compounds of units. 
+# Build integration tests with JUnit and DeepSampler!
 
-The API is able to _stub_ methods anywhere _deep_ inside of a compound of any size without the need to manually move a stubbed instance 
-from a test case into the compound. 
+While unit tests are meant to test _single classes_, integration tests are meant to test compounds that consist of _many classes_. Like most unit tests, most integration tests must be _stubbed_ to gain control over test data. DeepSampler is able to do this by using well known priciples from Mockito, augmented by two additional core features, that are necessary for vast integration tests:
 
-For tests with large test data (called _Samples_) DeepSampler can separate test logic from test data by _loading_
-and _saving_ test data in JSON-files. The JSON-files can be _recorded_ by activating the record-mode and simply running
-a test case. If a stub is in record-mode, it routes calls to the original methods and collects all data that flows through the stub. 
-This collected data can then be saved to JSON-files.
+   * __Sample Recorder__: The data, that is returned by stubs can be recorded and saved to a JSON-file from a live runtime example. This is usefull, because compounds usually have a great number of stubs, with vast amounts of data, which would be cumbersome to write manually. We call this big stub data _samples_.
+   * __Deep Stub Injection__: DeepSampler has an API, that defines, which methods on which classes should be stubbed. This information is then used to replace every instance of these classes within the compound by a stub, no matter where the instance inside the compound occurs. This is usefull, because the stubbed objects are often located deep inside of the compound, so that long chains of setters would be required to move the stub from the test case to its designated position in the compound. This would not only be cumbersome work, it is often even impossible, since the required setters might simply be non-existent.
 
 For light-way tests with smaller Samples, where using separate JSON-files might be unnecessary, DeepSampler 
 provides an API that can be used to define Samples
