@@ -4,10 +4,19 @@
 
 # Build integration tests with JUnit and DeepSampler!
 
-While unit tests are meant to test _single classes_, integration tests are meant to test compounds that consist of _many classes_. Like most unit tests, most integration tests must be _stubbed_ to gain control over test data. DeepSampler is able to do this by using well known priciples from Mockito, augmented by two additional core features, that are necessary for vast integration tests:
+While unit tests are meant to test _single classes_, integration tests are meant to test compounds that consist of _many classes_. 
+Like most unit tests, most integration tests must be _stubbed_ to gain control over test data. DeepSampler is able to do this by 
+using well known principles from Mockito, augmented by two additional core features, that are necessary for vast integration tests:
 
-   * __Sample Recorder__: The data, that is returned by stubs can be recorded and saved to a JSON-file from a live runtime example. This is usefull, because compounds usually have a great number of stubs, with vast amounts of data, which would be cumbersome to write manually. We call this big stub data _samples_.
-   * __Deep Stub Injection__: DeepSampler has an API, that defines, which methods on which classes should be stubbed. This information is then used to replace every instance of these classes within the compound by a stub, no matter where the instance inside the compound occurs. This is usefull, because the stubbed objects are often located deep inside of the compound, so that long chains of setters would be required to move the stub from the test case to its designated position in the compound. This would not only be cumbersome work, it is often even impossible, since the required setters might simply be non-existent.
+   * __Sample Recorder__: The data, that is returned by stubs can be recorded and saved to a JSON-file from a live runtime example. 
+     This is useful, because compounds usually have a great number of stubs, with vast amounts of data, which would be 
+     cumbersome to write manually. We call this big stub data _samples_.
+   * __Deep Stub Injection__: DeepSampler has an API, that defines, which methods on which classes should be stubbed. 
+     This information is then used to replace every instance of these classes within the compound by a stub, no matter 
+     where the instance inside the compound occurs. This is useful, because the stubbed objects are often located deep 
+     inside the compound. Long chains of setters would be required to move the stub from the test case to its designated 
+     position in the compound. This would not only be cumbersome work, it is often even impossible, since the required 
+     setters might simply be non-existent.
 
 For light-way tests with smaller Samples, where using separate JSON-files might be unnecessary, DeepSampler 
 provides an API that can be used to define Samples
@@ -178,7 +187,7 @@ PersistentSample.of(personDaoSampler.loadPerson(Matchers.anyInt()))     ;
 
 Persistent Samples are defined using `PersistentSample` and we don't need to define a concrete Sample using `is()` anymore, since this value
 will be provided by the JSON-File.
-__Second__ we we need to tell DeepSampler to record all Data, that flows through the stubbed methods. This is simply done by adding the annotation
+__Second__ we need to tell DeepSampler to record all Data, that flows through the stubbed methods. This is simply done by adding the annotation
 `@SaveSamples` to the test method. 
 
 ```
@@ -217,7 +226,7 @@ In this case DeepSampler would try to load a file named
 DeepSampler is by default Thread-scoped. So Samples, that have been defined 
 in one Thread, are available only in this particular Thread.
 
-But you can change the Scope using `SampleRepository::setScope`. DeepSampler comes with two
+You can change the Scope using `SampleRepository::setScope`. DeepSampler comes with two
 predefined Scopes:
    * `ThreadScope`: Samples are Thread-exclusive, this is the default.
    * `SingeltonScope`: The same Samples are available across the entire VM and all Threads share the same Samples.
