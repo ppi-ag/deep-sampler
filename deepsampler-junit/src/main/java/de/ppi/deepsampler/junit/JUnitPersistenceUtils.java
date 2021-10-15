@@ -9,10 +9,13 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import de.ppi.deepsampler.core.error.BaseException;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
+import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
+import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
 
 import java.lang.reflect.*;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class JUnitPersistenceUtils {
@@ -22,10 +25,16 @@ public class JUnitPersistenceUtils {
     }
 
     /**
-     * If testMethod is annotated with {@link LoadSamples} persistent samples from a JSON-File will be loaded. The file is
-     * defined by the {@link LoadSamples}.
+     * If testMethod is annotated with {@link LoadSamples}, persistent samples from a JSON-File will be loaded. The filename is
+     * defined by {@link LoadSamples}.
+     * <p>
+     * The annotation {@link UseSamplerFixture} must also be present on the method, or on the declaring class if {@link LoadSamples} is present.
+     * {@link UseSamplerFixture} defines the sampler that should use the data coming from the loaded json file.
+     * <p>
+     * The {@link SamplerFixture}, the testMethod, or the declaring class may also be annotated with {@link UseJsonDeserializer},
+     * {@link UseJsonSerializer} and {@link UseBeanConverterExtension}
      *
-     * @param testMethod samples will be laoded for the method testMethod if it is annotated with {@link LoadSamples}
+     * @param testMethod samples will be loaded for the method testMethod if it is annotated with {@link LoadSamples}
      */
     public static void loadSamples(final Method testMethod) {
         final LoadSamples loadSamples = testMethod.getAnnotation(LoadSamples.class);
@@ -34,13 +43,16 @@ public class JUnitPersistenceUtils {
             return;
         }
 
-        final JsonSourceManager jsonSourceManager = createSourceManager(testMethod, loadSamples);
+        final JsonSourceManager jsonSourceManager = createSourceManagerWithJsonSerializerExtensions(testMethod, loadSamples);
 
-        PersistentSampler.source(jsonSourceManager).load();
+        PersistentSampleManager sampleManager = PersistentSampler.source(jsonSourceManager);
+        applyBeanExtensionsFromTestCaseAndTestFixture(testMethod, sampleManager);
+
+        sampleManager.load();
     }
 
 
-    private static JsonSourceManager createSourceManager(final Method testMethod, final LoadSamples loadSamples) {
+    private static JsonSourceManager createSourceManagerWithJsonSerializerExtensions(final Method testMethod, final LoadSamples loadSamples) {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
@@ -58,6 +70,12 @@ public class JUnitPersistenceUtils {
         return testMethod.getDeclaringClass().getSimpleName() + "_" + testMethod.getName() + ".json";
     }
 
+    private static void applyBeanExtensionsFromTestCaseAndTestFixture(final Method testMethod, PersistentSampleManager persistentSampleManager) {
+        applyAnnotatedBeanConverterExtension(testMethod, persistentSampleManager);
+
+        JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod).map(JUnitPersistenceUtils::getDefineSamplersMethod)
+                .ifPresent(samplerFixtureMethod -> applyAnnotatedBeanConverterExtension(samplerFixtureMethod, persistentSampleManager));
+    }
 
     private static void applyJsonSerializersFromTestCaseAndTestFixture(final Method testMethod, final JsonSourceManager.Builder persistentSampleManagerBuilder) {
         applyAnnotatedJsonSerializers(testMethod, persistentSampleManagerBuilder);
@@ -170,7 +188,7 @@ public class JUnitPersistenceUtils {
      * @param clazz the class for which we want to find the first parameterized superclass.
      * @return the first parameterized superclass
      */
-    private static  ParameterizedType getParameterizedParentType(final Class<?> clazz) {
+    private static ParameterizedType getParameterizedParentType(final Class<?> clazz) {
         if (clazz.getGenericSuperclass() instanceof ParameterizedType) {
             return (ParameterizedType) clazz.getGenericSuperclass();
         }
@@ -183,12 +201,12 @@ public class JUnitPersistenceUtils {
      * recursively searched and used to initialize the inner class.
      *
      * @param clazz the class that should be instantiated. Inner classes are allowed.
-     * @param <T> The type of the class and the returned instance.
+     * @param <T>   The type of the class and the returned instance.
      * @return the new instance of clazz.
      */
     private static <T> T instantiate(final Class<T> clazz) {
         try {
-            if (clazz.isMemberClass()) {
+            if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {
                 Object declaringObject = instantiate(clazz.getDeclaringClass());
 
                 final Constructor<T> constructor = clazz.getDeclaredConstructor(clazz.getDeclaringClass());
@@ -209,11 +227,15 @@ public class JUnitPersistenceUtils {
             return;
         }
 
-        final JsonSourceManager sourceManager = createSourceManager(testMethod, saveSamples);
-        PersistentSampler.source(sourceManager).record();
+        final JsonSourceManager jsonSourceManager = createSourceManagerWithJsonSerializerExtensions(testMethod, saveSamples);
+
+        PersistentSampleManager sampleManager = PersistentSampler.source(jsonSourceManager);
+        applyBeanExtensionsFromTestCaseAndTestFixture(testMethod, sampleManager);
+
+        sampleManager.record();
     }
 
-    private static JsonSourceManager createSourceManager(final Method testMethod, final SaveSamples saveSamples) {
+    private static JsonSourceManager createSourceManagerWithJsonSerializerExtensions(final Method testMethod, final SaveSamples saveSamples) {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
@@ -226,6 +248,21 @@ public class JUnitPersistenceUtils {
 
     private static String getDefaultJsonFileNameWithFolder(final Method testMethod) {
         return testMethod.getDeclaringClass().getName().replace(".", "/") + "_" + testMethod.getName() + ".json";
+    }
+
+    private static void applyAnnotatedBeanConverterExtension(final Method testMethod, final PersistentSampleManager persistentSampleManager) {
+        final UseBeanConverterExtension useBeanConverterExtensionOnMethod = testMethod.getAnnotation(UseBeanConverterExtension.class);
+        final UseBeanConverterExtension useBeanConverterExtensionOnClass = testMethod.getDeclaringClass().getAnnotation(UseBeanConverterExtension.class);
+
+        Stream.of(useBeanConverterExtensionOnMethod, useBeanConverterExtensionOnClass)
+                .filter(Objects::nonNull)
+                .flatMap(annotation -> Stream.of(annotation.value()))
+                .forEach(extensionClass -> addBeanExtension(extensionClass, persistentSampleManager));
+    }
+
+    private static void addBeanExtension(final Class<? extends BeanConverterExtension> beanConverterExtensionClass, final PersistentSampleManager persistentSampleManager) {
+        BeanConverterExtension extension = instantiate(beanConverterExtensionClass);
+        persistentSampleManager.addBeanExtension(extension);
     }
 
 }

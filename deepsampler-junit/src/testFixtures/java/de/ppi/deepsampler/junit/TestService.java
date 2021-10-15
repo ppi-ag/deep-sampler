@@ -9,7 +9,25 @@ import java.time.Instant;
 
 public class TestService {
 
+    public static final String CATS_DEFAULT_NAME = "Spot";
+
+    private String catsName = CATS_DEFAULT_NAME;
+
+    private Instant defaultInstant = Instant.ofEpochMilli(0);
+
     public Instant getInstant() {
-        return Instant.now();
+        return defaultInstant;
+    }
+
+    public Cat getCat() {
+        return new Cat(catsName);
+    }
+
+    public void setCatsName(String catsName) {
+        this.catsName = catsName;
+    }
+
+    public void setDefaultInstant(Instant defaultInstant) {
+        this.defaultInstant = defaultInstant;
     }
 }
