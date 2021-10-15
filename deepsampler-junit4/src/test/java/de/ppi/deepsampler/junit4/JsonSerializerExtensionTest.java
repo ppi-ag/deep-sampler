@@ -27,8 +27,8 @@ import static org.junit.Assert.assertNotNull;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class JsonSerializerExtensionTest {
 
-    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("de", "ppi", "deepsampler", "junit4", "JsonSerializerExtensionTest_aSamplerCanBeSavedUsingAJsonExtension.json");
     public static final String SAVED_SAMPLER_FILE = "de/ppi/deepsampler/junit4/JsonSerializerExtensionTest_aSamplerCanBeSavedUsingAJsonExtension.json";
+    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get(SAVED_SAMPLER_FILE);
 
     @Inject
     private TestService testService;
