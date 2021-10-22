@@ -17,7 +17,7 @@ public class ExecutionManager {
         // This constructor is private since this class is not intended to be instantiated.
     }
 
-    public static void record(final SampleDefinition sampleDefinition, final MethodCall actualMethodCall) {
+    public static void recordMethodCall(final SampleDefinition sampleDefinition, final MethodCall actualMethodCall) {
         getSampleExecutionInformation(sampleDefinition).addMethodCall(actualMethodCall);
     }
 

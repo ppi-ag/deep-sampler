@@ -545,7 +545,7 @@ public abstract class PersistentSamplerAspectTest {
 
     private PersistentSampleManager save(Path pathToFile) {
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
+        source.recordSamples();
         return source;
     }
 

@@ -37,7 +37,7 @@ class VerifySampleHandlerTest {
         final Method simMethod = proxyTest.getClass().getMethod("test");
         final SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
         SampleRepository.getInstance().add(behaviorTest);
-        ExecutionManager.record(behaviorTest, new MethodCall(null, new ArrayList<>()));
+        ExecutionManager.recordMethodCall(behaviorTest, new MethodCall(null, new ArrayList<>()));
 
         // WHEN
         // THEN
@@ -52,7 +52,7 @@ class VerifySampleHandlerTest {
         final Method simMethod = proxyTest.getClass().getMethod("test");
         final SampleDefinition sampleDefinition = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
         SampleRepository.getInstance().add(sampleDefinition);
-        ExecutionManager.record(sampleDefinition, new MethodCall(null, new ArrayList<>()));
+        ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(null, new ArrayList<>()));
 
         // WHEN
         // THEN

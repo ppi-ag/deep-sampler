@@ -82,7 +82,7 @@ public class JUnitPersistenceUtils {
         PersistentSampleManager sampleManager = PersistentSampler.source(jsonSourceManager);
         applyBeanExtensionsFromTestCaseAndTestFixture(testMethod, sampleManager);
 
-        sampleManager.record();
+        sampleManager.recordSamples();
     }
 
 

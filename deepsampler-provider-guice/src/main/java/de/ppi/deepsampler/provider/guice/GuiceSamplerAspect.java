@@ -43,14 +43,14 @@ public class GuiceSamplerAspect implements MethodInterceptor {
                         invocation::proceed);
                 Object returnValue =  ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
 
-                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, arguments));
+                ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(returnValue, arguments));
 
                 return returnValue;
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = invocation.proceed();
 
-                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, arguments));
+                ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(returnValue, arguments));
                 return returnValue;
             }
         }

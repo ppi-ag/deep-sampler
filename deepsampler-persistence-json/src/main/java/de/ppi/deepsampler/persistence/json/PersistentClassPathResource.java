@@ -5,7 +5,7 @@
 
 package de.ppi.deepsampler.persistence.json;
 
-import de.ppi.deepsampler.persistence.json.error.JsonPersistenceException;
+import de.ppi.deepsampler.persistence.error.PersistenceException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,7 +28,7 @@ public class PersistentClassPathResource implements PersistentResource {
     public InputStream readAsStream(final OpenOption... openOptions) {
         final InputStream resourceAsStream = anchor.getResourceAsStream(resourcePath);
         if (resourceAsStream == null) {
-            throw new JsonPersistenceException("There is no resource '%s'. It is searched on the classpath relative to the class %s", resourcePath, anchor.getName());
+            throw new PersistenceException("There is no resource '%s'. It is searched on the classpath relative to the class %s", resourcePath, anchor.getName());
         }
 
         return resourceAsStream;

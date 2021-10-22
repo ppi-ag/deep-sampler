@@ -11,11 +11,11 @@ import de.ppi.deepsampler.core.model.MethodCall;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleExecutionInformation;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
+import de.ppi.deepsampler.persistence.error.PersistenceException;
+import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentActualSample;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentParameter;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
-import de.ppi.deepsampler.persistence.json.error.JsonPersistenceException;
-import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 import de.ppi.deepsampler.persistence.json.model.JsonSampleModel;
 
 import java.io.BufferedWriter;
@@ -38,7 +38,7 @@ public class JsonRecorder extends JsonOperator {
         super(persistentResource, Collections.emptyList(), serializationExtensions, moduleList);
     }
 
-    public void record(final Map<Class<?>, ExecutionInformation> executionInformationMap, PersistentSamplerContext persistentSamplerContext) {
+    public void recordExecutionInformation(final Map<Class<?>, ExecutionInformation> executionInformationMap, PersistentSamplerContext persistentSamplerContext) {
         try {
             final PersistentResource persistentResource = getPersistentResource();
             if (persistentResource instanceof PersistentFile) {
@@ -54,7 +54,7 @@ public class JsonRecorder extends JsonOperator {
                     StandardOpenOption.CREATE)));
             createObjectMapper().writeValue(writer, model);
         } catch (final IOException e) {
-            throw new JsonPersistenceException("It was not possible to serialize/write to json.", e);
+            throw new PersistenceException("It was not possible to serialize/write to json.", e);
         }
     }
 
