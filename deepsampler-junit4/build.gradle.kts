@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 plugins {
@@ -13,6 +13,8 @@ dependencies {
     implementation(project(":deepsampler-persistence-json"))
     implementation(project(":deepsampler-junit"))
     testImplementation(testFixtures(project(":deepsampler-junit")))
+    testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
+    testImplementation(project(":deepsampler-provider-guice"))
 }
 
 tasks.test {

@@ -1,11 +1,12 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.provider.common;
 
 import de.ppi.deepsampler.core.api.*;
+import de.ppi.deepsampler.core.error.BaseException;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.error.VerifyException;
@@ -144,7 +145,7 @@ public abstract class SamplerAspectTest {
     @Test
     public void finalClassCannotBeStubbed() {
         // GIVEN WHEN
-        FinalTestService finalTestService = getFinalTestService();
+        final FinalTestService finalTestService = getFinalTestService();
 
         // THEN
         assertNotNull(finalTestService);
@@ -155,7 +156,7 @@ public abstract class SamplerAspectTest {
     @Test
     public void serviceCanBeCastedFromInterfaceToConcrete() {
         // GIVEN WHEN
-        DecoupledTestService decoupledTestService = getDecoupledTestService();
+        final DecoupledTestService decoupledTestService = getDecoupledTestService();
 
         // THEN
 
@@ -164,7 +165,7 @@ public abstract class SamplerAspectTest {
         // like the following one, are bad smelling code, we expect them to occur frequently. So DeepSampler must cope with it.
         // To enable this, we have to exclude classes from being intercepted by adding a proper Pointcut expression to our
         // Spring-Aspect.
-        DecoupledTestServiceImpl implementation = (DecoupledTestServiceImpl) decoupledTestService;
+        final DecoupledTestServiceImpl implementation = (DecoupledTestServiceImpl) decoupledTestService;
         assertNotNull(implementation);
     }
 
@@ -347,8 +348,8 @@ public abstract class SamplerAspectTest {
         getTestService().echoParameter(TEST_BEAN_A);
 
         //THEN
-        Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_B);
         Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_A);
+        Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_B);
         Sample.verifyCallQuantity(TestService.class, NEVER).getMinusOne();
     }
 
@@ -546,11 +547,11 @@ public abstract class SamplerAspectTest {
         // GIVEN
         Execution.setScope(ScopeType.THREAD);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
         // WHEN
 
-        Future<?> createsASampler = executorService.submit(() -> {
+        final Future<?> createsASampler = executorService.submit(() -> {
             final TestService testServiceSampler = Sampler.prepare(TestService.class);
             Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
@@ -558,11 +559,11 @@ public abstract class SamplerAspectTest {
             assertFalse(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
         });
 
-        Future<?> findsNoSampler = executorService.submit(() -> {
+        final Future<?> findsNoSampler = executorService.submit(() -> {
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (final InterruptedException e) {
+                throw new BaseException(e.getMessage(), e);
             }
 
             // THEN
@@ -589,11 +590,11 @@ public abstract class SamplerAspectTest {
         // GIVEN
         Execution.setScope(ScopeType.SINGLETON);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
         //WHEN
 
-        Future<?> createsASampler = executorService.submit(() -> {
+        final Future<?> createsASampler = executorService.submit(() -> {
             final TestService testServiceSampler = Sampler.prepare(TestService.class);
             Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
 
@@ -601,11 +602,11 @@ public abstract class SamplerAspectTest {
             assertFalse(ExecutionRepository.getInstance().getOrCreate(TestService.class).getAll().isEmpty());
         });
 
-        Future<?> findsNoSampler = executorService.submit(() -> {
+        final Future<?> findsNoSampler = executorService.submit(() -> {
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (final InterruptedException e) {
+                throw new BaseException(e.getMessage(), e);
             }
 
             // THEN
@@ -631,8 +632,8 @@ public abstract class SamplerAspectTest {
         Execution.useGlobal((a, b, c) -> null);
 
         // WHEN
-        String resultEcho = getTestService().echoParameter(VALUE_A);
-        LocalDateTime localDateTime = getTestService().testLocalDateTime();
+        final String resultEcho = getTestService().echoParameter(VALUE_A);
+        final LocalDateTime localDateTime = getTestService().testLocalDateTime();
 
         // THEN
         assertNull(resultEcho);
@@ -655,8 +656,8 @@ public abstract class SamplerAspectTest {
         });
 
         // WHEN
-        String resultEcho = getTestService().echoParameter(VALUE_A);
-        LocalDateTime localDateTime = getTestService().testLocalDateTime();
+        final String resultEcho = getTestService().echoParameter(VALUE_A);
+        final LocalDateTime localDateTime = getTestService().testLocalDateTime();
 
         // THEN
         assertEquals(VALUE_B, resultEcho);
