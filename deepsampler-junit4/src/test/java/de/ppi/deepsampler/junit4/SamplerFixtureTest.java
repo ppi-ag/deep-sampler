@@ -5,7 +5,10 @@
 
 package de.ppi.deepsampler.junit4;
 
-import de.ppi.deepsampler.junit.*;
+import de.ppi.deepsampler.junit.GetSomeStringTestSampleFixture;
+import de.ppi.deepsampler.junit.LoadSamples;
+import de.ppi.deepsampler.junit.TestSampleFixture;
+import de.ppi.deepsampler.junit.UseSamplerFixture;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,7 +16,6 @@ import org.junit.runners.MethodSorters;
 
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
-import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @UseSamplerFixture(TestSampleFixture.class)

@@ -8,7 +8,6 @@ package de.ppi.deepsampler.persistence.bean;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

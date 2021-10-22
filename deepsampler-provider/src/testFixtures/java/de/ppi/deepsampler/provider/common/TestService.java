@@ -148,11 +148,11 @@ public class TestService {
     }
 
     public List<TestBean> getListOfTestBeans() {
-        return Arrays.asList(new TestBean(HARD_CODED_RETURN_VALUE));
+        return Collections.singletonList(new TestBean(HARD_CODED_RETURN_VALUE));
     }
 
     public List<String> getListOfStrings() {
-        return Arrays.asList(HARD_CODED_RETURN_VALUE);
+        return Collections.singletonList(HARD_CODED_RETURN_VALUE);
     }
 
     public Set<String> getSetOfStrings() {
