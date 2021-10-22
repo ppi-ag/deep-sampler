@@ -6,12 +6,10 @@
 package de.ppi.deepsampler.junit;
 
 import de.ppi.deepsampler.core.api.PersistentSample;
-import de.ppi.deepsampler.persistence.bean.DefaultPersistentBean;
 import de.ppi.deepsampler.persistence.bean.PersistentBeanConverter;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 
 import java.lang.reflect.ParameterizedType;
-import java.time.Instant;
 
 /**
  * A simple {@link SamplerFixture} that is used to test the annotation {@link UseBeanConverterExtension}

@@ -19,16 +19,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
 import static de.ppi.deepsampler.core.api.FixedQuantity.ONCE;
 import static de.ppi.deepsampler.core.api.Matchers.*;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -44,6 +42,7 @@ public abstract class PersistentSamplerAspectTest {
     private static final TestBean TEST_BEAN_A = new TestBean();
     public static final String MY_ECHO_PARAMS = "MY ECHO PARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
+    public static final String BLOCK = "BLOCK";
 
 
     /**
@@ -184,21 +183,27 @@ public abstract class PersistentSamplerAspectTest {
 
     @Test
     public void setOfTestBeansReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+        // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getSetOfTestBeans());
 
+        // WHEN
         getTestService().getSetOfTestBeans();
         final PersistentSampleManager source = save(tempFile);
 
         clearSampleRepositoryWithAssertion();
 
         PersistentSample.of(testServiceSampler.getSetOfTestBeans());
+
         source.load();
 
+        // THEN
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertEquals(1, getTestService().getSetOfTestBeans().size());
-        TestBean testBean = getTestService().getSetOfTestBeans().stream().findFirst().get();
-        assertEquals(TestService.HARD_CODED_RETURN_VALUE, testBean.getValue());
+
+        assertThat(getTestService().getSetOfTestBeans().stream().findFirst())
+                .isPresent()
+                .map(TestBean::getValue).hasValue(TestService.HARD_CODED_RETURN_VALUE);
     }
 
     @Test
@@ -472,26 +477,26 @@ public abstract class PersistentSamplerAspectTest {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
 
-        getTestService().methodWithThreeParametersReturningLast("BLOCK", "B", "R1");
-        getTestService().methodWithThreeParametersReturningLast("BLOCK", "C", "R3");
+        getTestService().methodWithThreeParametersReturningLast(BLOCK, "B", "R1");
+        getTestService().methodWithThreeParametersReturningLast(BLOCK, "C", "R3");
 
         final PersistentSampleManager source = save(tempFile);
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo("BLOCK"), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo(BLOCK), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
         source.load();
 
         // WHEN
         final TestService testService = getTestService();
-        String result = testService.methodWithThreeParametersReturningLast("BLOCK", "B", "ABC2");
+        String result = testService.methodWithThreeParametersReturningLast(BLOCK, "B", "ABC2");
 
         // THEN
-        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast("BLOCK", "C", "ABC1"));
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast(BLOCK, "C", "ABC1"));
         assertEquals("R1", result);
     }
 
     @Test
-    public void byteArrayCanBeRecordedAndLoaded(Path tempFile) throws IOException {
+    public void byteArrayCanBeRecordedAndLoaded(Path tempFile) {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
