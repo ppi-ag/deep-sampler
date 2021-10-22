@@ -26,7 +26,7 @@ public class JUnitSamplerUtils {
     }
 
     /**
-     * Searches for fields ind targetObject that are annotated with {@link PrepareSampler} and injects Sampler instances in all these fields.
+     * Searches for fields in targetObject that are annotated with {@link PrepareSampler} and injects Sampler instances in all these fields.
      *
      * @param targetObject the object in which Samplers should be injected.
      */
@@ -36,6 +36,17 @@ public class JUnitSamplerUtils {
                 .forEach(field -> assignNewSamplerToField(targetObject, field));
     }
 
+
+    /**
+     * If testMethod, or the class that declares testMethod, is annotated with @{@link UseSamplerFixture}, the {@link SamplerFixture}
+     * is instantiated and returned, but not executed.
+     * <p>
+     * If both, the method and it's declaring class are annotated with @{@link UseSamplerFixture} only the one from the method is
+     * instantiated. So the {@link SamplerFixture}s on methods override {@link SamplerFixture}s on classes.
+     *
+     * @param testMethod the corresponding {@link SamplerFixture} will be instantiated, but not executed.
+     * @return the instantiated {@link SamplerFixture} that will be used for testMethod.
+     */
     public static Optional<SamplerFixture> loadSamplerFixtureFromMethodOrDeclaringClass(final Method testMethod) {
         final UseSamplerFixture fixtureOnMethod = testMethod.getAnnotation(UseSamplerFixture.class);
         final UseSamplerFixture fixtureOnClass = testMethod.getDeclaringClass().getAnnotation(UseSamplerFixture.class);
@@ -64,9 +75,12 @@ public class JUnitSamplerUtils {
     }
 
     /**
-     * The annotation {@link UseSamplerFixture} references a {@link SamplerFixture} that can be used to define Samplers in a
-     * reusable manner. A test can use a {@link SamplerFixture} if the testMethod or the class that declares testMethod is annotated
-     * with {@link UseSamplerFixture}. The annotation at method-level overrides the annotation at class-level.
+     * If testMethod, or the class that declares testMethod, is annotated with @{@link UseSamplerFixture}, the {@link SamplerFixture}
+     * is instantiated and executed before testMethod executes. Samples, that have been defined by the {@link SamplerFixture} will be active
+     * during the execution of testMethod.
+     * <p>
+     * If both, the method and it's declaring class are annotated with @{@link UseSamplerFixture} only the one from the method is
+     * used. So the {@link SamplerFixture}s on methods override {@link SamplerFixture}s on classes.
      *
      * @param testMethod the test-method that should be initialized with a {@link SamplerFixture}
      */
@@ -104,7 +118,7 @@ public class JUnitSamplerUtils {
     }
 
     /**
-     * Prepares a new Sampler according to the type of field and assigns the Sampler the field on testInstance.
+     * Prepares a new Sampler corresponding to the type of field and assigns the Sampler the field on testInstance.
      *
      * @param testInstance the object in which the sampler should be injected.
      * @param field        the field that should be populated with a new Sampler.

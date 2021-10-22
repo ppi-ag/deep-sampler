@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.junit;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 
 import java.lang.annotation.*;
@@ -12,13 +13,16 @@ import java.lang.annotation.*;
 /**
  * This annotation can be used to register a {@link JsonSerializer} for the underlying Jackson JSON parser.
  * <p>
- * The annotation can be used on
+ * The annotation can be placed on
  * <ul>
- *     <li>test methods</li>
- *     <li>test classes</li>
- *     <li>{@link SamplerFixture}-classes</li>
+ *     <li>a test method</li>
+ *     <li>the class that declares the test method</li>
  *     <li>the method {@link SamplerFixture#defineSamplers()}</li>
+ *     <li>the class that defines the method defineSamplers</li>
  * </ul>
+ *
+ * If {@link UseJsonSerializer} is used at more than one of the aforementioned places, and several of them define {@link JsonSerializer}s
+ * for the same type, the ones on top of the aforementioned list, override the lower ones.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
