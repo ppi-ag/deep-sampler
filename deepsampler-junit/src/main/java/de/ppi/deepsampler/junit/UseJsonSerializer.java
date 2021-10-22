@@ -5,7 +5,6 @@
 
 package de.ppi.deepsampler.junit;
 
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 
 import java.lang.annotation.*;

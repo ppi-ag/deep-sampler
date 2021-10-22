@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(DeepSamplerExtension.class)
 @UseSamplerFixture(BeanExtensionSamplerFixture.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BeanExtensionTest {
+class BeanExtensionTest {
 
     public static final String SAVED_SAMPLER_FILE = "de/ppi/deepsampler/junit5/BeanExtensionTest_samplerCanBeSavedUsingABeanExtension.json";
     public static final Path EXPECTED_SAVED_SAMPLER = Paths.get(SAVED_SAMPLER_FILE);
@@ -44,7 +44,7 @@ public class BeanExtensionTest {
     @Test
     @SaveSamples
     @Order(0)
-    public void samplerCanBeSavedUsingABeanExtension() throws IOException {
+    void samplerCanBeSavedUsingABeanExtension() throws IOException {
         // GIVEN
         testService.setCatsName(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
 
@@ -59,7 +59,7 @@ public class BeanExtensionTest {
     @Test
     @LoadSamples(file = SAVED_SAMPLER_FILE)
     @Order(1)
-    public void samplerCanBeLoadedUsingBeanExtension() {
+    void samplerCanBeLoadedUsingBeanExtension() {
         // GIVEN
         testService.setCatsName("This name should be overridden by the stub");
 
