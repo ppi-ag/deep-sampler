@@ -148,11 +148,15 @@ public class TestService {
     }
 
     public List<TestBean> getListOfTestBeans() {
-        return Collections.singletonList(new TestBean(HARD_CODED_RETURN_VALUE));
+        // Usually it would be better to use Collections.singletonList() for Lists with only one entry, but
+        // we are unable to deserialize Collections.SingletonList since this is a private inner class.
+        return Arrays.asList(new TestBean(HARD_CODED_RETURN_VALUE));
     }
 
     public List<String> getListOfStrings() {
-        return Collections.singletonList(HARD_CODED_RETURN_VALUE);
+        // Usually it would be better to use Collections.singletonList() for Lists with only one entry, but
+        // we are unable to deserialize Collections.SingletonList since this is a private inner class.
+        return Arrays.asList(HARD_CODED_RETURN_VALUE);
     }
 
     public Set<String> getSetOfStrings() {
