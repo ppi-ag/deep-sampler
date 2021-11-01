@@ -20,8 +20,8 @@ a JSON-file, that can be used as a sample for stubbed tests.
 
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
 
-If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead a recored value from the samplefile will be returned. 
-If the method is called with particular parameters, DeepSampler looks for a sample that has the same parameters. The test is now independent from the database. 
+If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead a recored sample will be returned. 
+If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same parameters. 
 
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
