@@ -12,25 +12,19 @@ recorded samples can be "replayed" by DeepSampler's stubs.
 Let's say we want to test a compound consisting of numerous classes and somewhere deep inside the compound is one class, a DAO, that reads 
 data from a Database:
 
-<p align="center">
 <img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
-</p>
 
 We can now attach a stub to the DAO using DeepSampler. After switching DeepSampler to recording-mode, we can now start the test. Every
 call to the DAO is now recorded by DeepSampler. The intercepted data will be saved to a JSON-file as a sample, after the test has finished.
 A sample is usually a pair of parameters and return values. 
 
-<p align="center">
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
-</p>
 
 If we repeat the test with DeepSampler switched to player-mode, the original DAO will not be called anymore. If the stubbed method is called
 during the test, DeepSampler tries to find a return value in the previously recorded samples by matching the parameter values from running calls
 to recorded calls.
 
-<p align="center">
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
-</p>
 
 # Quickstart
 The following tutorial demonstrates how to use DeepSampler with JUnit5 and Guice. You can download or clone the complete
