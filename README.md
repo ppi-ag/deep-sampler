@@ -1,4 +1,6 @@
+<p align="center">
 <img src="/docs/assets/logo.svg?raw=true" alt="DeepSampler" width="33%"/>
+</p>
 
 ![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![CodeQL](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml)
 
@@ -12,20 +14,25 @@ recorded samples can be "replayed" by DeepSampler's stubs.
 Let's say we want to test a component consisting of numerous classes and somewhere deep inside the component is one class, a DAO, that reads 
 data from a Database:
 
+<p align="center">
 <img src="/docs/assets/deesampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a component reads data from a database" width="50%"/>
+</p>
 
 We can now attach a stub to the DAO using DeepSampler. After switching DeepSampler to recording-mode, we can now start the test. Every
 call to the DAO is now recorded by DeepSampler. The intercepted data will be saved to a JSON-file as a sample, after the test has finished.
 A sample is usually a pair of parameters and return values. 
 
+<p align="center">
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="A DAO somewhere inside a component reads data from a database" width="50%"/>
+</p>
 
 If we repeat the test with DeepSampler switched to player-mode, the original DAO will not be called anymore. If the stubbed method is called
 during the test, DeepSampler tries to find a return value in the previously recorded samples by matching the parameter values from running calls
 to recorded calls.
 
+<p align="center">
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="A DAO somewhere inside a component reads data from a database" width="50%"/>
-
+</p>
 
 # Quickstart
 The following tutorial demonstrates how to use DeepSampler with JUnit5 and Guice. You can download or clone the complete
