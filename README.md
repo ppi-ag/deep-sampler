@@ -14,9 +14,8 @@ data from a Database:
 
 <img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
 
-We can now attach a stub to the DAO using DeepSampler. After switching DeepSampler to recording-mode, we can now start the test. Every
-call to the DAO is now recorded by DeepSampler. The intercepted data will be saved to a JSON-file as a sample, after the test has finished.
-A sample is usually a pair of parameters and return values. 
+We can now attach a stub to the DAO using DeepSampler. After switching DeepSampler to recording-mode, we can start the test. Every
+call to the DAO is recorded by DeepSampler. The intercepted data will be saved to a JSON-file, that can be used as a sample for stubbed tests.
 
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
 
