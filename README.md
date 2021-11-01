@@ -4,24 +4,25 @@
 
 # Build integration tests with JUnit and DeepSampler!
 
-While unit tests are meant to test _single classes_, integration tests are meant to test compounds that consist of _many classes_. 
-Like most unit tests, most integration tests must be _stubbed_ to gain control over test data. DeepSampler is able to do this by 
-using well known principles from Mockito, augmented by two additional core features, that are necessary for vast integration tests:
+DeepSampler is a stubbing tool for integration tests. It is able to stub methods that are hard to reach using standard stubbing tools like
+Mockito, because they are hidden behind long reference-chains __deep__ inside the tested component. Since integration tests often need vast amounts
+of testdata and a great number of stubs, DeepSampler is able to record the testdata from a running test. We call this testdata __samples__. The
+recorded samples can be "replayed" by DeepSampler's stubs.
 
-   * __Sample Recorder__: The data, that is returned by stubs can be recorded and saved to a JSON-file from a live runtime example. 
-     This is useful, because compounds usually have a great number of stubs, with vast amounts of data, which would be 
-     cumbersome to write manually. We call this big stub data _samples_.
-     
-   * __Deep Stub Injection__: DeepSampler has an API, that defines, which methods on which classes should be stubbed. 
-     This information is then used to replace every instance of these classes within the compound by a stub, no matter 
-     where the instance inside the compound occurs. This is useful, because the stubbed objects are often located deep 
-     inside the compound. Long chains of setters would be required to move the stub from the test case to its designated 
-     position in the compound. This would not only be cumbersome work, it is often even impossible, since the required 
-     setters might simply be non-existent.
+Let's say we want to test a component consisting of numerous classes and somewhere deep inside the component is one class, a DAO, that reads 
+data from a Database:
+<img src="https://github.com/ppi-ag/deep-sampler/blob/main/docs/assets/deepsampler-demo-unsampled.svg" alt="DeepSampler" width="50%"/>
 
-For light-way tests with smaller Samples, where using separate JSON-files might be unnecessary, DeepSampler 
-provides an API that can be used to define Samples
-conveniently inside test classes. The API also comes with means to completely redefine the behavior of stubbed methods.
+We can now attach a stub to the DAO using DeepSampler. After switching DeepSampler to recording-mode, we can now start the test. Every
+call to the DAO is now recorded by DeepSampler. The intercepted data will be saved to a JSON-file as a sample, after the test has finished.
+A sample is usually a pair of parameters and return values. 
+<img src="https://github.com/ppi-ag/deep-sampler/blob/main/docs/assets/deepsampler-demo-recorder.svg" alt="DeepSampler" width="50%"/>
+
+If we repeat the test with DeepSampler switched to player-mode, the original DAO will not be called anymore. If the stubbed method is called
+during the test, DeepSampler tries to find a return value in the previously recorded samples by matching the parameter values from running calls
+to recorded calls.
+<img src="https://github.com/ppi-ag/deep-sampler/blob/main/docs/assets/deepsampler-demo-player.svg" alt="DeepSampler" width="50%"/>
+
 
 # Quickstart
 The following tutorial demonstrates how to use DeepSampler with JUnit5 and Guice. You can download or clone the complete
