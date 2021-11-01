@@ -4,7 +4,7 @@
 
 # Build integration tests with JUnit and DeepSampler!
 
-DeepSampler is a stubbing tool for integration tests. It is able to stub methods that are hard to reach using standard stubbing tools like
+DeepSampler is a stubbing tool for integration tests. It is designed to stub methods that are hard to reach using standard stubbing tools like
 Mockito, because they are hidden behind long reference-chains __deep__ inside the tested component. Since integration tests often need vast amounts
 of testdata and a great number of stubs, DeepSampler is able to record the testdata from a running test. We call this testdata __samples__. The
 recorded samples can be "replayed" by DeepSampler's stubs.
