@@ -18,6 +18,14 @@ a JSON-file.
 
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
 
+As a short appetizer, this is, how stubs are defined using DeepSampler: 
+```
+@PrepareSampler
+private MyDao myDaoSampler;
+...
+PersistentSample.of(myDaoSampler.load(Matchers.anyInt()));
+```
+
 If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead a recorded sample from the JSON-file will be returned. 
 If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same parameters. 
 
