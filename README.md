@@ -4,7 +4,7 @@
 
 # Build integration tests with JUnit and DeepSampler!
 
-DeepSampler is a stubbing tool for integration tests. It is designed to stub methods that are hidden behind long reference-chains __deep__ inside the tested compound. Since integration tests often need vast amounts of testdata, DeepSampler is able to __record__ the testdata from a running test. We call this testdata __samples__. The
+DeepSampler is a stubbing tool for integration tests. It is designed to stub methods that are hidden behind long reference-chains __deep__ inside the tested compound. Since integration tests often need vast amounts of testdata, DeepSampler is also able to __record__ the testdata from a running test. We call this testdata __samples__. The
 recorded samples can be "replayed" by DeepSampler's stubs.
 
 Let's say, we want to test a compound consisting of numerous classes and somewhere deep inside the compound is one class, a DAO, that reads 
@@ -18,7 +18,7 @@ a JSON-file.
 
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
 
-As a short appetizer, this is, how stubs are defined using DeepSampler: 
+As a short appetizer, this is how we tell DeepSampler to attach a stub to the method `load()` in all instances of `MyDao`: 
 ```
 @PrepareSampler
 private MyDao myDaoSampler;
