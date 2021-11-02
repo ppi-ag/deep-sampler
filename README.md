@@ -27,7 +27,7 @@ PersistentSample.of(myDaoSampler.load(Matchers.anyInt()));
 ```
 
 If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead a recorded sample from the JSON-file will be returned. 
-If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same parameters. This is how even longer tests with several variying calls to stubs can be replayed.
+If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same parameters. This is how even longer tests with several varying calls to stubs can be replayed.
 
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
