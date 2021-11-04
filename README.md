@@ -1,27 +1,38 @@
-<img src="https://github.com/ppi-ag/deep-sampler/blob/main/docs/assets/logo.svg" alt="DeepSampler" width="33%"/>
+<img src="/docs/assets/logo.svg?raw=true" alt="DeepSampler" width="40%"/>
 
 ![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![CodeQL](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/ppi-ag/deep-sampler/actions/workflows/codeql-analysis.yml)
 
 # Build integration tests with JUnit and DeepSampler!
 
-While unit tests are meant to test _single classes_, integration tests are meant to test compounds that consist of _many classes_. 
-Like most unit tests, most integration tests must be _stubbed_ to gain control over test data. DeepSampler is able to do this by 
-using well known principles from Mockito, augmented by two additional core features, that are necessary for vast integration tests:
+DeepSampler is a stubbing tool for integration tests. It is designed to stub methods that are hidden behind long reference-chains __deep__ inside the tested compound. Since integration tests often need vast amounts of testdata, DeepSampler is also able to __record__ the testdata from a running test. We call this testdata __samples__. The
+recorded samples can be "replayed" by DeepSampler's stubs.
 
-   * __Sample Recorder__: The data, that is returned by stubs can be recorded and saved to a JSON-file from a live runtime example. 
-     This is useful, because compounds usually have a great number of stubs, with vast amounts of data, which would be 
-     cumbersome to write manually. We call this big stub data _samples_.
-     
-   * __Deep Stub Injection__: DeepSampler has an API, that defines, which methods on which classes should be stubbed. 
-     This information is then used to replace every instance of these classes within the compound by a stub, no matter 
-     where the instance inside the compound occurs. This is useful, because the stubbed objects are often located deep 
-     inside the compound. Long chains of setters would be required to move the stub from the test case to its designated 
-     position in the compound. This would not only be cumbersome work, it is often even impossible, since the required 
-     setters might simply be non-existent.
+Let's say, we want to test a compound consisting of numerous classes and somewhere deep inside the compound is one class, a DAO, that reads 
+data from a Database:
 
-For light-way tests with smaller Samples, where using separate JSON-files might be unnecessary, DeepSampler 
-provides an API that can be used to define Samples
-conveniently inside test classes. The API also comes with means to completely redefine the behavior of stubbed methods.
+<img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
+
+In order to be independent of the database, we can now attach a stub to the DAO using DeepSampler. After switching 
+DeepSampler to recording-mode, we can start the test. If a method of the DAO is called during the test, DeepSampler 
+records the method parameters and the return value. The intercepted data will be saved to a JSON-file, that can be used 
+as a sample for stubbed tests.
+
+<img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
+
+As a short appetizer, this is how we tell DeepSampler to attach a stub to the method `load()` in all instances of `MyDao`: 
+```
+@PrepareSampler
+private MyDao myDaoSampler;
+...
+PersistentSample.of(myDaoSampler.load(Matchers.anyInt()));
+```
+
+If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead, 
+a recorded sample from the JSON-file will be returned. If the method is called with particular parameters, DeepSampler 
+looks for a sample, that has been recorded with the same parameters. This is how even longer tests, with several varying 
+calls to stubs, can be replayed.
+
+<img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
 # Quickstart
 The following tutorial demonstrates how to use DeepSampler with JUnit5 and Guice. You can download or clone the complete
@@ -179,6 +190,8 @@ possibly more important, we would not want to write such extensive Samples by ha
 can save and load Samples from JSON-files.
 
 ### Record a JSON-Sample
+<img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="25%" align="left"/>
+
 In order to save Samples in a JSON-file, we __first__ need to define which methods should be stubbed and which methods should be recorded.
 This is - again - done using `SamplerFixture`s. In contrast to the example above, we now need to define the Sampler slightly different:
 ```
@@ -207,6 +220,9 @@ filename is created using the class name, and the method name of the package. In
 `./de/ppi/deepsampler/examples/helloworld/GreetingServiceTest_recordSamplesToJson.json`.
 
 ### Load a JSON-Sample
+
+<img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="25%" align="left"/>
+
 Finally, we can use a `SamplerFixture`, and a JSON-file to build a test case. A JSON-file can be loaded using the 
 annotation `@LoadSamples`: 
 
