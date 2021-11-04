@@ -12,9 +12,10 @@ data from a Database:
 
 <img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
 
-In order to be independent from the database, we can now attach a stub to the methods of the DAO using DeepSampler. If we run the test with DeepSampler in recording-mode, every
-call to the method will be intercepted and all data, that was passed to it, or returned by it, is recorded. The recorded data, the sample, will be saved to 
-a JSON-file.
+In order to be independent of the database, we can now attach a stub to the DAO using DeepSampler. After switching 
+DeepSampler to recording-mode, we can start the test. If a method of the DAO is called during the test, DeepSampler 
+records the method parameters and the return value. The intercepted data will be saved to a JSON-file, that can be used 
+as a sample for stubbed tests.
 
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
 
@@ -26,8 +27,10 @@ private MyDao myDaoSampler;
 PersistentSample.of(myDaoSampler.load(Matchers.anyInt()));
 ```
 
-If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead a recorded sample from the JSON-file will be returned. 
-If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same parameters. This is how even longer tests with several varying calls to stubs can be replayed.
+If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead, 
+a recorded sample from the JSON-file will be returned. If the method is called with particular parameters, DeepSampler 
+looks for a sample, that has been recorded with the same parameters. This is how even longer tests, with several varying 
+calls to stubs, can be replayed.
 
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
