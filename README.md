@@ -6,22 +6,22 @@
 
 DeepSampler is a stubbing tool for integration tests. It is able to stub methods that are hard to reach using standard stubbing tools like
 Mockito, because they are hidden behind long reference-chains __deep__ inside the tested component. Since integration tests often need vast amounts
-of testdata and a great number of stubs, DeepSampler is able to record the testdata from a running test. We call this testdata __samples__. The
-recorded samples can be "replayed" by DeepSampler's stubs.
+of test data, and a great number of stubs, DeepSampler is able to record the test data from a _running_ test. We call this test data __samples__. The
+recorded samples can be _"replayed"_ by DeepSampler's stubs.
 
 Let's say we want to test a compound consisting of numerous classes and somewhere deep inside the compound is one class, a DAO, that reads 
 data from a Database:
 
 <img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
 
-We can now attach a stub to the DAO using DeepSampler. After switching DeepSampler to recording-mode, we can start the test. Every
-call to the DAO is recorded by DeepSampler. The intercepted data will be saved to a JSON-file, that can be used as a sample for stubbed tests.
+We can now attach a stub to the DAO using DeepSampler. After switching DeepSampler to recording-mode, we can start the test. If a method 
+of the DAO is called during the test, DeepSampler records the method parameters and the return value. The intercepted data will be saved to a JSON-file, 
+that can be used as a sample for stubbed tests.
 
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
 
 If we repeat the test with DeepSampler switched to player-mode, the original DAO will not be called anymore. If the stubbed method is called
-during the test, DeepSampler tries to find a return value in the previously recorded samples by matching the parameter values from running calls
-to recorded calls.
+during the test, DeepSampler tries to find a return value in the previously recorded samples, using the method's parameter values as keys.
 
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
