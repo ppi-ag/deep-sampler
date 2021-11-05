@@ -40,6 +40,7 @@ public abstract class SamplerAspectTest {
     public static final int INT_VALUE = 42;
     private static final TestBean TEST_BEAN_A = new TestBean();
     private static final TestBean TEST_BEAN_B = new TestBean();
+    private static final TestBean TEST_BEAN_C = new TestBean();
     public static final String MY_ECHO_PARAMS = "MY ECHO PARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
 
@@ -352,6 +353,7 @@ public abstract class SamplerAspectTest {
         Sample.verifyCallQuantity(TestService.class, ONCE).echoParameter(TEST_BEAN_B);
         Sample.verifyCallQuantity(TestService.class, NEVER).getMinusOne();
     }
+
 
     @Test
     public void verifyMethodCalledOnce() {

@@ -80,19 +80,31 @@ public class PersistentBeanConverter {
      * the persistence api is expected to be able to serialize the original bean directly.
      */
     @SuppressWarnings("unchecked")
-    public <T> T convert(final Object originalBean, ParameterizedType parameterizedType) {
-        if (isTransformationNotNecessary(originalBean, parameterizedType)) {
+    public <T> T convert(final Object originalBean, Type type) {
+        final ParameterizedType parameterizedReturnType = type instanceof ParameterizedType ? (ParameterizedType) type : null;
+        if (isTransformationNotNecessary(originalBean, parameterizedReturnType)) {
             return (T) originalBean;
         }
-
+        /**
+         * Todo
+         * 1. Transferobjekt für Extensionschnittstelle mit den Typen bauen
+         * 2. Issue für die Erweiterung der Extension schreiben und zur Diskussion stellen
+         *
+         */
         if (originalBean.getClass().isArray()) {
-            return (T) convertArray((Object[]) originalBean);
+            return (T) convertObjectArray((Object[]) originalBean);
         }
 
-        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass(), parameterizedType);
+
+
+        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass(), parameterizedReturnType);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
-            return (T) applicableExtensions.get(0).convert(originalBean, parameterizedType, this);
+            return (T) applicableExtensions.get(0).convert(originalBean, parameterizedReturnType, this);
+        }
+
+        if(!originalBean.getClass().equals(type)){
+            return (T) convertToPolymorphicPersistentBean(originalBean.getClass().getTypeName(), originalBean);
         }
 
         return (T) convertToPersistentBean(originalBean);
@@ -203,7 +215,7 @@ public class PersistentBeanConverter {
 
 
 
-    private Object convertArray(final Object[] objects) {
+    private Object convertObjectArray(final Object[] objects) {
         int[] dimensions = ReflectionTools.getArrayDimensions(objects);
         Class<?> componentType = Array.newInstance(PersistentBean.class, dimensions).getClass();
         Object persistentBeans = ReflectionTools.createEmptyArray(objects, componentType);
@@ -216,8 +228,20 @@ public class PersistentBeanConverter {
         return persistentBeans;
     }
 
+    private PersistentBean convertToPolymorphicPersistentBean(final String type, final Object obj) {
+        final Map<String, Object> valuesForBean = getValueMapForObjects(obj);
+
+        return new PolymorphicPersistentBean(valuesForBean, type);
+    }
+
 
     private PersistentBean convertToPersistentBean(final Object obj) {
+        final Map<String, Object> valuesForBean = getValueMapForObjects(obj);
+
+        return new DefaultPersistentBean(valuesForBean);
+    }
+
+    private Map<String, Object> getValueMapForObjects(Object obj) {
         final Map<Field, String> fieldStringMap = getAllFields(obj.getClass());
 
         final Map<String, Object> valuesForBean = new HashMap<>();
@@ -235,8 +259,7 @@ public class PersistentBeanConverter {
 
             valuesForBean.put(keyForField, fieldValue);
         }
-
-        return new DefaultPersistentBean(valuesForBean);
+        return valuesForBean;
     }
 
     @SuppressWarnings("java:S3011") // We need the possibility to set the values of private fields for deserialization.
