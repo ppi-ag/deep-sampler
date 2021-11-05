@@ -10,6 +10,7 @@ import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
+import de.ppi.deepsampler.persistence.bean.PolymorphicPersistentBean;
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
@@ -175,11 +176,22 @@ public class PersistentSampleManager {
                                                                       final PersistentMethodCall call) {
         final List<Object> parameterEnvelopes = call.getPersistentParameter().getParameter();
         final Object returnValueEnvelope = call.getPersistentReturnValue();
+        final Class<?> returnClass;
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
+        if(returnValueEnvelope instanceof PolymorphicPersistentBean){
+            try {
+               returnClass= Class.forName(((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType());
+            } catch (ClassNotFoundException e) {
+               throw new PersistenceException(
+                       "The Polymorphic Class "+ ((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType() +" was not found. This occures if a polymorphic class was recorded but is not in the classpath (anymore?)", e,returnValueEnvelope);
+            }
+        } else {
+             returnClass= sampledMethod.getMethod().getReturnType();
+        }
         final Type[] parameterTypes = sampledMethod.getMethod().getGenericParameterTypes();
         final Type genericReturnType = sampledMethod.getMethod().getGenericReturnType();
         final ParameterizedType parameterizedReturnType = genericReturnType instanceof ParameterizedType ? (ParameterizedType) genericReturnType : null;
-        final Class<?> returnClass = sampledMethod.getMethod().getReturnType();
+
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
         final List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);

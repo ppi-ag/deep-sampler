@@ -207,4 +207,8 @@ public class TestService {
 
     }
 
+    public Animal getAnimal() {
+        return new Dog("Porthos");
+    }
+
 }

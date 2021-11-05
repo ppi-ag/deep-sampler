@@ -11,6 +11,7 @@ import de.ppi.deepsampler.core.model.MethodCall;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleExecutionInformation;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
+import de.ppi.deepsampler.persistence.bean.ext.BeanConversion;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentActualSample;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentParameter;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
@@ -88,13 +89,24 @@ public class JsonRecorder extends JsonOperator {
         final JsonPersistentSampleMethod persistentSampleMethod = new JsonPersistentSampleMethod(sample.getSampleId());
         final JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
-        final Type returnType = sample.getSampledMethod().getMethod().getGenericReturnType();
-        final ParameterizedType parameterizedReturnType = returnType instanceof ParameterizedType ? (ParameterizedType) returnType : null;
+        final Type declaredReturnType = sample.getSampledMethod().getMethod().getGenericReturnType();
+
+        // public Animal getAnimal()
+        //
+
+
+        // Realen Typen Dog
+        // Declared Type Animal
+        // Generic null
+
+        final ParameterizedType parameterizedReturnType = declaredReturnType instanceof ParameterizedType ? (ParameterizedType) declaredReturnType : null;
         final Type[] argumentTypes = sample.getSampledMethod().getMethod().getGenericParameterTypes();
+
 
         for (final MethodCall call : calls) {
             final List<Object> argsAsPersistentBeans = convertArguments(call.getArgs(), argumentTypes, persistentSamplerContext);
-            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanConverter().convert(call.getReturnValue(), parameterizedReturnType);
+
+            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanConverter().convert(call.getReturnValue(), declaredReturnType);
             final JsonPersistentParameter newParameters = new JsonPersistentParameter(argsAsPersistentBeans);
 
             if (!callWithSameParametersExists(jsonPersistentActualSample, newParameters)) {
