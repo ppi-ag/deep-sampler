@@ -8,5 +8,7 @@ build
 .idea
 
 #ignore tmp test data
-/deepsampler-junit4/src/test/tmp/
-/deepsampler-junit5/src/test/tmp/
+/deepsampler-junit4/src/test/tmp/de/ppi/deepsampler/junit4/
+/deepsampler-junit4/src/test/tmp/my/
+/deepsampler-junit5/src/test/tmp/de/ppi/deepsampler/junit5/
+/deepsampler-junit5/src/test/tmp/my/specific/package/
