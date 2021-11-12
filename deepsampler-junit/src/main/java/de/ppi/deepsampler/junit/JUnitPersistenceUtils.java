@@ -142,7 +142,7 @@ public class JUnitPersistenceUtils {
         Path file = rootPath.map(a -> Paths.get(a.value())).orElse(Paths.get(DEFAULT_ROOT_PATH));
 
         if (packagePath.equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
-            file = file.resolve(testMethod.getDeclaringClass().getPackage().getName().replaceAll("\\.", "/"));
+            file = file.resolve(testMethod.getDeclaringClass().getPackage().getName().replace(".", "/"));
         } else {
             file = file.resolve(packagePath);
         }
@@ -374,10 +374,6 @@ public class JUnitPersistenceUtils {
         }
     }
 
-
-    private static String getDefaultJsonFileNameWithFolder(final Method testMethod) {
-        return testMethod.getDeclaringClass().getName().replace(".", "/") + "_" + testMethod.getName() + ".json";
-    }
 
     private static void applyAnnotatedBeanConverterExtension(final Method testMethod, final PersistentSampleManager persistentSampleManager) {
         final UseBeanConverterExtension useBeanConverterExtensionOnMethod = testMethod.getAnnotation(UseBeanConverterExtension.class);

@@ -2,6 +2,10 @@ package de.ppi.deepsampler.junit;
 
 public class AnnotationConstants {
 
+    private AnnotationConstants() {
+        // This class is a collection of annotations only, instantiation is not intended.
+    }
+
     /**
      * Default values in annotations must not be null (given by the java spec). However, we want to calculate
      * default values if the user doesn't provide a value. This calculation cannot be done inside the annotation,
