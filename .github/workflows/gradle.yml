@@ -24,11 +24,11 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
-      if: always()
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v2
+      if: always() # always run even if the previous step fails
       with:
-          files: $${{env.GITHUB_WORKSPACE}}/build/test-results/**/*.xml
+          report_paths: '**/build/test-results/test/TEST-*.xml'
     - name: Collect coverage data with Gradle
       run: ./gradlew codeCoverageReport
     - name: Analyze quality with sonar using Gradle
