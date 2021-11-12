@@ -15,4 +15,6 @@ dependencies {
     testImplementation(testFixtures(project(":deepsampler-junit")))
     testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
     testImplementation(project(":deepsampler-provider-guice"))
+
+    testImplementation(files("./src/test/tmp"))
 }

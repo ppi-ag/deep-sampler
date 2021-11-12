@@ -6,7 +6,7 @@ build
 
 # Ignore Intellij-Settings
 .idea
-/deepsampler-junit4/de/
-/deepsampler-junit4/out/
-/deepsampler-junit5/de/
-/deepsampler-junit5/out/
+
+#ignore tmp test data
+/deepsampler-junit4/src/test/tmp/
+/deepsampler-junit5/src/test/tmp/

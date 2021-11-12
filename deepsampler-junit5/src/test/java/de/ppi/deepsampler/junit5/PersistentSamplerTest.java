@@ -25,12 +25,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @UseSamplerFixture(GetSomeStringTestSampleFixture.class)
+@SampleRootPath("./src/test/tmp")
 class PersistentSamplerTest {
 
-    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("de", "ppi", "deepsampler", "junit5", "PersistentSamplerTest_samplerCanBeSaved.json");
-    public static final String SAVED_IN_SPECIFIC_FILE_JSON = "de/ppi/deepsampler/junit5/samplerCanBeSavedInSpecificFile.json";
-    public static final String LOAD_SPECIFIC_FILE_JSON = "src/test/resources/de/ppi/deepsampler/junit5/samplerCanBeLoadedFromSpecificFile.json";
-    public static final String LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON = "samplerCanBeLoadedFromSpecificFile.json";
+    public static final Path DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH =
+            Paths.get("./src/test/tmp/de/ppi/deepsampler/junit5/PersistentSamplerTest_whenSamplerWithDefaultPathIsSaved.json");
+
+    public static final String SAVED_IN_SPECIFIC_PACKAGE = "my/specific/package";
+    public static final String SAVED_IN_SPECIFIC_FILE = "samplerCanBeSavedInSpecificFile.json";
+    public static final Path SPECIFIC_PATH = Paths.get("./src/test/tmp").resolve(SAVED_IN_SPECIFIC_PACKAGE).resolve(SAVED_IN_SPECIFIC_FILE);
+
+    public static final String LOAD_SPECIFIC_PACKAGE_FOR_FILE_SYSTEM = "../resources/de/ppi/deepsampler/junit5";
+    public static final String LOAD_SPECIFIC_FILE = "samplerCanBeLoadedFromSpecificFile.json";
 
 
     @Test
@@ -45,53 +51,37 @@ class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @SaveSamples
     @Order(1)
-    void samplerCanBeSaved() throws IOException {
+    void whenSamplerWithDefaultPathIsSaved() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.
-        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_SAVED_SAMPLER);
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH);
     }
 
     @Test
     @Order(2)
-    void samplerHasBeenSavedByPriorTestMethod() {
-        assertTrue(Files.exists(EXPECTED_SAVED_SAMPLER));
+    void thenSamplerMustBeFoundUnderRootPathWithDefaultPackageAndFileName() {
+        assertTrue(Files.exists(DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH));
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON)
+    @SaveSamples(packagePath = SAVED_IN_SPECIFIC_PACKAGE, fileName = SAVED_IN_SPECIFIC_FILE)
     @Order(3)
-    void samplerCanBeSavedInSpecificFile() throws IOException {
+    void whenSamplerIsSavedInSpecificPackageAndFile() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.
-        assertThatFileDoesNotExistOrOtherwiseDeleteIt(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(SPECIFIC_PATH);
     }
 
     @Test
     @Order(4)
-    void samplerHasBeenSavedInSpecificFileByPriorTestMethod() {
-        assertTrue(Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON)));
+    void thenSamplerMustBeFoundUnderRootPathWithSpecificPath() {
+        assertTrue(Files.exists(SPECIFIC_PATH));
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON)
-    @Order(5)
-    void samplerCanBeSavedInSpecificFileWithSpecificBuilder() throws IOException {
-        // Cleaning up a possibly existing file since we want to check that this file is
-        // created by the annotation SaveFile after this test method has returned.
-        assertThatFileDoesNotExistOrOtherwiseDeleteIt(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
-    }
-
-    @Test
-    @Order(6)
-    void samplerHasBeenSavedInSpecificWithSpecificBuilderFileByPriorTestMethod() {
-        assertTrue(Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON)));
-    }
-
-    @Test
-    @UseSamplerFixture(TestSampleFixture.class)
-    @LoadSamples(file = LOAD_SPECIFIC_FILE_JSON)
+    @LoadSamples(packagePath = LOAD_SPECIFIC_PACKAGE_FOR_FILE_SYSTEM, fileName = LOAD_SPECIFIC_FILE, source = FileSource.FILE_SYSTEM)
     @Order(7)
     void samplerCanBeLoadedFromSpecificFile() throws Throwable {
         assertTestBeanHasStubbedInt();
@@ -99,7 +89,7 @@ class PersistentSamplerTest {
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @LoadSamples(classPath = LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON)
+    @LoadSamples(fileName = LOAD_SPECIFIC_FILE, source = FileSource.CLASSPATH)
     @Order(8)
     void samplerCanBeLoadedFromSpecificClasspathResource() throws Throwable {
         assertTestBeanHasStubbedInt();

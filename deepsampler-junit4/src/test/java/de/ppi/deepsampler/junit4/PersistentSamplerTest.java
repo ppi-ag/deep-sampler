@@ -5,10 +5,7 @@
 
 package de.ppi.deepsampler.junit4;
 
-import de.ppi.deepsampler.junit.LoadSamples;
-import de.ppi.deepsampler.junit.SaveSamples;
-import de.ppi.deepsampler.junit.TestSampleFixture;
-import de.ppi.deepsampler.junit.UseSamplerFixture;
+import de.ppi.deepsampler.junit.*;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,17 +16,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.*;
 import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@UseSamplerFixture(GetSomeStringTestSampleFixture.class)
+@SampleRootPath("./src/test/tmp")
 public class PersistentSamplerTest {
 
-    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("de", "ppi", "deepsampler", "junit4", "PersistentSamplerTest_bSamplerCanBeSaved.json");
-    public static final String SAVED_IN_SPECIFIC_FILE_JSON = "de/ppi/deepsampler/junit4/samplerCanBeSavedInSpecificFile.json";
-    public static final String LOAD_SPECIFIC_FILE_JSON = "src/test/resources/de/ppi/deepsampler/junit4/fSamplerCanBeLoadedFromSpecificFile.json";
-    public static final String LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON = "fSamplerCanBeLoadedFromSpecificFile.json";
+    public static final Path DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH =
+            Paths.get("./src/test/tmp/de/ppi/deepsampler/junit4/PersistentSamplerTest_b1WhenSamplerWithDefaultPathIsSaved.json");
+
+    public static final String SAVED_IN_SPECIFIC_PACKAGE = "my/specific/package";
+    public static final String SAVED_IN_SPECIFIC_FILE = "samplerCanBeSavedInSpecificFile.json";
+    public static final Path SPECIFIC_PATH = Paths.get("./src/test/tmp").resolve(SAVED_IN_SPECIFIC_PACKAGE).resolve(SAVED_IN_SPECIFIC_FILE);
+
+    public static final String LOAD_SPECIFIC_PACKAGE_FOR_FILE_SYSTEM = "../resources/de/ppi/deepsampler/junit4";
+    public static final String LOAD_SPECIFIC_FILE = "fSamplerCanBeLoadedFromSpecificFile.json";
+
+    public static final String FILENAME_WITH_FOLDER = "my/folder/mySampler.json";
+    public static final Path EXPECTED_FILENAME_WITH_FOLDER = Paths.get("./src/test/tmp").resolve(FILENAME_WITH_FOLDER);
 
     @Rule
     public DeepSamplerRule deepSamplerRule = new DeepSamplerRule();
@@ -44,58 +50,65 @@ public class PersistentSamplerTest {
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
     @SaveSamples
-    public void bSamplerCanBeSaved() throws IOException {
-        // Cleaning up a possibly existing file since we want to check that this file is
-        // created by the annotation SaveFile after this test method has returned.
-        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_SAVED_SAMPLER);
+    public void b1WhenSamplerWithDefaultPathIsSaved() throws IOException {
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH);
     }
 
     @Test
-    public void cTheSavedSamplerExists() {
-        assertTrue(Files.exists(EXPECTED_SAVED_SAMPLER));
-    }
-
-    @Test
-    @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON)
-    public void dSamplerCanBeSavedInSpecificFile() throws IOException {
-        // Cleaning up a possibly existing file since we want to check that this file is
-        // created by the annotation SaveFile after this test method has returned.
-        assertThatFileDoesNotExistOrOtherwiseDeleteIt(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
-    }
-
-    @Test
-    public void eSamplerHasBeenSavedInSpecificFileByPriorTestMethod() {
-        assertTrue(Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON)));
+    public void b2ThenAFileUnderRootPathAndInDefaultFoldersMustExist() {
+        assertTrue("Die Datei: " + DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH + " wurde nicht gefunden.", Files.exists(DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH));
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON)
-    public void fSamplerCanBeSavedInSpecificFileWithSpecificBuilder() throws IOException {
-        // Cleaning up a possibly existing file since we want to check that this file is
-        // created by the annotation SaveFile after this test method has returned.
-        assertThatFileDoesNotExistOrOtherwiseDeleteIt(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON));
+    @SaveSamples(packagePath = SAVED_IN_SPECIFIC_PACKAGE, fileName = SAVED_IN_SPECIFIC_FILE)
+    public void c1WhenSamplerIsSavedInSpecificPackageAndFile() throws IOException {
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(SPECIFIC_PATH);
     }
 
     @Test
-    public void gSamplerHasBeenSavedInSpecificWithSpecificBuilderFileByPriorTestMethod() {
-        assertTrue(Files.exists(Paths.get(SAVED_IN_SPECIFIC_FILE_JSON)));
+    public void c2ThenSamplerMustBeFoundUnderRootPathAndSpecificFolder() {
+        assertTrue("Die Datei " + SPECIFIC_PATH + " konnte nicht gefunden werden.", Files.exists(SPECIFIC_PATH));
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @LoadSamples(file = LOAD_SPECIFIC_FILE_JSON)
-    public void fSamplerCanBeLoadedFromSpecificFile() throws Throwable {
+    @LoadSamples(packagePath = LOAD_SPECIFIC_PACKAGE_FOR_FILE_SYSTEM, fileName = LOAD_SPECIFIC_FILE, source = FileSource.FILE_SYSTEM)
+    public void dSamplerCanBeLoadedFromSpecificFileAndOverrideSampleRootPath() throws Throwable {
         assertTestBeanHasStubbedInt();
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @LoadSamples(classPath = LOAD_SPECIFIC_FILE_FROM_CLASSPATH_JSON)
-    public void gSamplerCanBeLoadedFromSpecificClasspathResource() throws Throwable {
+    @LoadSamples(fileName = LOAD_SPECIFIC_FILE, source = FileSource.CLASSPATH)
+    public void eSamplerCanBeLoadedFromSpecificClasspathResource() throws Throwable {
         assertTestBeanHasStubbedInt();
     }
 
+    @Test
+    @LoadSamples
+    public void fSampleFixtureFromClassLevelShouldBeUsed() throws Throwable {
+        assertTestBeanHasStubbedString();
+    }
 
+    /**
+     * Is it possible to save a file using a fileName that also includes a path, not only a pure filename?
+     * Even if packagePath is set to empty?
+     * @throws IOException
+     */
+    @Test
+    @UseSamplerFixture(TestSampleFixture.class)
+    @SaveSamples(packagePath = "", fileName = FILENAME_WITH_FOLDER)
+    public void g1WhenSamplerIsSavedWithFileNameIncludingAFolder() throws IOException {
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_FILENAME_WITH_FOLDER);
+    }
+
+    /**
+     * We expect, that the preceding test has written a file under the SampleRootPath using only the fileName.
+     * And the fileName should include folders.
+     */
+    @Test
+    public void g2ThenSamplerMustBeFoundUnderRootPathWithFolderFromFileName() {
+        assertTrue("Die Datei " + EXPECTED_FILENAME_WITH_FOLDER + " konnte nicht gefunden werden.", Files.exists(EXPECTED_FILENAME_WITH_FOLDER));
+    }
 }
