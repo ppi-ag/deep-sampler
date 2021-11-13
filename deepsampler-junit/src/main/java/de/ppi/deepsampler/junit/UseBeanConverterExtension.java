@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * DeepSampler's persistence runs through two steps. First Objects are converted to abstract {@link de.ppi.deepsampler.persistence.model.PersistentBean}s and second
- * these beams are passed to Jackson, the actual Json-Serializer.
+ * these beans are passed to Jackson, the actual Json-Serializer.
  * DeepSampler is able to convert most objects to {@link de.ppi.deepsampler.persistence.model.PersistentBean}s out of the box, but sometimes objects need a special
  * conversion. This can be done using custom  {@link BeanConverterExtension}s.
  *
