@@ -21,6 +21,7 @@ import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbed
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -60,7 +61,7 @@ class PersistentSamplerTest {
     @Test
     @Order(2)
     void thenSamplerMustBeFoundUnderRootPathWithDefaultPackageAndFileName() {
-        assertTrue(Files.exists(DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH));
+        assertThat(DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH).exists();
     }
 
     @Test
