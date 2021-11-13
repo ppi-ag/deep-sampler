@@ -121,21 +121,22 @@ public class JUnitPersistenceUtils {
     }
 
     /**
-     * Creates a {@link Path} based on the three path elements. If any of them is missing a default will be used. The
+     * Creates a {@link Path} based on the three path elements. If any of them is missing, a default value will be used. The
      * path is concatenated like this: [rootPath][packagePath][fileName].
      *
-     * @param rootPath    the annotatio {@link SampleRootPath} that is used to configure the root path. If it is not
+     * @param rootPath    the annotation {@link SampleRootPath} that is used to configure the root path. If it is not
      *                    supplied, the default ./ will be used.
      * @param packagePath A folder that is resolved under rootPath. If it is not supplied, the package of the class,
-     *                    that declares testMethod is used. packagePath must not be null. An empty String will be
-     *                    treated not-supplied. This is because the empty default value of
-     *                    {@link LoadSamples#packagePath()} cannot be null.
-     * @param fileName    A fileName thath is resoved under packagePath. If it is not supplied, the name of the testMethod,
-     *                    ant the name of the class the declares testMethod, is used. fileName must not be null. An empty String will be
-     *                    treated not-supplied. This is because the empty default value of
+     *                    that declares testMethod is used. packagePath must not be null. The String
+     *                    {@link AnnotationConstants#DEFAULT_VALUE_MUST_BE_CALCULATED} will be treated as not-supplied.
+     *                    This is because the empty default value of {@link LoadSamples#packagePath()} cannot be null.
+     * @param fileName    A fileName that is resolved under packagePath. If it is not supplied, the name of the testMethod,
+     *                    ant the name of the class the declares testMethod, is used. fileName must not be null. The
+     *                    String {@link AnnotationConstants#DEFAULT_VALUE_MUST_BE_CALCULATED} will be treated as
+     *                    not-supplied. This is because the empty default value of
      *                    {@link LoadSamples#fileName()} ()} cannot be null.
      * @param testMethod  The test method that is running the current test. It is used to provide default values.
-     * @return A path that is formatted to be used on the file system (in contrast to a path that is formatted to be used
+     * @return A path that is formatted to be used on the file system (in contrast to a path, that is formatted to be used
      * on the classpath, see {@link JUnitPersistenceUtils#createPathForClasspath(LoadSamples, Method)}.
      */
     static Path createPathForFilesystem(Optional<SampleRootPath> rootPath, String packagePath, String fileName, Method testMethod) {
@@ -164,13 +165,13 @@ public class JUnitPersistenceUtils {
      * [packagePath][fileName]
      * </p>
      * <p>
-     * Tf any of these two are missing, a default will be used.
+     * If any of these two are missing, a default value will be used.
      * </p>
      *
      * @param loadSamples provides the packagePath and the fileName. If packagePath is not supplied, the package of
      *                    testMethod is used. If fileName is not supplied, the name of testMethod and it's declaring
      *                    class is used.
-     * @param testMethod the method that runns the current test. It is used to provide default values for path elements.
+     * @param testMethod the method that runs the current test. It is used to provide default values for path elements.
      * @return a path that can be used to load a sample file from the classpath.
      */
     static String createPathForClasspath(LoadSamples loadSamples, Method testMethod) {
