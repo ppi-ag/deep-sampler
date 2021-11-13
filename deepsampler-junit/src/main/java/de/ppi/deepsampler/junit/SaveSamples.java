@@ -25,14 +25,8 @@ import java.lang.annotation.Target;
  * <p>
  * This annotation must be used in combination with @{@link UseSamplerFixture}.
  * <p>
- * The deserialization is done in two steps: First, Jackson is used to deserialize the JSON-File. If the file contains
- * {@link de.ppi.deepsampler.persistence.model.PersistentBean}s a second deserialization-step is run. The
- * {@link de.ppi.deepsampler.persistence.model.PersistentBean} is an abstract model of a java Bean without any type
- * information. The second step reconstructs the type information from the sampler by analysing the sampled api and
- * recreates the original object from the {@link de.ppi.deepsampler.persistence.model.PersistentBean}
- * <p>
- * It is possible to register customisations of the deserialization-process using the annotations
- * {@link UseJsonDeserializer} and @{@link UseBeanConverterExtension}.
+ * It is possible to register customisations of the serialization-process using the annotations
+ * {@link UseJsonSerializer} and @{@link UseBeanConverterExtension}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -29,11 +29,7 @@ import java.lang.annotation.Target;
  * <p>
  * This annotation must be used in combination with @{@link UseSamplerFixture}.
  * <p>
- * The serialisation is done in two steps: First, the object may be converted to an abstract {@link de.ppi.deepsampler.persistence.model.PersistentBean}. This is done
- * to omit type information in JSON-Files. Primitive types, arrays, {@link java.util.List}s and {@link java.util.Map}s are usually not converted to a
- * {@link de.ppi.deepsampler.persistence.model.PersistentBean}. They are passed to the second step unchanged. The second step is the JSON-serialisation by Jackson.
- * <p>
- * It is possible to register some extensions to customize the serialisation using the annotations @{@link UseJsonSerializer}
+ * It is possible to register some extensions to customize the deserialization using the annotations @{@link UseJsonDeserializer}
  * and @{@link UseBeanConverterExtension}.
  */
 @Retention(RetentionPolicy.RUNTIME)
