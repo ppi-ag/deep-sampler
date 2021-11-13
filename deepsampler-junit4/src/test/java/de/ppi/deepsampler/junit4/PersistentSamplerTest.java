@@ -1,11 +1,14 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.junit4;
 
-import de.ppi.deepsampler.junit.*;
+import de.ppi.deepsampler.junit.LoadSamples;
+import de.ppi.deepsampler.junit.SaveSamples;
+import de.ppi.deepsampler.junit.TestSampleFixture;
+import de.ppi.deepsampler.junit.UseSamplerFixture;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,7 +71,7 @@ public class PersistentSamplerTest {
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON, persistenceManagerProvider = TestPersistenceManagerProvider.class)
+    @SaveSamples(file = SAVED_IN_SPECIFIC_FILE_JSON)
     public void fSamplerCanBeSavedInSpecificFileWithSpecificBuilder() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.

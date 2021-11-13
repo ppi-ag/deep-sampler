@@ -13,23 +13,24 @@ import java.io.IOException;
  *
  */
 public class PlainByteArrayDeserializer extends JsonDeserializer<byte[]> {
+
     @Override
     public byte[] deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 
-        ObjectCodec oc = p.getCodec();
-        JsonNode node = oc.readTree(p);
+        ObjectCodec objectCodec = p.getCodec();
+        JsonNode node = objectCodec.readTree(p);
 
         if (node.isArray() && node.isEmpty()) {
             return null;
         }
 
-        byte[] returnValue = new byte[node.size()];
+        byte[] deserializedBytes = new byte[node.size()];
         int i =0;
         for (JsonNode value : node) {
-            returnValue[i]= (byte) value.asInt();
+            deserializedBytes[i]= (byte) value.asInt();
             i++;
         }
 
-        return returnValue;
+        return deserializedBytes;
     }
 }

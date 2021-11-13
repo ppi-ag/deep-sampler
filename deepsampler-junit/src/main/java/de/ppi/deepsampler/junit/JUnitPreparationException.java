@@ -23,4 +23,5 @@ public class JUnitPreparationException extends BaseException {
         super(message, cause, args);
     }
 
+
 }

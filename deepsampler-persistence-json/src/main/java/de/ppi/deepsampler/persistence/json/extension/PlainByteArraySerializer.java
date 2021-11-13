@@ -25,17 +25,27 @@ public class PlainByteArraySerializer extends StdSerializer<byte[]> {
     @Override
     public void serialize(byte[] value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeStartArray();
-        for (byte b: value) {
-            gen.writeNumber(b );
+        for (byte b : value) {
+            gen.writeNumber(b);
         }
         gen.writeEndArray();
     }
 
+    /**
+     * Adds serialization-capabilities for polymorphic types.
+     *
+     * @param value
+     * @param gen
+     * @param serializers
+     * @param typeSer
+     * @throws IOException
+     * @see <a href=""https://stackoverflow.com/questions/26672297/how-to-trigger-calls-to-serializewithtype-of-a-class-implementing-jsonseriali">Stackoverflow</a>
+     */
     @Override
     public void serializeWithType(byte[] value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
         WritableTypeId typeIdDef = typeSer.writeTypePrefix(gen,
                 typeSer.typeId(value, JsonToken.VALUE_EMBEDDED_OBJECT));
-        serialize(value,gen,serializers);
+        serialize(value, gen, serializers);
         typeSer.writeTypeSuffix(gen, typeIdDef);
     }
 }
