@@ -62,7 +62,7 @@ public class PersistentSampleManager {
      * End of chain method: call {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
     public void record() {
-        for (final SourceManager sourceManager: sourceManagerList) {
+        for (final SourceManager sourceManager : sourceManagerList) {
             sourceManager.save(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
         }
     }
@@ -72,7 +72,7 @@ public class PersistentSampleManager {
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {
-        for (final SourceManager sourceManager: sourceManagerList) {
+        for (final SourceManager sourceManager : sourceManagerList) {
             final PersistentModel persistentModel = sourceManager.load();
 
             mergeSamplesFromPersistenceIntoSampleRepository(persistentModel);
@@ -88,7 +88,7 @@ public class PersistentSampleManager {
      * This method merges the samples from the persistence (e.g. JSON-File) into manually defined Samplers and Samples. The order of the
      * Samplers is defined by the Samplers in the test class or the compound. Samples from the file will be inserted in the list of Samples
      * at the position where the matching samplers have been defined.
-     *
+     * <p>
      * E.G. Someone could now first define a matcher that matches only on a particular parameter of the value
      * "Picard". The second matcher could then by anyString(). The first Sample would then be used only if the correct parameter is supplied and in all
      * other cases the second sampler would be used.
@@ -142,7 +142,7 @@ public class PersistentSampleManager {
         List<SampleDefinition> usedPersistentCalls = new ArrayList<>();
         List<SampleDefinition> unusedPersistentCalls = new ArrayList<>();
 
-        for(PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
+        for (PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
 
             if (persistentSampleMethod.getSampleMethodId().equals(sampler.getSampleId())) {
                 List<PersistentMethodCall> calls = persistentSamples.getSampleMethodToSampleMap().get(persistentSampleMethod).getAllCalls();
@@ -178,15 +178,16 @@ public class PersistentSampleManager {
         final Object returnValueEnvelope = call.getPersistentReturnValue();
         final Class<?> returnClass;
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
-        if(returnValueEnvelope instanceof PolymorphicPersistentBean){
+        if (returnValueEnvelope instanceof PolymorphicPersistentBean) {
             try {
-               returnClass= Class.forName(((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType());
+                returnClass = Class.forName(((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType());
             } catch (ClassNotFoundException e) {
-               throw new PersistenceException(
-                       "The Polymorphic Class "+ ((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType() +" was not found. This occures if a polymorphic class was recorded but is not in the classpath (anymore?)", e,returnValueEnvelope);
+                throw new PersistenceException(
+                        "The Polymorphic Class %s was not found. This occurs if a polymorphic class was recorded but is not in the classpath (anymore?)", e,
+                        ((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType());
             }
         } else {
-             returnClass= sampledMethod.getMethod().getReturnType();
+            returnClass = sampledMethod.getMethod().getReturnType();
         }
         final Type[] parameterTypes = sampledMethod.getMethod().getGenericParameterTypes();
         final Type genericReturnType = sampledMethod.getMethod().getGenericReturnType();
@@ -216,7 +217,7 @@ public class PersistentSampleManager {
                     "not match the number of persistent parameters (%s:%s)!", id, parameterTypes, parameterPersistentBeans);
         }
         for (int i = 0; i < parameterPersistentBeans.size(); ++i) {
-            final ParameterizedType parameterType = parameterTypes[i] instanceof  ParameterizedType ? (ParameterizedType) parameterTypes[i] : null;
+            final ParameterizedType parameterType = parameterTypes[i] instanceof ParameterizedType ? (ParameterizedType) parameterTypes[i] : null;
             final Class<?> parameterClass = ReflectionTools.getClass(parameterTypes[i]);
             final Object persistentBean = parameterPersistentBeans.get(i);
 
@@ -224,7 +225,6 @@ public class PersistentSampleManager {
         }
         return params;
     }
-
 
 
     private Object unwrapValue(final Class<?> targetClass, final ParameterizedType type, final Object persistentBean) {
@@ -236,7 +236,7 @@ public class PersistentSampleManager {
         List<ParameterMatcher<?>> resultingParameterMatcher = new ArrayList<>();
         for (int i = 0; i < params.size(); ++i) {
             Object param = params.get(i);
-            ParameterMatcher<?> parameterMatcher  = parameterMatchers.get(i);
+            ParameterMatcher<?> parameterMatcher = parameterMatchers.get(i);
 
             if (parameterMatcher instanceof ComboMatcher) {
                 resultingParameterMatcher.add(s -> ((ComboMatcher<Object>) parameterMatcher).getPersistentMatcher().matches(s, param));

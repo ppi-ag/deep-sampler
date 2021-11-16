@@ -40,7 +40,6 @@ public abstract class SamplerAspectTest {
     public static final int INT_VALUE = 42;
     private static final TestBean TEST_BEAN_A = new TestBean();
     private static final TestBean TEST_BEAN_B = new TestBean();
-    private static final TestBean TEST_BEAN_C = new TestBean();
     public static final String MY_ECHO_PARAMS = "MY ECHO PARAMS";
     public static final String NO_RETURN_VALUE_SAMPLE_ID = "NoReturnValue";
 
@@ -664,44 +663,6 @@ public abstract class SamplerAspectTest {
         // THEN
         assertEquals(VALUE_B, resultEcho);
         assertNull(localDateTime);
-    }
-
-
-
-    @Test
-    public void polymorphicSamplesCanBeRecordedAndLoaded() throws IOException {
-        // Ensure, that no Samples from previous tests exists...
-        Sampler.clear();
-
-        // GIVEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.getAnimal());
-
-        // make the method call that is recorded
-        getTestService().getAnimal();
-
-        // save the recorded sample to file...
-        final String pathToFile = "./record/polymorphicSamplesCanBeRecordedAndLoaded.json";
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-
-        // Reset SampleRepository to ensure that only deserialized samples will be used in the next steps...
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-
-        // deserialize the sample...
-        Sample.of(testServiceSampler.getAnimal());
-        source.load();
-
-        // THEN
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        assertNotNull(getTestService().getAnimal());
-        // Although only the interface was declared in the sampled method, we expect to see the concrete return type Dog:
-        assertTrue(getTestService().getAnimal() instanceof Dog);
-        assertEquals("Porthos", getTestService().getAnimal().getName());
-
-        Files.delete(Paths.get(pathToFile));
     }
 
 }

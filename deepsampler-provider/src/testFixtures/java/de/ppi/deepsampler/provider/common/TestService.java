@@ -207,8 +207,34 @@ public class TestService {
 
     }
 
-
     public Animal getAnimal() {
         return new Dog("Porthos");
+    }
+
+    public Dog getBeagle() {
+        return new Beagle("Porthos");
+    }
+
+    public AbstractDog getLabrador() {
+        return new Labrador("BlackDog");
+    }
+
+    public AbstractDog getInternalDog() {
+        return new AbstractDog.InternalDog("InnerClassDog");
+    }
+
+    public Animal getCatWithMouse() {
+        Mouse mouse = new Mouse("Jerry");
+        HunterCat cat = new HunterCat("Tom");
+        cat.setFood(mouse);
+
+        return cat;
+    }
+
+    public Dog getGenericBeagle() {
+        GreedyBeagle<Cheese> porthos = new GreedyBeagle<>("GreedyPorthos");
+        porthos.setFood(new Cheese("cheddar"));
+
+        return porthos;
     }
 }
