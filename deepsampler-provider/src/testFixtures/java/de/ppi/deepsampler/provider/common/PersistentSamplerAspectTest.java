@@ -539,26 +539,14 @@ public abstract class PersistentSamplerAspectTest {
         assertEquals("CBD", getTestService().echoParameter("ABC"));
     }
 
-    private void clearSampleRepositoryWithAssertion() {
-        assertFalse(SampleRepository.getInstance().isEmpty());
-        Sampler.clear();
-        assertTrue(SampleRepository.getInstance().isEmpty());
-    }
-
-    private PersistentSampleManager save(Path pathToFile) {
-        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
-        return source;
-    }
-
     @Test
     public void interfaceImplementationCanBeRecordedAndLoaded(Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getAnimal());
+        PersistentSample.of(testServiceSampler.getConcreteDogObject());
 
         // make the method call that is recorded
-        getTestService().getAnimal();
+        getTestService().getConcreteDogObject();
 
         // save the recorded sample to file...
         final PersistentSampleManager source = save(tempFile);
@@ -567,25 +555,29 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // deserialize the sample...
-        PersistentSample.of(testServiceSampler.getAnimal());
+        PersistentSample.of(testServiceSampler.getConcreteDogObject());
         source.load();
 
-        // THEN
         assertFalse(SampleRepository.getInstance().isEmpty());
-        assertNotNull(getTestService().getAnimal());
-        // Although only the interface was declared in the sampled method, we expect to see the concrete return type Dog:
-        assertThat(getTestService().getAnimal()).isInstanceOf(Dog.class);
-        assertEquals("Porthos", getTestService().getAnimal().getName());
+
+        // WHEN
+        Animal actualDog = getTestService().getConcreteDogObject();
+
+        // THEN
+        assertNotNull(actualDog);
+        // Although only the interface Animal was declared in the sampled method, we expect to see the concrete return type Dog:
+        assertThat(actualDog).isInstanceOf(Dog.class);
+        assertEquals("Porthos", actualDog.getName());
     }
 
     @Test
     public void subclassFromAConcreteClassCanBeRecordedAndLoaded(Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getBeagle());
+        PersistentSample.of(testServiceSampler.getSubClassOfDog());
 
         // make the method call that is recorded
-        getTestService().getBeagle();
+        getTestService().getSubClassOfDog();
 
         // save the recorded sample to file...
         final PersistentSampleManager source = save(tempFile);
@@ -594,12 +586,12 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // deserialize the sample...
-        PersistentSample.of(testServiceSampler.getBeagle());
+        PersistentSample.of(testServiceSampler.getSubClassOfDog());
         source.load();
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        Dog actualBeagle = getTestService().getBeagle();
+        Dog actualBeagle = getTestService().getSubClassOfDog();
 
         // THEN
 
@@ -612,10 +604,10 @@ public abstract class PersistentSamplerAspectTest {
     public void subclassFromAnAbstractClassCanBeRecordedAndLoaded(Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getLabrador());
+        PersistentSample.of(testServiceSampler.getSubClassOfAbstractDog());
 
         // make the method call that is recorded
-        getTestService().getLabrador();
+        getTestService().getSubClassOfAbstractDog();
 
         // save the recorded sample to file...
         final PersistentSampleManager source = save(tempFile);
@@ -624,12 +616,12 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // deserialize the sample...
-        PersistentSample.of(testServiceSampler.getLabrador());
+        PersistentSample.of(testServiceSampler.getSubClassOfAbstractDog());
         source.load();
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        AbstractDog actualLabrador = getTestService().getLabrador();
+        AbstractDog actualLabrador = getTestService().getSubClassOfAbstractDog();
 
         // THEN
 
@@ -643,10 +635,10 @@ public abstract class PersistentSamplerAspectTest {
     public void polymorphicInnerClassCanBeRecordedAndLoaded(Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getInternalDog());
+        PersistentSample.of(testServiceSampler.getInternalClassThatExtendsAbstractDog());
 
         // make the method call that is recorded
-        getTestService().getInternalDog();
+        getTestService().getInternalClassThatExtendsAbstractDog();
 
         // save the recorded sample to file...
         final PersistentSampleManager source = save(tempFile);
@@ -655,12 +647,12 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // deserialize the sample...
-        PersistentSample.of(testServiceSampler.getInternalDog());
+        PersistentSample.of(testServiceSampler.getInternalClassThatExtendsAbstractDog());
         source.load();
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        AbstractDog actualInternalDog = getTestService().getInternalDog();
+        AbstractDog actualInternalDog = getTestService().getInternalClassThatExtendsAbstractDog();
 
         // THEN
 
@@ -691,16 +683,16 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        Animal actualAnimal = getTestService().getCatWithMouse();
+        Animal actualCatWithMouse = getTestService().getCatWithMouse();
 
         // THEN
 
         // Although only the abstract parent type AbstractDog was declared in the sampled method, we expect to see the
         // concrete inner class AbstractDog.InternalDog:
-        assertThat(actualAnimal).isInstanceOf(HunterCat.class);
-        assertEquals("Tom", actualAnimal.getName());
+        assertThat(actualCatWithMouse).isInstanceOf(HunterCat.class);
+        assertEquals("Tom", actualCatWithMouse.getName());
 
-        HunterCat actualHunterCat = (HunterCat)  actualAnimal;
+        HunterCat actualHunterCat = (HunterCat)  actualCatWithMouse;
 
         assertThat(actualHunterCat.getFood()).isInstanceOf(Mouse.class);
         assertThat(actualHunterCat.getFood().getName()).isEqualTo("Jerry");
@@ -710,10 +702,10 @@ public abstract class PersistentSamplerAspectTest {
     public void genericSubClassCanBeRecordedAndLoaded(Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getGenericBeagle());
+        PersistentSample.of(testServiceSampler.getGenericSubClass());
 
         // make the method call that is recorded
-        getTestService().getGenericBeagle();
+        getTestService().getGenericSubClass();
 
         // save the recorded sample to file...
         final PersistentSampleManager source = save(tempFile);
@@ -722,12 +714,12 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // deserialize the sample...
-        PersistentSample.of(testServiceSampler.getGenericBeagle());
+        PersistentSample.of(testServiceSampler.getGenericSubClass());
         source.load();
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        Dog expectedGenericType = getTestService().getGenericBeagle();
+        Dog expectedGenericType = getTestService().getGenericSubClass();
 
         // THEN
 
@@ -735,15 +727,18 @@ public abstract class PersistentSamplerAspectTest {
         // concrete inner class AbstractDog.InternalDog:
         assertThat(expectedGenericType).isInstanceOf(GreedyBeagle.class);
         assertEquals("GreedyPorthos", expectedGenericType.getName());
-        assertThat( ((GreedyBeagle) expectedGenericType).getFood()).isInstanceOf(Cheese.class);
-        assertThat(((Cheese) ((GreedyBeagle) expectedGenericType).getFood()).getName()).isEqualTo("Cheddar");
+
+        GreedyBeagle<?> actualGreedyBeagle = (GreedyBeagle<?>) expectedGenericType;
+
+        assertThat( actualGreedyBeagle.getFood()).isInstanceOf(Cheese.class);
+        assertThat( ((Cheese) actualGreedyBeagle.getFood()).getName()).isEqualTo("Cheddar");
     }
 
     @Test
     public void polymorphicSampleWithMissingConcreteClassThrowsError() {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getAnimal());
+        PersistentSample.of(testServiceSampler.getConcreteDogObject());
 
         final String samplerFile = "/polymorphicSampleWithMissingConcreteClassThrowsError.json";
         JsonSourceManager jsonSourceManager = JsonSourceManager.builder().buildWithClassPathResource(samplerFile, this.getClass());
@@ -755,6 +750,18 @@ public abstract class PersistentSamplerAspectTest {
                 .isInstanceOf(PersistenceException.class)
                 .hasMessage("The Polymorphic Class de.ppi.deepsampler.provider.common.ClassDoesNotExist was not found. " +
                         "This occurs if a polymorphic class was recorded but is not in the classpath (anymore?)");
+    }
+
+    private void clearSampleRepositoryWithAssertion() {
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        Sampler.clear();
+        assertTrue(SampleRepository.getInstance().isEmpty());
+    }
+
+    private PersistentSampleManager save(Path pathToFile) {
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
+        source.record();
+        return source;
     }
 
 }

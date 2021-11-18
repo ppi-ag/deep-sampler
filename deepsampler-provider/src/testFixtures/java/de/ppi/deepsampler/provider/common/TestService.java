@@ -207,19 +207,19 @@ public class TestService {
 
     }
 
-    public Animal getAnimal() {
+    public Animal getConcreteDogObject() {
         return new Dog("Porthos");
     }
 
-    public Dog getBeagle() {
+    public Dog getSubClassOfDog() {
         return new Beagle("Porthos");
     }
 
-    public AbstractDog getLabrador() {
+    public AbstractDog getSubClassOfAbstractDog() {
         return new Labrador("BlackDog");
     }
 
-    public AbstractDog getInternalDog() {
+    public AbstractDog getInternalClassThatExtendsAbstractDog() {
         return new AbstractDog.InternalDog("InnerClassDog");
     }
 
@@ -231,7 +231,7 @@ public class TestService {
         return cat;
     }
 
-    public Dog getGenericBeagle() {
+    public Dog getGenericSubClass() {
         GreedyBeagle<Cheese> porthos = new GreedyBeagle<>("GreedyPorthos");
         porthos.setFood(new Cheese("cheddar"));
 

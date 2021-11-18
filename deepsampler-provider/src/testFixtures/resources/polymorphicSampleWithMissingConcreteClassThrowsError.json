@@ -1,7 +1,7 @@
 {
   "id" : "e148c4c4-4336-4fea-baf9-1a634d73b52a",
   "sampleMethodToSampleMap" : {
-    "public de.ppi.deepsampler.provider.common.Animal de.ppi.deepsampler.provider.common.TestService.getAnimal()" : {
+    "public de.ppi.deepsampler.provider.common.Animal de.ppi.deepsampler.provider.common.TestService.getConcreteDogObject()" : {
       "callMap" : [ {
         "parameter" : {
           "args" : [ ]
