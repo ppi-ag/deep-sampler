@@ -233,7 +233,7 @@ public class TestService {
 
     public Dog getGenericSubClass() {
         GreedyBeagle<Cheese> porthos = new GreedyBeagle<>("GreedyPorthos");
-        porthos.setFood(new Cheese("cheddar"));
+        porthos.setFood(new Cheese("Cheddar"));
 
         return porthos;
     }

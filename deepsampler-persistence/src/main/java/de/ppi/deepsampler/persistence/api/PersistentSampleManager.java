@@ -178,17 +178,13 @@ public class PersistentSampleManager {
         final Object returnValueEnvelope = call.getPersistentReturnValue();
         final Class<?> returnClass;
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
+
         if (returnValueEnvelope instanceof PolymorphicPersistentBean) {
-            try {
-                returnClass = Class.forName(((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType());
-            } catch (ClassNotFoundException e) {
-                throw new PersistenceException(
-                        "The Polymorphic Class %s was not found. This occurs if a polymorphic class was recorded but is not in the classpath (anymore?)", e,
-                        ((PolymorphicPersistentBean) returnValueEnvelope).getPolymorphicBeanType());
-            }
+            returnClass = ReflectionTools.getOriginalClassFromPolymorphicPersistentBean((PolymorphicPersistentBean) returnValueEnvelope);
         } else {
             returnClass = sampledMethod.getMethod().getReturnType();
         }
+
         final Type[] parameterTypes = sampledMethod.getMethod().getGenericParameterTypes();
         final Type genericReturnType = sampledMethod.getMethod().getGenericReturnType();
         final ParameterizedType parameterizedReturnType = genericReturnType instanceof ParameterizedType ? (ParameterizedType) genericReturnType : null;

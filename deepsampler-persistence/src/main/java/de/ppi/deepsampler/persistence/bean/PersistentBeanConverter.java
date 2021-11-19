@@ -20,11 +20,10 @@ import java.util.stream.Collectors;
  * DeepSampler saves Beans by converting them in an abstract model that enables DeepSampler to omit type information in persistent files.
  * This approach makes persistent beans less vulnerable to refactorings. E.g. it is not necessary to rename classes in persistent Sample-files
  * if classes are renamed during refactorings.
- *
+ * <p>
  * The concrete serialization / Deserialization is done by an underlying persistence api. PersistentBeanConverter is only responsible to
  * to create an intermediate data structures for cases where the persistence api is not capable to serialize / deserialize the original
  * data on its own.
- *
  */
 public class PersistentBeanConverter {
 
@@ -38,11 +37,11 @@ public class PersistentBeanConverter {
     /**
      * Reverts an abstract model from the persistence to the original bean.
      *
-     * @param persistentBean an object that has been deserialized from a persistence api (e.g. some JSON-API). This object
-     *                       might already be the original bean it the persistence api was able to deserialize it. Otherwise
-     *                       it is the abstract model represented by {@link PersistentBean}
+     * @param persistentBean    an object that has been deserialized from a persistence api (e.g. some JSON-API). This object
+     *                          might already be the original bean it the persistence api was able to deserialize it. Otherwise
+     *                          it is the abstract model represented by {@link PersistentBean}
      * @param parameterizedType The Type of the original bean
-     * @param <T> the original bean.
+     * @param <T>               the original bean.
      * @return the original deserialized bean.
      */
     @SuppressWarnings("unchecked")
@@ -74,8 +73,9 @@ public class PersistentBeanConverter {
 
     /**
      * Converts an original bean to the abstract model (most likely {@link PersistentBean} that is used to save the original bean to e.g. JSON.
+     *
      * @param originalBean The original Bean that is supposed to be persisted.
-     * @param <T> The type of the persistent bean.
+     * @param <T>          The type of the persistent bean.
      * @return The object that will be sent to the underlying persistence api. This might be a {@link PersistentBean} or the original bean if
      * the persistence api is expected to be able to serialize the original bean directly.
      */
@@ -96,14 +96,13 @@ public class PersistentBeanConverter {
         }
 
 
-
         final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass(), parameterizedReturnType);
         if (!applicableExtensions.isEmpty()) {
             // Only use the first one!
             return (T) applicableExtensions.get(0).convert(originalBean, parameterizedReturnType, this);
         }
 
-        if(!originalBean.getClass().equals(type)){
+        if (!originalBean.getClass().equals(type)) {
             return (T) convertToPolymorphicPersistentBean(originalBean.getClass().getTypeName(), originalBean);
         }
 
@@ -129,20 +128,28 @@ public class PersistentBeanConverter {
         return (T[]) originalBeansArray;
     }
 
-    private <T> T revertPersistentBean(final PersistentBean value, final Class<T> originalBeanClass) {
+    @SuppressWarnings("unchecked")
+    private <T> T revertPersistentBean(final PersistentBean value, final Class<T> declaredOriginalBeanClass) {
+        final Class<T> valueType;
+        if (value instanceof PolymorphicPersistentBean) {
+            valueType = (Class<T>) ReflectionTools.getOriginalClassFromPolymorphicPersistentBean((PolymorphicPersistentBean) value);
+        } else {
+            valueType = declaredOriginalBeanClass;
+        }
+
         final T instance;
-        final Map<Field, String> fields = getAllFields(originalBeanClass);
+        final Map<Field, String> fields = getAllFields(valueType);
 
         if (hasFinalFields(fields)) {
-            instance = instantiateUsingMatchingConstructor(originalBeanClass, value, fields);
+            instance = instantiateUsingMatchingConstructor(valueType, value, fields);
         } else {
-            instance = instantiate(originalBeanClass);
+            instance = instantiate(valueType);
 
             for (final Map.Entry<Field, String> entry : fields.entrySet()) {
                 final Field field = entry.getKey();
                 final String key = entry.getValue();
 
-                transferFromBean(value, instance, field, key);
+                transferFieldFromBean(value, instance, field, key);
             }
         }
         return instance;
@@ -195,10 +202,10 @@ public class PersistentBeanConverter {
                 .anyMatch(entry -> Modifier.isFinal(entry.getKey().getModifiers()));
     }
 
-    private <T> void transferFromBean(final PersistentBean persistentBean, final T instance, final Field field, final String key) {
-        Object lookedUpValueInBean = persistentBean.getValue(key);
+    private <T> void transferFieldFromBean(final PersistentBean persistentBean, final T instance, final Field field, final String fieldKeyInPersistentBean) {
+        Object lookedUpValueInBean = persistentBean.getValue(fieldKeyInPersistentBean);
         if (lookedUpValueInBean != null) {
-            if (lookedUpValueInBean instanceof DefaultPersistentBean) {
+            if (lookedUpValueInBean instanceof PersistentBean) {
                 lookedUpValueInBean = revertPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
             } else if (lookedUpValueInBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(lookedUpValueInBean.getClass().getComponentType())) {
                 lookedUpValueInBean = revertPersistentBeanArray(lookedUpValueInBean, field.getType());
@@ -212,7 +219,6 @@ public class PersistentBeanConverter {
         final ObjectInstantiator<T> instantiatorOf = objenesis.getInstantiatorOf(cls);
         return instantiatorOf.newInstance();
     }
-
 
 
     private Object convertObjectArray(final Object[] objects) {
@@ -285,7 +291,6 @@ public class PersistentBeanConverter {
     }
 
 
-
     private Map<Field, String> getAllFields(final Class<?> cls) {
         final Map<Field, String> fields = new LinkedHashMap<>();
         Class<?> currentCls = cls;
@@ -303,7 +308,6 @@ public class PersistentBeanConverter {
     }
 
 
-
     private List<BeanConverterExtension> findApplicableExtensions(final Class<?> beanClass, final ParameterizedType parameterizedType) {
         return beanConverterExtensions.stream().filter(ext -> ext.isProcessable(beanClass, parameterizedType)).collect(Collectors.toList());
     }
@@ -312,11 +316,8 @@ public class PersistentBeanConverter {
 
         return obj == null || ReflectionTools.isPrimitiveOrWrapper(obj.getClass()) || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
                 || findApplicableExtensions(obj.getClass(), parameterizedType).stream()
-                    .anyMatch(ext -> ext.skip(obj.getClass(), parameterizedType));
+                .anyMatch(ext -> ext.skip(obj.getClass(), parameterizedType));
     }
-
-
-
 
 
 }

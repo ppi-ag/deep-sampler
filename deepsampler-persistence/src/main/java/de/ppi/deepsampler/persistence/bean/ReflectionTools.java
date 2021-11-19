@@ -219,10 +219,10 @@ public class ReflectionTools {
     /**
      * Converts the String source into a primitive wrapper object using the supplied wrapperType.
      *
-     * @param source The String that should be converted to a wrapperType. The String must be formatted in a way that complies with
-     *               the parser of the desired wrapper type.
+     * @param source      The String that should be converted to a wrapperType. The String must be formatted in a way that complies with
+     *                    the parser of the desired wrapper type.
      * @param wrapperType A wrapper type. This must be a Class of any Wrapper type otherwise an Exception will be thrown.
-     * @param <T> The target type.
+     * @param <T>         The target type.
      * @return returns an instance of wrapperType containing the parsed value of source.
      */
     public static <T> T parseString(String source, Class<T> wrapperType) {
@@ -238,6 +238,24 @@ public class ReflectionTools {
             }
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new PersistenceException("We were unable to parse %s from %s", e, wrapperType.getTypeName(), source);
+        }
+    }
+
+    /**
+     * Retrieves the original type from polymorphicPersistentBean and tries to instantiate a {@link Class} for the type.
+     * If the {@link Class} cannot be found a {@link PersistenceException} is thrown.
+     *
+     * @param polymorphicPersistentBean The {@link PolymorphicPersistentBean} which holds the wanted type.
+     * @return the class of the original bean that is described by polymorphicPersistentBean.
+     */
+    public static Class<?> getOriginalClassFromPolymorphicPersistentBean(PolymorphicPersistentBean polymorphicPersistentBean) {
+        try {
+            return Class.forName(polymorphicPersistentBean.getPolymorphicBeanType());
+        } catch (ClassNotFoundException e) {
+            throw new PersistenceException(
+                    "The Polymorphic Class %s was not found. This occurs if a polymorphic class was recorded but is not in the classpath (anymore?)",
+                    e,
+                    polymorphicPersistentBean.getPolymorphicBeanType());
         }
     }
 
