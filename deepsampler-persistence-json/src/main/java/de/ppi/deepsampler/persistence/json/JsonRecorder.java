@@ -11,7 +11,6 @@ import de.ppi.deepsampler.core.model.MethodCall;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleExecutionInformation;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
-import de.ppi.deepsampler.persistence.bean.ext.BeanConversion;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentActualSample;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentParameter;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
