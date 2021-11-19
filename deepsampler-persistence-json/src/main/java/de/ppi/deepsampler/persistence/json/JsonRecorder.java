@@ -89,18 +89,7 @@ public class JsonRecorder extends JsonOperator {
         final JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
         final Type declaredReturnType = sample.getSampledMethod().getMethod().getGenericReturnType();
-
-        // public Animal getAnimal()
-        //
-
-
-        // Realen Typen Dog
-        // Declared Type Animal
-        // Generic null
-
-        final ParameterizedType parameterizedReturnType = declaredReturnType instanceof ParameterizedType ? (ParameterizedType) declaredReturnType : null;
         final Type[] argumentTypes = sample.getSampledMethod().getMethod().getGenericParameterTypes();
-
 
         for (final MethodCall call : calls) {
             final List<Object> argsAsPersistentBeans = convertArguments(call.getArgs(), argumentTypes, persistentSamplerContext);
