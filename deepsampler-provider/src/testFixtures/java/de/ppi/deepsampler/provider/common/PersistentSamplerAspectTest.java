@@ -725,13 +725,13 @@ public abstract class PersistentSamplerAspectTest {
 
         // Although only the abstract parent type AbstractDog was declared in the sampled method, we expect to see the
         // concrete inner class AbstractDog.InternalDog:
-        assertThat(expectedGenericType).isInstanceOf(GreedyBeagle.class);
+        assertThat(expectedGenericType).isInstanceOf(GenericBeagle.class);
         assertEquals("GreedyPorthos", expectedGenericType.getName());
 
-        GreedyBeagle<?> actualGreedyBeagle = (GreedyBeagle<?>) expectedGenericType;
+        GenericBeagle<?> actualGenericBeagle = (GenericBeagle<?>) expectedGenericType;
 
-        assertThat( actualGreedyBeagle.getFood()).isInstanceOf(Cheese.class);
-        assertThat( ((Cheese) actualGreedyBeagle.getFood()).getName()).isEqualTo("Cheddar");
+        assertThat( actualGenericBeagle.getFood()).isInstanceOf(Cheese.class);
+        assertThat( ((Cheese) actualGenericBeagle.getFood()).getName()).isEqualTo("Cheddar");
     }
 
     @Test

@@ -232,7 +232,7 @@ public class TestService {
     }
 
     public Dog getGenericSubClass() {
-        GreedyBeagle<Cheese> porthos = new GreedyBeagle<>("GreedyPorthos");
+        GenericBeagle<Cheese> porthos = new GenericBeagle<>("GreedyPorthos");
         porthos.setFood(new Cheese("Cheddar"));
 
         return porthos;

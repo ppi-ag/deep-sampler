@@ -5,11 +5,11 @@
 
 package de.ppi.deepsampler.provider.common;
 
-public class GreedyBeagle<T> extends Dog {
+public class GenericBeagle<T> extends Dog {
 
     private T food;
 
-    public GreedyBeagle(String name) {
+    public GenericBeagle(String name) {
         super(name);
     }
 
