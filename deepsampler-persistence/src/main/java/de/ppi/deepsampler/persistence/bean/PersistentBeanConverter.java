@@ -102,11 +102,12 @@ public class PersistentBeanConverter {
             return (T) applicableExtensions.get(0).convert(originalBean, parameterizedReturnType, this);
         }
 
-        if (!originalBean.getClass().equals(type)) {
-            return (T) convertToPolymorphicPersistentBean(originalBean.getClass().getTypeName(), originalBean);
+        if (originalBean.getClass().equals(type)
+                || (parameterizedReturnType != null && originalBean.getClass().equals(parameterizedReturnType.getRawType()))) {
+            return (T) convertToPersistentBean(originalBean);
         }
 
-        return (T) convertToPersistentBean(originalBean);
+        return (T) convertToPolymorphicPersistentBean(originalBean.getClass().getTypeName(), originalBean);
     }
 
     @SuppressWarnings("unchecked")

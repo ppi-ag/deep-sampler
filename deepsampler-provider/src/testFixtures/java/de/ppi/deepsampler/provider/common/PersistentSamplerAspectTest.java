@@ -62,7 +62,6 @@ public abstract class PersistentSamplerAspectTest {
     }
 
 
-
     @Test
     public void samplesCanBeRecordedAndLoaded(Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
@@ -87,7 +86,6 @@ public abstract class PersistentSamplerAspectTest {
     }
 
 
-
     @Test
     public void voidMethodsCanBeRecordedAndLoaded(Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
@@ -108,6 +106,29 @@ public abstract class PersistentSamplerAspectTest {
 
         assertFalse(SampleRepository.getInstance().isEmpty());
         Sample.verifyCallQuantity(TestService.class, ONCE).noReturnValue(2);
+    }
+
+    @Test
+    public void nullSampleCanBeRecordedAndLoaded(Path tempFile) {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getNull());
+
+        getTestService().getNull();
+
+        final PersistentSampleManager source = save(tempFile);
+
+        clearSampleRepositoryWithAssertion();
+
+        // WHEN
+        PersistentSample.of(testServiceSampler.getNull());
+        source.load();
+        assertFalse(SampleRepository.getInstance().isEmpty());
+
+        String actualValue = getTestService().getNull();
+
+        // THEN
+        assertNull(actualValue);
     }
 
     @Test
@@ -266,7 +287,6 @@ public abstract class PersistentSamplerAspectTest {
         assertEquals(1, result.length);
         assertEquals(TestService.HARD_CODED_RETURN_VALUE, result[0][0]);
     }
-
 
 
     @Test
@@ -445,8 +465,6 @@ public abstract class PersistentSamplerAspectTest {
     }
 
 
-
-
     @Test
     void testComboMatcherLoadAllButAcceptOnlyA(Path tempFile) {
         // GIVEN
@@ -514,8 +532,8 @@ public abstract class PersistentSamplerAspectTest {
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        byte[] valueStubbedMethod =  getTestService().getRandomByteArray(42);
-        assertArrayEquals(expectedArray ,valueStubbedMethod);
+        byte[] valueStubbedMethod = getTestService().getRandomByteArray(42);
+        assertArrayEquals(expectedArray, valueStubbedMethod);
     }
 
     @Test
@@ -692,14 +710,14 @@ public abstract class PersistentSamplerAspectTest {
         assertThat(actualCatWithMouse).isInstanceOf(HunterCat.class);
         assertEquals("Tom", actualCatWithMouse.getName());
 
-        HunterCat actualHunterCat = (HunterCat)  actualCatWithMouse;
+        HunterCat actualHunterCat = (HunterCat) actualCatWithMouse;
 
         assertThat(actualHunterCat.getFood()).isInstanceOf(Mouse.class);
         assertThat(actualHunterCat.getFood().getName()).isEqualTo("Jerry");
     }
 
     @Test
-    public void genericSubClassCanBeRecordedAndLoaded(Path tempFile) {
+    public void genericReferencedClassCanBeRecordedAndLoaded(Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getGenericSubClass());
@@ -730,8 +748,38 @@ public abstract class PersistentSamplerAspectTest {
 
         GenericBeagle<?> actualGenericBeagle = (GenericBeagle<?>) expectedGenericType;
 
-        assertThat( actualGenericBeagle.getFood()).isInstanceOf(Cheese.class);
-        assertThat( ((Cheese) actualGenericBeagle.getFood()).getName()).isEqualTo("Cheddar");
+        assertThat(actualGenericBeagle.getFood()).isInstanceOf(Cheese.class);
+        assertThat(((Cheese) actualGenericBeagle.getFood()).getName()).isEqualTo("Cheddar");
+    }
+
+    @Test
+    public void genericClassCanBeRecordedAndLoaded(Path tempFile) {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getGenericClass());
+
+        // make the method call that is recorded
+        getTestService().getGenericClass();
+
+        // save the recorded sample to file...
+        final PersistentSampleManager source = save(tempFile);
+
+        // Reset SampleRepository to ensure that only deserialized samples will be used in the next steps...
+        clearSampleRepositoryWithAssertion();
+
+        // deserialize the sample...
+        PersistentSample.of(testServiceSampler.getGenericClass());
+        source.load();
+        assertFalse(SampleRepository.getInstance().isEmpty());
+
+        // WHEN
+        GenericBeagle<Cheese> expectedGenericType = getTestService().getGenericClass();
+
+        // THEN
+        assertEquals("GenericPorthos", expectedGenericType.getName());
+
+        assertThat(expectedGenericType.getFood()).isInstanceOf(Cheese.class);
+        assertThat(expectedGenericType.getFood().getName()).isEqualTo("Gauda");
     }
 
     @Test

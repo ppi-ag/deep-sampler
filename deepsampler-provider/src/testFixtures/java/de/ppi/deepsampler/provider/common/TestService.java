@@ -237,4 +237,15 @@ public class TestService {
 
         return porthos;
     }
+
+    public GenericBeagle<Cheese> getGenericClass() {
+        GenericBeagle<Cheese> porthos = new GenericBeagle<>("GenericPorthos");
+        porthos.setFood(new Cheese("Gauda"));
+
+        return porthos;
+    }
+
+    public String getNull() {
+        return null;
+    }
 }
