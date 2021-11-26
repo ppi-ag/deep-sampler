@@ -85,12 +85,7 @@ public class PersistentBeanConverter {
         if (isTransformationNotNecessary(originalBean, parameterizedReturnType)) {
             return (T) originalBean;
         }
-        /**
-         * Todo
-         * 1. Transferobjekt für Extensionschnittstelle mit den Typen bauen
-         * 2. Issue für die Erweiterung der Extension schreiben und zur Diskussion stellen
-         *
-         */
+
         if (originalBean.getClass().isArray()) {
             return (T) convertObjectArray((Object[]) originalBean);
         }
