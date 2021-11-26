@@ -34,6 +34,8 @@ public class ProxyFactory {
         return (T) proxyObject;
     }
 
+
+
     public static boolean isProxyClass(final Class<?> aClass) {
         return javassist.util.proxy.ProxyFactory.isProxyClass(aClass);
     }

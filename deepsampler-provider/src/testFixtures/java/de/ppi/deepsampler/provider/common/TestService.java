@@ -207,4 +207,45 @@ public class TestService {
 
     }
 
+    public Animal getConcreteDogObject() {
+        return new Dog("Porthos");
+    }
+
+    public Dog getSubClassOfDog() {
+        return new Beagle("Porthos");
+    }
+
+    public AbstractDog getSubClassOfAbstractDog() {
+        return new Labrador("BlackDog");
+    }
+
+    public AbstractDog getInternalClassThatExtendsAbstractDog() {
+        return new AbstractDog.InternalDog("InnerClassDog");
+    }
+
+    public Animal getCatWithMouse() {
+        Mouse mouse = new Mouse("Jerry");
+        HunterCat cat = new HunterCat("Tom");
+        cat.setFood(mouse);
+
+        return cat;
+    }
+
+    public Dog getGenericSubClass() {
+        GenericBeagle<Cheese> porthos = new GenericBeagle<>("GreedyPorthos");
+        porthos.setFood(new Cheese("Cheddar"));
+
+        return porthos;
+    }
+
+    public GenericBeagle<Cheese> getGenericClass() {
+        GenericBeagle<Cheese> porthos = new GenericBeagle<>("GenericPorthos");
+        porthos.setFood(new Cheese("Gauda"));
+
+        return porthos;
+    }
+
+    public String getNull() {
+        return null;
+    }
 }
