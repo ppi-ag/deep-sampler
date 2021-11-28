@@ -66,8 +66,8 @@ public abstract class SpringSamplerAspect {
      */
     @Around("!@within(org.springframework.context.annotation.Configuration) " // excludes all SpringConfigs
             + "&& !@within(org.aspectj.lang.annotation.Aspect) " // Excludes all Aspects by excluding classes annotated with @Aspect
-            + "&& !within(is(EnumType)) " // Exludes all Enums
-            + "&& !within(is(FinalType)) " // Exludes all final classes
+            + "&& !within(is(EnumType)) " // Excludes all Enums
+            + "&& !within(is(FinalType)) " // Excludes all final classes
             + "&& include()") // Delegates to the custom Pointcut that must be defined by overriding the Method SpringSamplerAspect::include
     @SuppressWarnings("unused") // Method is called generically by Spring, so the compiler believes it would be unused.
     public Object aroundMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
@@ -98,7 +98,7 @@ public abstract class SpringSamplerAspect {
 
     /**
      * Searches for a {@link SampleDefinition} that matches to a particular method call.
-     * @param proceedingJoinPoint describes the intercepted method. If a {@link SampleDefinition} for this method hs beed defined, this method will be stubbed.
+     * @param proceedingJoinPoint describes the intercepted method. If a {@link SampleDefinition} for this method has been defined, this method will be stubbed.
      * @return If the intercepted method (as described by proceedingJoinPoint) has a Sampler the {@link SampleDefinition} will be returned, otherwise null.
      */
     private SampleDefinition findSampleDefinition(final ProceedingJoinPoint proceedingJoinPoint) {

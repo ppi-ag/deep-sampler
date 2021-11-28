@@ -19,7 +19,7 @@ public class TestService {
     private int counter = 0;
 
     /**
-     * This method returns a primitve parameter if the method is not sampled.
+     * This method returns a primitive parameter if the method is not sampled.
      * This Method is intended to be used in positive and negative tests.
      *
      * @param param The parameter that will be returned unchanged

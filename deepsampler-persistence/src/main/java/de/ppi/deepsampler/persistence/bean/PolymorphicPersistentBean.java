@@ -7,7 +7,7 @@ import java.util.Map;
  */
 public class PolymorphicPersistentBean extends DefaultPersistentBean {
     /**
-     * contains the true type of the object for deserialization purpose asstring
+     * Contains the true type of the object for deserialization purpose as string
      */
     private String polymorphicBeanType;
 
