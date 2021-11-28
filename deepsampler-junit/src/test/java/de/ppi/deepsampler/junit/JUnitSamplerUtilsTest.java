@@ -5,8 +5,6 @@
 
 package de.ppi.deepsampler.junit;
 
-import de.ppi.deepsampler.core.api.Sampler;
-import de.ppi.deepsampler.core.model.SampleRepository;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;

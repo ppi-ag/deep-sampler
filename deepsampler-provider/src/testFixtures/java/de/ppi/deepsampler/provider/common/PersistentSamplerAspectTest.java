@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import static de.ppi.deepsampler.core.api.FixedQuantity.ONCE;
 import static de.ppi.deepsampler.core.api.Matchers.*;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.assertj.core.api.Assertions.*;

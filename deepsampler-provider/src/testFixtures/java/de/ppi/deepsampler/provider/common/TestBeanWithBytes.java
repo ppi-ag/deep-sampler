@@ -6,7 +6,6 @@
 package de.ppi.deepsampler.provider.common;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * A very simple Bean that represents non primitive types in TestCases containing a byte[].
