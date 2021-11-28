@@ -12,7 +12,7 @@ data from a Database:
 
 <img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
 
-In order to be independent from the database, we can now attach a stub to the methods of the DAO using DeepSampler. If we run the test with DeepSampler in recording-mode, every
+In order to be independent of the database, we can now attach a stub to the methods of the DAO using DeepSampler. If we run the test with DeepSampler in recording-mode, every
 call to the method will be intercepted and all data, that was passed to it, or returned by it, is recorded. The recorded data, the sample, will be saved to 
 a JSON-file.
 
@@ -26,8 +26,10 @@ private MyDao myDaoSampler;
 PersistentSample.of(myDaoSampler.load(Matchers.anyInt()));
 ```
 
-If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead a recorded sample from the JSON-file will be returned. 
-If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same parameters. This is how even longer tests with several varying calls to stubs can be replayed.
+If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead, 
+a recorded sample from the JSON-file will be returned. 
+If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same 
+parameters. This is how even longer tests with several varying calls to stubs can be replayed.
 
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
@@ -56,7 +58,7 @@ We use Maven to build the example. So, as a first step, we add the following dep
 
 ## The Testee
 Let's say, we have a `GreetingService` that would create greeting messages for particular persons. We know only the ID 
-of the person we want to greet, so the `GreetingService` needs to lookup the person somewhere (e.g. DB). 
+of the person we want to greet, so the `GreetingService` needs to lookup the person somewhere (e.g., DB). 
 This is done by a 
 `PersonService`, which provides a method `getName(personId)`. `getName()` in turn, would use a `PersonDAO` to 
 load the `Person` from a Database.  
@@ -106,7 +108,7 @@ class GreetingServiceTest {
 }
 ```
 
-Inside of a concrete test method we would now use the Sampler to define a stub:
+Inside a concrete test method we would now use the Sampler to define a stub:
 ```
 @Test
 void greetingShouldBeGenerated() {
@@ -179,7 +181,7 @@ void greetingShouldBeGenerated() {
 The stubs, that are defined by the `SamplerFixture`, are now active for the time the method runs. 
 
 ## Persistent Samples
-For the sake of understandability, the tested compound in this example is fairly simple, however DeepSampler was 
+For the sake of understandability, the tested compound in this example is fairly simple. However, DeepSampler was 
 especially designed for complex compound tests with quite a lot of stubs which also might return extensive Samples. 
 In these cases we would not want
 to have big sets of test data (Samples) in JUnit Test classes, we would rather separate test data from test logic. And
