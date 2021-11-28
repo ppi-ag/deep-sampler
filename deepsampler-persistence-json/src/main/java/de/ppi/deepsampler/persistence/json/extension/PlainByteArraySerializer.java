@@ -3,7 +3,6 @@ package de.ppi.deepsampler.persistence.json.extension;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.WritableTypeId;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -34,11 +33,11 @@ public class PlainByteArraySerializer extends StdSerializer<byte[]> {
     /**
      * Adds serialization-capabilities for polymorphic types.
      *
-     * @param value
-     * @param gen
-     * @param serializers
-     * @param typeSer
-     * @throws IOException
+     * @param value {@inheritDoc}
+     * @param gen {@inheritDoc}
+     * @param serializers {@inheritDoc}
+     * @param typeSer {@inheritDoc}
+     * @throws IOException {@inheritDoc}
      * @see <a href=""https://stackoverflow.com/questions/26672297/how-to-trigger-calls-to-serializewithtype-of-a-class-implementing-jsonseriali">Stackoverflow</a>
      */
     @Override
