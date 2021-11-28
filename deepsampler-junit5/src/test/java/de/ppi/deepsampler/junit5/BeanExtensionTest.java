@@ -29,7 +29,7 @@ class BeanExtensionTest {
     public static final Path EXPECTED_SAVED_SAMPLER = Paths.get(SAVED_SAMPLER_FILE);
 
     public static final String CATS_NAME_AS_IT_SHOULD_BE_RECORDED = "Cats name that should be recorded and written to the json file";
-    public static final String CATS_NAME_FOR_CROSS_CHECK = "This name is unstubbd";
+    public static final String CATS_NAME_FOR_CROSS_CHECK = "This name is unstubbed";
 
 
     @Inject

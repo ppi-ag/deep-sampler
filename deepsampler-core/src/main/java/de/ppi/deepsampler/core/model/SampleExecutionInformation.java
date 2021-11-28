@@ -11,7 +11,7 @@ import java.util.List;
 
 public class SampleExecutionInformation {
 
-    private SampleDefinition sampleDefinition;
+    private final SampleDefinition sampleDefinition;
     private final List<MethodCall> methodCallList = new ArrayList<>();
 
     public SampleExecutionInformation(SampleDefinition sampleDefinition) {

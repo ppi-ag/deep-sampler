@@ -27,7 +27,7 @@ import de.ppi.deepsampler.core.model.SampleRepository;
  * the Sampler manually and to distribute the Sampler into the objects that will be tested. The distribution is done by a Dependency Injection Framework like Spring or Guice.
  *
  * Methods of the class {@link Object} are ignored. Otherwise strange effects might appear, e.g. if Object::finalize is
- * called by the garbage collactor.
+ * called by the garbage collector.
  *
  * @author Jan Schankin, Rico Schrage
  */

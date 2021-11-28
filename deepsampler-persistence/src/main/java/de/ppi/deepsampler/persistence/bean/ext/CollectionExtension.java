@@ -31,10 +31,10 @@ public class CollectionExtension extends StandardBeanConverterExtension {
     }
 
     /**
-     * We skip the conversion of all Collections, which have primitive (or their wrapper) generic types. Primitve Collections
+     * We skip the conversion of all Collections, which have primitive (or their wrapper) generic types. Primitive Collections
      * will then be handled by the concrete persistence api (i.e. Jackson for JSON serialisation).
      *
-     * @param beanType the {@link Type} of the bean (Collection is expected here) that is handeld by this {@link BeanConverterExtension}
+     * @param beanType the {@link Type} of the bean (Collection is expected here) that is handled by this {@link BeanConverterExtension}
      * @return true if beanType is a primitive {@link Collection}
      */
     @Override

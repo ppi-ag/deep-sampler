@@ -17,8 +17,6 @@ import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import de.ppi.deepsampler.persistence.json.extension.PlainByteArrayDeserializer;
-import de.ppi.deepsampler.persistence.json.extension.PlainByteArraySerializer;
 import de.ppi.deepsampler.persistence.json.extension.DeserializationExtension;
 import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 
