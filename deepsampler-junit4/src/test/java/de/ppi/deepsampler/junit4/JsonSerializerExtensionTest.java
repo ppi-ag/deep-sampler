@@ -32,8 +32,8 @@ import static org.junit.Assert.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class JsonSerializerExtensionTest {
 
-    public static final String SAVED_SAMPLER_FILE = "aSamplerCanBeSavedUsingAJsonExtension.json";
-    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("./src/test/tmp/de/ppi/deepsampler/junit4").resolve(SAVED_SAMPLER_FILE);
+    public static final String SAVED_SAMPLER_FILE = "/aSamplerCanBeSavedUsingAJsonExtension.json";
+    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("./src/test/tmp/aSamplerCanBeSavedUsingAJsonExtension.json");
 
     private static final Instant STUBBED_INSTANT = LocalDateTime.of(2021, 10, 15, 17, 45).toInstant(ZoneOffset.UTC);
     private static final Instant UN_STUBBED_INSTANT = LocalDateTime.of(2000, 1, 1, 12, 0).toInstant(ZoneOffset.UTC);
@@ -51,7 +51,7 @@ public class JsonSerializerExtensionTest {
     }
 
     @Test
-    @SaveSamples(fileName = SAVED_SAMPLER_FILE)
+    @SaveSamples(SAVED_SAMPLER_FILE)
     public void aSamplerCanBeSavedUsingAJsonExtension() throws IOException {
         // GIVEN
         testService.setDefaultInstant(STUBBED_INSTANT);
@@ -66,11 +66,11 @@ public class JsonSerializerExtensionTest {
 
     @Test
     public void aTheSavedSamplerExists(){
-        assertTrue("Die Datei: " + EXPECTED_SAVED_SAMPLER + " wurde nicht gefunden.", Files.exists(EXPECTED_SAVED_SAMPLER));
+        assertTrue("The file: " + EXPECTED_SAVED_SAMPLER + " is missing.", Files.exists(EXPECTED_SAVED_SAMPLER));
     }
 
     @Test
-    @LoadSamples(fileName = SAVED_SAMPLER_FILE)
+    @LoadSamples(SAVED_SAMPLER_FILE)
     public void bSamplerCanBeLoadedUsingJsonExtension() {
         // GIVEN
         testService.setDefaultInstant(UN_STUBBED_INSTANT);

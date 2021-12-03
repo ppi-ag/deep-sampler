@@ -79,7 +79,7 @@ class JUnitPersistenceUtilsTest {
         LoadSamples loadSamples = testMethod.getAnnotation(LoadSamples.class);
 
         // WHEN
-        Path defaultPath = JUnitPersistenceUtils.createPathForFilesystem(Optional.empty(), DEFAULT_VALUE_MUST_BE_CALCULATED, DEFAULT_VALUE_MUST_BE_CALCULATED, testMethod);
+        Path defaultPath = JUnitPersistenceUtils.createPathForFilesystem(Optional.empty(), DEFAULT_VALUE_MUST_BE_CALCULATED, testMethod);
 
         // THEN
         Path expectedDefaultPath = Paths.get("./", "de/ppi/deepsampler/junit", "Example_loadInnerSerializerClass.json");
@@ -92,8 +92,7 @@ class JUnitPersistenceUtilsTest {
         Method testMethod = Example.class.getMethod("loadInnerSerializerClass");
 
         // WHEN
-        when(mockedLoadSamples.packagePath()).thenReturn(DEFAULT_VALUE_MUST_BE_CALCULATED);
-        when(mockedLoadSamples.fileName()).thenReturn(DEFAULT_VALUE_MUST_BE_CALCULATED);
+        when(mockedLoadSamples.value()).thenReturn(DEFAULT_VALUE_MUST_BE_CALCULATED);
 
         String defaultPath = JUnitPersistenceUtils.createPathForClasspath(mockedLoadSamples, testMethod);
 
@@ -109,7 +108,7 @@ class JUnitPersistenceUtilsTest {
         SampleRootPath sampleRootPath = Example.class.getAnnotation(SampleRootPath.class);
 
         // WHEN
-        Path defaultPath = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), DEFAULT_VALUE_MUST_BE_CALCULATED, DEFAULT_VALUE_MUST_BE_CALCULATED, testMethod);
+        Path defaultPath = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), DEFAULT_VALUE_MUST_BE_CALCULATED, testMethod);
 
         // THEN
         String expectedFileName = "./myRoot/de/ppi/deepsampler/junit/Example_loadInnerSerializerClass.json".replace("/", File.separator);
@@ -123,10 +122,10 @@ class JUnitPersistenceUtilsTest {
         SampleRootPath sampleRootPath = Example.class.getAnnotation(SampleRootPath.class);
 
         // WHEN
-        Path path = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), DEFAULT_VALUE_MUST_BE_CALCULATED, "myCustom.file", testMethod);
+        Path path = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), "myCustom.file", testMethod);
 
         // THEN
-        String expectedFileName = "./myRoot/de/ppi/deepsampler/junit/myCustom.file".replace("/", File.separator);
+        String expectedFileName = "./myRoot/myCustom.file".replace("/", File.separator);
         assertEquals(expectedFileName, path.toString());
     }
 
@@ -136,84 +135,17 @@ class JUnitPersistenceUtilsTest {
         Method testMethod = Example.class.getMethod("loadInnerSerializerClass");
 
         // WHEN
-        when(mockedLoadSamples.packagePath()).thenReturn(DEFAULT_VALUE_MUST_BE_CALCULATED);
-        when(mockedLoadSamples.fileName()).thenReturn("myCustomFile.json");
+        when(mockedLoadSamples.value()).thenReturn("myCustomFile.json");
 
         String defaultPath = JUnitPersistenceUtils.createPathForClasspath(mockedLoadSamples, testMethod);
 
         // THEN
-        String expectedDefaultPath = "/de/ppi/deepsampler/junit/myCustomFile.json";
+        String expectedDefaultPath = "myCustomFile.json";
         assertEquals(expectedDefaultPath, defaultPath);
     }
 
-    @Test
-    void pathForFileSystemWithCustomPackageCanBeCreated() throws NoSuchMethodException {
-        // GIVEN
-        Method testMethod = Example.class.getMethod("loadInnerSerializerClass");
-        SampleRootPath sampleRootPath = Example.class.getAnnotation(SampleRootPath.class);
 
-        // WHEN
-        Path path = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), "myCustomPackage", DEFAULT_VALUE_MUST_BE_CALCULATED, testMethod);
 
-        // THEN
-        String expectedFileName = "./myRoot/myCustomPackage/Example_loadInnerSerializerClass.json".replace("/", File.separator);
-        assertEquals(expectedFileName, path.toString());
-    }
-
-    @Test
-    void pathForClasspathWithCustomPackageCanBeCreated() throws NoSuchMethodException {
-        // GIVEN
-        Method testMethod = Example.class.getMethod("loadInnerSerializerClass");
-
-        // WHEN
-        when(mockedLoadSamples.packagePath()).thenReturn("/myCustomPackage");
-        when(mockedLoadSamples.fileName()).thenReturn(DEFAULT_VALUE_MUST_BE_CALCULATED);
-
-        String defaultPath = JUnitPersistenceUtils.createPathForClasspath(mockedLoadSamples, testMethod);
-
-        // THEN
-        String expectedDefaultPath = "/myCustomPackage/Example_loadInnerSerializerClass.json";
-        assertEquals(expectedDefaultPath, defaultPath);
-
-        // WHEN
-        when(mockedLoadSamples.packagePath()).thenReturn("/my.Custom.Package");
-
-        defaultPath = JUnitPersistenceUtils.createPathForClasspath(mockedLoadSamples, testMethod);
-
-        // THEN
-        expectedDefaultPath = "/my.Custom.Package/Example_loadInnerSerializerClass.json";
-        assertEquals(expectedDefaultPath, defaultPath);
-    }
-
-    @Test
-    void completeCustomPathForFileSystemCanBeCreated() throws NoSuchMethodException {
-        // GIVEN
-        Method testMethod = Example.class.getMethod("loadInnerSerializerClass");
-        SampleRootPath sampleRootPath = Example.class.getAnnotation(SampleRootPath.class);
-
-        // WHEN
-        Path path = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), "myCustomPackage", "myCustomFile.json", testMethod);
-
-        // THEN
-        String expectedFileName = "./myRoot/myCustomPackage/myCustomFile.json".replace("/", File.separator);
-        assertEquals(expectedFileName, path.toString());
-    }
-
-    @Test
-    void completeCustomPathForClasspathCanBeCreated() throws NoSuchMethodException {
-        // GIVEN
-        Method testMethod = Example.class.getMethod("loadInnerSerializerClass");
-
-        // WHEN
-        when(mockedLoadSamples.packagePath()).thenReturn("/myCustomPackage");
-        when(mockedLoadSamples.fileName()).thenReturn("myCustomFile.json");
-
-        String defaultPath = JUnitPersistenceUtils.createPathForClasspath(mockedLoadSamples, testMethod);
-
-        // THEN
-        String expectedDefaultPath = "/myCustomPackage/myCustomFile.json";
-        assertEquals(expectedDefaultPath, defaultPath);
-    }
 
 
     @SampleRootPath("./myRoot")

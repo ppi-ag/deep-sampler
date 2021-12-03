@@ -10,3 +10,6 @@ build
 #ignore tmp test data
 /deepsampler-junit4/src/test/tmp/de
 /deepsampler-junit4/src/test/tmp/my/
+/deepsampler-junit4/src/test/tmp/aSamplerCanBeSavedUsingAJsonExtension.json
+/deepsampler-junit5/src/test/tmp/de
+/deepsampler-junit5/src/test/tmp/my/

@@ -99,7 +99,7 @@ public class JUnitPersistenceUtils {
 
         switch (loadSamples.source()) {
             case FILE_SYSTEM:
-                Path file = createPathForFilesystem(rootPath, loadSamples.packagePath(), loadSamples.fileName(), testMethod);
+                Path file = createPathForFilesystem(rootPath, loadSamples.value(), testMethod);
                 return persistentSampleManagerBuilder.buildWithFile(file);
             case CLASSPATH:
             default:
@@ -124,72 +124,49 @@ public class JUnitPersistenceUtils {
      * Creates a {@link Path} based on the three path elements. If any of them is missing, a default value will be used. The
      * path is concatenated like this: [rootPath][packagePath][fileName].
      *
-     * @param rootPath    the annotation {@link SampleRootPath} that is used to configure the root path. If it is not
-     *                    supplied, the default ./ will be used.
-     * @param packagePath A folder that is resolved under rootPath. If it is not supplied, the package of the class,
-     *                    that declares testMethod is used. packagePath must not be null. The String
-     *                    {@link AnnotationConstants#DEFAULT_VALUE_MUST_BE_CALCULATED} will be treated as not-supplied.
-     *                    This is because the empty default value of {@link LoadSamples#packagePath()} cannot be null.
-     * @param fileName    A fileName that is resolved under packagePath. If it is not supplied, the name of the testMethod,
-     *                    ant the name of the class the declares testMethod, is used. fileName must not be null. The
-     *                    String {@link AnnotationConstants#DEFAULT_VALUE_MUST_BE_CALCULATED} will be treated as
-     *                    not-supplied. This is because the empty default value of
-     *                    {@link LoadSamples#fileName()} ()} cannot be null.
-     * @param testMethod  The test method that is running the current test. It is used to provide default values.
+     * @param sampleRootPath the annotation {@link SampleRootPath} that is used to configure the root path. If it is not
+     *                       supplied, the default ./ will be used.
+     * @param file           A file name, that is resolved under rootPath. If it is not supplied, the package of the class,
+     *                       that declares testMethod, the test class name and the test method name is used.
+     *                       file must not be null. The String
+     *                       {@link AnnotationConstants#DEFAULT_VALUE_MUST_BE_CALCULATED} will be treated as not-supplied.
+     *                       This is because the empty default value of {@link LoadSamples#value()} cannot be null.
+     * @param testMethod     The test method that is running the current test. It is used to provide default values.
      * @return A path that is formatted to be used on the file system (in contrast to a path, that is formatted to be used
      * on the classpath, see {@link JUnitPersistenceUtils#createPathForClasspath(LoadSamples, Method)}.
      */
-    static Path createPathForFilesystem(Optional<SampleRootPath> rootPath, String packagePath, String fileName, Method testMethod) {
-        Path file = rootPath.map(a -> Paths.get(a.value())).orElse(Paths.get(DEFAULT_ROOT_PATH));
+    static Path createPathForFilesystem(Optional<SampleRootPath> sampleRootPath, String file, Method testMethod) {
+        Path path = sampleRootPath.map(a -> Paths.get(a.value())).orElse(Paths.get(DEFAULT_ROOT_PATH));
 
-        if (packagePath.equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
-            file = file.resolve(testMethod.getDeclaringClass().getPackage().getName().replace(".", "/"));
+        if (file.equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
+            return path.resolve(testMethod.getDeclaringClass().getPackage().getName().replace(".", "/"))
+                    .resolve(getDefaultJsonFileName(testMethod));
         } else {
-            file = file.resolve(packagePath);
+            return path.resolve(file.replaceFirst("^[/\\\\]", ""));
         }
-
-        if (fileName.equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
-            file = file.resolve(getDefaultJsonFileName(testMethod));
-        } else {
-            file = file.resolve(fileName);
-        }
-
-        return file;
     }
 
     /**
      * <p>
      * Creates a Path that is used to load a sample file from the classpath. The path is based on two elements:
-     * </p>
      * <p>
      * [packagePath][fileName]
-     * </p>
      * <p>
      * If any of these two are missing, a default value will be used.
-     * </p>
      *
      * @param loadSamples provides the packagePath and the fileName. If packagePath is not supplied, the package of
      *                    testMethod is used. If fileName is not supplied, the name of testMethod and it's declaring
      *                    class is used.
-     * @param testMethod the method that runs the current test. It is used to provide default values for path elements.
+     * @param testMethod  the method that runs the current test. It is used to provide default values for path elements.
      * @return a path that can be used to load a sample file from the classpath.
      */
     static String createPathForClasspath(LoadSamples loadSamples, Method testMethod) {
-        String file;
-
-        if (loadSamples.packagePath().equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
-            file = "/" + testMethod.getDeclaringClass().getPackage().getName().replace(".", "/");
+        if (loadSamples.value().equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
+            return "/" + testMethod.getDeclaringClass().getPackage().getName().replace(".", "/")
+                    + "/" + getDefaultJsonFileName(testMethod);
         } else {
-            file = loadSamples.packagePath();
+            return loadSamples.value();
         }
-
-        if (loadSamples.fileName().equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
-            file += "/" + getDefaultJsonFileName(testMethod);
-        } else {
-            file += "/" + loadSamples.fileName();
-        }
-
-        return file;
     }
 
     private static JsonSourceManager createSourceManagerWithJsonSerializerExtensions(final Method testMethod, final SaveSamples saveSamples) {
@@ -198,7 +175,7 @@ public class JUnitPersistenceUtils {
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
 
         Optional<SampleRootPath> sampleRootPath = loadSampleRootPathFromTestOrSampleFixture(testMethod);
-        final Path fileName = createPathForFilesystem(sampleRootPath, saveSamples.packagePath(), saveSamples.fileName(), testMethod);
+        final Path fileName = createPathForFilesystem(sampleRootPath, saveSamples.value(), testMethod);
 
         return persistentSampleManagerBuilder.buildWithFile(fileName);
     }

@@ -51,7 +51,7 @@ class PersistentSamplerWithFixtureTest {
     }
 
     @Test
-    @LoadSamples(fileName = "PersistentSamplerWithFixtureTest_whenSavedWithRootPathOnFixture.json")
+    @LoadSamples("/de/ppi/deepsampler/junit5/PersistentSamplerWithFixtureTest_whenSavedWithRootPathOnFixture.json")
     @Order(2)
     void andThenSavedFileWithRootOnFixtureMustBeLoadable() {
         Cat sampledCat = testService.getCat();

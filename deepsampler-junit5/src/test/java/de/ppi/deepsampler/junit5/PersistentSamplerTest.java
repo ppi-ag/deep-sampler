@@ -32,12 +32,11 @@ class PersistentSamplerTest {
     public static final Path DEFAULT_PATH_INCLUDING_SAMPLE_ROOT_PATH =
             Paths.get("./src/test/tmp/de/ppi/deepsampler/junit5/PersistentSamplerTest_whenSamplerWithDefaultPathIsSaved.json");
 
-    public static final String SAVED_IN_SPECIFIC_PACKAGE = "my/specific/package";
-    public static final String SAVED_IN_SPECIFIC_FILE = "samplerCanBeSavedInSpecificFile.json";
-    public static final Path SPECIFIC_PATH = Paths.get("./src/test/tmp").resolve(SAVED_IN_SPECIFIC_PACKAGE).resolve(SAVED_IN_SPECIFIC_FILE);
+    public static final String SAVED_IN_SPECIFIC_FILE = "my/specific/package/samplerCanBeSavedInSpecificFile.json";
+    public static final Path SPECIFIC_PATH_WITH_SAMPLE_ROOT = Paths.get("./src/test/tmp").resolve(SAVED_IN_SPECIFIC_FILE);
 
-    public static final String LOAD_SPECIFIC_PACKAGE_FOR_FILE_SYSTEM = "../resources/de/ppi/deepsampler/junit5";
-    public static final String LOAD_SPECIFIC_FILE = "samplerCanBeLoadedFromSpecificFile.json";
+    public static final String LOAD_SPECIFIC_FILE_RELATIVE_TO_SAMPLE_ROOT = "../resources/de/ppi/deepsampler/junit5/samplerCanBeLoadedFromSpecificFile.json";
+    public static final String LOAD_SPECIFIC_FILE_FROM_CLASS_PATH = "/de/ppi/deepsampler/junit5/samplerCanBeLoadedFromSpecificFile.json";
 
 
     @Test
@@ -66,23 +65,23 @@ class PersistentSamplerTest {
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @SaveSamples(packagePath = SAVED_IN_SPECIFIC_PACKAGE, fileName = SAVED_IN_SPECIFIC_FILE)
+    @SaveSamples(SAVED_IN_SPECIFIC_FILE)
     @Order(3)
-    void whenSamplerIsSavedInSpecificPackageAndFile() throws IOException {
+    void whenSamplerIsSavedInSpecificFile() throws IOException {
         // Cleaning up a possibly existing file since we want to check that this file is
         // created by the annotation SaveFile after this test method has returned.
-        assertThatFileDoesNotExistOrOtherwiseDeleteIt(SPECIFIC_PATH);
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(SPECIFIC_PATH_WITH_SAMPLE_ROOT);
     }
 
     @Test
     @Order(4)
     void thenSamplerMustBeFoundUnderRootPathWithSpecificPath() {
-        assertTrue(Files.exists(SPECIFIC_PATH));
+        assertTrue(Files.exists(SPECIFIC_PATH_WITH_SAMPLE_ROOT));
     }
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @LoadSamples(packagePath = LOAD_SPECIFIC_PACKAGE_FOR_FILE_SYSTEM, fileName = LOAD_SPECIFIC_FILE, source = FileSource.FILE_SYSTEM)
+    @LoadSamples(value = LOAD_SPECIFIC_FILE_RELATIVE_TO_SAMPLE_ROOT, source = FileSource.FILE_SYSTEM)
     @Order(7)
     void samplerCanBeLoadedFromSpecificFile() throws Throwable {
         assertTestBeanHasStubbedInt();
@@ -90,7 +89,7 @@ class PersistentSamplerTest {
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @LoadSamples(fileName = LOAD_SPECIFIC_FILE, source = FileSource.CLASSPATH)
+    @LoadSamples(value = LOAD_SPECIFIC_FILE_FROM_CLASS_PATH, source = FileSource.CLASSPATH)
     @Order(8)
     void samplerCanBeLoadedFromSpecificClasspathResource() throws Throwable {
         assertTestBeanHasStubbedInt();

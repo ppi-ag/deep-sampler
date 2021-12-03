@@ -13,7 +13,6 @@ import org.junit.runners.MethodSorters;
 
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
-import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @UseSamplerFixture(TestSampleFixture.class)

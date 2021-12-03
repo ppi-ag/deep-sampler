@@ -30,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class JsonSerializerExtensionTest {
 
-    public static final String SAVED_SAMPLER_FILE = "samplerCanBeSavedUsingAJsonExtension.json";
-    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("./src/test/tmp/de/ppi/deepsampler/junit5").resolve(SAVED_SAMPLER_FILE);
+    public static final String SAVED_SAMPLER_FILE = "/de/ppi/deepsampler/junit5/samplerCanBeSavedUsingAJsonExtension.json";
+    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("./src/test/tmp/").resolve(SAVED_SAMPLER_FILE);
 
     private static final Instant STUBBED_INSTANT = LocalDateTime.of(2021, 10, 15, 17, 45).toInstant(ZoneOffset.UTC);
     private static final Instant UN_STUBBED_INSTANT = LocalDateTime.of(2000, 1, 1, 12, 0).toInstant(ZoneOffset.UTC);
@@ -45,7 +45,7 @@ class JsonSerializerExtensionTest {
     }
 
     @Test
-    @SaveSamples(fileName = SAVED_SAMPLER_FILE)
+    @SaveSamples(SAVED_SAMPLER_FILE)
     @Order(0)
     void samplerCanBeSavedUsingAJsonExtension() throws IOException {
         // GIVEN
@@ -60,7 +60,7 @@ class JsonSerializerExtensionTest {
     }
 
     @Test
-    @LoadSamples(fileName = SAVED_SAMPLER_FILE)
+    @LoadSamples(SAVED_SAMPLER_FILE)
     @Order(1)
     void samplerCanBeLoadedUsingJsonExtension() {
         // GIVEN

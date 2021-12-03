@@ -16,16 +16,10 @@ import java.lang.annotation.Target;
  * <p>
  * It is possible to load the file either from a local filesystem or from the classpath (property {@link LoadSamples#source()})
  * <p>
- * The file's name is composed of three parts: [rootPath][packagePath][fileName]. DeepSampler generates a default name using
- * the test class and test method. In most cases this will suffice, however you can change the path in detail:
- * <ul>
- *     <li>rootPath: The root path for relative packagePaths is by default './'. It can be changed, using the annotation
- *     {@link SampleRootPath}.
- *     <p>
- *     The rootPath is ignored, if the file is loaded from the classpath.</li>
- *     <li>packagePath: The path under the rootPath: If omitted, the package of the test class is used.</li>
- *     <li>fileName: the concrete name of the JSON-file: If omitted, the name of the test class and the test method is used.</li>
- * </ul>
+ * The filename may be defined using the property {@link LoadSamples#value()}. The default filename is composed using the
+ * full qualified name of the test class and the test method.
+ * <p>
+ * The root path for relative filenames is by default './'. It can be changed, using the annotation {@link SampleRootPath}.
  * <p>
  * This annotation must be used in combination with @{@link UseSamplerFixture}.
  * <p>
@@ -36,23 +30,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface LoadSamples {
 
-    /**
-     * Defines the parent folder of {@link LoadSamples#fileName()}. Default is the package of the test class.
-     * <p>
-     * If {@link LoadSamples#source()} is set to {@link FileSource#FILE_SYSTEM}, packagePath is treated as a simple
-     * path on the filesystem. If packagePath is a relative path, the root lies on './' by default. This root can be
-     * changed using @{@link SampleRootPath}.
-     *
-     * @return the parent path of {@link LoadSamples#fileName()}. Default is the package of the test class.
-     */
-    String packagePath() default AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED;
 
     /**
-     * The name of the json file without a path. Default is the name of the test class followed by the name of the test method.
+     * The name of the json file. If this property is omitted, the name will be composed like this:
+     * [package of the test class]/[Test class name]_[test method].json
+     * <p>
+     * If the annotation {@link SampleRootPath} is present, file() will be interpreted relative to the
+     * supplied root path.
      *
      * @return the name of the sample JSON file.
      */
-    String fileName() default AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED;
+    String value() default AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED;
 
     /**
      * Defines from where the file is loaded. Either the classpath or the vanilla filesystem can be used. Default is
