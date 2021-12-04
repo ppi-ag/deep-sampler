@@ -1,3 +1,8 @@
+/*
+ * Copyright 2021  PPI AG (Hamburg, Germany)
+ * This program is made available under the terms of the MIT License.
+ */
+
 import org.gradle.kotlin.dsl.provider.inClassPathMode
 
 /*
