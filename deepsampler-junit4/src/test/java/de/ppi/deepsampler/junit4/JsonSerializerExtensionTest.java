@@ -17,6 +17,7 @@ import org.junit.runners.MethodSorters;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -24,15 +25,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @UseSamplerFixture(JsonSerializerExtensionSamplerFixture.class)
+@SampleRootPath("./src/test/tmp")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class JsonSerializerExtensionTest {
 
-    public static final String SAVED_SAMPLER_FILE = "de/ppi/deepsampler/junit4/JsonSerializerExtensionTest_aSamplerCanBeSavedUsingAJsonExtension.json";
-    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get(SAVED_SAMPLER_FILE);
+    public static final String SAVED_SAMPLER_FILE = "/aSamplerCanBeSavedUsingAJsonExtension.json";
+    public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("./src/test/tmp/aSamplerCanBeSavedUsingAJsonExtension.json");
 
     private static final Instant STUBBED_INSTANT = LocalDateTime.of(2021, 10, 15, 17, 45).toInstant(ZoneOffset.UTC);
     private static final Instant UN_STUBBED_INSTANT = LocalDateTime.of(2000, 1, 1, 12, 0).toInstant(ZoneOffset.UTC);
@@ -50,7 +51,7 @@ public class JsonSerializerExtensionTest {
     }
 
     @Test
-    @SaveSamples
+    @SaveSamples(SAVED_SAMPLER_FILE)
     public void aSamplerCanBeSavedUsingAJsonExtension() throws IOException {
         // GIVEN
         testService.setDefaultInstant(STUBBED_INSTANT);
@@ -64,7 +65,12 @@ public class JsonSerializerExtensionTest {
     }
 
     @Test
-    @LoadSamples(file = SAVED_SAMPLER_FILE)
+    public void aTheSavedSamplerExists(){
+        assertTrue("The file: " + EXPECTED_SAVED_SAMPLER + " is missing.", Files.exists(EXPECTED_SAVED_SAMPLER));
+    }
+
+    @Test
+    @LoadSamples(SAVED_SAMPLER_FILE)
     public void bSamplerCanBeLoadedUsingJsonExtension() {
         // GIVEN
         testService.setDefaultInstant(UN_STUBBED_INSTANT);
