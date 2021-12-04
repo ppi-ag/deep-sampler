@@ -40,7 +40,7 @@ import java.util.Objects;
  * There are two things you have to care about when using matchers:
  * </p>
  * <ul>
- *     <li>You cant't mix matchers and normal parameters when defining a sample.</li>
+ *     <li>You can't mix matchers and normal parameters when defining a sample.</li>
  *     <li>The order of method calls when defining a sample matters! So you have to call it within the method invocation you want to stub!</li>
  * </ul>
  * To use your own matcher you have to implement {@link ParameterMatcher} and call {@link Matchers#matcher(ParameterMatcher)} withing the method

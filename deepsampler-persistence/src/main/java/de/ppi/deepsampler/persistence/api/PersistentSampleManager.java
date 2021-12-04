@@ -10,6 +10,7 @@ import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
+import de.ppi.deepsampler.persistence.bean.PolymorphicPersistentBean;
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
@@ -60,8 +61,8 @@ public class PersistentSampleManager {
     /**
      * End of chain method: call {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
-    public void recordSamples() {
-        for (final SourceManager sourceManager: sourceManagerList) {
+    public void record() {
+        for (final SourceManager sourceManager : sourceManagerList) {
             sourceManager.save(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
         }
     }
@@ -71,7 +72,7 @@ public class PersistentSampleManager {
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {
-        for (final SourceManager sourceManager: sourceManagerList) {
+        for (final SourceManager sourceManager : sourceManagerList) {
             final PersistentModel persistentModel = sourceManager.load();
 
             mergeSamplesFromPersistenceIntoSampleRepository(persistentModel);
@@ -87,7 +88,7 @@ public class PersistentSampleManager {
      * This method merges the samples from the persistence (e.g. JSON-File) into manually defined Samplers and Samples. The order of the
      * Samplers is defined by the Samplers in the test class or the compound. Samples from the file will be inserted in the list of Samples
      * at the position where the matching samplers have been defined.
-     *
+     * <p>
      * E.G. Someone could now first define a matcher that matches only on a particular parameter of the value
      * "Picard". The second matcher could then by anyString(). The first Sample would then be used only if the correct parameter is supplied and in all
      * other cases the second sampler would be used.
@@ -141,7 +142,7 @@ public class PersistentSampleManager {
         List<SampleDefinition> usedPersistentCalls = new ArrayList<>();
         List<SampleDefinition> unusedPersistentCalls = new ArrayList<>();
 
-        for(PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
+        for (PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
 
             if (persistentSampleMethod.getSampleMethodId().equals(sampler.getSampleId())) {
                 List<PersistentMethodCall> calls = persistentSamples.getSampleMethodToSampleMap().get(persistentSampleMethod).getAllCalls();
@@ -175,11 +176,19 @@ public class PersistentSampleManager {
                                                                       final PersistentMethodCall call) {
         final List<Object> parameterEnvelopes = call.getPersistentParameter().getParameter();
         final Object returnValueEnvelope = call.getPersistentReturnValue();
+        final Class<?> returnClass;
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
+
+        if (returnValueEnvelope instanceof PolymorphicPersistentBean) {
+            returnClass = ReflectionTools.getOriginalClassFromPolymorphicPersistentBean((PolymorphicPersistentBean) returnValueEnvelope);
+        } else {
+            returnClass = sampledMethod.getMethod().getReturnType();
+        }
+
         final Type[] parameterTypes = sampledMethod.getMethod().getGenericParameterTypes();
         final Type genericReturnType = sampledMethod.getMethod().getGenericReturnType();
         final ParameterizedType parameterizedReturnType = genericReturnType instanceof ParameterizedType ? (ParameterizedType) genericReturnType : null;
-        final Class<?> returnClass = sampledMethod.getMethod().getReturnType();
+
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
         final List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
@@ -204,7 +213,7 @@ public class PersistentSampleManager {
                     "not match the number of persistent parameters (%s:%s)!", id, parameterTypes, parameterPersistentBeans);
         }
         for (int i = 0; i < parameterPersistentBeans.size(); ++i) {
-            final ParameterizedType parameterType = parameterTypes[i] instanceof  ParameterizedType ? (ParameterizedType) parameterTypes[i] : null;
+            final ParameterizedType parameterType = parameterTypes[i] instanceof ParameterizedType ? (ParameterizedType) parameterTypes[i] : null;
             final Class<?> parameterClass = ReflectionTools.getClass(parameterTypes[i]);
             final Object persistentBean = parameterPersistentBeans.get(i);
 
@@ -212,7 +221,6 @@ public class PersistentSampleManager {
         }
         return params;
     }
-
 
 
     private Object unwrapValue(final Class<?> targetClass, final ParameterizedType type, final Object persistentBean) {
@@ -224,7 +232,7 @@ public class PersistentSampleManager {
         List<ParameterMatcher<?>> resultingParameterMatcher = new ArrayList<>();
         for (int i = 0; i < params.size(); ++i) {
             Object param = params.get(i);
-            ParameterMatcher<?> parameterMatcher  = parameterMatchers.get(i);
+            ParameterMatcher<?> parameterMatcher = parameterMatchers.get(i);
 
             if (parameterMatcher instanceof ComboMatcher) {
                 resultingParameterMatcher.add(s -> ((ComboMatcher<Object>) parameterMatcher).getPersistentMatcher().matches(s, param));

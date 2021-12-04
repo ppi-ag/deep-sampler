@@ -6,9 +6,7 @@
 package de.ppi.deepsampler.provider.guice;
 
 import com.google.inject.Guice;
-import de.ppi.deepsampler.provider.common.PersistentSamplerAspectTest;
-import de.ppi.deepsampler.provider.common.TestService;
-
+import de.ppi.deepsampler.provider.common.*;
 import javax.inject.Inject;
 
 

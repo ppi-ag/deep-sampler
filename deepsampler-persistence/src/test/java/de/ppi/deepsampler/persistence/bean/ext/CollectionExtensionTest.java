@@ -163,7 +163,7 @@ class CollectionExtensionTest {
         // WHEN
         Set<Date> result = converter.convert(unmodifiableSet, returnType);
 
-        // TEHN
+        // THEN
         assertNotNull(result);
         assertTrue(result instanceof HashSet);
         assertFalse(unmodifiableSet instanceof HashSet);

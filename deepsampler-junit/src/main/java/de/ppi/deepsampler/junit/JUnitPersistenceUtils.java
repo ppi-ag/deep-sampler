@@ -15,7 +15,10 @@ import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
 
 import java.lang.reflect.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -23,6 +26,8 @@ import java.util.stream.Stream;
  * methods.
  */
 public class JUnitPersistenceUtils {
+
+    public static final String DEFAULT_ROOT_PATH = "./";
 
     private JUnitPersistenceUtils() {
         // Private constructor since this utility class is not intended to be instantiated.
@@ -90,13 +95,77 @@ public class JUnitPersistenceUtils {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
+        Optional<SampleRootPath> rootPath = loadSampleRootPathFromTestOrSampleFixture(testMethod);
 
-        if (!loadSamples.classPath().isEmpty()) {
-            return persistentSampleManagerBuilder.buildWithClassPathResource(loadSamples.classPath(), testMethod.getDeclaringClass());
-        } else if (!loadSamples.file().isEmpty()) {
-            return persistentSampleManagerBuilder.buildWithFile(loadSamples.file());
+        switch (loadSamples.source()) {
+            case FILE_SYSTEM:
+                Path file = createPathForFilesystem(rootPath, loadSamples.value(), testMethod);
+                return persistentSampleManagerBuilder.buildWithFile(file);
+            case CLASSPATH:
+            default:
+                String classPathResource = createPathForClasspath(loadSamples, testMethod);
+                return persistentSampleManagerBuilder.buildWithClassPathResource(classPathResource, testMethod.getDeclaringClass());
+        }
+    }
+
+    private static Optional<SampleRootPath> loadSampleRootPathFromTestOrSampleFixture(Method testMethod) {
+        SampleRootPath sampleRootPath = testMethod.getDeclaringClass().getAnnotation(SampleRootPath.class);
+
+        if (sampleRootPath != null) {
+            return Optional.of(sampleRootPath);
+        }
+
+        return JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod)
+                .map(Object::getClass)
+                .map(fixtureClass -> fixtureClass.getAnnotation(SampleRootPath.class));
+    }
+
+    /**
+     * Creates a {@link Path} based on the three path elements. If any of them is missing, a default value will be used. The
+     * path is concatenated like this: [rootPath][packagePath][fileName].
+     *
+     * @param sampleRootPath the annotation {@link SampleRootPath} that is used to configure the root path. If it is not
+     *                       supplied, the default ./ will be used.
+     * @param file           A file name, that is resolved under rootPath. If it is not supplied, the package of the class,
+     *                       that declares testMethod, the test class name and the test method name is used.
+     *                       file must not be null. The String
+     *                       {@link AnnotationConstants#DEFAULT_VALUE_MUST_BE_CALCULATED} will be treated as not-supplied.
+     *                       This is because the empty default value of {@link LoadSamples#value()} cannot be null.
+     * @param testMethod     The test method that is running the current test. It is used to provide default values.
+     * @return A path that is formatted to be used on the file system (in contrast to a path, that is formatted to be used
+     * on the classpath, see {@link JUnitPersistenceUtils#createPathForClasspath(LoadSamples, Method)}.
+     */
+    static Path createPathForFilesystem(Optional<SampleRootPath> sampleRootPath, String file, Method testMethod) {
+        Path path = sampleRootPath.map(a -> Paths.get(a.value())).orElse(Paths.get(DEFAULT_ROOT_PATH));
+
+        if (file.equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
+            return path.resolve(testMethod.getDeclaringClass().getPackage().getName().replace(".", "/"))
+                    .resolve(getDefaultJsonFileName(testMethod));
         } else {
-            return persistentSampleManagerBuilder.buildWithClassPathResource(getDefaultJsonFileName(testMethod), testMethod.getDeclaringClass());
+            return path.resolve(file.replaceFirst("^[/\\\\]", ""));
+        }
+    }
+
+    /**
+     * <p>
+     * Creates a Path that is used to load a sample file from the classpath. The path is based on two elements:
+     * <p>
+     * [packagePath][fileName]
+     * <p>
+     * If any of these two are missing, a default value will be used.
+     *
+     * @param loadSamples provides the packagePath and the fileName. If packagePath is not supplied, the package of
+     *                    testMethod is used. If fileName is not supplied, the name of testMethod and it's declaring
+     *                    class is used.
+     * @param testMethod  the method that runs the current test. It is used to provide default values for path elements.
+     * @return a path that can be used to load a sample file from the classpath.
+     */
+    static String createPathForClasspath(LoadSamples loadSamples, Method testMethod) {
+        if (loadSamples.value().equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
+            return "/" + testMethod.getDeclaringClass().getPackage().getName().replace(".", "/")
+                    + "/" + getDefaultJsonFileName(testMethod);
+        } else {
+            return loadSamples.value();
         }
     }
 
@@ -105,7 +174,8 @@ public class JUnitPersistenceUtils {
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
 
-        final String fileName = saveSamples.file().isEmpty() ? getDefaultJsonFileNameWithFolder(testMethod) : saveSamples.file();
+        Optional<SampleRootPath> sampleRootPath = loadSampleRootPathFromTestOrSampleFixture(testMethod);
+        final Path fileName = createPathForFilesystem(sampleRootPath, saveSamples.value(), testMethod);
 
         return persistentSampleManagerBuilder.buildWithFile(fileName);
     }
@@ -148,6 +218,7 @@ public class JUnitPersistenceUtils {
     /**
      * Activates {@link UseJsonSerializers} from testMethod and it's declaring class. If both are annotated, both are activated.
      * If testMethod declares {@link JsonSerializer}s for the same types as it's declaring class, the ones from testMethod override the ones from the class.
+     *
      * @param testMethod
      * @param persistentSampleManagerBuilder
      */
@@ -163,6 +234,7 @@ public class JUnitPersistenceUtils {
     /**
      * Activates {@link UseJsonDeserializer}s from testMethod and it's declaring class. If both are annotated, both are activated.
      * If testMethod declares {@link JsonDeserializer}s for the same types as it's declaring class, the ones from testMethod override the ones from the class.
+     *
      * @param testMethod
      * @param persistentSampleManagerBuilder
      */
@@ -280,10 +352,6 @@ public class JUnitPersistenceUtils {
         }
     }
 
-
-    private static String getDefaultJsonFileNameWithFolder(final Method testMethod) {
-        return testMethod.getDeclaringClass().getName().replace(".", "/") + "_" + testMethod.getName() + ".json";
-    }
 
     private static void applyAnnotatedBeanConverterExtension(final Method testMethod, final PersistentSampleManager persistentSampleManager) {
         final UseBeanConverterExtension useBeanConverterExtensionOnMethod = testMethod.getAnnotation(UseBeanConverterExtension.class);

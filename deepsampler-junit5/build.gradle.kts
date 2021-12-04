@@ -15,4 +15,7 @@ dependencies {
     testImplementation(testFixtures(project(":deepsampler-junit")))
     testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
     testImplementation(project(":deepsampler-provider-guice"))
+    testImplementation("org.assertj:assertj-core:3.21.0")
+
+    testImplementation(files("./src/test/tmp"))
 }

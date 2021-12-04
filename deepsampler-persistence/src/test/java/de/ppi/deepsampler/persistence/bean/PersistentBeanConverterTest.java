@@ -107,7 +107,7 @@ class PersistentBeanConverterTest {
     }
 
     @Test
-    void primitiveBeanShouldBereverted() {
+    void primitiveBeanShouldBeReverted() {
         // GIVEN
         final Map<String, Object> values = new HashMap<>();
         values.put("0$simpleInt", 2);

@@ -23,11 +23,11 @@ public class ReflectionTools {
 
     /**
      * Checks if cls is an Array with a complex component type. This is the case if the component type is not a primitive type
-     * nor one of its wrapper types. Multidimensional arrays, thus arrays in arrays are also treated as primitve arrays if the component type
-     * of the deepest not array type is a primitve.
+     * nor one of its wrapper types. Multidimensional arrays, thus arrays in arrays are also treated as primitive arrays if the component type
+     * of the deepest not array type is a primitive.
      *
      * @param cls The class of the suspected array
-     * @return true if cls is an array with elements that have a Type that is not primitive nor a primitve wrapper.
+     * @return true if cls is an array with elements that have a Type that is not primitive nor a primitive wrapper.
      */
     public static boolean isObjectArray(final Class<?> cls) {
         if (!cls.isArray()) {
@@ -60,8 +60,8 @@ public class ReflectionTools {
     /**
      * Checks if cls is a primitive type or one of its wrapper types i.e. Integer for int.
      *
-     * @param cls The suspected primitve type
-     * @return true it cls is a primitve or a wrapper like int and Integer.
+     * @param cls The suspected primitive type
+     * @return true it cls is a primitive or a wrapper like int and Integer.
      */
     public static boolean isPrimitiveOrWrapper(final Class<?> cls) {
         return cls.isPrimitive()
@@ -92,7 +92,7 @@ public class ReflectionTools {
      * (Real primitives cannot occur here, because primitives are not allowed as generic type parameters.)
      *
      * @param type                      The generic class that should be checked.
-     * @param numberOfParametersToCheck The number of the first generic parameters that should be chekced.
+     * @param numberOfParametersToCheck The number of the first generic parameters that should be checked.
      * @return true if cls has generic type parameters that are wrapper types.
      */
     public static boolean hasPrimitiveTypeParameters(Type type, int numberOfParametersToCheck) {
@@ -154,7 +154,7 @@ public class ReflectionTools {
      * Creates an empty array. The dimensions of the new array will be the same as of templateArray. The componentType of the
      * new array will be newArrayType.
      *
-     * @param templateArray A template array that is used as an example for the deimensions of the new array.
+     * @param templateArray A template array that is used as an example for the dimensions of the new array.
      * @param newArrayType  the componentType of the new array
      * @param <T>           the componentType of the new array
      * @return the new array formed after templateArray and newArrayType.
@@ -224,10 +224,10 @@ public class ReflectionTools {
     /**
      * Converts the String source into a primitive wrapper object using the supplied wrapperType.
      *
-     * @param source The String that should be converted to a wrapperType. The String must be formatted in a way that complies with
-     *               the parser of the desired wrapper type.
+     * @param source      The String that should be converted to a wrapperType. The String must be formatted in a way that complies with
+     *                    the parser of the desired wrapper type.
      * @param wrapperType A wrapper type. This must be a Class of any Wrapper type otherwise an Exception will be thrown.
-     * @param <T> The target type.
+     * @param <T>         The target type.
      * @return returns an instance of wrapperType containing the parsed value of source.
      */
     public static <T> T parseString(String source, Class<T> wrapperType) {
@@ -243,6 +243,24 @@ public class ReflectionTools {
             }
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new PersistenceException("We were unable to parse %s from %s", e, wrapperType.getTypeName(), source);
+        }
+    }
+
+    /**
+     * Retrieves the original type from polymorphicPersistentBean and tries to instantiate a {@link Class} for the type.
+     * If the {@link Class} cannot be found a {@link PersistenceException} is thrown.
+     *
+     * @param polymorphicPersistentBean The {@link PolymorphicPersistentBean} which holds the wanted type.
+     * @return the class of the original bean that is described by polymorphicPersistentBean.
+     */
+    public static Class<?> getOriginalClassFromPolymorphicPersistentBean(PolymorphicPersistentBean polymorphicPersistentBean) {
+        try {
+            return Class.forName(polymorphicPersistentBean.getPolymorphicBeanType());
+        } catch (ClassNotFoundException e) {
+            throw new PersistenceException(
+                    "The Polymorphic Class %s was not found. This occurs if a polymorphic class was recorded but is not in the classpath (anymore?)",
+                    e,
+                    polymorphicPersistentBean.getPolymorphicBeanType());
         }
     }
 
