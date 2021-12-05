@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -807,7 +807,7 @@ public abstract class PersistentSamplerAspectTest {
 
     private PersistentSampleManager save(Path pathToFile) {
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
-        source.record();
+        source.recordSamples();
         return source;
     }
 

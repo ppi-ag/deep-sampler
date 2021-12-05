@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -34,7 +34,7 @@ class PersistentSamplerManagerTest {
 
         // WHEN
         PersistentSampler.source(JsonSourceManager.builder().buildWithFile("./record/testApiSay.json"))
-                .record();
+                .recordSamples();
 
         // THEN
         assertTrue(Files.exists(path));
@@ -81,7 +81,7 @@ class PersistentSamplerManagerTest {
 
         // WHEN
         PersistentSampler.source(JsonSourceManager.builder().buildWithFile(path.toString()))
-                .record();
+                .recordSamples();
 
         // THEN
         assertTrue(Files.exists(path));

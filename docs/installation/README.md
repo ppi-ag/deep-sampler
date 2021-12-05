@@ -13,13 +13,13 @@ fit best to your environment.
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-junit5</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-provider-spring</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -30,13 +30,13 @@ fit best to your environment.
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-junit5</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-provider-guice</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -47,13 +47,13 @@ fit best to your environment.
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-junit4</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-provider-spring</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -64,13 +64,13 @@ fit best to your environment.
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-junit4</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 <dependency>
     <groupId>de.ppi</groupId>
     <artifactId>deepsampler-provider-guice</artifactId>
-    <version>1.0.4</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 ```

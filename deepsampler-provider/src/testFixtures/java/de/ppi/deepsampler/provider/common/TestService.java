@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -148,10 +148,14 @@ public class TestService {
     }
 
     public List<TestBean> getListOfTestBeans() {
+        // Usually it would be better to use Collections.singletonList() for Lists with only one entry, but
+        // we are unable to deserialize Collections.SingletonList since this is a private inner class.
         return Arrays.asList(new TestBean(HARD_CODED_RETURN_VALUE));
     }
 
     public List<String> getListOfStrings() {
+        // Usually it would be better to use Collections.singletonList() for Lists with only one entry, but
+        // we are unable to deserialize Collections.SingletonList since this is a private inner class.
         return Arrays.asList(HARD_CODED_RETURN_VALUE);
     }
 

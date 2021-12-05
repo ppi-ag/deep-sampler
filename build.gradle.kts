@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -11,7 +11,7 @@ plugins {
 }
 
 allprojects {
-    version = "1.0.0"
+    version = "2.0.0"
     group = "de.ppi"
 
     apply(plugin = "java-library")

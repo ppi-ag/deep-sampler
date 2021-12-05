@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -82,13 +82,13 @@ public abstract class SpringSamplerAspect {
                         joinPoint::proceed);
                 Object returnValue = ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
 
-                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, Arrays.asList(joinPoint.getArgs())));
+                ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(returnValue, Arrays.asList(joinPoint.getArgs())));
 
                 return returnValue;
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = joinPoint.proceed();
-                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, Arrays.asList(joinPoint.getArgs())));
+                ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(returnValue, Arrays.asList(joinPoint.getArgs())));
                 return returnValue;
             }
         }

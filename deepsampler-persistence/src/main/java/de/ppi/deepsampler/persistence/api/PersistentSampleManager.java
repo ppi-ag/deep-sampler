@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -61,7 +61,7 @@ public class PersistentSampleManager {
     /**
      * End of chain method: call {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
-    public void record() {
+    public void recordSamples() {
         for (final SourceManager sourceManager : sourceManagerList) {
             sourceManager.save(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
         }
