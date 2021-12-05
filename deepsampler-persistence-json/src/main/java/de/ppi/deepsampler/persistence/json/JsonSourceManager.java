@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -34,7 +34,7 @@ public class JsonSourceManager implements SourceManager {
 
     @Override
     public void save(final Map<Class<?>, ExecutionInformation> executionInformation, final PersistentSamplerContext persistentSamplerContext) {
-        jsonRecorder.record(executionInformation, persistentSamplerContext);
+        jsonRecorder.recordExecutionInformation(executionInformation, persistentSamplerContext);
     }
 
     @Override

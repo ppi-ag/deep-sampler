@@ -1,11 +1,14 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.junit4;
 
-import de.ppi.deepsampler.junit.*;
+import de.ppi.deepsampler.junit.GetSomeStringTestSampleFixture;
+import de.ppi.deepsampler.junit.LoadSamples;
+import de.ppi.deepsampler.junit.TestSampleFixture;
+import de.ppi.deepsampler.junit.UseSamplerFixture;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;

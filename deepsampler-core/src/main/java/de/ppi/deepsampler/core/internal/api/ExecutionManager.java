@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2021  PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -17,7 +17,7 @@ public class ExecutionManager {
         // This constructor is private since this class is not intended to be instantiated.
     }
 
-    public static void record(final SampleDefinition sampleDefinition, final MethodCall actualMethodCall) {
+    public static void recordMethodCall(final SampleDefinition sampleDefinition, final MethodCall actualMethodCall) {
         getSampleExecutionInformation(sampleDefinition).addMethodCall(actualMethodCall);
     }
 
