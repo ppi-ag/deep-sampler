@@ -98,6 +98,32 @@ class MatchersTest {
     }
 
     @Test
+    void equalsMatcherWithStringWorks() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoString("make it so!")).is("engage!");
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+
+        assertEquals(1, currentSampleDefinition.getNumberOfParameters());
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("make it so!"));
+    }
+
+    @Test
+    void explicitEqualsMatcherWithStringWorks() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoString(Matchers.equalTo("make it so!"))).is("engage!");
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+
+        assertEquals(1, currentSampleDefinition.getNumberOfParameters());
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("make it so!"));
+    }
+
+    @Test
     void sameAsMatcherWorks() {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
@@ -246,6 +272,10 @@ class MatchersTest {
 
         byte echoByte(final byte someByte) {
             return someByte;
+        }
+
+        String echoString(String string) {
+            return string;
         }
 
         boolean echoBoolean(final boolean someBoolean) {
