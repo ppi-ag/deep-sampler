@@ -310,7 +310,7 @@ public class PersistentBeanConverter {
 
     private boolean isTransformationNotNecessary(final Object obj, final ParameterizedType parameterizedType) {
 
-        return obj == null || ReflectionTools.isPrimitiveOrWrapper(obj.getClass()) || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
+        return obj == null|| obj.getClass().isEnum() || ReflectionTools.isPrimitiveOrWrapper(obj.getClass()) || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
                 || findApplicableExtensions(obj.getClass(), parameterizedType).stream()
                 .anyMatch(ext -> ext.skip(obj.getClass(), parameterizedType));
     }

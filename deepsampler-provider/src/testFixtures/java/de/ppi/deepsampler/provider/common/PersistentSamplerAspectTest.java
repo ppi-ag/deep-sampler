@@ -479,10 +479,9 @@ public abstract class PersistentSamplerAspectTest {
         // 🧪 WHEN
         PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(any(Ship.class)));
         source.load();
-
-        String actualRegistration = getTestService().getShipsRegistrationFromEnum(Ship.DEFIANT);
-
         // 🔬 THEN
+        assertThrows(NoMatchingParametersFoundException.class, ()-> getTestService().getShipsRegistrationFromEnum(Ship.DEFIANT));
+        String actualRegistration = getTestService().getShipsRegistrationFromEnum(Ship.ENTERPRISE);
         assertEquals(Ship.ENTERPRISE.getRegistration(), actualRegistration);
     }
 
