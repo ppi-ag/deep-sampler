@@ -5,6 +5,8 @@
 
 package de.ppi.deepsampler.provider.common;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -17,6 +19,7 @@ public class TestService {
     public static final String HARD_CODED_RETURN_VALUE = "Some value";
 
     private int counter = 0;
+    private Ship shipEnum;
 
     /**
      * This method returns a primitive parameter if the method is not sampled.
@@ -251,5 +254,25 @@ public class TestService {
 
     public String getNull() {
         return null;
+    }
+
+    public String getShipsRegistrationFromEnum(Ship ship) {
+        return ship.getRegistration();
+    }
+
+    public Ship getShipEnum() {
+        return this.shipEnum;
+    }
+
+    public void setShipEnum(Ship shipEnum) {
+        this.shipEnum = shipEnum;
+    }
+
+    public TestBeanWithEnum getBeanWithShipEnum() {
+        return new TestBeanWithEnum(this.shipEnum);
+    }
+
+    public RetentionPolicy getEnumWithDefaultConstructor() {
+        return RetentionPolicy.CLASS;
     }
 }

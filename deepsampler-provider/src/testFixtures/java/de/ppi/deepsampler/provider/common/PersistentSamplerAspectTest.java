@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.lang.annotation.RetentionPolicy;
 import java.nio.file.Path;
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -463,10 +464,112 @@ public abstract class PersistentSamplerAspectTest {
         assertEquals(LocalDateTime.of(2020, 10, 29, 10, 10, 10), getTestService().testLocalDateTime());
     }
 
+    @Test
+    public void enumInParameterCanBeRecordedAndLoaded(Path tempFile) {
+        // 👉 GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(any(Ship.class)));
+
+        getTestService().getShipsRegistrationFromEnum(Ship.ENTERPRISE);
+
+        final PersistentSampleManager source = save(tempFile);
+
+        clearSampleRepositoryWithAssertion();
+
+        // 🧪 WHEN
+        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(any(Ship.class)));
+        source.load();
+        // 🔬 THEN
+        assertThrows(NoMatchingParametersFoundException.class, ()-> getTestService().getShipsRegistrationFromEnum(Ship.DEFIANT));
+        String actualRegistration = getTestService().getShipsRegistrationFromEnum(Ship.ENTERPRISE);
+        assertEquals(Ship.ENTERPRISE.getRegistration(), actualRegistration);
+    }
+
+
+    @Test
+    public void enumInReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+        // 👉 GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getShipEnum());
+
+        final Ship recordedShip = Ship.ENTERPRISE;
+        getTestService().setShipEnum(recordedShip);
+
+        getTestService().getShipEnum();
+
+        final PersistentSampleManager source = save(tempFile);
+
+        clearSampleRepositoryWithAssertion();
+
+        // 🧪 WHEN
+        PersistentSample.of(testServiceSampler.getShipEnum());
+        source.load();
+
+        final Ship notShip = Ship.DEFIANT;
+        getTestService().setShipEnum(notShip);
+
+        Ship actualShip = getTestService().getShipEnum();
+
+        // 🔬 THEN
+        assertEquals(recordedShip, actualShip);
+    }
+
+
+    @Test
+    public void enumInBeanCanBeRecordedAndLoaded(Path tempFile) {
+        // 👉 GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getBeanWithShipEnum());
+
+        final Ship recordedShip = Ship.ENTERPRISE;
+        getTestService().setShipEnum(recordedShip);
+
+        getTestService().getBeanWithShipEnum();
+
+        final PersistentSampleManager source = save(tempFile);
+
+        clearSampleRepositoryWithAssertion();
+
+        // 🧪 WHEN
+        PersistentSample.of(testServiceSampler.getBeanWithShipEnum());
+        source.load();
+
+        final Ship notShip = Ship.DEFIANT;
+        getTestService().setShipEnum(notShip);
+
+        TestBeanWithEnum actualBeanWithShipEnum = getTestService().getBeanWithShipEnum();
+
+        // 🔬 THEN
+        assertEquals(recordedShip, actualBeanWithShipEnum.getShip());
+    }
+
+
+    @Test
+    public void enumWithDefaultConstructorCanBeRecordedAndLoaded(Path tempFile) {
+        // 👉 GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getEnumWithDefaultConstructor());
+
+        getTestService().getEnumWithDefaultConstructor();
+
+        final PersistentSampleManager source = save(tempFile);
+
+        clearSampleRepositoryWithAssertion();
+
+        // 🧪 WHEN
+        PersistentSample.of(testServiceSampler.getEnumWithDefaultConstructor());
+        source.load();
+
+        RetentionPolicy actualEnum = getTestService().getEnumWithDefaultConstructor();
+
+        // 🔬 THEN
+        assertEquals(RetentionPolicy.CLASS, actualEnum);
+    }
+
 
     @Test
     void testComboMatcherLoadAllButAcceptOnlyA(Path tempFile) {
-        // GIVEN
+        // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.echoParameter(anyString())).hasId(MY_ECHO_PARAMS);
 
@@ -479,12 +582,12 @@ public abstract class PersistentSamplerAspectTest {
 
         source.load();
 
-        // WHEN
+        // 🧪 WHEN
         final TestService testService = getTestService();
         String result = testService.echoParameter("A");
         String secondCallResult = testService.echoParameter("A");
 
-        // THEN
+        // 🔬 THEN
         assertEquals("ABC", result);
         assertEquals("ABC", secondCallResult);
         assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter("B"));
