@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ProxiedServiceSpringConfig.class)
-public class ProxiedServiceTest {
+class ProxiedServiceTest {
 
     public static final String VALUE_A = "Value A";
     public static final String VALUE_B = "Value B";
@@ -27,7 +27,7 @@ public class ProxiedServiceTest {
     private ProxiedTestService proxiedTestService;
 
     @Test
-    public void proxiedServiceCanBeStubbed() {
+    void proxiedServiceCanBeStubbed() {
         // 👉 GIVEN
         final ProxiedTestService testServiceSampler = Sampler.prepare(ProxiedTestService.class);
         Sample.of(testServiceSampler.echoParameter(VALUE_B)).is(VALUE_A);
