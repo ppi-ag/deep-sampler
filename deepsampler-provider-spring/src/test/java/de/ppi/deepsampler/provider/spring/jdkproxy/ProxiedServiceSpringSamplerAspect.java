@@ -21,6 +21,7 @@ public class ProxiedServiceSpringSamplerAspect extends SpringSamplerAspect {
      * See https://docs.spring.io/spring-framework/docs/2.0.x/reference/aop.html
      */
     @Pointcut("target(de.ppi.deepsampler.provider.spring.jdkproxy.ProxiedTestService)")
+    @Override
     public void include() {
     }
 
@@ -34,6 +35,7 @@ public class ProxiedServiceSpringSamplerAspect extends SpringSamplerAspect {
             + "&& !@within(org.aspectj.lang.annotation.Aspect) " // Excludes all Aspects by excluding classes annotated with @Aspect
             + "&& !within(is(EnumType)) ") // Excludes all Enums
     @SuppressWarnings("unused") // Method is called generically by Spring, so the compiler believes it would be unused.
+    @Override
     public void defaultPointCut() {
     }
 }
