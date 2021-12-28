@@ -24,7 +24,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
         with:
           gradle-version: 6.6
-          arguments: publishAllPublicationsToMavenRepository --no-daemon --no-parallel
+          arguments: publishAllPublicationsToMavenCentralRepository --no-daemon --no-parallel
 
       - name: Publish release
         run: ./gradlew closeAndReleaseRepository --no-daemon --no-parallel
