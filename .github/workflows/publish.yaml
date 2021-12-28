@@ -7,7 +7,6 @@ jobs:
         environment: publish
         steps:
             -   uses: actions/checkout@v2
-
             -   name: Set up Maven Central Repository
                 uses: actions/setup-java@v2
                 with:
