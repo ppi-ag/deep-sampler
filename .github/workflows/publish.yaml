@@ -17,13 +17,12 @@ jobs:
             -   name: Create POM
                 run: ./gradlew generatePomFileForMavenPublication
             -   name: Publish package
-                run: ./gradlew publish
+                run: ./gradlew publishAllPublicationsToMavenCentralRepository --no-daemon --no-parallel
                 env:
                     ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
                     ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_TOKEN }}
                     #see https://central.sonatype.org/publish/requirements/gpg/
                     ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSPHRASE }}
-                    ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_KEY_ID }}
                     ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_ASCII }}
                     # this helps to identify issues with GPG
                     GPG_TTY: $(tty)
