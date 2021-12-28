@@ -5,8 +5,7 @@ jobs:
   publish:
 
     runs-on: ubuntu-latest
-    if: github.repository == 'vanniktech/gradle-maven-publish-plugin'
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v2
