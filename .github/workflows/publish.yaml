@@ -2,24 +2,31 @@ name: Publish to Maven Central
 on:
     workflow_dispatch
 jobs:
-    publish:
-        runs-on: ubuntu-latest
-        environment: publish
-        steps:
-            -   uses: actions/checkout@v2
-            -   name: Set up Maven Central Repository
-                uses: actions/setup-java@v2
-                with:
-                    java-version: '15'
-                    distribution: 'zulu'
-            -   name: Grant execute permission for gradlew
-                run: chmod +x gradlew
-            -   name: Create POM
-                run: ./gradlew generatePomFileForMavenPublication
-            -   name: Publish package
-                run: ./gradlew publish --no-daemon --no-parallel
-                env:
-                    ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
-                    ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_TOKEN }}
-                    ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
-                    ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+  publish:
+
+    runs-on: ubuntu-latest
+    if: github.repository == 'vanniktech/gradle-maven-publish-plugin'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Upload release
+        run: ./gradlew publishAllPublicationsToMavenRepository --no-daemon --no-parallel
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+
+      - name: Publish release
+        run: ./gradlew closeAndReleaseRepository --no-daemon --no-parallel
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
