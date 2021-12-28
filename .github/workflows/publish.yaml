@@ -15,7 +15,8 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-      - uses: gradle/gradle-build-action@v2
+      - name: Upload archives to Nexus    
+        uses: gradle/gradle-build-action@v2
         env:
           ORG_GRADLE_PROJECT_SONATYPE_NEXUS_USERNAME: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
@@ -28,6 +29,7 @@ jobs:
       - name: Publish release
         uses: gradle/gradle-build-action@v2
         with: 
+           gradle-version: 6.6
            arguments: closeAndReleaseRepository --no-daemon --no-parallel
         env:
           ORG_GRADLE_PROJECT_SONATYPE_NEXUS_USERNAME: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
