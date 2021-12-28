@@ -34,12 +34,6 @@ tasks.jar {
     }
 }
 
-mavenPublish {
-    nexus {
-        baseUrl = "https://oss.sonatype.org/service/local/"
-        stagingProfile = "de.ppi"
-    }
-}
 
 
 sonarqube {
