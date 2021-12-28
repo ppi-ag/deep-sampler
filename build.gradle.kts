@@ -7,7 +7,7 @@ plugins {
     `java-library`
     id("jacoco")
     id("org.sonarqube") version "3.0"
-    id("com.vanniktech.maven.publish") version "0.13.0"
+    id("com.vanniktech.maven.publish") version "0.17.0"
 }
 
 allprojects {
