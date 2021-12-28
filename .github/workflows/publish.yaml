@@ -26,7 +26,9 @@ jobs:
           arguments: uploadArchives --no-daemon --no-parallel --stacktrace
 
       - name: Publish release
-        run: ./gradlew closeAndReleaseRepository --no-daemon --no-parallel
+        uses: gradle/gradle-build-action@v2
+        with: 
+           arguments: closeAndReleaseRepository --no-daemon --no-parallel
         env:
           ORG_GRADLE_PROJECT_SONATYPE_NEXUS_USERNAME: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
