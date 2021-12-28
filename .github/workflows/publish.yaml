@@ -15,16 +15,16 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Upload release
-        run: ./gradlew publishAllPublicationsToMavenRepository --no-daemon --no-parallel
+      - uses: gradle/gradle-build-action@v2
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+        with:
+          gradle-version: 6.5
+          arguments: publishAllPublicationsToMavenRepository --no-daemon --no-parallel
 
       - name: Publish release
         run: ./gradlew closeAndReleaseRepository --no-daemon --no-parallel
