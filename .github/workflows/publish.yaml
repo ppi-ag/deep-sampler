@@ -17,7 +17,7 @@ jobs:
             -   name: Create POM
                 run: ./gradlew generatePomFileForMavenPublication
             -   name: Publish package
-                run: ./gradlew publish --debug
+                run: ./gradlew publish
                 env:
                     ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
                     ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_TOKEN }}
