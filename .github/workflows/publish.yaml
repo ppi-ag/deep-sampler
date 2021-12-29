@@ -20,17 +20,8 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
-          ORG_GRADLE_PROJECT_SIGNING_PRIVATE_KEY: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_SIGNINGPASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
         with:
-          gradle-version: 6.6
+          gradle-version: 7.3.3
           arguments: publish --no-daemon --no-parallel --stacktrace
-
-      - name: closeAndReleaseRepository
-        uses: gradle/gradle-build-action@v2
-        with: 
-           gradle-version: 6.6
-           arguments: closeAndReleaseRepository --no-daemon --no-parallel
-        env:
-          ORG_GRADLE_PROJECT_repositoryUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
-          ORG_GRADLE_PROJECT_repositoryPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
