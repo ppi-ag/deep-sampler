@@ -116,7 +116,7 @@ class JUnitPersistenceUtilsTest {
         Path defaultPath = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), DEFAULT_VALUE_MUST_BE_CALCULATED, testMethod);
 
         // THEN
-        String expectedFileName = "./myRoot/de/ppi/deepsampler/junit/Example_loadInnerSerializerClass.json".replace("/", File.separator);
+        String expectedFileName = "./src/test/resources/de/ppi/deepsampler/junit/Example_loadInnerSerializerClass.json".replace("/", File.separator);
         assertEquals(expectedFileName, defaultPath.toString());
     }
 
@@ -130,7 +130,7 @@ class JUnitPersistenceUtilsTest {
         Path path = JUnitPersistenceUtils.createPathForFilesystem(Optional.of(sampleRootPath), "myCustom.file", testMethod);
 
         // THEN
-        String expectedFileName = "./myRoot/myCustom.file".replace("/", File.separator);
+        String expectedFileName = "./src/test/resources/myCustom.file".replace("/", File.separator);
         assertEquals(expectedFileName, path.toString());
     }
 
@@ -153,7 +153,7 @@ class JUnitPersistenceUtilsTest {
 
 
 
-    @SampleRootPath("./myRoot")
+    @SampleRootPath("./src/test/resources/")
     public class Example {
 
         @LoadSamples

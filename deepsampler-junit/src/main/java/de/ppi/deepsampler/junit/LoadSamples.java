@@ -18,8 +18,7 @@ import java.lang.annotation.Target;
  * <p>
  * The filename may be defined using the property {@link LoadSamples#value()}. The default filename is composed using the
  * full qualified name of the test class and the test method.
- * <p>
- * The root path for relative filenames is by default './'. It can be changed, using the annotation {@link SampleRootPath}.
+ *
  * <p>
  * This annotation must be used in combination with @{@link UseSamplerFixture}.
  * <p>
@@ -32,11 +31,16 @@ public @interface LoadSamples {
 
 
     /**
-     * The name of the json file. If this property is omitted, the name will be composed like this:
+     * The name of the json file. If this property is omitted, the name will be composed like so:
      * [package of the test class]/[Test class name]_[test method].json
      * <p>
-     * If the annotation {@link SampleRootPath} is present, file() will be interpreted relative to the
-     * supplied root path.
+     * The root path of relative filenames for source
+     *  <ul>
+     *      <li>{@link FileSource#FILE_SYSTEM} is by default './'. It can be changed, using the annotation {@link SampleRootPath}.</li>
+     *      <li>{@link FileSource#CLASSPATH} is the classpath itself. value() will be interpreted exactly as it is described by
+     *         {@link ClassLoader#getResource(String)}. Since the ClassLoader is retrieved from the current test class, value()
+     *         can also be defined relative to the test class. The annotation {@link SampleRootPath} is ignored.</li>
+     *  * </ul>
      *
      * @return the name of the sample JSON file.
      */
@@ -44,9 +48,9 @@ public @interface LoadSamples {
 
     /**
      * Defines from where the file is loaded. Either the classpath or the vanilla filesystem can be used. Default is
-     * {@link FileSource#CLASSPATH}.
+     * {@link FileSource#FILE_SYSTEM}.
      *
      * @return The source of the file.
      */
-    FileSource source() default FileSource.CLASSPATH;
+    FileSource source() default FileSource.FILE_SYSTEM;
 }

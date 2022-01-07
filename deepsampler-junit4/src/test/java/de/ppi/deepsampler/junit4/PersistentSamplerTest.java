@@ -38,7 +38,7 @@ public class PersistentSamplerTest {
 
     @Test
     @UseSamplerFixture(TestSampleFixture.class)
-    @LoadSamples
+    @LoadSamples(source = FileSource.CLASSPATH)
     public void aSamplerCanBeLoadedFromFile() throws Throwable {
         assertTestBeanHasStubbedInt();
     }
@@ -82,7 +82,7 @@ public class PersistentSamplerTest {
     }
 
     @Test
-    @LoadSamples
+    @LoadSamples(source = FileSource.CLASSPATH)
     public void fSampleFixtureFromClassLevelShouldBeUsed() throws Throwable {
         assertTestBeanHasStubbedString();
     }
