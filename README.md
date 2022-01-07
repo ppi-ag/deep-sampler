@@ -1,6 +1,6 @@
 <img src="/docs/assets/logo.svg?raw=true" alt="DeepSampler" width="40%"/>
 
-This is the doc for the upcomming version 2.0.0 - For older versions see [1.1.0](https://github.com/ppi-ag/deep-sampler/tree/%F0%9F%93%9A-maintenance-v1.1.0)
+This is the doc for the upcoming version 2.0.0 - For older versions see [1.1.0](https://github.com/ppi-ag/deep-sampler/tree/%F0%9F%93%9A-maintenance-v1.1.0)
 
 ![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler)
 
@@ -235,9 +235,8 @@ void loadSamplesFromJson() {
    assertEquals("Hello Sarek!", greetingService.createGreeting(1));
 }
 ```
-By default `LoadSamples` searches for the JSON-file on the classpath. It expects the JSON-file in the same package
-where the current test case is located. The file name is created using the class name, and the method name of the package. 
-In this case DeepSampler would try to load a file named 
+By default `LoadSamples` searches for the JSON-file on the filesystem. The file name is created using the 
+full qualified class name, and the method name of the package. In this case DeepSampler would try to load a file named 
 `./de/ppi/deepsampler/examples/helloworld/GreetingServiceTest_loadSamplesFromJson.json`.
 
 ## Scopes
