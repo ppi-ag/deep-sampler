@@ -35,9 +35,11 @@ parameters. This is how even longer tests with several varying calls to stubs ca
 
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
-# 🎓 Quickstart
-The following tutorial demonstrates how to use DeepSampler with JUnit5 and Guice. You can download or clone the complete
-code from [DeepSampler Examples](https://github.com/ppi-ag/deep-sampler-examples).
+# 🎓 Examples
+We have a second repo where we collect runnable examples with detailed explanations: [DeepSampler Examples 🚀](https://github.com/ppi-ag/deep-sampler-examples).
+
+# Quickstart
+The following tutorial demonstrates how to use DeepSampler with JUnit5 and Guice. 
 
 ## Installation
 We use Maven to build the example. So, as a first step, we add the following dependencies to our pom.xml:
