@@ -5,6 +5,7 @@
 
 package de.ppi.deepsampler.junit4;
 
+import de.ppi.deepsampler.junit.FileSource;
 import de.ppi.deepsampler.junit.GetSomeStringTestSampleFixture;
 import de.ppi.deepsampler.junit.LoadSamples;
 import de.ppi.deepsampler.junit.TestSampleFixture;
@@ -25,13 +26,13 @@ public class SamplerFixtureTest {
     public DeepSamplerRule deepSamplerRule = new DeepSamplerRule();
 
     @Test
-    @LoadSamples
+    @LoadSamples(source = FileSource.CLASSPATH)
     public void samplerFixtureAtClassLevelShouldBeUsed() throws Throwable {
         assertTestBeanHasStubbedInt();
     }
 
     @Test
-    @LoadSamples
+    @LoadSamples(source = FileSource.CLASSPATH)
     @UseSamplerFixture(GetSomeStringTestSampleFixture.class)
     public void samplerFixtureAtMethodLevelShouldBeUsed() throws Throwable {
         assertTestBeanHasStubbedString();
