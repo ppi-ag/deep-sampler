@@ -215,20 +215,18 @@ In this case DeepSampler would try to load a file named
 DeepSampler is by default Thread-scoped. So Samples, that have been defined 
 in one Thread, are available only in this particular Thread.
 
-But you can change the Scope using `SampleRepository::setScope`. DeepSampler comes with two
+You can change the Scope using `Execution::setScope`. DeepSampler comes with two
 predefined Scopes:
-   * `ThreadScope`: Samples are Thread-exclusive, this is the default.
-   * `SingeltonScope`: The same Samples are available across the entire VM and all Threads share the same Samples.
-
-You can also define your own custom Scope by implementing the interface 
-`de.ppi.deepsampler.core.model.Scope`. 
+   * `ScopeType#THREAD`: Samples are Thread-exclusive, this is the default.
+   * `ScopeType#SINGLETON`: The same Samples are available across the entire VM and all Threads share the same Samples.
   
-🔎 __Note__ the Scope must be changed before the first Samples have been defined.
+🔎 __Note__ the Scope must be changed before any Samples have been defined.
 
 The following line would make all Samples available across all Threads:
 ```
-    SampleRepository.setScope(new SingletonScope());
+    Execution.setScope(ScopeType.SINGLETON);
 ```
+
 
 
 
