@@ -57,10 +57,9 @@ public class PersistentBeanConverter {
             return (T) revertPersistentBeanArray(persistentBean, originalBeanClass);
         }
 
-        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBeanClass, parameterizedType);
-        if (!applicableExtensions.isEmpty()) {
-            // Only use the first one!
-            return applicableExtensions.get(0).revert(persistentBean, originalBeanClass, parameterizedType, this);
+        final Optional<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBeanClass, parameterizedType);
+        if (applicableExtensions.isPresent()) {
+            return applicableExtensions.get().revert(persistentBean, originalBeanClass, parameterizedType, this);
         }
 
         if (persistentBean instanceof PersistentBean) {
@@ -91,10 +90,9 @@ public class PersistentBeanConverter {
         }
 
 
-        final List<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass(), parameterizedReturnType);
-        if (!applicableExtensions.isEmpty()) {
-            // Only use the first one!
-            return (T) applicableExtensions.get(0).convert(originalBean, parameterizedReturnType, this);
+        final Optional<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass(), parameterizedReturnType);
+        if (applicableExtensions.isPresent()) {
+            return (T) applicableExtensions.get().convert(originalBean, parameterizedReturnType, this);
         }
 
         if (originalBean.getClass().equals(type)
@@ -304,15 +302,26 @@ public class PersistentBeanConverter {
     }
 
 
-    private List<BeanConverterExtension> findApplicableExtensions(final Class<?> beanClass, final ParameterizedType parameterizedType) {
-        return beanConverterExtensions.stream().filter(ext -> ext.isProcessable(beanClass, parameterizedType)).collect(Collectors.toList());
+    private Optional<BeanConverterExtension> findApplicableExtensions(final Class<?> beanClass, final ParameterizedType parameterizedType) {
+        List<BeanConverterExtension> allApplicableExtensions = beanConverterExtensions.stream()
+                .filter(ext -> ext.isProcessable(beanClass, parameterizedType))
+                .collect(Collectors.toList());
+
+        // The list of extensions is a LIFO, so that last added extensions can overwrite previously added extensions.
+        // Otherwise, default extensions could not be overwritten by users.
+        return allApplicableExtensions.isEmpty()
+                ? Optional.empty()
+                : Optional.of(allApplicableExtensions.get(allApplicableExtensions.size() - 1));
     }
 
     private boolean isTransformationNotNecessary(final Object obj, final ParameterizedType parameterizedType) {
-
-        return obj == null|| obj.getClass().isEnum() || ReflectionTools.isPrimitiveOrWrapper(obj.getClass()) || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
-                || findApplicableExtensions(obj.getClass(), parameterizedType).stream()
-                .anyMatch(ext -> ext.skip(obj.getClass(), parameterizedType));
+        return obj == null
+                || obj.getClass().isEnum()
+                || ReflectionTools.isPrimitiveOrWrapper(obj.getClass())
+                || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
+                || findApplicableExtensions(obj.getClass(), parameterizedType)
+                    .map(ext -> ext.skip(obj.getClass(), parameterizedType))
+                    .orElse(false);
     }
 
 

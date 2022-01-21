@@ -133,6 +133,7 @@ public abstract class PersistentSamplerAspectTest {
 
     @Test
     public void sqlDateCanBeRecordedAndLoaded(Path tempFile) {
+        // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
 
@@ -142,13 +143,46 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
+        // WHEN
         PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
         source.load();
 
+        // THEN
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
         assertEquals(expectedDate, stubbedDate);
+
+        assertThat(tempFile).content().containsPattern("\"returnValue\" : \\[ \"java.sql.Date\", [0-9]{11} \\]");
+    }
+
+    @Test
+    public void sqlDateCanBeRecordedAndLoadedWithBeanConverter(Path tempFile) {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+
+        Date expectedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+
+        final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder()
+                .buildWithFile(tempFile))
+                .addBeanExtension(new SqlDateBeanConverterExtension());
+
+        source.recordSamples();
+
+        clearSampleRepositoryWithAssertion();
+
+        // WHEN
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        source.load();
+
+        // THEN
+        assertFalse(SampleRepository.getInstance().isEmpty());
+
+        Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        assertEquals(expectedDate.toString(), stubbedDate.toString());
+
+        assertThat(tempFile).content().containsPattern("\"returnValue\" : \"[0-9]{2}.[0-9]{2}.[0-9]{4}");
     }
 
     @Test
