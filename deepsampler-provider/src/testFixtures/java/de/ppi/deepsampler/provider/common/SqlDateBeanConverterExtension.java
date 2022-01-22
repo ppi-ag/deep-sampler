@@ -6,14 +6,17 @@ import de.ppi.deepsampler.persistence.error.PersistenceException;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.Date;
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 /**
  * java.sql.Date is by default converted to a simple long value, which represents the epoch value. This Extension
  * converts the Date to a human-readable String.
  */
 public class SqlDateBeanConverterExtension extends StandardBeanConverterExtension {
+
+    private static final DateFormat DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);
+
     @Override
     public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
         return beanClass.isAssignableFrom(Date.class);
@@ -21,14 +24,14 @@ public class SqlDateBeanConverterExtension extends StandardBeanConverterExtensio
 
     @Override
     public Object convert(Object originalBean, ParameterizedType beanType, PersistentBeanConverter persistentBeanConverter) {
-        return SimpleDateFormat.getDateInstance().format((Date) originalBean);
+        return DATE_FORMAT.format((Date) originalBean);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T revert(Object persistentBean, Class<T> targetClass, ParameterizedType type, PersistentBeanConverter persistentBeanConverter) {
         try {
-            return (T) new Date(SimpleDateFormat.getDateInstance().parse((String) persistentBean).getTime());
+            return (T) new Date(DATE_FORMAT.parse((String) persistentBean).getTime());
         } catch (ParseException e) {
             throw new PersistenceException(e.getMessage());
         }
