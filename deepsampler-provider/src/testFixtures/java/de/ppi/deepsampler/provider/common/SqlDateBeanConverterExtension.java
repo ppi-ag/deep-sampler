@@ -8,6 +8,7 @@ import java.lang.reflect.ParameterizedType;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * java.sql.Date is by default converted to a simple long value, which represents the epoch value. This Extension
@@ -15,7 +16,7 @@ import java.text.ParseException;
  */
 public class SqlDateBeanConverterExtension extends StandardBeanConverterExtension {
 
-    private static final DateFormat DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);
+    private final DateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     @Override
     public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
@@ -24,14 +25,14 @@ public class SqlDateBeanConverterExtension extends StandardBeanConverterExtensio
 
     @Override
     public Object convert(Object originalBean, ParameterizedType beanType, PersistentBeanConverter persistentBeanConverter) {
-        return DATE_FORMAT.format((Date) originalBean);
+        return simpleDateFormat.format((Date) originalBean);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T revert(Object persistentBean, Class<T> targetClass, ParameterizedType type, PersistentBeanConverter persistentBeanConverter) {
         try {
-            return (T) new Date(DATE_FORMAT.parse((String) persistentBean).getTime());
+            return (T) new Date(simpleDateFormat.parse((String) persistentBean).getTime());
         } catch (ParseException e) {
             throw new PersistenceException(e.getMessage());
         }
