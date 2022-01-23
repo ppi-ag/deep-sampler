@@ -153,7 +153,7 @@ public abstract class PersistentSamplerAspectTest {
         Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
         assertEquals(expectedDate, stubbedDate);
 
-        assertThat(tempFile).content().containsPattern("\"returnValue\" : \\[ \"java.sql.Date\", [0-9]{11} \\]");
+        assertThat(tempFile).content().containsPattern("\"returnValue\" : \\[ \"java.sql.Date\", [0-9]+ \\]");
     }
 
     @Test
