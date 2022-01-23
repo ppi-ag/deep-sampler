@@ -36,9 +36,11 @@ public class PersistentBeanConverter {
 
     /**
      * Reverts an abstract model from the persistence to the original bean.
+     * <p>
+     * If more than one applicable {@link BeanConverterExtension} is found, the last registered one will be used.
      *
-     * @param persistentBean    an object that has been deserialized from a persistence api (e.g. some JSON-API). This object
-     *                          might already be the original bean it the persistence api was able to deserialize it. Otherwise
+     * @param persistentBean    an object that has been deserialized by a persistence api (e.g. some JSON-API). This object
+     *                          might already be the original bean, if the persistence api was able to deserialize it. Otherwise,
      *                          it is the abstract model represented by {@link PersistentBean}
      * @param parameterizedType The Type of the original bean
      * @param <T>               the original bean.
@@ -57,9 +59,9 @@ public class PersistentBeanConverter {
             return (T) revertPersistentBeanArray(persistentBean, originalBeanClass);
         }
 
-        final Optional<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBeanClass, parameterizedType);
-        if (applicableExtensions.isPresent()) {
-            return applicableExtensions.get().revert(persistentBean, originalBeanClass, parameterizedType, this);
+        final Optional<BeanConverterExtension> applicableExtension = findApplicableExtension(originalBeanClass, parameterizedType);
+        if (applicableExtension.isPresent()) {
+            return applicableExtension.get().revert(persistentBean, originalBeanClass, parameterizedType, this);
         }
 
         if (persistentBean instanceof PersistentBean) {
@@ -71,7 +73,9 @@ public class PersistentBeanConverter {
 
 
     /**
-     * Converts an original bean to the abstract model (most likely {@link PersistentBean} that is used to save the original bean to e.g. JSON.
+     * Converts an original bean to the abstract model (most likely {@link PersistentBean}) that is used to save the original bean to e.g. JSON.
+     * <p>
+     * If more than one applicable {@link BeanConverterExtension} is found, the last registered one will be used.
      *
      * @param originalBean The original Bean that is supposed to be persisted.
      * @param <T>          The type of the persistent bean.
@@ -90,9 +94,9 @@ public class PersistentBeanConverter {
         }
 
 
-        final Optional<BeanConverterExtension> applicableExtensions = findApplicableExtensions(originalBean.getClass(), parameterizedReturnType);
-        if (applicableExtensions.isPresent()) {
-            return (T) applicableExtensions.get().convert(originalBean, parameterizedReturnType, this);
+        final Optional<BeanConverterExtension> applicableExtension = findApplicableExtension(originalBean.getClass(), parameterizedReturnType);
+        if (applicableExtension.isPresent()) {
+            return (T) applicableExtension.get().convert(originalBean, parameterizedReturnType, this);
         }
 
         if (originalBean.getClass().equals(type)
@@ -149,9 +153,7 @@ public class PersistentBeanConverter {
         return instance;
     }
 
-    private <T> T instantiateUsingMatchingConstructor(final Class<T> type,
-                                                      final PersistentBean persistentBean,
-                                                      final Map<Field, String> fields) {
+    private <T> T instantiateUsingMatchingConstructor(final Class<T> type, final PersistentBean persistentBean, final Map<Field, String> fields) {
         try {
             return createInstance(type, persistentBean, fields);
 
@@ -170,8 +172,7 @@ public class PersistentBeanConverter {
                 .toArray(Class[]::new);
 
         final List<Object> values = createValuesForConstructingInstance(persistentBean, fields);
-        return type.getDeclaredConstructor(parameterTypes)
-                .newInstance(values.toArray());
+        return type.getDeclaredConstructor(parameterTypes).newInstance(values.toArray());
     }
 
     private List<Object> createValuesForConstructingInstance(final PersistentBean persistentBean, final Map<Field, String> fields) {
@@ -302,7 +303,17 @@ public class PersistentBeanConverter {
     }
 
 
-    private Optional<BeanConverterExtension> findApplicableExtensions(final Class<?> beanClass, final ParameterizedType parameterizedType) {
+    /**
+     * Searches the registered {@link BeanConverterExtension}s for any applicable extensions. A {@link BeanConverterExtension} is applicable
+     * if  {@link BeanConverterExtension#isProcessable(Class, ParameterizedType)} returns true.
+     *
+     * If more than one applicable extension is found, the last registered one will be used.
+     *
+     * @param beanClass the class for which a {@link BeanConverterExtension} is wanted
+     * @param parameterizedType If beanClass is generic, a parameterized type may be passed to the registered extensions. Otherwise, it is null.
+     * @return Optional.empty() if no extension was found. Otherwise, the extension is returned.
+     */
+    private Optional<BeanConverterExtension> findApplicableExtension(final Class<?> beanClass, final ParameterizedType parameterizedType) {
         List<BeanConverterExtension> allApplicableExtensions = beanConverterExtensions.stream()
                 .filter(ext -> ext.isProcessable(beanClass, parameterizedType))
                 .collect(Collectors.toList());
@@ -319,7 +330,7 @@ public class PersistentBeanConverter {
                 || obj.getClass().isEnum()
                 || ReflectionTools.isPrimitiveOrWrapper(obj.getClass())
                 || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
-                || findApplicableExtensions(obj.getClass(), parameterizedType)
+                || findApplicableExtension(obj.getClass(), parameterizedType)
                     .map(ext -> ext.skip(obj.getClass(), parameterizedType))
                     .orElse(false);
     }

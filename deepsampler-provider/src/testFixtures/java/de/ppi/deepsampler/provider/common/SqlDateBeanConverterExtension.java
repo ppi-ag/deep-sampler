@@ -34,7 +34,7 @@ public class SqlDateBeanConverterExtension extends StandardBeanConverterExtensio
         try {
             return (T) new Date(simpleDateFormat.parse((String) persistentBean).getTime());
         } catch (ParseException e) {
-            throw new PersistenceException(e.getMessage());
+            throw new PersistenceException("SqlDate %s could not be deserialized!", e, persistentBean);
         }
     }
 }
