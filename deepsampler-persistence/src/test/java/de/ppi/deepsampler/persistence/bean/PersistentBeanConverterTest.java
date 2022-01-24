@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.bean.ext.StandardBeanConverterExtension;
+import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.junit.jupiter.api.Test;
 
@@ -21,12 +22,9 @@ class PersistentBeanConverterTest {
     @Test
     void simpleBeanShouldBeReverted() {
         // GIVEN
-        final String keyOne = "0$abc";
-        final String keyTwo = "0$def";
-        final Map<String, Object> values = new HashMap<>();
-        values.put(keyOne, "ME AND ALL");
-        values.put(keyTwo, "ME AND MORE");
-        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean();
+        defaultPersistentBean.putValue("0$abc", "ME AND ALL");
+        defaultPersistentBean.putValue("0$def", "ME AND MORE");
 
         // WHEN
         final SimpleTestBean testBean = new PersistentBeanConverter().revert(defaultPersistentBean, SimpleTestBean.class, null);
@@ -75,7 +73,7 @@ class PersistentBeanConverterTest {
         final DefaultPersistentBean defaultPersistentBean2 = new DefaultPersistentBean(values2);
 
         // WHEN
-        final SimpleTestBean[] testBean = new PersistentBeanConverter().revert(new DefaultPersistentBean[] {defaultPersistentBean, defaultPersistentBean2}, SimpleTestBean[].class, null);
+        final SimpleTestBean[] testBean = new PersistentBeanConverter().revert(new DefaultPersistentBean[]{defaultPersistentBean, defaultPersistentBean2}, SimpleTestBean[].class, null);
 
         // THEN
         assertEquals("ME AND ALL", testBean[0].abc);
@@ -111,7 +109,7 @@ class PersistentBeanConverterTest {
         // GIVEN
         final Map<String, Object> values = new HashMap<>();
         values.put("0$simpleInt", 2);
-        values.put("0$longArray", new long[] {12, 32, 45});
+        values.put("0$longArray", new long[]{12, 32, 45});
         final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
 
         // WHEN
@@ -119,7 +117,7 @@ class PersistentBeanConverterTest {
 
         // THEN
         assertEquals(2, testBean.simpleInt);
-        assertArrayEquals(new long[] {12, 32, 45}, testBean.longArray);
+        assertArrayEquals(new long[]{12, 32, 45}, testBean.longArray);
     }
 
     @Test
@@ -162,7 +160,7 @@ class PersistentBeanConverterTest {
         testBean.def = "456";
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanConverter().convert(testBean, null);
+        final PersistentBean bean = new PersistentBeanConverter().convert(testBean, null);
 
         // THEN
         assertEquals("123", bean.getValue("0$abc"));
@@ -178,13 +176,13 @@ class PersistentBeanConverterTest {
         testBean.str = "ABC";
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanConverter().convert(testBean, null);
-        SimpleTestBeanRec[] beanRec = new PersistentBeanConverter().revert(new PersistentBean[] {bean}, SimpleTestBeanRec[].class, null);
+        final PersistentBean bean = new PersistentBeanConverter().convert(testBean, null);
+        SimpleTestBeanRec[] beanRec = new PersistentBeanConverter().revert(new PersistentBean[]{bean}, SimpleTestBeanRec[].class, null);
 
         // THEN
         assertEquals(testBean.beanInBean.str, beanRec[0].beanInBean.str);
         assertEquals("ABC", bean.getValue("0$str"));
-        assertEquals("REC",((PersistentBean) bean.getValue("0$beanInBean")).getValue("0$str"));
+        assertEquals("REC", ((PersistentBean) bean.getValue("0$beanInBean")).getValue("0$str"));
     }
 
     @Test
@@ -192,14 +190,14 @@ class PersistentBeanConverterTest {
         // GIVEN
         final SimpleTestBeanWithPrimitive testBean = new SimpleTestBeanWithPrimitive();
         testBean.simpleInt = 2;
-        testBean.longArray = new long[] {21};
+        testBean.longArray = new long[]{21};
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanConverter().convert(testBean, null);
+        final PersistentBean bean = new PersistentBeanConverter().convert(testBean, null);
 
         // THEN
         assertEquals(2, bean.getValue("0$simpleInt"));
-        assertArrayEquals(new long[] {21}, (long[]) bean.getValue("0$longArray"));
+        assertArrayEquals(new long[]{21}, (long[]) bean.getValue("0$longArray"));
     }
 
     @Test
@@ -212,7 +210,7 @@ class PersistentBeanConverterTest {
         testBean.setAbcSuperClass("SUPER");
 
         // WHEN
-        final PersistentBean bean  = new PersistentBeanConverter().convert(testBean, null);
+        final PersistentBean bean = new PersistentBeanConverter().convert(testBean, null);
 
         // THEN
         assertEquals("abc", bean.getValue("0$abc"));
@@ -244,12 +242,10 @@ class PersistentBeanConverterTest {
     @Test
     void beanWithSimpleExtensionShouldBeReverted() {
         // GIVEN
-        final String keyOne = "0$abc";
-        final String keyTwo = "0$def";
-        final Map<String, Object> values = new HashMap<>();
-        values.put(keyOne, "ME AND ALL");
-        values.put(keyTwo, "ME AND MORE");
-        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean(values);
+        final DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean();
+        defaultPersistentBean.putValue("0$abc", "ME AND ALL");
+        defaultPersistentBean.putValue("0$def", "ME AND MORE");
+
         PersistentBeanConverter persistentBeanConverter = new PersistentBeanConverter();
         persistentBeanConverter.addExtension(new SimpleTestExtension());
 
@@ -257,8 +253,8 @@ class PersistentBeanConverterTest {
         final SimpleTestBean testBean = persistentBeanConverter.revert(defaultPersistentBean, SimpleTestBean.class, null);
 
         // THEN
-        assertNull(testBean.abc);
-        assertNull(testBean.def);
+        assertEquals(testBean.abc, "ME AND ALL");
+        assertEquals(testBean.def, "ME AND MORE");
     }
 
     private static class SimpleTestExtension extends StandardBeanConverterExtension {
@@ -275,8 +271,122 @@ class PersistentBeanConverterTest {
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T revert(Object bean, Class<T> targetClass, ParameterizedType targetType,  PersistentBeanConverter persistentBeanConverter) {
-            return (T) new SimpleTestBean();
+        public <T> T revert(Object bean, Class<T> targetClass, ParameterizedType targetType, PersistentBeanConverter persistentBeanConverter) {
+            SimpleTestBean simpleTestBean = new SimpleTestBean();
+
+            simpleTestBean.abc = (String) ((PersistentBean) bean).getValue("0$abc");
+            simpleTestBean.def = (String) ((PersistentBean) bean).getValue("0$def");
+
+            return (T) simpleTestBean;
+        }
+    }
+
+    @Test
+    void extensionThatDoesNotUsePersistentBeanShouldRevertABean() {
+        // GIVEN
+        final String beanPropertyValues = "a;b";
+
+        PersistentBeanConverter persistentBeanConverter = new PersistentBeanConverter();
+        // The PrimitiveTestextension should be able to revert ContainerTestBean from a
+        // simple String instead from a PersistentBean:
+        persistentBeanConverter.addExtension(new PrimitiveTestExtension());
+
+        // WHEN
+        final ContainerTestBean containerTestBean = persistentBeanConverter.revert(beanPropertyValues, ContainerTestBean.class, null);
+
+        // THEN
+        assertNotNull(containerTestBean);
+        assertNotNull(containerTestBean.simpleTestBean);
+        assertEquals(containerTestBean.simpleTestBean.abc, "a");
+        assertEquals(containerTestBean.simpleTestBean.def, "b");
+    }
+
+    /**
+     * Converts a bean to String that contains the properties of the bean. So no {@link PersistentBean} is used by
+     * this extension.
+     */
+    private static class PrimitiveTestExtension extends StandardBeanConverterExtension {
+
+        @Override
+        public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
+            return ContainerTestBean.class.isAssignableFrom(beanClass);
+        }
+
+        @Override
+        public Object convert(Object originalBean, ParameterizedType beanType, PersistentBeanConverter persistentBeanConverter) {
+            ContainerTestBean containerTestBean = (ContainerTestBean) originalBean;
+            return containerTestBean.simpleTestBean.abc + ";" + containerTestBean.simpleTestBean.def;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T revert(Object bean, Class<T> targetClass, ParameterizedType targetType, PersistentBeanConverter persistentBeanConverter) {
+            ContainerTestBean containerTestBean = new ContainerTestBean();
+            SimpleTestBean simpleTestBean = new SimpleTestBean();
+
+            containerTestBean.simpleTestBean = simpleTestBean;
+
+            String[] properties = ((String) bean).split(";");
+            simpleTestBean.abc = properties[0];
+            simpleTestBean.def = properties[1];
+
+            return (T) containerTestBean;
+        }
+    }
+
+    @Test
+    void anExtensionIsNeededButNonIsFound() {
+        // GIVEN
+        PersistentBeanConverter persistentBeanConverter = new PersistentBeanConverter();
+
+        DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean();
+        defaultPersistentBean.putValue("0$localDateTime", "wrong date");
+
+        // WHEN
+        PersistenceException thrownException = assertThrows(PersistenceException.class, () -> persistentBeanConverter.revert(defaultPersistentBean, SimpleTestBeanWithDates.class, null));
+
+        // THEN
+        assertEquals("An object of type java.lang.String has been deserialized, but the type java.time.LocalDateTime, " +
+                "or one of its subtypes, was requested.", thrownException.getMessage());
+    }
+
+    @Test
+    void wrongReturnTypeFromExtensionYieldsException() {
+        // GIVEN
+        PersistentBeanConverter persistentBeanConverter = new PersistentBeanConverter();
+        WrongReturnTypeTestExtension wrongReturnTypeTestExtension = new WrongReturnTypeTestExtension();
+        persistentBeanConverter.addExtension(wrongReturnTypeTestExtension);
+
+        DefaultPersistentBean defaultPersistentBean = new DefaultPersistentBean();
+        defaultPersistentBean.putValue("0$localDateTime", "wrong date");
+
+        // WHEN
+        PersistenceException thrownException = assertThrows(PersistenceException.class, () -> persistentBeanConverter.revert(defaultPersistentBean, SimpleTestBeanWithDates.class, null));
+
+        // THEN
+        assertEquals("The de.ppi.deepsampler.persistence.bean.PersistentBeanConverterTest$WrongReturnTypeTestExtension#revert() " +
+                        "returned an object of type java.lang.String, but a type of java.time.LocalDateTime, or one of " +
+                        "its subtypes, was requested.",
+                thrownException.getMessage());
+
+    }
+
+    private static class WrongReturnTypeTestExtension extends StandardBeanConverterExtension {
+
+        @Override
+        public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
+            return LocalDateTime.class.isAssignableFrom(beanClass);
+        }
+
+        @Override
+        public Object convert(Object originalBean, ParameterizedType beanType, PersistentBeanConverter persistentBeanConverter) {
+            return new DefaultPersistentBean();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T revert(Object bean, Class<T> targetClass, ParameterizedType targetType, PersistentBeanConverter persistentBeanConverter) {
+            return (T) "Wrongly typed object";
         }
     }
 
@@ -320,7 +430,7 @@ class PersistentBeanConverterTest {
         PersistentBean b = new PersistentBeanConverter().convert(cs, null);
 
         // WHEN
-        Cs[] result = new PersistentBeanConverter().revert(new PersistentBean[] {b}, Cs[].class, null);
+        Cs[] result = new PersistentBeanConverter().revert(new PersistentBean[]{b}, Cs[].class, null);
 
         // THEN
         assertEquals(cs.character, result[0].character);
@@ -370,7 +480,6 @@ class PersistentBeanConverterTest {
         assertNotNull(resultBean[0]);
         assertEquals("make it so", resultBean[0].abc);
     }
-
 
 
     private static class TestBeanWithBeanArray {
@@ -436,5 +545,9 @@ class PersistentBeanConverterTest {
         public void setAbcSuperClass(final String abc) {
             super.abc = abc;
         }
+    }
+
+    private static class ContainerTestBean {
+        protected SimpleTestBean simpleTestBean;
     }
 }
