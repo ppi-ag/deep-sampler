@@ -8,6 +8,7 @@ package de.ppi.deepsampler.persistence.bean;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,5 +37,9 @@ public class DefaultPersistentBean implements PersistentBean {
     @Override
     public Object getValue(final String key) {
         return values.get(key);
+    }
+
+    public void putValue(final String key, Object value) {
+        values.put(key, value);
     }
 }
