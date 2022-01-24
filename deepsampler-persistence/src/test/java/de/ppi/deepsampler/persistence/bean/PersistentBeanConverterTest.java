@@ -253,8 +253,8 @@ class PersistentBeanConverterTest {
         final SimpleTestBean testBean = persistentBeanConverter.revert(defaultPersistentBean, SimpleTestBean.class, null);
 
         // THEN
-        assertEquals(testBean.abc, "ME AND ALL");
-        assertEquals(testBean.def, "ME AND MORE");
+        assertEquals("ME AND ALL", testBean.abc);
+        assertEquals("ME AND MORE", testBean.def);
     }
 
     private static class SimpleTestExtension extends StandardBeanConverterExtension {
@@ -297,8 +297,8 @@ class PersistentBeanConverterTest {
         // THEN
         assertNotNull(containerTestBean);
         assertNotNull(containerTestBean.simpleTestBean);
-        assertEquals(containerTestBean.simpleTestBean.abc, "a");
-        assertEquals(containerTestBean.simpleTestBean.def, "b");
+        assertEquals("a", containerTestBean.simpleTestBean.abc);
+        assertEquals("b", containerTestBean.simpleTestBean.def);
     }
 
     /**
