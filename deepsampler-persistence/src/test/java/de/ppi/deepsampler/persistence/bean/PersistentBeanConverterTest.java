@@ -346,8 +346,9 @@ class PersistentBeanConverterTest {
         PersistenceException thrownException = assertThrows(PersistenceException.class, () -> persistentBeanConverter.revert(defaultPersistentBean, SimpleTestBeanWithDates.class, null));
 
         // THEN
-        assertEquals("An object of type java.lang.String has been deserialized, but the type java.time.LocalDateTime, " +
-                "or one of its subtypes, was requested.", thrownException.getMessage());
+        assertEquals("An object of type java.lang.String has been deserialized, but the type " +
+                "java.time.LocalDateTime, or one of its subtypes, was requested.\n" +
+                "java.lang.String.toString() = \"wrong date\"", thrownException.getMessage());
     }
 
     @Test

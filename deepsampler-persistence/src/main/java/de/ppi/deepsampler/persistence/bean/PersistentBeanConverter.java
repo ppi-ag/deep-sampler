@@ -81,9 +81,11 @@ public class PersistentBeanConverter {
 
         if (!originalBeanClass.isAssignableFrom(persistentBean.getClass())
                 && !(ReflectionTools.isPrimitiveOrWrapper(originalBeanClass) && ReflectionTools.isPrimitiveOrWrapper(persistentBean.getClass()))) {
-            throw new PersistenceException("An object of type %s has been deserialized, but the type %s, or one of its subtypes, was requested.",
+            throw new PersistenceException("An object of type %s has been deserialized, but the type %s, or one of its subtypes, was requested." +
+                    "\n%1$s.toString() = \"%s\"",
                     persistentBean.getClass().getName(),
-                    originalBeanClass.getName());
+                    originalBeanClass.getName(),
+                    persistentBean.toString());
         }
 
         return (T) persistentBean;
