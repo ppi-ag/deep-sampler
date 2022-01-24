@@ -61,11 +61,29 @@ public class PersistentBeanConverter {
 
         final Optional<BeanConverterExtension> applicableExtension = findApplicableExtension(originalBeanClass, parameterizedType);
         if (applicableExtension.isPresent()) {
-            return applicableExtension.get().revert(persistentBean, originalBeanClass, parameterizedType, this);
+            T revertedByExtension = applicableExtension.get().revert(persistentBean, originalBeanClass, parameterizedType, this);
+
+            if (revertedByExtension != null
+                    && !originalBeanClass.isAssignableFrom(revertedByExtension.getClass())
+                    && !(ReflectionTools.isPrimitiveOrWrapper(originalBeanClass) && ReflectionTools.isPrimitiveOrWrapper(revertedByExtension.getClass()))) {
+                throw new PersistenceException("The %s#revert() returned an object of type %s, but a type of %s, or one of its subtypes, was requested.",
+                        applicableExtension.get().getClass().getName(),
+                        revertedByExtension.getClass().getName(),
+                        originalBeanClass.getName());
+            }
+
+            return revertedByExtension;
         }
 
         if (persistentBean instanceof PersistentBean) {
             return revertPersistentBean((PersistentBean) persistentBean, originalBeanClass);
+        }
+
+        if (!originalBeanClass.isAssignableFrom(persistentBean.getClass())
+                && !(ReflectionTools.isPrimitiveOrWrapper(originalBeanClass) && ReflectionTools.isPrimitiveOrWrapper(persistentBean.getClass()))) {
+            throw new PersistenceException("An object of type %s has been deserialized, but the type %s, or one of its subtypes, was requested.",
+                    persistentBean.getClass().getName(),
+                    originalBeanClass.getName());
         }
 
         return (T) persistentBean;
@@ -200,11 +218,8 @@ public class PersistentBeanConverter {
     private <T> void transferFieldFromBean(final PersistentBean persistentBean, final T instance, final Field field, final String fieldKeyInPersistentBean) {
         Object lookedUpValueInBean = persistentBean.getValue(fieldKeyInPersistentBean);
         if (lookedUpValueInBean != null) {
-            if (lookedUpValueInBean instanceof PersistentBean) {
-                lookedUpValueInBean = revertPersistentBean((DefaultPersistentBean) lookedUpValueInBean, field.getType());
-            } else if (lookedUpValueInBean.getClass().isArray() && PersistentBean.class.isAssignableFrom(lookedUpValueInBean.getClass().getComponentType())) {
-                lookedUpValueInBean = revertPersistentBeanArray(lookedUpValueInBean, field.getType());
-            }
+            lookedUpValueInBean = revert(lookedUpValueInBean, field.getType(), null);
+
             setValue(instance, field, lookedUpValueInBean);
         }
     }
@@ -306,10 +321,10 @@ public class PersistentBeanConverter {
     /**
      * Searches the registered {@link BeanConverterExtension}s for any applicable extensions. A {@link BeanConverterExtension} is applicable
      * if  {@link BeanConverterExtension#isProcessable(Class, ParameterizedType)} returns true.
-     *
+     * <p>
      * If more than one applicable extension is found, the last registered one will be used.
      *
-     * @param beanClass the class for which a {@link BeanConverterExtension} is wanted
+     * @param beanClass         the class for which a {@link BeanConverterExtension} is wanted
      * @param parameterizedType If beanClass is generic, a parameterized type may be passed to the registered extensions. Otherwise, it is null.
      * @return Optional.empty() if no extension was found. Otherwise, the extension is returned.
      */
@@ -331,8 +346,8 @@ public class PersistentBeanConverter {
                 || ReflectionTools.isPrimitiveOrWrapper(obj.getClass())
                 || (!ReflectionTools.isObjectArray(obj.getClass()) && obj.getClass().isArray())
                 || findApplicableExtension(obj.getClass(), parameterizedType)
-                    .map(ext -> ext.skip(obj.getClass(), parameterizedType))
-                    .orElse(false);
+                .map(ext -> ext.skip(obj.getClass(), parameterizedType))
+                .orElse(false);
     }
 
 
