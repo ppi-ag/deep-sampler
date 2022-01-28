@@ -287,7 +287,7 @@ class PersistentBeanConverterTest {
         final String beanPropertyValues = "a;b";
 
         PersistentBeanConverter persistentBeanConverter = new PersistentBeanConverter();
-        // The PrimitiveTestextension should be able to revert ContainerTestBean from a
+        // The PrimitiveTestExtension should be able to revert ContainerTestBean from a
         // simple String instead from a PersistentBean:
         persistentBeanConverter.addExtension(new PrimitiveTestExtension());
 
@@ -302,7 +302,7 @@ class PersistentBeanConverterTest {
     }
 
     /**
-     * Converts a bean to String that contains the properties of the bean. So no {@link PersistentBean} is used by
+     * Converts a bean to a String that contains the properties of the bean. So no {@link PersistentBean} is used by
      * this extension.
      */
     private static class PrimitiveTestExtension extends StandardBeanConverterExtension {
