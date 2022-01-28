@@ -37,4 +37,8 @@ public class DefaultPersistentBean implements PersistentBean {
     public Object getValue(final String key) {
         return values.get(key);
     }
+
+    public void putValue(final String key, Object value) {
+        values.put(key, value);
+    }
 }
