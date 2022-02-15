@@ -15,7 +15,7 @@ data from a Database:
 
 <img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
 
-We don't want to access the database during testing. So we mark the methods of the DAO, that would access the db as "stubbed" using DeepSampler. If we run the test with DeepSampler in recording-mode, every
+We don't want to access the database during testing. So we mark the methods, that would access the db, as "stubbed" using DeepSampler. If we run the test with DeepSampler in recording-mode, every
 call to the marked methods will be intercepted and all data, that was passed to it, or returned by it, is recorded. The recorded data, the __sample__, will be saved to 
 a JSON-file.
 
