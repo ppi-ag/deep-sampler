@@ -8,16 +8,15 @@ This is the doc for the upcoming version 2.0.0 - For older versions see [1.1.0](
 
 DeepSampler is a stubbing tool for integration tests. It is designed to 
    * stub methods, that are hidden behind long reference-chains 🐳 __deep__ inside the tested compound. 
-   * Since integration tests often need vast amounts of testdata, DeepSampler is also able to __record the testdata from a running test__. We call this testdata 🧪 __samples__. The
-recorded samples can be "replayed" by DeepSampler's stubs.
+   * __record testdata at runtime__. We call this testdata 🧪 __samples__. The recorded samples can be "replayed" by DeepSampler's stubs.
 
-Let's say, we want to test a compound consisting of numerous classes and somewhere deep inside the compound is one class, a DAO, that reads 
+Let's say, we wanted to test a compound consisting of numerous classes and somewhere deep inside the compound is one class, a DAO, that reads 
 data from a Database:
 
 <img src="/docs/assets/deepsampler-demo-unsampled.png?raw=true" alt="A DAO somewhere inside a compound reads data from a database" width="50%"/>
 
-In order to be independent of the database, we can now attach a stub to the methods of the DAO using DeepSampler. If we run the test with DeepSampler in recording-mode, every
-call to the method will be intercepted and all data, that was passed to it, or returned by it, is recorded. The recorded data, the sample, will be saved to 
+We don't want to access the database during testing. So we mark the methods of the DAO, that would access the db as "stubbed" using DeepSampler. If we run the test with DeepSampler in recording-mode, every
+call to the marked methods will be intercepted and all data, that was passed to it, or returned by it, is recorded. The recorded data, the __sample__, will be saved to 
 a JSON-file.
 
 <img src="/docs/assets/deepsampler-demo-recorder.png?raw=true" alt="All calls to the DAO get intercepted and parameters and return values are recorded" width="50%"/>
@@ -30,10 +29,10 @@ private MyDao myDaoSampler;
 PersistentSample.of(myDaoSampler.load(Matchers.anyInt()));
 ```
 
-If we repeat the test with DeepSampler switched to player-mode, the original method will not be called anymore. Instead, 
+If we repeat the test with DeepSampler switched to player-mode, the marked method will not be called anymore. Instead, 
 a recorded sample from the JSON-file will be returned. 
-If the method is called with particular parameters, DeepSampler looks for a sample that has been recorded with the same 
-parameters. This is how even longer tests with several varying calls to stubs can be replayed.
+If the method is called with particular parameters, DeepSampler looks for a sample, that has been recorded with the same 
+parameters.
 
 <img src="/docs/assets/deepsampler-demo-player.png?raw=true" alt="Only samples from the previous recording are returned by the stub" width="50%"/>
 
