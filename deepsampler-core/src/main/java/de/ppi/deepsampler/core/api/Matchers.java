@@ -6,11 +6,9 @@
 
 package de.ppi.deepsampler.core.api;
 
-import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleRepository;
 
-import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -172,7 +170,7 @@ public class Matchers {
 
     /**
      * This Matcher is typically used by {@link Matchers#equalTo(Object)}, but since it is also used internally in various places
-     * it is implemented as a class rather then a simple lambda, as it is the case with most of the Matchers.
+     * it is implemented as a class rather than a simple lambda, as it is the case with most of the Matchers.
      *
      * @param <T> The type of the objects that will be compared by this Matcher.
      */
@@ -186,30 +184,8 @@ public class Matchers {
 
         @Override
         public boolean matches(final T parameter) {
-            checkObjectImplementsEquals(parameter);
+            MatcherTools.checkObjectOverridesEquals(parameter);
             return Objects.equals(expectedObject, parameter);
-        }
-
-        private void checkObjectImplementsEquals(final Object object) {
-            if (object == null) {
-                return;
-            }
-
-            try {
-                Method equals = object.getClass().getMethod("equals", Object.class);
-
-                if (equals.getDeclaringClass().equals(Object.class)) {
-                    complainAboutMissingEqualsMethod(object);
-                }
-            } catch (final NoSuchMethodException e) {
-                complainAboutMissingEqualsMethod(object);
-            }
-        }
-
-        private void complainAboutMissingEqualsMethod(Object object) {
-            throw new InvalidConfigException("The class %s must implement equals() if you want to use an %s",
-                    object.getClass().getName(),
-                    EqualsMatcher.class.getName());
         }
     }
 }
