@@ -9,6 +9,7 @@ import de.ppi.deepsampler.core.api.FixedQuantity;
 import de.ppi.deepsampler.core.api.PersistentSample;
 import de.ppi.deepsampler.core.api.Sample;
 import de.ppi.deepsampler.core.api.Sampler;
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
@@ -649,6 +650,29 @@ public abstract class PersistentSamplerAspectTest {
         // THEN
         assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast(BLOCK, "C", "ABC1"));
         assertEquals("R1", result);
+    }
+
+    @Test
+    public void equalsMatcherComplainsWhenParameterHasNoEqualsMethod(Path tempFile) {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.echoParameter(any(TestBeanWithoutEquals.class)));
+
+        getTestService().echoParameter(new TestBeanWithoutEquals());
+
+        final PersistentSampleManager source = save(tempFile);
+        clearSampleRepositoryWithAssertion();
+
+        PersistentSample.of(testServiceSampler.echoParameter(any(TestBeanWithoutEquals.class)));
+        source.load();
+
+        // WHEN
+        final TestService testService = getTestService();
+
+        assertThatExceptionOfType(InvalidConfigException.class)
+                .isThrownBy(() -> testService.echoParameter(new TestBeanWithoutEquals()))
+                .withMessage("The class de.ppi.deepsampler.provider.common.TestBeanWithoutEquals must implement equals() " +
+                        "if you want to use an de.ppi.deepsampler.core.api.Matchers$EqualsMatcher");
     }
 
     @Test
