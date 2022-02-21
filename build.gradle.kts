@@ -11,7 +11,7 @@ plugins {
 }
 
 allprojects {
-    version = "2.0.0-SNAPSHOT"
+    version = "2.0.0"
     group = "de.ppi"
 
     apply(plugin = "java-library")
