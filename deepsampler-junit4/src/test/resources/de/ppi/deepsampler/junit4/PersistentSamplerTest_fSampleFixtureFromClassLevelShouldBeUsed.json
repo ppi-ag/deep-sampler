@@ -1,0 +1,13 @@
+{
+  "id" : "e189ff1a-24ca-4a0b-ad70-d80a612b3a98",
+  "sampleMethodToSampleMap" : {
+    "public java.lang.String de.ppi.deepsampler.junit.TestBean.getSomeString()" : {
+      "callMap" : [ {
+        "parameter" : {
+          "args" : [ ]
+        },
+        "returnValue" : "42"
+      } ]
+    }
+  }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -19,15 +19,15 @@ import java.io.Serializable;
  * In essence using Answers gives free control on what a stubbed method should do.
  */
 @FunctionalInterface
-public interface Answer<E extends Exception> extends Serializable {
+public interface Answer<E extends Throwable> extends Serializable {
 
     /**
      * A method that is executed as a replacement of the stubbed method.
      *
      * @param stubMethodInvocation A description of the stubbed method
      * @return a Sample that should be returned by the stubbed method.
-     * @throws E By declaring the {@link Exception} as a generic type, this functional interface can cope with methods that throw any kind of {@link Exception} and
-     * also allows methods that don't declare an {@link Exception} at all.
+     * @throws E By declaring the {@link Throwable} as a generic type, this functional interface can cope with methods that throw any kind of {@link Throwable} and
+     * also allows methods that don't declare an {@link Throwable} at all.
      */
     Object call(StubMethodInvocation stubMethodInvocation) throws E;
 }

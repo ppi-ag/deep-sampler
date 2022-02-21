@@ -1,22 +1,27 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.persistence.bean.ext;
 
+
+import java.lang.reflect.ParameterizedType;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
-public class JavaTimeExtension extends StandardBeanFactoryExtension {
+public class JavaTimeExtension extends StandardBeanConverterExtension {
 
     @Override
-    public boolean isProcessable(Class<?> beanCls) {
-        return LocalDateTime.class.isAssignableFrom(beanCls) || LocalDate.class.isAssignableFrom(beanCls);
+    public boolean isProcessable(final Class<?> beanClass, final ParameterizedType beanType) {
+        return LocalDateTime.class.isAssignableFrom(beanClass) || LocalDate.class.isAssignableFrom(beanClass)
+                || Date.class.isAssignableFrom(beanClass) || Instant.class.isAssignableFrom(beanClass);
     }
 
     @Override
-    public boolean skip(Class<?> beanCls) {
+    public boolean skip(final Class<?> beanClass, final ParameterizedType beanType) {
         return true;
     }
 }

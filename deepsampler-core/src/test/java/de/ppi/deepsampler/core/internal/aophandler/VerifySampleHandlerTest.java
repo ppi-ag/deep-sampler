@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -7,8 +7,9 @@ package de.ppi.deepsampler.core.internal.aophandler;
 
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.VerifyException;
-import de.ppi.deepsampler.core.internal.FixedQuantity;
+import de.ppi.deepsampler.core.api.FixedQuantity;
 import de.ppi.deepsampler.core.internal.api.ExecutionManager;
+import de.ppi.deepsampler.core.model.MethodCall;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.core.model.SampledMethod;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -35,7 +37,7 @@ class VerifySampleHandlerTest {
         final Method simMethod = proxyTest.getClass().getMethod("test");
         final SampleDefinition behaviorTest = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
         SampleRepository.getInstance().add(behaviorTest);
-        ExecutionManager.notify(behaviorTest);
+        ExecutionManager.recordMethodCall(behaviorTest, new MethodCall(null, new ArrayList<>()));
 
         // WHEN
         // THEN
@@ -50,7 +52,7 @@ class VerifySampleHandlerTest {
         final Method simMethod = proxyTest.getClass().getMethod("test");
         final SampleDefinition sampleDefinition = new SampleDefinition(new SampledMethod(proxyTest.getClass(), simMethod));
         SampleRepository.getInstance().add(sampleDefinition);
-        ExecutionManager.notify(sampleDefinition);
+        ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(null, new ArrayList<>()));
 
         // WHEN
         // THEN

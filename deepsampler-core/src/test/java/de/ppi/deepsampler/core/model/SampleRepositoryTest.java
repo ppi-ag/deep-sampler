@@ -1,11 +1,12 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.core.model;
 
 import de.ppi.deepsampler.core.api.Sampler;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +42,7 @@ class SampleRepositoryTest {
 
         // THEN
         final SampleDefinition expectedSampleDefinition =
-                SampleRepository.getInstance().find(foundSampledMethod, "Argument");
+                SampleRepository.getInstance().findValidated(foundSampledMethod, "Argument");
         assertNotNull(expectedSampleDefinition);
         assertEquals(registeredSampleDefinition, expectedSampleDefinition);
     }
@@ -61,12 +62,12 @@ class SampleRepositoryTest {
 
         // THEN
         final SampleDefinition expectedSampleDefinition =
-                SampleRepository.getInstance().find(foundSampledMethod, "Argument");
+                SampleRepository.getInstance().findValidated(foundSampledMethod, "Argument");
         assertNotNull(expectedSampleDefinition);
     }
 
     /**
-     * Tests {@link SampleRepository#find(SampledMethod, Object...)}
+     * Tests {@link SampleRepository#findValidated(SampledMethod, Object...)}
      * for {@link SampleDefinition} with different {@link SampledMethod}.
      *
      * @throws NoSuchMethodException NoSuchMethodException
@@ -79,12 +80,13 @@ class SampleRepositoryTest {
                 "ReturnValue"
         );
         SampleRepository.getInstance().add(sampleDefinition);
-        assertNull(SampleRepository.getInstance().find(
-                createSampledMethod(TestObject.class, "someMethod"), "someArg"));
+        final SampleRepository sampleRepository = SampleRepository.getInstance();
+        final SampledMethod sampledMethod = createSampledMethod(TestObject.class, "someMethod");
+        assertThrows(NoMatchingParametersFoundException.class, ()-> sampleRepository.findValidated(sampledMethod, "someArg"));
     }
 
     /**
-     * Tests {@link SampleRepository#find(SampledMethod, Object...)}
+     * Tests {@link SampleRepository#findValidated(SampledMethod, Object...)}
      * for {@link SampleDefinition} with different arguments.
      *
      * @throws NoSuchMethodException NoSuchMethodException
@@ -98,7 +100,9 @@ class SampleRepositoryTest {
         );
         SampleRepository.getInstance().add(sampleDefinition);
         final SampledMethod lookupMethod = createSampledMethod(TestObject.class, "someMethod");
-        assertNull(SampleRepository.getInstance().find(lookupMethod, "otherArg"));
+        final SampleRepository sampleRepository = SampleRepository.getInstance();
+
+        assertThrows(NoMatchingParametersFoundException.class, ()-> sampleRepository.findValidated(lookupMethod, "otherArg"));
     }
 
     @Test

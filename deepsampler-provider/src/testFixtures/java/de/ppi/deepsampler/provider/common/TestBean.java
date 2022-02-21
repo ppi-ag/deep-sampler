@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -12,16 +12,33 @@ import java.util.Objects;
  */
 public class TestBean {
 
+    private String value;
+
+    public TestBean() {
+    }
+
+    public TestBean(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final TestBean that = (TestBean) o;
-        return Objects.equals(this, that);
+        TestBean testBean = (TestBean) o;
+        return Objects.equals(value, testBean.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash();
+        return Objects.hash(value);
     }
 }

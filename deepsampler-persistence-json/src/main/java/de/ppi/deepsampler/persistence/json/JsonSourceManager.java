@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -15,6 +15,7 @@ import de.ppi.deepsampler.persistence.json.extension.DeserializationExtension;
 import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class JsonSourceManager implements SourceManager {
 
     @Override
     public void save(final Map<Class<?>, ExecutionInformation> executionInformation, final PersistentSamplerContext persistentSamplerContext) {
-        jsonRecorder.record(executionInformation, persistentSamplerContext);
+        jsonRecorder.recordExecutionInformation(executionInformation, persistentSamplerContext);
     }
 
     @Override
@@ -89,7 +90,11 @@ public class JsonSourceManager implements SourceManager {
         }
 
         public JsonSourceManager buildWithFile(final String filePath) {
-            this.resource = new PersistentFile(Paths.get(filePath));
+            return buildWithFile(Paths.get(filePath));
+        }
+
+        public JsonSourceManager buildWithFile(final Path filePath) {
+            this.resource = new PersistentFile(filePath);
             return new JsonSourceManager(this);
         }
 

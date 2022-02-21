@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -34,7 +34,7 @@ class PersistentSamplerManagerTest {
 
         // WHEN
         PersistentSampler.source(JsonSourceManager.builder().buildWithFile("./record/testApiSay.json"))
-                .record();
+                .recordSamples();
 
         // THEN
         assertTrue(Files.exists(path));
@@ -54,9 +54,10 @@ class PersistentSamplerManagerTest {
     }
 
     @Test
-    void testSimpleLoad() throws Exception {
+    void testSimpleLoad() throws Throwable {
         // GIVEN
         final SampleDefinition saySample = new SampleDefinition(new SampledMethod(InnerBean.class, InnerBean.class.getDeclaredMethod("say")));
+        saySample.setMarkedForPersistence(true);
         SampleRepository.getInstance().add(saySample);
 
         // WHEN
@@ -80,7 +81,7 @@ class PersistentSamplerManagerTest {
 
         // WHEN
         PersistentSampler.source(JsonSourceManager.builder().buildWithFile(path.toString()))
-                .record();
+                .recordSamples();
 
         // THEN
         assertTrue(Files.exists(path));
@@ -100,9 +101,10 @@ class PersistentSamplerManagerTest {
     }
 
     @Test
-    void testDateLoad() throws Exception {
+    void testDateLoad() throws Throwable {
         // GIVEN
         final SampleDefinition dateSample = new SampleDefinition(new SampledMethod(DateBean.class, DateBean.class.getDeclaredMethod("now")));
+        dateSample.setMarkedForPersistence(true);
         SampleRepository.getInstance().add(dateSample);
 
         // WHEN

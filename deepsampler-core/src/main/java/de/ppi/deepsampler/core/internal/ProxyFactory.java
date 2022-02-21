@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -33,6 +33,8 @@ public class ProxyFactory {
         proxyObject.setHandler(proxyBehavior);
         return (T) proxyObject;
     }
+
+
 
     public static boolean isProxyClass(final Class<?> aClass) {
         return javassist.util.proxy.ProxyFactory.isProxyClass(aClass);

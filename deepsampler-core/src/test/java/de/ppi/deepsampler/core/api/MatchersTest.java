@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -95,6 +95,32 @@ class MatchersTest {
         assertEquals(1, currentSampleDefinition.getNumberOfParameters());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
         assertFalse(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_B));
+    }
+
+    @Test
+    void equalsMatcherWithStringWorks() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoString("make it so!")).is("engage!");
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+
+        assertEquals(1, currentSampleDefinition.getNumberOfParameters());
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("make it so!"));
+    }
+
+    @Test
+    void explicitEqualsMatcherWithStringWorks() {
+        //GIVEN WHEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.echoString(Matchers.equalTo("make it so!"))).is("engage!");
+
+        //THEN
+        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+
+        assertEquals(1, currentSampleDefinition.getNumberOfParameters());
+        assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("make it so!"));
     }
 
     @Test
@@ -246,6 +272,10 @@ class MatchersTest {
 
         byte echoByte(final byte someByte) {
             return someByte;
+        }
+
+        String echoString(String string) {
+            return string;
         }
 
         boolean echoBoolean(final boolean someBoolean) {

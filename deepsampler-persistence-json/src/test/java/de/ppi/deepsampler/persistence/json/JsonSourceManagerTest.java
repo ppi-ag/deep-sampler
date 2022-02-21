@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -34,7 +34,7 @@ class JsonSourceManagerTest {
         // GIVEN
         final Map<Class<?>, ExecutionInformation> executionInformationMap = new HashMap<>();
         final ExecutionInformation executionInformation = new ExecutionInformation();
-        final SampledMethod sampledMethod = new SampledMethod(String.class, String.class.getDeclaredMethod("hashCode"));
+        final SampledMethod sampledMethod = new SampledMethod(String.class, Bean.class.getDeclaredMethod("testMethod", Object.class));
         final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
         sampleDefinition.setParameterMatchers(Collections.singletonList((p) -> true));
         final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
@@ -60,7 +60,7 @@ class JsonSourceManagerTest {
         // GIVEN
         final Map<Class<?>, ExecutionInformation> executionInformationMap = new HashMap<>();
         final ExecutionInformation executionInformation = new ExecutionInformation();
-        final SampledMethod sampledMethod = new SampledMethod(String.class, String.class.getDeclaredMethod("hashCode"));
+        final SampledMethod sampledMethod = new SampledMethod(String.class, Bean.class.getDeclaredMethod("testMethod", Object.class));
         final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
         sampleDefinition.setParameterMatchers(Collections.singletonList((p) -> true));
         final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
@@ -147,6 +147,27 @@ class JsonSourceManagerTest {
             gen.writeStartObject();
             gen.writeNumberField("myitem", 1);
             gen.writeEndObject();
+        }
+    }
+
+    private static class Bean {
+        private String valueOne;
+        private String valueTwo;
+
+        @SuppressWarnings("unused")
+        public Bean() {
+            // DEFAULT FOR JACKSON
+        }
+
+        public Bean(final String valueOne, final String valueTwo) {
+            this.valueOne = valueOne;
+            this.valueTwo = valueTwo;
+        }
+
+        @SuppressWarnings("unused")
+        public Object testMethod(Object obj) {
+            // Is used by reflection only is not intended to do anything.
+            return null;
         }
     }
 }

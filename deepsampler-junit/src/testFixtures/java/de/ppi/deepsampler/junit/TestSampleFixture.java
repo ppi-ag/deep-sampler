@@ -1,11 +1,11 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.junit;
 
-import de.ppi.deepsampler.core.api.Sample;
+import de.ppi.deepsampler.core.api.PersistentSample;
 
 @SuppressWarnings("unused")
 public class TestSampleFixture implements SamplerFixture {
@@ -15,6 +15,6 @@ public class TestSampleFixture implements SamplerFixture {
 
     @Override
     public void defineSamplers() {
-        Sample.of(testBeanSampler.getSomeInt());
+        PersistentSample.of(testBeanSampler.getSomeInt());
     }
 }

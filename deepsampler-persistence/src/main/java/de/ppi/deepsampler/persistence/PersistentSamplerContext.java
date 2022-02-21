@@ -1,21 +1,21 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.persistence;
 
-import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
-import de.ppi.deepsampler.persistence.bean.PersistentBeanFactory;
+import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
+import de.ppi.deepsampler.persistence.bean.PersistentBeanConverter;
 
 public class PersistentSamplerContext {
-    private final PersistentBeanFactory persistentBeanFactory = SamplerBeanFactory.create();
+    private final PersistentBeanConverter persistentBeanConverter = SamplerBeanConverter.create();
 
-    public void addBeanFactoryExtension(BeanFactoryExtension beanFactoryExtension) {
-        persistentBeanFactory.addExtension(beanFactoryExtension);
+    public void addBeanConverterExtension(BeanConverterExtension beanConverterExtension) {
+        persistentBeanConverter.addExtension(beanConverterExtension);
     }
 
-    public PersistentBeanFactory getPersistentBeanFactory() {
-        return persistentBeanFactory;
+    public PersistentBeanConverter getPersistentBeanConverter() {
+        return persistentBeanConverter;
     }
 }

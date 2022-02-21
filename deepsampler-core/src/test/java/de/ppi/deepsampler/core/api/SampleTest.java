@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -33,7 +33,7 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithoutParam() throws Exception {
+    void testSampleDefinitionWithoutParam() throws Throwable {
         // GIVEN WHEN
         final TestService serviceSampler = Sampler.prepare(TestService.class);
         Sample.of(serviceSampler.noParameter()).is(STRING_SAMPLE);
@@ -156,7 +156,7 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithArrayReturnValue() throws Exception {
+    void testSampleDefinitionWithArrayReturnValue() throws Throwable {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.getArray()).is(new String[] {STRING_SAMPLE});
@@ -170,7 +170,7 @@ class SampleTest {
     }
 
     @Test
-    void testSampleDefinitionWithPrimitiveReturnValues() throws Exception {
+    void testSampleDefinitionWithPrimitiveReturnValues() throws Throwable {
         //GIVEN WHEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
 
@@ -277,7 +277,7 @@ class SampleTest {
     }
 
     @Test
-    void voidMethodsCanBeReplacedByVoidAnswers() throws Exception {
+    void voidMethodsCanBeReplacedByVoidAnswers() throws Throwable {
         //GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
 
@@ -293,18 +293,6 @@ class SampleTest {
 
         assertEquals(1, counter.get());
     }
-
-    @Test
-    void samplerForVerificationIsChecked() {
-        //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.forVerification(testServiceSampler);
-
-        // THEN
-        assertThrows(NotASamplerException.class, () -> Sample.forVerification("I'm not a Sampler."));
-        assertThrows(NullPointerException.class, () -> Sample.forVerification(null));
-    }
-
 
     public static class TestService {
 

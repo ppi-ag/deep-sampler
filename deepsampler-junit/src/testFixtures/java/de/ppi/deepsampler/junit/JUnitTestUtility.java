@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -29,12 +29,12 @@ public class JUnitTestUtility {
 
     /**
      * Proves that {@link TestBean} has a Sampler in {@link SampleRepository} and that the Sample for the {@link TestBean#getSomeInt()} method
-     * is 42. this value should be provided by an arbitrary Sampler, since the default implementarion would return 0.
+     * is 42. this value should be provided by an arbitrary Sampler, since the default implementation would return 0.
      *
      * @throws Exception the generic call to an {@link Answer#call(StubMethodInvocation)} may yield an Exception of any kind if the concrete
      * implementation decides that this is necessary.
      */
-    public static void assertTestBeanHasBeenStubbed() throws Exception {
+    public static void assertTestBeanHasStubbedInt() throws Throwable {
         final SampleRepository sampleRepository = SampleRepository.getInstance();
 
         assertFalse(sampleRepository.isEmpty());
@@ -43,6 +43,24 @@ public class JUnitTestUtility {
         final SampleDefinition getSomeInt = sampleRepository.findAllForMethod(expectedSampledMethod).get(0);
 
         assertEquals(42, getSomeInt.getAnswer().call(null));
+    }
+
+    /**
+     * Proves that {@link TestBean} has a Sampler in {@link SampleRepository} and that the Sample for the {@link TestBean#getSomeString()} method
+     * is "42". this value should be provided by an arbitrary Sampler.
+     *
+     * @throws Throwable the generic call to an {@link Answer#call(StubMethodInvocation)} may yield an {@link Throwable} of any kind if the concrete
+     * implementation decides that this was necessary.
+     */
+    public static void assertTestBeanHasStubbedString() throws Throwable {
+        final SampleRepository sampleRepository = SampleRepository.getInstance();
+
+        assertFalse(sampleRepository.isEmpty());
+
+        final SampledMethod expectedSampledMethod = new SampledMethod(TestBean.class, TestBean.class.getMethod("getSomeString"));
+        final SampleDefinition getSomeString = sampleRepository.findAllForMethod(expectedSampledMethod).get(0);
+
+        assertEquals("42", getSomeString.getAnswer().call(null));
     }
 
     /**

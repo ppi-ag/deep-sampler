@@ -1,10 +1,11 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.persistence.api;
 
+import de.ppi.deepsampler.core.api.MatcherTools;
 import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
@@ -53,7 +54,7 @@ public class PersistentMatchers {
      * @return the created {@link PersistentMatcher}
      */
     public static <T> PersistentMatcher<T> equalsMatcher() {
-        return Objects::equals;
+        return new EqualsMatcher<>();
     }
 
     /**
@@ -63,5 +64,23 @@ public class PersistentMatchers {
      */
     public static <T> PersistentMatcher<T> sameMatcher() {
         return (first, second) -> first == second;
+    }
+
+    /**
+     * This Matcher is typically used by {@link PersistentMatchers#equalsMatcher()}, but since it is also used internally in various places
+     * it is implemented as a class rather than a simple lambda, as it is the case with most of the Matchers.
+     *
+     * @param <T> The type of the objects that will be compared by this Matcher.
+     */
+    public static class EqualsMatcher<T> implements PersistentMatcher<T> {
+
+
+        @Override
+        public boolean matches(final T first, final T second) {
+            MatcherTools.checkObjectOverridesEquals(first);
+            MatcherTools.checkObjectOverridesEquals(second);
+
+            return Objects.equals(first, second);
+        }
     }
  }

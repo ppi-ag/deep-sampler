@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -7,11 +7,11 @@ plugins {
     `java-library`
     id("jacoco")
     id("org.sonarqube") version "3.0"
-    id("com.vanniktech.maven.publish") version "0.13.0"
+    id("com.vanniktech.maven.publish") version "0.18.0"
 }
 
 allprojects {
-    version = "1.0.0"
+    version = "2.0.0"
     group = "de.ppi"
 
     apply(plugin = "java-library")
@@ -34,12 +34,6 @@ tasks.jar {
     }
 }
 
-mavenPublish {
-    nexus {
-        baseUrl = "https://oss.sonatype.org/service/local/"
-        stagingProfile = "de.ppi"
-    }
-}
 
 
 sonarqube {
@@ -125,7 +119,7 @@ subprojects {
 }
 
 dependencies {
-    testImplementation("org.mockito:mockito-core:3.3.3")
+    testImplementation("org.mockito:mockito-core:4.0.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")

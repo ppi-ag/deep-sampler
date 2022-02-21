@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -32,21 +32,25 @@ public class GuiceSamplerAspect implements MethodInterceptor {
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         final SampleDefinition sampleDefinition = findSampleDefinition(invocation);
+        final List<Object> arguments = Arrays.asList(invocation.getArguments());
 
         if (sampleDefinition != null) {
-            ExecutionManager.notify(sampleDefinition);
-
             final Answer<?> answer = sampleDefinition.getAnswer();
 
             if (answer != null) {
-                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(invocation.getArguments()), invocation.getThis());
-                return ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
+                final StubMethodInvocation stubMethodInvocation = new StubMethodInvocation(Arrays.asList(invocation.getArguments()),
+                        invocation.getThis(),
+                        invocation::proceed);
+                Object returnValue =  ExecutionManager.execute(sampleDefinition, stubMethodInvocation);
+
+                ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(returnValue, arguments));
+
+                return returnValue;
             } else {
                 // no returnValueSupplier -> we have to log the invocations for recordings
                 final Object returnValue = invocation.proceed();
-                final List<Object> arguments = Arrays.asList(invocation.getArguments());
 
-                ExecutionManager.record(sampleDefinition, new MethodCall(returnValue, arguments));
+                ExecutionManager.recordMethodCall(sampleDefinition, new MethodCall(returnValue, arguments));
                 return returnValue;
             }
         }
@@ -64,6 +68,6 @@ public class GuiceSamplerAspect implements MethodInterceptor {
      */
     private SampleDefinition findSampleDefinition(final MethodInvocation invocation) {
         final SampledMethod sampledMethod = new SampledMethod(invocation.getThis().getClass(), invocation.getMethod());
-        return SampleRepository.getInstance().find(sampledMethod, invocation.getArguments());
+        return SampleRepository.getInstance().findValidated(sampledMethod, invocation.getArguments());
     }
 }

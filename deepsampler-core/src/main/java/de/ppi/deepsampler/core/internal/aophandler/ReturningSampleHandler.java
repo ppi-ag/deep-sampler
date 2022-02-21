@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -31,6 +31,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
 
         sampleDefinition.setParameterMatchers(parameterMatchers);
         sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));
+        sampleDefinition.setMarkedForPersistence(SampleRepository.getInstance().getMarkNextVoidSamplerForPersistence());
 
         return sampleDefinition;
     }

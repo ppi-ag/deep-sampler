@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 plugins {
@@ -13,4 +13,9 @@ dependencies {
     implementation(project(":deepsampler-persistence-json"))
     implementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testImplementation(testFixtures(project(":deepsampler-junit")))
+    testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
+    testImplementation(project(":deepsampler-provider-guice"))
+    testImplementation("org.assertj:assertj-core:3.21.0")
+
+    testImplementation(files("./src/test/tmp"))
 }

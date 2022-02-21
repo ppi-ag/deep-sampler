@@ -1,12 +1,15 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.provider.common;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * A Service that will be instrumented to test the interceptors.
@@ -16,9 +19,10 @@ public class TestService {
     public static final String HARD_CODED_RETURN_VALUE = "Some value";
 
     private int counter = 0;
+    private Ship shipEnum;
 
     /**
-     * This method returns a primitve parameter if the method is not sampled.
+     * This method returns a primitive parameter if the method is not sampled.
      * This Method is intended to be used in positive and negative tests.
      *
      * @param param The parameter that will be returned unchanged
@@ -30,6 +34,11 @@ public class TestService {
 
     public String anotherMethodThatReturnsStrings(final String param) {
         return param;
+    }
+
+
+    public String getRandom(String param) {
+        return Double.toString(Math.random());
     }
 
 
@@ -64,6 +73,17 @@ public class TestService {
     }
 
     /**
+     * This method returns a non primitive parameter containing a byte[] if the method is not mocked.
+     * This Method is intended to be used in positive and negative tests.
+     *
+     * @param someObject The parameter that will be returned unchanged
+     * @return the unchanged parameter value
+     */
+    public TestBeanWithBytes echoParameter(final TestBeanWithBytes someObject) {
+        return someObject;
+    }
+
+    /**
      * This method is needed to test whether calls of void methods can be verified or not.
      *
      * @param someInt int value
@@ -74,8 +94,8 @@ public class TestService {
     }
 
     @SuppressWarnings("unused")
-    public Date testSqlDate(final RecTestBean someObject) {
-        return new Date(1);
+    public Date testRandomSqlDate(final RecTestBean someObject) {
+        return new Date((long)(Math.random() * 100000000000L));
     }
 
 
@@ -114,4 +134,145 @@ public class TestService {
         this.counter = counter;
     }
 
+    public String[] getArrayOfStrings() {
+        return new String[]{HARD_CODED_RETURN_VALUE};
+    }
+
+    public String[][] getArrayOfStrings2d() {
+        return new String[][]{new String[]{HARD_CODED_RETURN_VALUE}};
+    }
+
+    public TestBean[][][] getArrayOfTestBeans3d() {
+        return new TestBean[][][] {{{new TestBean(HARD_CODED_RETURN_VALUE)}, {new TestBean(HARD_CODED_RETURN_VALUE)}}};
+    }
+
+    public TestBean[] getArrayOfTestBeans() {
+        return new TestBean[]{new TestBean(HARD_CODED_RETURN_VALUE)};
+    }
+
+    public List<TestBean> getListOfTestBeans() {
+        // Usually it would be better to use Collections.singletonList() for Lists with only one entry, but
+        // we are unable to deserialize Collections.SingletonList since this is a private inner class.
+        return Arrays.asList(new TestBean(HARD_CODED_RETURN_VALUE));
+    }
+
+    public List<String> getListOfStrings() {
+        // Usually it would be better to use Collections.singletonList() for Lists with only one entry, but
+        // we are unable to deserialize Collections.SingletonList since this is a private inner class.
+        return Arrays.asList(HARD_CODED_RETURN_VALUE);
+    }
+
+    public Set<String> getSetOfStrings() {
+        Set<String> set = new HashSet<>();
+        set.add(HARD_CODED_RETURN_VALUE);
+
+        return set;
+    }
+
+    public Set<TestBean> getSetOfTestBeans() {
+        Set<TestBean> set = new HashSet<>();
+        set.add(new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return set;
+    }
+
+    public Map<String, String> getMapOfStrings() {
+        Map<String, String> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, HARD_CODED_RETURN_VALUE);
+
+        return map;
+    }
+
+    public Map<String, TestBean> getMapOfStringsToTestBeans() {
+        Map<String, TestBean> map = new HashMap<>();
+        map.put(HARD_CODED_RETURN_VALUE, new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
+    }
+
+    public Map<TestBean, TestBean> getComplexMap() {
+        Map<TestBean, TestBean> map = new HashMap<>();
+
+        map.put(new TestBean(HARD_CODED_RETURN_VALUE), new TestBean(HARD_CODED_RETURN_VALUE));
+
+        return map;
+    }
+
+    public Map<Integer, Integer> getMapOfIntegers() {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(1, 2);
+
+        return map;
+    }
+
+
+    public byte[] getRandomByteArray(int size){
+
+        byte[] b = new byte[size];
+        new Random().nextBytes(b);
+        return b;
+
+    }
+
+    public Animal getConcreteDogObject() {
+        return new Dog("Porthos");
+    }
+
+    public Dog getSubClassOfDog() {
+        return new Beagle("Porthos");
+    }
+
+    public AbstractDog getSubClassOfAbstractDog() {
+        return new Labrador("BlackDog");
+    }
+
+    public AbstractDog getInternalClassThatExtendsAbstractDog() {
+        return new AbstractDog.InternalDog("InnerClassDog");
+    }
+
+    public Animal getCatWithMouse() {
+        Mouse mouse = new Mouse("Jerry");
+        HunterCat cat = new HunterCat("Tom");
+        cat.setFood(mouse);
+
+        return cat;
+    }
+
+    public Dog getGenericSubClass() {
+        GenericBeagle<Cheese> porthos = new GenericBeagle<>("GreedyPorthos");
+        porthos.setFood(new Cheese("Cheddar"));
+
+        return porthos;
+    }
+
+    public GenericBeagle<Cheese> getGenericClass() {
+        GenericBeagle<Cheese> porthos = new GenericBeagle<>("GenericPorthos");
+        porthos.setFood(new Cheese("Gauda"));
+
+        return porthos;
+    }
+
+    public String getNull() {
+        return null;
+    }
+
+    public String getShipsRegistrationFromEnum(Ship ship) {
+        return ship.getRegistration();
+    }
+
+    public Ship getShipEnum() {
+        return this.shipEnum;
+    }
+
+    public void setShipEnum(Ship shipEnum) {
+        this.shipEnum = shipEnum;
+    }
+
+    public TestBeanWithEnum getBeanWithShipEnum() {
+        return new TestBeanWithEnum(this.shipEnum);
+    }
+
+    public RetentionPolicy getEnumWithDefaultConstructor() {
+        return RetentionPolicy.CLASS;
+    }
 }

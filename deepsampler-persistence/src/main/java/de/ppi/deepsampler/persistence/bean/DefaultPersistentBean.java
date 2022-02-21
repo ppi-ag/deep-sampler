@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -36,5 +36,9 @@ public class DefaultPersistentBean implements PersistentBean {
     @Override
     public Object getValue(final String key) {
         return values.get(key);
+    }
+
+    public void putValue(final String key, Object value) {
+        values.put(key, value);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -25,7 +25,7 @@ public class ComboMatcher<T> implements ParameterMatcher<T> {
 
     /**
      * Create a ComboMatcher with the parameterMatcher to be imitated and the persistentMatcher to hold for the later creating of a real matcher
-     * in the proces of loading persistent samples.
+     * in the process of loading persistent samples.
      *
      * @param parameterMatcher the {@link ParameterMatcher} to imitate
      * @param persistentMatcher the {@link PersistentMatcher} to hold

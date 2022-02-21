@@ -1,24 +1,27 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
 package de.ppi.deepsampler.persistence.api;
 
 import de.ppi.deepsampler.core.api.Matchers;
+import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.internal.SampleHandling;
 import de.ppi.deepsampler.core.model.*;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
-import de.ppi.deepsampler.persistence.bean.ext.BeanFactoryExtension;
+import de.ppi.deepsampler.persistence.bean.PolymorphicPersistentBean;
+import de.ppi.deepsampler.persistence.bean.ReflectionTools;
+import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
-import de.ppi.deepsampler.persistence.model.PersistentActualSample;
+import de.ppi.deepsampler.persistence.error.NoMatchingSamplerFoundException;
 import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,21 +48,21 @@ public class PersistentSampleManager {
     }
 
     /**
-     * Add a {@link BeanFactoryExtension} to the sample manager.
+     * Add a {@link BeanConverterExtension} to the sample manager.
      *
-     * @param beanFactoryExtension {@link BeanFactoryExtension}
+     * @param beanConverterExtension {@link BeanConverterExtension}
      * @return this
      */
-    public PersistentSampleManager addBeanExtension(final BeanFactoryExtension beanFactoryExtension) {
-        persistentSamplerContext.addBeanFactoryExtension(beanFactoryExtension);
+    public PersistentSampleManager addBeanExtension(final BeanConverterExtension beanConverterExtension) {
+        persistentSamplerContext.addBeanConverterExtension(beanConverterExtension);
         return this;
     }
 
     /**
      * End of chain method: call {@link SourceManager#save(Map, PersistentSamplerContext)} on all added {@link SourceManager}s.
      */
-    public void record() {
-        for (final SourceManager sourceManager: sourceManagerList) {
+    public void recordSamples() {
+        for (final SourceManager sourceManager : sourceManagerList) {
             sourceManager.save(ExecutionRepository.getInstance().getAll(), persistentSamplerContext);
         }
     }
@@ -69,20 +72,10 @@ public class PersistentSampleManager {
      * all loaded samples to the DeepSampler repositories.
      */
     public void load() {
-        List<SampleDefinition> loadedSampledDefinitions = new ArrayList<>();
-        for (final SourceManager sourceManager: sourceManagerList) {
-            final Map<String, SampleDefinition> definedSamples = SampleRepository.getInstance().getSamples().stream()
-                    .collect(Collectors.toMap(SampleDefinition::getSampleId, s -> s));
+        for (final SourceManager sourceManager : sourceManagerList) {
             final PersistentModel persistentModel = sourceManager.load();
 
-            final List<SampleDefinition> filteredMappedSample = toSample(persistentModel, definedSamples);
-            loadedSampledDefinitions.addAll(filteredMappedSample);
-        }
-
-        SampleRepository.getInstance().clear();
-
-        for (final SampleDefinition sample : loadedSampledDefinitions) {
-            SampleRepository.getInstance().add(sample);
+            mergeSamplesFromPersistenceIntoSampleRepository(persistentModel);
         }
 
         if (SampleRepository.getInstance().isEmpty()) {
@@ -91,34 +84,111 @@ public class PersistentSampleManager {
         }
     }
 
-    private List<SampleDefinition> toSample(final PersistentModel model, final Map<String, SampleDefinition> idToSampleMethodMapping) {
-        final List<SampleDefinition> samples = new ArrayList<>();
+    /**
+     * This method merges the samples from the persistence (e.g. JSON-File) into manually defined Samplers and Samples. The order of the
+     * Samplers is defined by the Samplers in the test class or the compound. Samples from the file will be inserted in the list of Samples
+     * at the position where the matching samplers have been defined.
+     * <p>
+     * E.G. Someone could now first define a matcher that matches only on a particular parameter of the value
+     * "Picard". The second matcher could then by anyString(). The first Sample would then be used only if the correct parameter is supplied and in all
+     * other cases the second sampler would be used.
+     *
+     * @param persistentSamples Contains the Samples from the persistence i.e. JSON
+     */
+    private void mergeSamplesFromPersistenceIntoSampleRepository(final PersistentModel persistentSamples) {
+        SampleRepository sampleRepository = SampleRepository.getInstance();
+        List<SampleDefinition> originallyDefinedSamplers = new ArrayList<>(sampleRepository.getSamples());
 
-        for (final Map.Entry<PersistentSampleMethod, PersistentActualSample> joinPointBehaviorEntry : model.getSampleMethodToSampleMap().entrySet()) {
-            final PersistentSampleMethod persistentSampleMethod = joinPointBehaviorEntry.getKey();
-            final PersistentActualSample persistentActualSample = joinPointBehaviorEntry.getValue();
-            final SampleDefinition matchingSample = idToSampleMethodMapping.get(persistentSampleMethod.getSampleMethodId());
+        // This is a Set of all SampleIds from the persistence. Everytime, when a SampleId could be matched to a Sampler from the SampleRepository,
+        // the SampleId will be removed from this Set. The remaining SampleIds are unmatched and will be reported by an Exception.
+        Set<String> unusedPersistentSampleIds = getPersistentSampleIds(persistentSamples);
 
-            // When there is no matching JointPoint, the persistentJoinPointEntity will be discarded
-            if (matchingSample != null) {
-                for (final PersistentMethodCall call : persistentActualSample.getAllCalls()) {
-                    final SampleDefinition behavior = mapToSample(matchingSample, persistentSampleMethod, call);
-                    if (SampleHandling.argumentsMatch(matchingSample, behavior.getParameterValues().toArray(new Object[0]))) {
-                        samples.add(behavior);
-                    }
-                }
+        for (int i = 0; i < sampleRepository.size(); i++) {
+            SampleDefinition sampler = sampleRepository.get(i);
+
+            if (!sampler.isMarkedForPersistence()) {
+                continue;
             }
+
+            List<SampleDefinition> mergedPersistentSamples = createSampleDefinitionForEachPersistentSample(persistentSamples, sampler);
+
+            sampleRepository.replace(i, mergedPersistentSamples);
+            i += mergedPersistentSamples.size() - 1;
+
+            unusedPersistentSampleIds = filterUsedSampleIds(unusedPersistentSampleIds, mergedPersistentSamples);
         }
-        return samples;
+
+        if (!unusedPersistentSampleIds.isEmpty()) {
+            throw new NoMatchingSamplerFoundException(unusedPersistentSampleIds, originallyDefinedSamplers);
+        }
+
     }
 
-    private SampleDefinition mapToSample(final SampleDefinition matchingSample, final PersistentSampleMethod persistentSampleMethod,
-                                         final PersistentMethodCall call) {
+    private Set<String> filterUsedSampleIds(Set<String> unusedPersistentSampleIds, List<SampleDefinition> mergedPersistentCalls) {
+        List<String> mergedSampleIds = mergedPersistentCalls.stream().map(SampleDefinition::getSampleId).collect(Collectors.toList());
+
+        return unusedPersistentSampleIds.stream()
+                .filter(s -> !mergedSampleIds.contains(s))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> getPersistentSampleIds(PersistentModel persistentSamples) {
+        return persistentSamples.getSampleMethodToSampleMap().keySet().stream()
+                .map(PersistentSampleMethod::getSampleMethodId)
+                .collect(Collectors.toSet());
+    }
+
+    private List<SampleDefinition> createSampleDefinitionForEachPersistentSample(PersistentModel persistentSamples, SampleDefinition sampler) {
+        List<SampleDefinition> usedPersistentCalls = new ArrayList<>();
+        List<SampleDefinition> unusedPersistentCalls = new ArrayList<>();
+
+        for (PersistentSampleMethod persistentSampleMethod : persistentSamples.getSampleMethodToSampleMap().keySet()) {
+
+            if (persistentSampleMethod.getSampleMethodId().equals(sampler.getSampleId())) {
+                List<PersistentMethodCall> calls = persistentSamples.getSampleMethodToSampleMap().get(persistentSampleMethod).getAllCalls();
+
+                for (PersistentMethodCall call : calls) {
+                    SampleDefinition combinedSampleDefinition = combinePersistentSampleAndDefinedSampler(sampler, persistentSampleMethod, call);
+                    // We use the parameter values from combinedSampleDefinition because combinePersistentSampleAndDefinedSampler() unwraps the
+                    // parameters from persistence containers.
+                    Object[] actualParameterValues = combinedSampleDefinition.getParameterValues().toArray();
+
+                    unusedPersistentCalls.add(combinedSampleDefinition);
+
+                    if (SampleHandling.argumentsMatch(sampler, actualParameterValues)) {
+                        usedPersistentCalls.add(combinedSampleDefinition);
+                        unusedPersistentCalls.remove(combinedSampleDefinition);
+                    }
+                }
+
+            }
+        }
+
+        if (!unusedPersistentCalls.isEmpty()) {
+            throw new NoMatchingParametersFoundException(unusedPersistentCalls);
+        }
+
+        return usedPersistentCalls;
+    }
+
+
+    private SampleDefinition combinePersistentSampleAndDefinedSampler(final SampleDefinition matchingSample, final PersistentSampleMethod persistentSampleMethod,
+                                                                      final PersistentMethodCall call) {
         final List<Object> parameterEnvelopes = call.getPersistentParameter().getParameter();
         final Object returnValueEnvelope = call.getPersistentReturnValue();
+        final Class<?> returnClass;
         final SampledMethod sampledMethod = matchingSample.getSampledMethod();
-        final Class<?>[] parameterTypes = sampledMethod.getMethod().getParameterTypes();
-        final Class<?> returnType = sampledMethod.getMethod().getReturnType();
+
+        if (returnValueEnvelope instanceof PolymorphicPersistentBean) {
+            returnClass = ReflectionTools.getOriginalClassFromPolymorphicPersistentBean((PolymorphicPersistentBean) returnValueEnvelope);
+        } else {
+            returnClass = sampledMethod.getMethod().getReturnType();
+        }
+
+        final Type[] parameterTypes = sampledMethod.getMethod().getGenericParameterTypes();
+        final Type genericReturnType = sampledMethod.getMethod().getGenericReturnType();
+        final ParameterizedType parameterizedReturnType = genericReturnType instanceof ParameterizedType ? (ParameterizedType) genericReturnType : null;
+
         final String joinPointId = persistentSampleMethod.getSampleMethodId();
 
         final List<Object> parameterValues = unwrapValue(joinPointId, parameterTypes, parameterEnvelopes);
@@ -129,13 +199,13 @@ public class PersistentSampleManager {
         sample.setParameterMatchers(parameterMatchers);
         sample.setParameterValues(parameterValues);
 
-        final Object returnValue = unwrapValue(returnType, returnValueEnvelope);
+        final Object returnValue = unwrapValue(returnClass, parameterizedReturnType, returnValueEnvelope);
         sample.setAnswer(invocation -> returnValue);
 
         return sample;
     }
 
-    private List<Object> unwrapValue(final String id, final Class<?>[] parameterTypes, final List<Object> parameterPersistentBeans) {
+    private List<Object> unwrapValue(final String id, final Type[] parameterTypes, final List<Object> parameterPersistentBeans) {
         final List<Object> params = new ArrayList<>();
 
         if (parameterTypes.length != parameterPersistentBeans.size()) {
@@ -143,15 +213,18 @@ public class PersistentSampleManager {
                     "not match the number of persistent parameters (%s:%s)!", id, parameterTypes, parameterPersistentBeans);
         }
         for (int i = 0; i < parameterPersistentBeans.size(); ++i) {
-            final Class<?> parameterType = parameterTypes[i];
+            final ParameterizedType parameterType = parameterTypes[i] instanceof ParameterizedType ? (ParameterizedType) parameterTypes[i] : null;
+            final Class<?> parameterClass = ReflectionTools.getClass(parameterTypes[i]);
             final Object persistentBean = parameterPersistentBeans.get(i);
-            params.add(unwrapValue(parameterType, persistentBean));
+
+            params.add(unwrapValue(parameterClass, parameterType, persistentBean));
         }
         return params;
     }
 
-    private Object unwrapValue(final Class<?> type, final Object persistentBean) {
-        return persistentSamplerContext.getPersistentBeanFactory().convertValueFromPersistentBeanIfNecessary(persistentBean, type);
+
+    private Object unwrapValue(final Class<?> targetClass, final ParameterizedType type, final Object persistentBean) {
+        return persistentSamplerContext.getPersistentBeanConverter().revert(persistentBean, targetClass, type);
     }
 
     @SuppressWarnings("unchecked")
@@ -159,7 +232,7 @@ public class PersistentSampleManager {
         List<ParameterMatcher<?>> resultingParameterMatcher = new ArrayList<>();
         for (int i = 0; i < params.size(); ++i) {
             Object param = params.get(i);
-            ParameterMatcher<?> parameterMatcher  = parameterMatchers.get(i);
+            ParameterMatcher<?> parameterMatcher = parameterMatchers.get(i);
 
             if (parameterMatcher instanceof ComboMatcher) {
                 resultingParameterMatcher.add(s -> ((ComboMatcher<Object>) parameterMatcher).getPersistentMatcher().matches(s, param));

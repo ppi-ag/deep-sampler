@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -11,11 +11,11 @@ import java.util.List;
 
 public class SampleExecutionInformation {
 
-    private int timesInvoked ;
+    private final SampleDefinition sampleDefinition;
     private final List<MethodCall> methodCallList = new ArrayList<>();
 
-    public SampleExecutionInformation(final int timesInvoked) {
-        this.timesInvoked = timesInvoked;
+    public SampleExecutionInformation(SampleDefinition sampleDefinition) {
+        this.sampleDefinition = sampleDefinition;
     }
 
     public List<MethodCall> getMethodCalls() {
@@ -26,11 +26,11 @@ public class SampleExecutionInformation {
         this.methodCallList.add(call);
     }
 
-    public void increaseTimesInvoked() {
-        timesInvoked++;
+    public int getTimesInvoked() {
+        return methodCallList.size();
     }
 
-    public int getTimesInvoked() {
-        return timesInvoked;
+    public SampleDefinition getSampleDefinition() {
+        return sampleDefinition;
     }
 }

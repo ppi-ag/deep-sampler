@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -13,6 +13,7 @@ dependencies {
     testFixturesImplementation(project(":deepsampler-persistence"))
     testFixturesImplementation(project(":deepsampler-persistence-json"))
     testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testFixturesImplementation("org.assertj:assertj-core:3.21.0")
 }
 
 

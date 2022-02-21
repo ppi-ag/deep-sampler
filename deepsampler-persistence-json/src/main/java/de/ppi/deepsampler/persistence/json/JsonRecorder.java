@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -11,16 +11,18 @@ import de.ppi.deepsampler.core.model.MethodCall;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleExecutionInformation;
 import de.ppi.deepsampler.persistence.PersistentSamplerContext;
+import de.ppi.deepsampler.persistence.error.PersistenceException;
+import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentActualSample;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentParameter;
 import de.ppi.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
-import de.ppi.deepsampler.persistence.json.error.JsonPersistenceException;
-import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 import de.ppi.deepsampler.persistence.json.model.JsonSampleModel;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -36,7 +38,7 @@ public class JsonRecorder extends JsonOperator {
         super(persistentResource, Collections.emptyList(), serializationExtensions, moduleList);
     }
 
-    public void record(final Map<Class<?>, ExecutionInformation> executionInformationMap, PersistentSamplerContext persistentSamplerContext) {
+    public void recordExecutionInformation(final Map<Class<?>, ExecutionInformation> executionInformationMap, PersistentSamplerContext persistentSamplerContext) {
         try {
             final PersistentResource persistentResource = getPersistentResource();
             if (persistentResource instanceof PersistentFile) {
@@ -52,7 +54,7 @@ public class JsonRecorder extends JsonOperator {
                     StandardOpenOption.CREATE)));
             createObjectMapper().writeValue(writer, model);
         } catch (final IOException e) {
-            throw new JsonPersistenceException("It was not possible to serialize/write to json.", e);
+            throw new PersistenceException("It was not possible to serialize/write to json.", e);
         }
     }
 
@@ -68,29 +70,31 @@ public class JsonRecorder extends JsonOperator {
 
         for (final Map.Entry<Class<?>, ExecutionInformation> informationEntry : executionInformationMap.entrySet()) {
             final ExecutionInformation information = informationEntry.getValue();
-            final Map<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationMap = information.getAll();
+            final List<SampleExecutionInformation> sampleExecutionInformationMapList = information.getAll();
 
-            for (final Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry : sampleExecutionInformationMap.entrySet()) {
-                addToPersistentMap(sampleMethodJsonPersistentActualSampleMap, sampleExecutionInformationEntry, persistentSamplerContext);
+            for (final SampleExecutionInformation sampleExecutionInformation : sampleExecutionInformationMapList) {
+                addToPersistentMap(sampleMethodJsonPersistentActualSampleMap, sampleExecutionInformation, persistentSamplerContext);
             }
         }
         return sampleMethodJsonPersistentActualSampleMap;
     }
 
     private void addToPersistentMap(final Map<JsonPersistentSampleMethod, JsonPersistentActualSample> sampleMethodJsonPersistentActualSampleMap,
-                                    final Map.Entry<SampleDefinition, SampleExecutionInformation> sampleExecutionInformationEntry,
+                                    final SampleExecutionInformation sampleExecutionInformation,
                                     PersistentSamplerContext persistentSamplerContext) {
-        final SampleDefinition sample = sampleExecutionInformationEntry.getKey();
-        final SampleExecutionInformation sampleExecutionInformation = sampleExecutionInformationEntry.getValue();
-
+        final SampleDefinition sample = sampleExecutionInformation.getSampleDefinition();
         final List<MethodCall> calls = sampleExecutionInformation.getMethodCalls();
 
         final JsonPersistentSampleMethod persistentSampleMethod = new JsonPersistentSampleMethod(sample.getSampleId());
         final JsonPersistentActualSample jsonPersistentActualSample = new JsonPersistentActualSample();
 
+        final Type declaredReturnType = sample.getSampledMethod().getMethod().getGenericReturnType();
+        final Type[] argumentTypes = sample.getSampledMethod().getMethod().getGenericParameterTypes();
+
         for (final MethodCall call : calls) {
-            final List<Object> argsAsPersistentBeans = persistentSamplerContext.getPersistentBeanFactory().toBeanIfNecessary(call.getArgs());
-            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanFactory().toBeanIfNecessary(call.getReturnValue());
+            final List<Object> argsAsPersistentBeans = convertArguments(call.getArgs(), argumentTypes, persistentSamplerContext);
+
+            final Object returnValuePersistentBean = persistentSamplerContext.getPersistentBeanConverter().convert(call.getReturnValue(), declaredReturnType);
             final JsonPersistentParameter newParameters = new JsonPersistentParameter(argsAsPersistentBeans);
 
             if (!callWithSameParametersExists(jsonPersistentActualSample, newParameters)) {
@@ -99,6 +103,18 @@ public class JsonRecorder extends JsonOperator {
             }
         }
         sampleMethodJsonPersistentActualSampleMap.put(persistentSampleMethod, jsonPersistentActualSample);
+    }
+
+    private List<Object> convertArguments(List<Object> arguments, Type[] argumentTypes, PersistentSamplerContext persistentSamplerContext) {
+        List<Object> argumentPersistentBeans = new ArrayList<>();
+
+        for (int i = 0; i < arguments.size(); i++) {
+            final ParameterizedType parameterizedType = argumentTypes[i] instanceof ParameterizedType ? (ParameterizedType) argumentTypes[i] : null;
+            final Object argumentPersistentBean = persistentSamplerContext.getPersistentBeanConverter().convert(arguments.get(i), parameterizedType);
+            argumentPersistentBeans.add(argumentPersistentBean);
+        }
+
+        return argumentPersistentBeans;
     }
 
     private boolean callWithSameParametersExists(JsonPersistentActualSample jsonPersistentActualSample, JsonPersistentParameter parameter) {

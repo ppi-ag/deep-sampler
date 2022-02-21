@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -22,5 +22,6 @@ public class JUnitPreparationException extends BaseException {
     public JUnitPreparationException(final String message, final Throwable cause, final Object... args) {
         super(message, cause, args);
     }
+
 
 }

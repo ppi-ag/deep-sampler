@@ -1,5 +1,5 @@
 /*
- * Copyright 2020  PPI AG (Hamburg, Germany)
+ * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
 
@@ -25,7 +25,7 @@ public class VerifySampleHandler extends ReturningSampleHandler {
     @Override
     public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) {
         final SampledMethod sampledMethod = new SampledMethod(cls, thisMethod);
-        final SampleDefinition sampleDefinition = SampleRepository.getInstance().find(sampledMethod, args);
+        final SampleDefinition sampleDefinition = SampleRepository.getInstance().findUnvalidated(sampledMethod, args);
 
         if (sampleDefinition != null) {
             final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
