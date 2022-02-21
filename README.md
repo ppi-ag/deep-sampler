@@ -263,5 +263,5 @@ The following line would make all Samples available across all Threads:
 # License
 DeepSampler is made available under the terms of the __MIT License__ (see [LICENSE.md](./LICENSE.md)).
 
-Copyright 2021 PPI AG (Hamburg, Germany)
+Copyright 2022 PPI AG (Hamburg, Germany)
 
