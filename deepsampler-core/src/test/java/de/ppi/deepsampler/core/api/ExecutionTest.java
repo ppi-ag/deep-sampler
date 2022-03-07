@@ -31,7 +31,7 @@ class ExecutionTest {
     @Test
     void useForLastSample() {
         // GIVEN
-        final SampleDefinition sdSampler = Sampler.prepare(SampleDefinition.class);
+        final var sdSampler = Sampler.prepare(SampleDefinition.class);
         Sample.of(sdSampler.getSampleId()).is("");
         final SampleReturnProcessor sampleReturnProcessor = (a, b, c) -> null;
 

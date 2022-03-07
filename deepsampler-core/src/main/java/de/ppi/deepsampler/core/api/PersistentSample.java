@@ -48,8 +48,8 @@ public class PersistentSample {
      * fluent API only.
      */
     public static <T> PersistentSampleBuilder<T> of(final T sampledMethodCall) {
-        SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        SampleDefinition lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
+        var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        var lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
 
         if (currentSampleDefinition == lastSampleDefinition) {
             throw new NotASamplerException("sampledMethodCall is not a Sampler. Did you prepare the Sampler using Sampler.prepare() or @PrepareSampler?");

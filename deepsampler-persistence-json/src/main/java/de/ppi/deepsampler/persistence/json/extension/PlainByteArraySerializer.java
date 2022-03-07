@@ -43,7 +43,7 @@ public class PlainByteArraySerializer extends StdSerializer<byte[]> {
      * @param serializers {@inheritDoc}
      * @param typeSer {@inheritDoc}
      * @throws IOException {@inheritDoc}
-     * @see <a href=""https://stackoverflow.com/questions/26672297/how-to-trigger-calls-to-serializewithtype-of-a-class-implementing-jsonseriali">Stackoverflow</a>
+     * @see <a href="https://stackoverflow.com/questions/26672297/how-to-trigger-calls-to-serializewithtype-of-a-class-implementing-jsonseriali">Stackoverflow</a>
      */
     @Override
     public void serializeWithType(byte[] value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {

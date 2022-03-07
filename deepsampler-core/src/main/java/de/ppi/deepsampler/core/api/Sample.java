@@ -48,8 +48,8 @@ public class Sample {
      * fluent API only.
      */
     public static <T> FunctionalSampleBuilder<T> of(final T sampledMethodCall) {
-        SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        SampleDefinition lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
+        var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        var lastSampleDefinition = SampleRepository.getInstance().getLastSampleDefinition();
 
         if (currentSampleDefinition == lastSampleDefinition) {
             throw new NotASamplerException("sampledMethodCall is not a Sampler. Did you prepare the Sampler using Sampler.prepare() or @PrepareSampler?");
@@ -86,9 +86,9 @@ public class Sample {
      * fluent API only.
      */
     public static <E extends Exception> VoidSampleBuilder of(final VoidCall<E> sampledMethodCall) {
-        final SampleRepository sampleRepository = SampleRepository.getInstance();
+        final var sampleRepository = SampleRepository.getInstance();
 
-        final SampleDefinition lastSampleDefinition = sampleRepository.getCurrentSampleDefinition();
+        final var lastSampleDefinition = sampleRepository.getCurrentSampleDefinition();
 
         try {
             sampledMethodCall.call();
@@ -97,7 +97,7 @@ public class Sample {
                     "instead of a method on a Sampler?", e);
         }
 
-        final SampleDefinition newSampleDefinition = sampleRepository.getCurrentSampleDefinition();
+        final var newSampleDefinition = sampleRepository.getCurrentSampleDefinition();
 
         if (lastSampleDefinition == newSampleDefinition) {
             throw new NotASamplerException("sampledMethodCall did not call a method on a Sampler. Did you use a " +

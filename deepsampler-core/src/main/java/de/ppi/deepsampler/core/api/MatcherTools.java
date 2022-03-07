@@ -30,7 +30,7 @@ public class MatcherTools {
         }
 
         try {
-            Method equals = object.getClass().getMethod("equals", Object.class);
+            var equals = object.getClass().getMethod("equals", Object.class);
 
             if (equals.getDeclaringClass().equals(Object.class)) {
                 complainAboutMissingEqualsMethod(object);

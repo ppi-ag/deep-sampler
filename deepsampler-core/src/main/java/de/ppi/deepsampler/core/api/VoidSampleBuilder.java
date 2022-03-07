@@ -55,8 +55,8 @@ public class VoidSampleBuilder extends SampleBuilder {
      */
     public void throwsException(final Class<? extends Exception> exceptionClass) {
         getSampleDefinition().setAnswer(invocation -> {
-            final Objenesis objenesis = new ObjenesisStd();
-            final ObjectInstantiator<?> exceptionInstantiator = objenesis.getInstantiatorOf(exceptionClass);
+            final var objenesis = new ObjenesisStd();
+            final var exceptionInstantiator = objenesis.getInstantiatorOf(exceptionClass);
 
             throw (Exception) exceptionInstantiator.newInstance();
         });

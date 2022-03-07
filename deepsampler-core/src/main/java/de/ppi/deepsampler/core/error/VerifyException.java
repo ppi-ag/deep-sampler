@@ -41,7 +41,7 @@ public class VerifyException extends BaseException {
             return "(null)";
         }
 
-        final String formattedArgs = Arrays.stream(args)//
+        final var formattedArgs = Arrays.stream(args)//
             .map(Objects::toString)//
             .collect(Collectors.joining(", "));
 

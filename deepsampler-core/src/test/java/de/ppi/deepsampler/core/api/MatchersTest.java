@@ -32,11 +32,11 @@ class MatchersTest {
     @Test
     void testSampleDefinitionWithAnyMatcher() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(any(Bean.class))).is(BEAN_A);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(1, currentSampleDefinition.getNumberOfParameters());
         assertAnyParameterMayAppear(0, BEAN_A, BEAN_B);
@@ -45,11 +45,11 @@ class MatchersTest {
     @Test
     void testSampleDefinitionWithMultipleAnyMatcher() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.methodWithMultipleParams(anyString(), any(Bean.class))).is("Some sampler");
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(2, currentSampleDefinition.getNumberOfParameters());
         assertAnyParameterMayAppear(0, "A random String", "Another random String");
@@ -59,7 +59,7 @@ class MatchersTest {
     @Test
     void testSampleDefinitionWithPrimitiveMatcher() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
 
         Sample.of(testServiceSampler.echoBoolean(anyBoolean())).is(true);
         assertAnyParameterMayAppear(0, true, false);
@@ -86,11 +86,11 @@ class MatchersTest {
     @Test
     void equalsMatcherWorks() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(equalTo(BEAN_A))).is(BEAN_B);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(1, currentSampleDefinition.getNumberOfParameters());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
@@ -100,11 +100,11 @@ class MatchersTest {
     @Test
     void equalsMatcherWithStringWorks() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoString("make it so!")).is("engage!");
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(1, currentSampleDefinition.getNumberOfParameters());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("make it so!"));
@@ -113,11 +113,11 @@ class MatchersTest {
     @Test
     void explicitEqualsMatcherWithStringWorks() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoString(Matchers.equalTo("make it so!"))).is("engage!");
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(1, currentSampleDefinition.getNumberOfParameters());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("make it so!"));
@@ -126,11 +126,11 @@ class MatchersTest {
     @Test
     void sameAsMatcherWorks() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(sameAs(BEAN_A))).is(BEAN_B);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(1, currentSampleDefinition.getNumberOfParameters());
         assertFalse(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(new Bean(BEAN_A.someString, BEAN_A.someInt)));
@@ -140,11 +140,11 @@ class MatchersTest {
     @Test
     void mixedMatchersWork() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.methodWithMultipleParams(equalTo("Expected String"), sameAs(BEAN_A))).is("Some result");
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(2, currentSampleDefinition.getParameterMatchers().size());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches("Expected String"));
@@ -155,7 +155,7 @@ class MatchersTest {
 
 
     private void assertAnyParameterMayAppear(final int parameterIndex, final Object alternativeOne, final Object alternativeTwo) {
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertTrue(currentSampleDefinition.getParameterMatcherAs(parameterIndex, Object.class).matches(alternativeOne));
         assertTrue(currentSampleDefinition.getParameterMatcherAs(parameterIndex, Object.class).matches(alternativeTwo));
@@ -167,7 +167,7 @@ class MatchersTest {
     @Test
     void mixedMatchersAreNotAllowed() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         assertThrows(InvalidMatcherConfigException.class,() -> mixMatchers(testServiceSampler));
     }
 
@@ -179,32 +179,32 @@ class MatchersTest {
     @SuppressWarnings("unchecked")
     void testCustomMatcher() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.methodWithMultipleParams(Matchers.matcher(new ContainsMatcher("ABC")), any(Bean.class)))
                 .is("Some result");
 
         // THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var parameterMatchers = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(2, parameter.size());
-        assertTrue(((ParameterMatcher<String>)parameter.get(0)).matches("XABCX"));
-        assertFalse(((ParameterMatcher<String>)parameter.get(0)).matches("ABDX"));
+        assertEquals(2, parameterMatchers.size());
+        assertTrue(((ParameterMatcher<String>)parameterMatchers.get(0)).matches("XABCX"));
+        assertFalse(((ParameterMatcher<String>)parameterMatchers.get(0)).matches("ABDX"));
     }
 
     @Test
     @SuppressWarnings("unchecked")
     void parameterWithoutEqualsIsDetected() {
         //GIVEN WHEN
-        final BeanWithoutEquals beanWithoutEquals = new BeanWithoutEquals();
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var beanWithoutEquals = new BeanWithoutEquals();
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.provokeMissingEqualsException(beanWithoutEquals)).is(BEAN_A);
 
         // THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var parameterMatchers = currentSampleDefinition.getParameterMatchers();
 
-        final ParameterMatcher<BeanWithoutEquals> matcher = (ParameterMatcher<BeanWithoutEquals>) parameter.get(0);
+        final var matcher = (ParameterMatcher<BeanWithoutEquals>) parameterMatchers.get(0);
 
         assertThrows(InvalidConfigException.class, () -> matcher.matches(beanWithoutEquals));
     }
@@ -213,17 +213,17 @@ class MatchersTest {
     @SuppressWarnings("unchecked")
     void equalsMatcherAllowsEqualsMethodInSuperType() {
         // GIVEN WHEN
-        final BeanWithInheritedEquals bean = new BeanWithInheritedEquals("a", 1);
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        Sample.of(testServiceSampler.acceptInheritedEquals(bean)).is(BEAN_A);
+        final var beanWithInheritedEquals = new BeanWithInheritedEquals("a", 1);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
+        Sample.of(testServiceSampler.acceptInheritedEquals(beanWithInheritedEquals)).is(BEAN_A);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var parameterMatchers = currentSampleDefinition.getParameterMatchers();
 
-        final EqualsMatcher<BeanWithInheritedEquals> matcher = (EqualsMatcher<BeanWithInheritedEquals>) parameter.get(0);
+        final var equalsMatcher = (EqualsMatcher<BeanWithInheritedEquals>) parameterMatchers.get(0);
 
-        assertTrue(matcher.matches(bean));
+        assertTrue(equalsMatcher.matches(beanWithInheritedEquals));
     }
 
     static class ContainsMatcher implements ParameterMatcher<String> {

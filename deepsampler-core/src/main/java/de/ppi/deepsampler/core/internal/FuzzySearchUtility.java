@@ -47,7 +47,7 @@ public class FuzzySearchUtility {
             return null;
         }
 
-        List<Match<T>> matchedCandidates = candidates.stream()
+        var matchedCandidates = candidates.stream()
                 .map(candidate -> new Match<>(candidate, calcEquality(candidateKeyProvider.apply(candidate), wantedKey)))
                 .sorted(Comparator.comparingDouble(Match<T>::getEquality))
                 .collect(Collectors.toList());

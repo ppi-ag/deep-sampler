@@ -32,7 +32,7 @@ public class PersistentMatchers {
      * Create a {@link ComboMatcher} with respect of making it available for the current {@link de.ppi.deepsampler.core.model.SampleDefinition}.
      *
      * @param parameterMatcher the parameterMatcher to be imitated by the {@link ComboMatcher}
-     * @param persistentMatcher the persistentMatcher to be used as comparator (real value <-> persistent value)
+     * @param persistentMatcher the persistentMatcher to be used as comparator (real value v.s. persistent value)
      * @param <T> type to compare/match
      *
      * @return always returns null

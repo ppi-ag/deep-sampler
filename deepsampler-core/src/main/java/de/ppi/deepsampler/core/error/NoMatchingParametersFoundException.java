@@ -42,7 +42,7 @@ public class NoMatchingParametersFoundException extends BaseException {
     }
 
     private static String formatArgs(Object[] args) {
-        StringBuilder argsFormatted = new StringBuilder("\n");
+        var argsFormatted = new StringBuilder("\n");
 
         for (Object arg : args) {
             argsFormatted.append("\t");

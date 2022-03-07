@@ -30,15 +30,15 @@ public class ExecutionInformation {
      * @return A {@link SampleExecutionInformation} for sampleDefinition. A new one if non was known yet, or an already registered version.
      */
     public SampleExecutionInformation getOrCreateBySample(final SampleDefinition sampleDefinition) {
-        for (SampleExecutionInformation execution : sampleExecutionInformationList) {
+        for (var execution : sampleExecutionInformationList) {
             if (execution.getSampleDefinition() == sampleDefinition) {
                 return execution;
             }
         }
 
-        SampleExecutionInformation execution = new SampleExecutionInformation(sampleDefinition);
-        this.sampleExecutionInformationList.add(execution);
-        return execution;
+        var sampleExecutionInformation = new SampleExecutionInformation(sampleDefinition);
+        this.sampleExecutionInformationList.add(sampleExecutionInformation);
+        return sampleExecutionInformation;
     }
 
     public List<SampleExecutionInformation> getAll() {

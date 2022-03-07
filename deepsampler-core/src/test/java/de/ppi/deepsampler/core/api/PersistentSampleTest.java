@@ -23,7 +23,7 @@ class PersistentSampleTest {
     @Test
     void callOfANonSamplerIsDetectedIBeforeSamplerHasBeenDefined() {
         // GIVEN
-        final TestService notASampler = new TestService();
+        final var notASampler = new TestService();
         // THEN
         Sampler.clear();
         assertThrows(NotASamplerException.class, () -> shouldThrowExceptionAttemptingToSampleANonSampler(notASampler));
@@ -37,8 +37,8 @@ class PersistentSampleTest {
     void callOfANonSamplerIsDetectedAfterSamplersHasBeenDefined() {
         //GIVEN
         Sampler.clear();
-        final TestService realTestServiceSampler = Sampler.prepare(TestService.class);
-        final TestService notASampler = new TestService();
+        final var realTestServiceSampler = Sampler.prepare(TestService.class);
+        final var notASampler = new TestService();
 
         //WHEN UNCHANGED
         assertDoesNotThrow(() -> PersistentSample.of(realTestServiceSampler.echoParameter(PARAMETER_VALUE)));
@@ -50,7 +50,7 @@ class PersistentSampleTest {
     @Test
     void samplerForVerificationIsChecked() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.forVerification(testServiceSampler);
 
         // THEN

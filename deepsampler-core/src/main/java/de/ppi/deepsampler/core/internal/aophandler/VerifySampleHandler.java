@@ -24,12 +24,12 @@ public class VerifySampleHandler extends ReturningSampleHandler {
 
     @Override
     public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) {
-        final SampledMethod sampledMethod = new SampledMethod(cls, thisMethod);
-        final SampleDefinition sampleDefinition = SampleRepository.getInstance().findUnvalidated(sampledMethod, args);
+        final var sampledMethod = new SampledMethod(cls, thisMethod);
+        final var sampleDefinition = SampleRepository.getInstance().findUnvalidated(sampledMethod, args);
 
         if (sampleDefinition != null) {
-            final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
-            final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
+            final var executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
+            final var sampleExecutionInformation = executionInformation.getOrCreateBySample(sampleDefinition);
 
             final int expected = quantity.getTimes();
             final int actual = sampleExecutionInformation.getTimesInvoked();
@@ -39,11 +39,11 @@ public class VerifySampleHandler extends ReturningSampleHandler {
             }
         } else if (quantity.getTimes() != 0) {
 
-            final List<SampleDefinition> similarDefinition = SampleRepository.getInstance().findAllForMethod(sampledMethod);
+            final var similarDefinition = SampleRepository.getInstance().findAllForMethod(sampledMethod);
             if (!similarDefinition.isEmpty()) {
-                final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
-                for (final SampleDefinition similarSampleDefinition : similarDefinition) {
-                    final SampleExecutionInformation sampleExecutionInformation = executionInformation.getOrCreateBySample(similarSampleDefinition);
+                final var executionInformation = ExecutionRepository.getInstance().getOrCreate(cls);
+                for (final var similarSampleDefinition : similarDefinition) {
+                    final var sampleExecutionInformation = executionInformation.getOrCreateBySample(similarSampleDefinition);
                     if (sampleExecutionInformation.getTimesInvoked() != 0) {
                         throw new VerifyException(similarSampleDefinition, args, sampleExecutionInformation.getTimesInvoked());
                     }

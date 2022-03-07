@@ -125,9 +125,9 @@ public class SampleRepository {
     }
 
     public List<SampleDefinition> findAllForMethod(SampledMethod wantedSampledMethod) {
-        List<SampleDefinition> sampleDefinitions = new ArrayList<>();
-        for (final SampleDefinition sampleDefinition : samples) {
-            final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
+        var sampleDefinitions = new ArrayList<SampleDefinition>();
+        for (final var sampleDefinition : samples) {
+            final var sampledMethod = sampleDefinition.getSampledMethod();
 
             if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
                     && methodMatches(wantedSampledMethod, sampledMethod)) {
@@ -170,7 +170,7 @@ public class SampleRepository {
         boolean matchingMethodFound = false;
 
         for (final SampleDefinition sampleDefinition : samples) {
-            final SampledMethod sampledMethod = sampleDefinition.getSampledMethod();
+            final var sampledMethod = sampleDefinition.getSampledMethod();
 
             if (wantedTypeExtendsSampledType(wantedSampledMethod, sampledMethod)
                     && methodMatches(wantedSampledMethod, sampledMethod)) {

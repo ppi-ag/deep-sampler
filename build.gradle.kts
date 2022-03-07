@@ -10,21 +10,29 @@ plugins {
     id("com.vanniktech.maven.publish") version "0.18.0"
 }
 
+dependencies {
+    annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.1")
+    compileOnly("com.github.bsideup.jabel:jabel-javac-plugin:0.4.1")
+}
+
 allprojects {
-    version = "2.0.0"
+    version = "2.0.1-SNAPSHOT"
     group = "de.ppi"
 
     apply(plugin = "java-library")
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
 
     repositories {
         jcenter()
     }
 
+    tasks.compileJava {
+        sourceCompatibility = "16"
+        options.release.set(8)
+
+        javaCompiler.set(javaToolchains.compilerFor {
+            languageVersion.set(JavaLanguageVersion.of(16))
+        })
+    }
 }
 
 
@@ -92,7 +100,7 @@ subprojects {
     if (!projectsWithoutTests.contains(project.name)) {
         apply(plugin = "jacoco")
         jacoco {
-            toolVersion = "0.8.6"
+            toolVersion = "0.8.7"
         }
         collectTestCoverage()
     }

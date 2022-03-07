@@ -28,7 +28,7 @@ public class RecordSampleHandler extends ReturningSampleHandler {
     @Override
     public Object invoke(final Object self, final Method method, final Method proceed, final Object[] args) {
         if (!Object.class.equals(method.getDeclaringClass())) {
-            final SampleDefinition sampleDefinition = createSampleDefinition(cls, method, args);
+            final var sampleDefinition = createSampleDefinition(cls, method, args);
             SampleRepository.getInstance().add(sampleDefinition);
             SampleRepository.getInstance().setMarkNextVoidSamplerForPersistence(false);
         }

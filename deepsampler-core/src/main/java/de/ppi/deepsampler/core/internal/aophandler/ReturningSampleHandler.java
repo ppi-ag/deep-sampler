@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 public abstract class ReturningSampleHandler implements MethodHandler {
 
     protected SampleDefinition createSampleDefinition(final Class<?> cls, final Method method, final Object[] args) {
-        List<ParameterMatcher<?>> parameterMatchers = collectMatchersForParameters(method, args);
+        var parameterMatchers = collectMatchersForParameters(method, args);
 
-        final SampledMethod sampledMethod = new SampledMethod(cls, method);
-        final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
+        final var sampledMethod = new SampledMethod(cls, method);
+        final var sampleDefinition = new SampleDefinition(sampledMethod);
 
         sampleDefinition.setParameterMatchers(parameterMatchers);
         sampleDefinition.setParameterValues(new ArrayList<>(Arrays.asList(args)));

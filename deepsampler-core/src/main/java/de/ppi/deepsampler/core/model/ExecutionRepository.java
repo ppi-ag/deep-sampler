@@ -55,7 +55,7 @@ public class ExecutionRepository {
     }
 
     public void addSampleReturnProcessor(SampleDefinition sampleDefinition, SampleReturnProcessor sampleReturnProcessor) {
-        List<SampleReturnProcessor> sampleReturnProcessors = this.sampleDefinitionSampleReturnProcessorMap.computeIfAbsent(sampleDefinition, k -> new ArrayList<>());
+        var sampleReturnProcessors = this.sampleDefinitionSampleReturnProcessorMap.computeIfAbsent(sampleDefinition, k -> new ArrayList<>());
         sampleReturnProcessors.add(sampleReturnProcessor);
     }
 

@@ -35,11 +35,11 @@ class SampleTest {
     @Test
     void testSampleDefinitionWithoutParam() throws Throwable {
         // GIVEN WHEN
-        final TestService serviceSampler = Sampler.prepare(TestService.class);
+        final var serviceSampler = Sampler.prepare(TestService.class);
         Sample.of(serviceSampler.noParameter()).is(STRING_SAMPLE);
 
         // THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
 
         assertEquals(TestService.class, currentSampleDefinition.getSampledMethod().getTarget());
         assertTrue(currentSampleDefinition.getParameterMatchers().isEmpty());
@@ -49,7 +49,7 @@ class SampleTest {
     @Test
     void callOfANonSamplerIsDetectedIBeforeSamplerHasBeenDefined() {
         // GIVEN
-        final TestService notASampler = new TestService();
+        final var notASampler = new TestService();
         // THEN
         Sampler.clear();
         assertThrows(NotASamplerException.class, () -> shouldThrowExceptionAttemptingToSampleANonSampler(notASampler));
@@ -62,7 +62,7 @@ class SampleTest {
     @Test
     void callOfAVoidNonSamplerIsDetectedIBeforeSamplerHasBeenDefined() {
         // GIVEN
-        final TestService notASampler = new TestService();
+        final var notASampler = new TestService();
         // THEN
         Sampler.clear();
         assertThrows(NotASamplerException.class, () -> Sample.of(notASampler::voidMethod));
@@ -72,8 +72,8 @@ class SampleTest {
     void callOfANonSamplerIsDetectedAfterSamplersHasBeenDefined() {
         //GIVEN
         Sampler.clear();
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        final TestService notASampler = new TestService();
+        final var testServiceSampler = Sampler.prepare(TestService.class);
+        final var notASampler = new TestService();
 
         //WHEN UNCHANGED
         assertDoesNotThrow(() -> Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)));
@@ -86,8 +86,8 @@ class SampleTest {
     void callOfAVoidNonSamplerIsDetectedAfterSamplersHasBeenDefined() {
         //GIVEN
         Sampler.clear();
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        final TestService notASampler = new TestService();
+        final var testServiceSampler = Sampler.prepare(TestService.class);
+        final var notASampler = new TestService();
 
         //WHEN UNCHANGED
         assertDoesNotThrow(() -> Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)));
@@ -100,8 +100,8 @@ class SampleTest {
     void callOfANonSamplerIsDetectedAfterVoidSamplersHasBeenDefined() {
         //GIVEN
         Sampler.clear();
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        final TestService notASampler = new TestService();
+        final var testServiceSampler = Sampler.prepare(TestService.class);
+        final var notASampler = new TestService();
 
         //WHEN
         Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE));
@@ -115,28 +115,28 @@ class SampleTest {
     @Test
     void testSampleDefinitionWithPrimitiveParam() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)).is("New Sample");
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var parameterMatchers = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(1, parameter.size());
+        assertEquals(1, parameterMatchers.size());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches(PARAMETER_VALUE));
     }
 
     @Test
     void testSampleDefinitionForInterface() {
         //GIVEN WHEN
-        final TestServiceInterface testServiceSampler = Sampler.prepare(TestServiceInterface.class);
+        final var testServiceSampler = Sampler.prepare(TestServiceInterface.class);
         Sample.of(testServiceSampler.echoParameter(PARAMETER_VALUE)).is(STRING_SAMPLE);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var parameterMatchers = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(1, parameter.size());
+        assertEquals(1, parameterMatchers.size());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, String.class).matches(PARAMETER_VALUE));
     }
 
@@ -144,26 +144,26 @@ class SampleTest {
     @Test
     void testSampleDefinitionWithBeanParam() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(BEAN_A)).is(BEAN_B);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var parameterMatchers = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(1, parameter.size());
+        assertEquals(1, parameterMatchers.size());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_A_COPY));
     }
 
     @Test
     void testSampleDefinitionWithArrayReturnValue() throws Throwable {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.getArray()).is(new String[] {STRING_SAMPLE});
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final Answer<?> answer = currentSampleDefinition.getAnswer();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var answer = currentSampleDefinition.getAnswer();
 
         assertEquals(1, ((String[]) answer.call(null)).length);
         assertEquals(STRING_SAMPLE, ((String[]) answer.call(null))[0]);
@@ -172,7 +172,7 @@ class SampleTest {
     @Test
     void testSampleDefinitionWithPrimitiveReturnValues() throws Throwable {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
 
         Sample.of(testServiceSampler.getInt()).is(1);
         assertEquals(1, getCurrentReturnValueSupplier().call(null));
@@ -193,33 +193,33 @@ class SampleTest {
     }
 
     private Answer<?> getCurrentReturnValueSupplier() {
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
         return currentSampleDefinition.getAnswer();
     }
 
     @Test
     void testSampleDefinitionWithLambda() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(BEAN_A)).answers(invocation -> BEAN_B);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final List<ParameterMatcher<?>> parameter = currentSampleDefinition.getParameterMatchers();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var parameterMatchers = currentSampleDefinition.getParameterMatchers();
 
-        assertEquals(1, parameter.size());
+        assertEquals(1, parameterMatchers.size());
         assertTrue(currentSampleDefinition.getParameterMatcherAs(0, Bean.class).matches(BEAN_A_COPY));
     }
 
     @Test
     void exceptionCanBeThrownBySample() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(BEAN_A)).throwsException(Exception.class);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final Answer<?> answer = currentSampleDefinition.getAnswer();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var answer = currentSampleDefinition.getAnswer();
 
         assertThrows(Exception.class, () -> answer.call(null));
     }
@@ -227,12 +227,12 @@ class SampleTest {
     @Test
     void runTimeExceptionCanBeThrownBySample() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler.echoParameter(BEAN_A)).throwsException(new RuntimeException());
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final Answer<?> answer = currentSampleDefinition.getAnswer();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var answer = currentSampleDefinition.getAnswer();
 
         assertThrows(Exception.class, () -> answer.call(null));
     }
@@ -240,12 +240,12 @@ class SampleTest {
     @Test
     void voidMethodThrowsAnExceptionBySample() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler::voidMethod).throwsException(Exception.class);
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final Answer<?> answer = currentSampleDefinition.getAnswer();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var answer = currentSampleDefinition.getAnswer();
 
         assertThrows(Exception.class, () -> answer.call(null));
     }
@@ -253,12 +253,12 @@ class SampleTest {
     @Test
     void voidMethodThrowsAnRuntimeExceptionBySample() {
         //GIVEN WHEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
         Sample.of(testServiceSampler::voidMethod).throwsException(new RuntimeException());
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final Answer<?> answer = currentSampleDefinition.getAnswer();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var answer = currentSampleDefinition.getAnswer();
 
         assertThrows(RuntimeException.class, () -> answer.call(null));
     }
@@ -267,7 +267,7 @@ class SampleTest {
     @Test
     void callOfANonSamplerInsideOfAVoidCallIsDetected() {
         //GIVEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
 
         //WHEN UNCHANGED
         assertDoesNotThrow(() -> Sample.of(testServiceSampler::voidMethod));
@@ -279,16 +279,16 @@ class SampleTest {
     @Test
     void voidMethodsCanBeReplacedByVoidAnswers() throws Throwable {
         //GIVEN
-        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        final var testServiceSampler = Sampler.prepare(TestService.class);
 
-        final AtomicInteger counter = new AtomicInteger(0);
+        final var counter = new AtomicInteger(0);
 
         // WHEN
         Sample.of(testServiceSampler::voidMethod).answers(stubMethodInvocation -> counter.set(1));
 
         //THEN
-        final SampleDefinition currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
-        final Answer<?> answer = currentSampleDefinition.getAnswer();
+        final var currentSampleDefinition = SampleRepository.getInstance().getCurrentSampleDefinition();
+        final var answer = currentSampleDefinition.getAnswer();
         answer.call(null);
 
         assertEquals(1, counter.get());

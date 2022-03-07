@@ -22,7 +22,7 @@ public class ExecutionManager {
     }
 
     private static SampleExecutionInformation getSampleExecutionInformation(final SampleDefinition sampleDefinition) {
-        final ExecutionInformation executionInformation = ExecutionRepository.getInstance().getOrCreate(sampleDefinition.getSampledMethod().getTarget());
+        final var executionInformation = ExecutionRepository.getInstance().getOrCreate(sampleDefinition.getSampledMethod().getTarget());
 
         return executionInformation.getOrCreateBySample(sampleDefinition);
     }
@@ -32,7 +32,7 @@ public class ExecutionManager {
         try {
             callReturnValue = sampleDefinition.getAnswer().call(stubMethodInvocation);
         } finally {
-            for (SampleReturnProcessor sampleReturnProcessor : getApplicableReturnProcessors(sampleDefinition)) {
+            for (var sampleReturnProcessor : getApplicableReturnProcessors(sampleDefinition)) {
                 callReturnValue = sampleReturnProcessor.onReturn(sampleDefinition, stubMethodInvocation, callReturnValue);
             }
         }
@@ -40,10 +40,10 @@ public class ExecutionManager {
     }
 
     private static List<SampleReturnProcessor> getApplicableReturnProcessors(final SampleDefinition sampleDefinition) {
-        final List<SampleReturnProcessor> allSampleReturnProcessors = new ArrayList<>();
+        final var allSampleReturnProcessors = new ArrayList<SampleReturnProcessor>();
 
-        final List<SampleReturnProcessor> globalSampleReturnProcessors = ExecutionRepository.getInstance().getGlobalProcessors();
-        final List<SampleReturnProcessor> localSampleReturnProcessors = ExecutionRepository.getInstance().getSampleReturnProcessorsFor(sampleDefinition);
+        final var globalSampleReturnProcessors = ExecutionRepository.getInstance().getGlobalProcessors();
+        final var localSampleReturnProcessors = ExecutionRepository.getInstance().getSampleReturnProcessorsFor(sampleDefinition);
 
         allSampleReturnProcessors.addAll(globalSampleReturnProcessors);
         allSampleReturnProcessors.addAll(localSampleReturnProcessors);
