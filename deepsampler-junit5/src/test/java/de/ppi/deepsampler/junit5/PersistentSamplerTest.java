@@ -23,10 +23,8 @@ import java.util.Arrays;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(DeepSamplerExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -122,7 +120,9 @@ class PersistentSamplerTest {
     @UseSamplerFixture(TestSampleFixture.class)
     @UseCharset("cp1252")
     @Order(10)
-    void whenSamplerIsSavedWithCharsetCp1252() {
+    void whenSamplerIsSavedWithCharsetCp1252() throws IOException {
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(FILE_CP1252);
+
         // 👉 GIVEN
         testService.setCatsName("Spot ü");
 
@@ -147,6 +147,19 @@ class PersistentSamplerTest {
     @Order(11)
     void thenUtf8ShouldNotBeReadable() {
         assertNotEquals("Spot ü", testService.getCat().getName());
+    }
+
+    /**
+     * Proves that path does not exist. However, if it exists, it is deleted.
+     * @param path the path of the file that must not exist.
+     * @throws IOException In case the file cannot be deleted.
+     */
+    public static void assertThatFileDoesNotExistOrOtherwiseDeleteIt(final Path path) throws IOException {
+        if (Files.exists(path)) {
+            Files.delete(path);
+        }
+
+        assertFalse(Files.exists(path));
     }
 
 }
