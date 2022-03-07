@@ -54,7 +54,7 @@ public class Matchers {
      * Accepts any parameter value.
      * @return a matcher that accepts any parameter value
      * @param <T> The type of the parameter that will be accepted
-     * @param type The {@link Class} of the parameter that will be accepted independently from its concrete value.
+     * @param type The {@link Class} of the parameter that will be accepted independently of its concrete value.
      */
     @SuppressWarnings("unused")
     public static <T> T any(final Class<T> type) {
