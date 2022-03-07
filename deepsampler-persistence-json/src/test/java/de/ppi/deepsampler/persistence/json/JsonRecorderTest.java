@@ -15,6 +15,7 @@ import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +41,8 @@ class JsonRecorderTest {
         ExecutionManager.recordMethodCall(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
 
         // WHEN
-        new JsonRecorder(new PersistentFile(path)).recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+        new JsonRecorder(new PersistentFile(path), StandardCharsets.UTF_8)
+                .recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));
@@ -59,12 +61,13 @@ class JsonRecorderTest {
         ExecutionManager.recordMethodCall(sample, new MethodCall("ABC", Collections.singletonList("Args1")));
 
         // WHEN
-        new JsonRecorder(new PersistentFile(path)).recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+        new JsonRecorder(new PersistentFile(path), StandardCharsets.UTF_8)
+                .recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));
 
-        final PersistentModel loadedModel = new JsonLoader(new PersistentFile(path)).load();
+        final PersistentModel loadedModel = new JsonLoader(new PersistentFile(path), StandardCharsets.UTF_8).load();
         Map<PersistentSampleMethod, PersistentActualSample> sampleMap = loadedModel.getSampleMethodToSampleMap();
         PersistentActualSample persistentActualSample = sampleMap.get(new JsonPersistentSampleMethod("TestMethodForRecord"));
 
@@ -84,7 +87,8 @@ class JsonRecorderTest {
         ExecutionManager.recordMethodCall(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
 
         // WHEN
-        new JsonRecorder(new PersistentFile(path)).recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+        new JsonRecorder(new PersistentFile(path), StandardCharsets.UTF_8)
+                .recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));
@@ -101,7 +105,8 @@ class JsonRecorderTest {
         ExecutionManager.recordMethodCall(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
 
         // WHEN
-        new JsonRecorder(new PersistentFile(path)).recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+        new JsonRecorder(new PersistentFile(path), StandardCharsets.UTF_8)
+                .recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));
@@ -121,7 +126,8 @@ class JsonRecorderTest {
         ExecutionManager.recordMethodCall(sample, new MethodCall(new Bean("ABC", "ABC"), Collections.singletonList("Args1")));
 
         // WHEN
-        new JsonRecorder(new PersistentFile(path)).recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
+        new JsonRecorder(new PersistentFile(path), StandardCharsets.UTF_8)
+                .recordExecutionInformation(ExecutionRepository.getInstance().getAll(), new PersistentSamplerContext());
 
         // THEN
         assertTrue(Files.exists(path));

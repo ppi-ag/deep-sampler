@@ -14,7 +14,9 @@ import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -95,7 +97,9 @@ public class JUnitPersistenceUtils {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
-        Optional<SampleRootPath> rootPath = loadSampleRootPathFromTestOrSampleFixture(testMethod);
+        applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
+
+        Optional<SampleRootPath> rootPath = loadAnnotationFromTestOrSampleFixture(testMethod, SampleRootPath.class);
 
         switch (loadSamples.source()) {
             case FILE_SYSTEM:
@@ -108,16 +112,24 @@ public class JUnitPersistenceUtils {
         }
     }
 
-    private static Optional<SampleRootPath> loadSampleRootPathFromTestOrSampleFixture(Method testMethod) {
-        SampleRootPath sampleRootPath = testMethod.getDeclaringClass().getAnnotation(SampleRootPath.class);
 
-        if (sampleRootPath != null) {
-            return Optional.of(sampleRootPath);
+
+    private static <T extends Annotation> Optional<T> loadAnnotationFromTestOrSampleFixture(Method testMethod, Class<T> annotationType) {
+        T annotationFromMethod = testMethod.getDeclaredAnnotation(annotationType);
+
+        if (annotationFromMethod != null) {
+            return Optional.of(annotationFromMethod);
+        }
+
+        T annotationFromTestClass = testMethod.getDeclaringClass().getAnnotation(annotationType);
+
+        if (annotationFromTestClass != null) {
+            return Optional.of(annotationFromTestClass);
         }
 
         return JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod)
                 .map(Object::getClass)
-                .map(fixtureClass -> fixtureClass.getAnnotation(SampleRootPath.class));
+                .map(fixtureClass -> fixtureClass.getAnnotation(annotationType));
     }
 
     /**
@@ -173,8 +185,9 @@ public class JUnitPersistenceUtils {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
+        applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
 
-        Optional<SampleRootPath> sampleRootPath = loadSampleRootPathFromTestOrSampleFixture(testMethod);
+        Optional<SampleRootPath> sampleRootPath = loadAnnotationFromTestOrSampleFixture(testMethod, SampleRootPath.class);
         final Path fileName = createPathForFilesystem(sampleRootPath, saveSamples.value(), testMethod);
 
         return persistentSampleManagerBuilder.buildWithFile(fileName);
@@ -204,6 +217,13 @@ public class JUnitPersistenceUtils {
         // 2. Load serializers from testMethod. Serializers from testMethod override the ones from the TestFixture.
         applyAnnotatedJsonSerializers(testMethod, persistentSampleManagerBuilder);
         applyAnnotatedJsonDeserializers(testMethod, persistentSampleManagerBuilder);
+    }
+
+    private static void applyCharsetFromTestCaseOrTestFixture(Method testMethod, JsonSourceManager.Builder persistentSampleManagerBuilder) {
+        loadAnnotationFromTestOrSampleFixture(testMethod, UseCharset.class)
+                .map(UseCharset::value)
+                .map(Charset::forName)
+                .ifPresent(persistentSampleManagerBuilder::withCharset);
     }
 
     private static Method getDefineSamplersMethod(final SamplerFixture samplerFixture) {

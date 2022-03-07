@@ -20,9 +20,11 @@ import de.ppi.deepsampler.persistence.json.model.JsonSampleModel;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -30,12 +32,12 @@ import java.util.*;
 
 public class JsonRecorder extends JsonOperator {
 
-    public JsonRecorder(PersistentResource persistentResource) {
-        super(persistentResource, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+    public JsonRecorder(PersistentResource persistentResource, Charset charset) {
+        super(persistentResource, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), charset);
     }
 
-    public JsonRecorder(PersistentResource persistentResource, List<SerializationExtension<?>> serializationExtensions, List<Module> moduleList) {
-        super(persistentResource, Collections.emptyList(), serializationExtensions, moduleList);
+    public JsonRecorder(PersistentResource persistentResource, List<SerializationExtension<?>> serializationExtensions, List<Module> moduleList, Charset charset) {
+        super(persistentResource, Collections.emptyList(), serializationExtensions, moduleList, charset);
     }
 
     public void recordExecutionInformation(final Map<Class<?>, ExecutionInformation> executionInformationMap, PersistentSamplerContext persistentSamplerContext) {
@@ -50,8 +52,10 @@ public class JsonRecorder extends JsonOperator {
             }
 
             final JsonSampleModel model = toPersistentModel(executionInformationMap, persistentSamplerContext);
-            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(persistentResource.writeAsStream(StandardOpenOption.TRUNCATE_EXISTING,
-                    StandardOpenOption.CREATE)));
+
+            final OutputStream outputStream = persistentResource.writeAsStream(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, getCharset()));
+
             createObjectMapper().writeValue(writer, model);
         } catch (final IOException e) {
             throw new PersistenceException("It was not possible to serialize/write to json.", e);
