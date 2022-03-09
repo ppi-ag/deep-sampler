@@ -6,7 +6,7 @@
 package de.ppi.deepsampler.junit5;
 
 import com.google.inject.Guice;
-import com.sun.org.apache.xerces.internal.impl.xs.util.StringListImpl;
+import de.ppi.deepsampler.core.api.PersistentSample;
 import de.ppi.deepsampler.junit.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,15 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
-import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -144,9 +141,55 @@ class PersistentSamplerTest {
     @LoadSamples(SAVED_AS_CP1252)
     @UseSamplerFixture(TestSampleFixture.class)
     @UseCharset("utf-8")
-    @Order(11)
+    @Order(12)
     void thenUtf8ShouldNotBeReadable() {
         assertNotEquals("Spot ü", testService.getCat().getName());
+    }
+
+    @Test
+    @SaveSamples(SAVED_AS_CP1252)
+    @UseSamplerFixture(SamplerFixtureWithCharsetOnClass.class)
+    @Order(13)
+    void whenSamplerCharsetConfigOnSamplerFixtureClass() throws IOException {
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(FILE_CP1252);
+
+        // 👉 GIVEN
+        testService.setCatsName("Spot ü");
+
+        // 🧪 WHEN
+        testService.getCat();
+    }
+
+    @Test
+    @LoadSamples(SAVED_AS_CP1252)
+    @UseSamplerFixture(SamplerFixtureWithCharsetOnMethod.class)
+    @Order(14)
+    void thenCharsetFromSamplerFixtureMethodShouldBeInFile() {
+        assertThat(FILE_CP1252).content(Charset.forName("cp1252")).contains("ü");
+        assertEquals("Spot ü", testService.getCat().getName());
+    }
+
+    @Test
+    @SaveSamples(SAVED_AS_CP1252)
+    @UseSamplerFixture(SamplerFixtureWithCharsetOnMethod.class)
+    @Order(15)
+    void whenSamplerCharsetConfigOnSamplerFixtureMethod() throws IOException {
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(FILE_CP1252);
+
+        // 👉 GIVEN
+        testService.setCatsName("Spot ü");
+
+        // 🧪 WHEN
+        testService.getCat();
+    }
+
+    @Test
+    @LoadSamples(SAVED_AS_CP1252)
+    @UseSamplerFixture(SamplerFixtureWithCharsetOnClass.class)
+    @Order(16)
+    void thenCharsetFromSamplerFixtureClassShouldBeInFile() {
+        assertThat(FILE_CP1252).content(Charset.forName("cp1252")).contains("ü");
+        assertEquals("Spot ü", testService.getCat().getName());
     }
 
     /**
@@ -160,6 +203,30 @@ class PersistentSamplerTest {
         }
 
         assertFalse(Files.exists(path));
+    }
+
+    @UseCharset("cp1252")
+    public static class SamplerFixtureWithCharsetOnClass implements SamplerFixture {
+
+        @PrepareSampler
+        private TestService testServiceSampler;
+
+        @Override
+        public void defineSamplers() {
+            PersistentSample.of(testServiceSampler.getCat());
+        }
+    }
+
+    public static class SamplerFixtureWithCharsetOnMethod implements SamplerFixture {
+
+        @PrepareSampler
+        private TestService testServiceSampler;
+
+        @UseCharset("cp1252")
+        @Override
+        public void defineSamplers() {
+            PersistentSample.of(testServiceSampler.getCat());
+        }
     }
 
 }

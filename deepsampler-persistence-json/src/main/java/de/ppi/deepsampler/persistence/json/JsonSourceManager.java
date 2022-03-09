@@ -59,7 +59,7 @@ public class JsonSourceManager implements SourceManager {
      *     <li>{@link PersistentClassPathResource}</li>
      * </ul>
      *
-     * Default charset is UTF-8.
+     * Default charset is determined by {@link Charset#defaultCharset()}.
      *
      * @return The Builder
      */
@@ -72,7 +72,7 @@ public class JsonSourceManager implements SourceManager {
         private final List<SerializationExtension<?>> serializerList = new ArrayList<>();
         private final List<DeserializationExtension<?>> deserializerList = new ArrayList<>();
         private final List<Module> moduleList = new ArrayList<>();
-        private Charset charset = StandardCharsets.UTF_8;
+        private Charset charset = Charset.defaultCharset();
 
         public <T> Builder addSerializer(final Class<T> typeToSerialize, final JsonSerializer<T>jsonSerializer) {
             serializerList.add(new SerializationExtension<>(typeToSerialize, jsonSerializer));
@@ -89,6 +89,11 @@ public class JsonSourceManager implements SourceManager {
             return this;
         }
 
+        /**
+         * Changes the charset to charset. The default charset is defined by {@link Charset#defaultCharset()}.
+         * @param charset The name of the charset that is used by this {@link SourceManager}.
+         * @return The {@link Builder} for the fluent-api.
+         */
         public Builder withCharset(final Charset charset) {
             this.charset = charset;
             return this;

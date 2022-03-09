@@ -112,24 +112,48 @@ public class JUnitPersistenceUtils {
         }
     }
 
-
-
+    /**
+     * Loads the annotation annotationType, if it can be found. The annotation is searched in the following places:
+     * <ul>
+     *     <li>testMethod</li>
+     *     <li>class that declares testMethod</li>
+     *     <li>method {@link SamplerFixture#defineSamplers()} if testMethod is associated with a {@link SamplerFixture}</li>
+     *     <li>class that implements {@link SamplerFixture} if testMethod is associated with a {@link SamplerFixture}</li>
+     * </ul>
+     * The annotation is searched in the sequence as shown in the list above. The first found annotation will be used.
+     * A testMethod is associated with a {@link SamplerFixture} if the method itself, or the class that declares the method,
+     * is annotated with {@link UseSamplerFixture}.
+     *
+     * @param testMethod a method from a test case
+     * @param annotationType the searched annotation
+     * @param <T> the type of the annotation
+     * @return an {@link Optional} that may contain the annotation, if it could be found.
+     */
     private static <T extends Annotation> Optional<T> loadAnnotationFromTestOrSampleFixture(Method testMethod, Class<T> annotationType) {
-        T annotationFromMethod = testMethod.getDeclaredAnnotation(annotationType);
+        Optional<T> annotationFromTest = loadAnnotationFromMethodOrDeclaringClass(testMethod, annotationType);
+
+        if (annotationFromTest.isPresent()) {
+            return annotationFromTest;
+        }
+
+        return JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod)
+                .flatMap(samplerFixture -> loadAnnotationFromMethodOrDeclaringClass(getDefineSamplersMethod(samplerFixture), annotationType));
+    }
+
+    public static <T extends Annotation> Optional<T> loadAnnotationFromMethodOrDeclaringClass(Method method, Class<T> annotationType) {
+        T annotationFromMethod = method.getDeclaredAnnotation(annotationType);
 
         if (annotationFromMethod != null) {
             return Optional.of(annotationFromMethod);
         }
 
-        T annotationFromTestClass = testMethod.getDeclaringClass().getAnnotation(annotationType);
+        T annotationFromClass = method.getDeclaringClass().getAnnotation(annotationType);
 
-        if (annotationFromTestClass != null) {
-            return Optional.of(annotationFromTestClass);
+        if (annotationFromClass != null) {
+            return Optional.of(annotationFromClass);
         }
 
-        return JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod)
-                .map(Object::getClass)
-                .map(fixtureClass -> fixtureClass.getAnnotation(annotationType));
+        return Optional.empty();
     }
 
     /**
