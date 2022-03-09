@@ -120,11 +120,8 @@ class PersistentSamplerTest {
     void whenSamplerIsSavedWithCharsetCp1252() throws IOException {
         assertThatFileDoesNotExistOrOtherwiseDeleteIt(FILE_CP1252);
 
-        // 👉 GIVEN
-        testService.setCatsName("Spot ü");
-
         // 🧪 WHEN
-        testService.getCat();
+        recordSampleWithUmlaut();
     }
 
     @Test
@@ -152,7 +149,11 @@ class PersistentSamplerTest {
     @Order(13)
     void whenSamplerCharsetConfigOnSamplerFixtureClass() throws IOException {
         assertThatFileDoesNotExistOrOtherwiseDeleteIt(FILE_CP1252);
+        // 🧪 WHEN
+        recordSampleWithUmlaut();
+    }
 
+    private void recordSampleWithUmlaut() {
         // 👉 GIVEN
         testService.setCatsName("Spot ü");
 
@@ -176,11 +177,8 @@ class PersistentSamplerTest {
     void whenSamplerCharsetConfigOnSamplerFixtureMethod() throws IOException {
         assertThatFileDoesNotExistOrOtherwiseDeleteIt(FILE_CP1252);
 
-        // 👉 GIVEN
-        testService.setCatsName("Spot ü");
-
         // 🧪 WHEN
-        testService.getCat();
+        recordSampleWithUmlaut();
     }
 
     @Test
