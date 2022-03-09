@@ -16,7 +16,6 @@ import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
