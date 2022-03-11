@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.persistence.bean;
 
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
+import de.ppi.deepsampler.persistence.bean.ext.StandardBeanConverterExtension;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 import de.ppi.deepsampler.persistence.model.PersistentBean;
 import org.objenesis.Objenesis;
@@ -180,8 +181,8 @@ public class PersistentBeanConverter {
         } catch (final NoSuchMethodException | InstantiationException
                 | IllegalAccessException | InvocationTargetException e) {
             throw new PersistenceException("The type %s includes at least one final field. Therefore we tried to automatically detect a " +
-                    "constructor accepting all field values, but weren't able to find any. If you still want to transform the bean you have to implement a BeanFactoryExtension" +
-                    " which is able to construct the desired type %s.", e, type, type);
+                    "constructor accepting all field values, but weren't able to find any. If you still want to transform the bean you " +
+                    "have to implement a %s which is able to construct the desired type %s.", e, type, StandardBeanConverterExtension.class.getName(), type);
         }
     }
 

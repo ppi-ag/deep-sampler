@@ -6,6 +6,7 @@
 package de.ppi.deepsampler.junit;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class TestService {
 
@@ -25,6 +26,10 @@ public class TestService {
 
     public void setCatsName(String catsName) {
         this.catsName = catsName;
+    }
+
+    public Optional<String> getOptionalCatsName() {
+        return Optional.of(catsName);
     }
 
     public void setDefaultInstant(Instant defaultInstant) {

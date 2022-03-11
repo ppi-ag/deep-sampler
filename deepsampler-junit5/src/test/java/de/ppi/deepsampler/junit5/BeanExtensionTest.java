@@ -9,6 +9,7 @@ package de.ppi.deepsampler.junit5;
 import com.google.inject.Guice;
 import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.junit.*;
+import de.ppi.deepsampler.persistence.bean.ext.OptionalExtension;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -20,6 +21,8 @@ import java.nio.file.Paths;
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
 import static org.junit.jupiter.api.Assertions.*;
 
+import static org.assertj.core.api.Assertions.*;
+
 @ExtendWith(DeepSamplerExtension.class)
 @UseSamplerFixture(BeanExtensionSamplerFixture.class)
 @SampleRootPath("./src/test/tmp")
@@ -28,6 +31,7 @@ class BeanExtensionTest {
 
     public static final String SAVED_SAMPLER_FILE = "/de/ppi/deepsampler/junit5/samplerCanBeSavedUsingABeanExtension.json";
     public static final Path EXPECTED_SAVED_FILE_INCLUDING_ROOT_PATH = Paths.get("./src/test/tmp/").resolve(SAVED_SAMPLER_FILE);
+    public static final String OPTIONAL_VALUE_SAMPLE_FILE = "/de/ppi/deepsampler/junit5/optionalValue.json";
 
 
     public static final String CATS_NAME_AS_IT_SHOULD_BE_RECORDED = "Cats name that should be recorded and written to the json file";
@@ -84,6 +88,32 @@ class BeanExtensionTest {
         // THEN
         assertNotNull(unStubbedCat);
         assertEquals(CATS_NAME_FOR_CROSS_CHECK, unStubbedCat.getName());
+    }
 
+    @Test
+    @Order(2)
+    @SaveSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalValueCanBeRecorded() throws IOException {
+        // GIVEN
+        testService.setCatsName(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
+
+        // WHEN
+        // Call the method that should be recorded
+        testService.getOptionalCatsName();
+
+        // THEN
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_SAVED_FILE_INCLUDING_ROOT_PATH);
+    }
+
+    @Test
+    @Order(3)
+    @LoadSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalValueCanBeLoaded() {
+        // GIVEN
+        testService.setCatsName("This name should be overridden by the stub");
+
+        assertThat(testService.getOptionalCatsName())
+                .isPresent()
+                .hasValue(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
     }
 }
