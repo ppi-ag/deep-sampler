@@ -73,16 +73,44 @@ public class JsonSourceManager implements SourceManager {
         private final List<Module> moduleList = new ArrayList<>();
         private Charset charset = Charset.defaultCharset();
 
+        /**
+         * The underlying persistence-api is by default Jackson. This api is capable to serialize various types
+         * by default. However, sometimes objects cannot be serialized by Jackson by default. In these cases, custom
+         * {@link JsonSerializer}s must be implemented. This method can be used to register such a {@link JsonSerializer}.
+         *
+         * @param typeToSerialize a class representing the type, which will be serialized by jsonSerializer.
+         * @param jsonSerializer the custom {@link JsonSerializer}, that is able to serialize objects of the type typeToSerialize.
+         * @param <T> The type, which will be serialized by jsonSerializer.
+         * @return This {@link Builder} for a fluent-api.
+         */
         public <T> Builder addSerializer(final Class<T> typeToSerialize, final JsonSerializer<T>jsonSerializer) {
             serializerList.add(new SerializationExtension<>(typeToSerialize, jsonSerializer));
             return this;
         }
 
-        public <T> Builder addDeserializer(final Class<T> typeToSerialize, final JsonDeserializer<T> deserializer) {
-            deserializerList.add(new DeserializationExtension<>(typeToSerialize, deserializer));
+        /**
+         * The underlying persistence-api is by default Jackson. This api is capable to deserialize various types
+         * by default. However, sometimes objects cannot be deserialized by Jackson by default. In these cases, custom
+         * {@link JsonDeserializer}s must be implemented. This method can be used to register such a {@link JsonDeserializer}.
+         *
+         * @param typeToDeserialize a class representing the type, which will be deserialized by jsonDeserializer.
+         * @param jsonDeserializer the custom {@link JsonDeserializer}, that is able to deserialize objects of the type typeToDeserialize.
+         * @param <T> The type, which will be deserialized by jsonDeserializer.
+         * @return This {@link Builder} for a fluent-api.
+         */
+        public <T> Builder addDeserializer(final Class<T> typeToDeserialize, final JsonDeserializer<T> jsonDeserializer) {
+            deserializerList.add(new DeserializationExtension<>(typeToDeserialize, jsonDeserializer));
             return this;
         }
 
+        /**
+         * The underlying persistence-api is by default Jackson. This api is capable to serialize and deserialize various types
+         * of objects by default. However, sometimes objects cannot be serialized or deserialized by Jackson by default.
+         * Jackson has the possibility to define {@link Module}s which bind various custom {@link JsonSerializer}s and
+         * {@link JsonDeserializer}s. These modules can be registered with Jackson using this method.
+         * @param module The Jackson {@link Module}
+         * @return This {@link Builder} for a fluent-api.
+         */
         public Builder addModule(final Module module) {
             moduleList.add(module);
             return this;
@@ -90,14 +118,22 @@ public class JsonSourceManager implements SourceManager {
 
         /**
          * Changes the charset to charset. The default charset is defined by {@link Charset#defaultCharset()}.
-         * @param charset The name of the charset that is used by this {@link SourceManager}.
-         * @return The {@link Builder} for the fluent-api.
+         * @param charset The charset that will be used by this {@link SourceManager}.
+         * @return This {@link Builder} for a fluent-api.
          */
         public Builder withCharset(final Charset charset) {
             this.charset = charset;
             return this;
         }
 
+        /**
+         * A {@link JsonSourceManager} is able to read and write resources which are abstracted by the interface
+         * {@link PersistentResource}. This allows to write and read JSON not only from files but from various
+         * other resources, like JSON-capable object-oriented DBs.
+         *
+         * @param resource a custom {@link PersistentResource} which will be used to write and read the JSON.
+         * @return This {@link Builder} for a fluent-api.
+         */
         public JsonSourceManager buildWithResource(final PersistentResource resource) {
             this.resource = resource;
             return new JsonSourceManager(this);
