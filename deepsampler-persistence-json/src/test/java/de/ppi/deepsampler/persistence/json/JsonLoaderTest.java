@@ -12,6 +12,7 @@ import de.ppi.deepsampler.persistence.json.model.JsonPersistentSampleMethod;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -25,7 +26,7 @@ class JsonLoaderTest {
         final Path path = Paths.get("./record/testPersistent.json");
 
         // WHEN
-        final PersistentModel persistentModel = new JsonLoader(new PersistentFile(path)).load();
+        final PersistentModel persistentModel = new JsonLoader(new PersistentFile(path), StandardCharsets.UTF_8).load();
 
         // THEN
         assertEquals(1, persistentModel.getSampleMethodToSampleMap().size());
@@ -38,7 +39,7 @@ class JsonLoaderTest {
         final Path path = Paths.get("./record/testTimePersistent.json");
 
         // WHEN
-        final PersistentModel persistentModel = new JsonLoader(new PersistentFile(path)).load();
+        final PersistentModel persistentModel = new JsonLoader(new PersistentFile(path), StandardCharsets.UTF_8).load();
 
         // THEN
         assertEquals(1, persistentModel.getSampleMethodToSampleMap().size());

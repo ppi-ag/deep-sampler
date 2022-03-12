@@ -13,8 +13,12 @@ public class TestSampleFixture implements SamplerFixture {
     @PrepareSampler
     private TestBean testBeanSampler;
 
+    @PrepareSampler
+    private TestService testServiceSampler;
+
     @Override
     public void defineSamplers() {
         PersistentSample.of(testBeanSampler.getSomeInt());
+        PersistentSample.of(testServiceSampler.getCat());
     }
 }

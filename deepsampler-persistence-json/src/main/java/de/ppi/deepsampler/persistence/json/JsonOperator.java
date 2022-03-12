@@ -20,6 +20,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.ppi.deepsampler.persistence.json.extension.DeserializationExtension;
 import de.ppi.deepsampler.persistence.json.extension.SerializationExtension;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 public abstract class JsonOperator {
@@ -28,15 +29,18 @@ public abstract class JsonOperator {
     private final List<SerializationExtension<?>> serializationExtensions;
     private final List<DeserializationExtension<?>> deserializationExtensions;
     private final List<Module> moduleList;
+    private final Charset charset;
 
     protected JsonOperator(final PersistentResource persistentResource,
                            final List<DeserializationExtension<?>> deserializerList,
                            final List<SerializationExtension<?>> serializerList,
-                           final List<Module> moduleList) {
+                           final List<Module> moduleList,
+                           final Charset charset) {
         this.persistentResource = persistentResource;
         this.serializationExtensions = serializerList;
         this.deserializationExtensions = deserializerList;
         this.moduleList = moduleList;
+        this.charset = charset;
     }
 
     protected PersistentResource getPersistentResource() {
@@ -95,5 +99,9 @@ public abstract class JsonOperator {
         public boolean useForType(final JavaType t) {
             return !t.isContainerType() && super.useForType(t);
         }
+    }
+
+    public Charset getCharset() {
+        return charset;
     }
 }

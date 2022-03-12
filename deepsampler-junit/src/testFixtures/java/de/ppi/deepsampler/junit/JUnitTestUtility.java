@@ -65,7 +65,7 @@ public class JUnitTestUtility {
 
     /**
      * Proves that path does not exist. However, if it exists, it is deleted.
-     * @param path the path of the file that must must not exist.
+     * @param path the path of the file that must not exist.
      * @throws IOException In case the file cannot be deleted.
      */
     public static void assertThatFileDoesNotExistOrOtherwiseDeleteIt(final Path path) throws IOException {

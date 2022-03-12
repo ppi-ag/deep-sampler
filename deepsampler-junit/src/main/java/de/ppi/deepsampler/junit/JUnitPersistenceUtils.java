@@ -14,7 +14,9 @@ import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -95,7 +97,9 @@ public class JUnitPersistenceUtils {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
-        Optional<SampleRootPath> rootPath = loadSampleRootPathFromTestOrSampleFixture(testMethod);
+        applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
+
+        Optional<SampleRootPath> rootPath = loadAnnotationFromTestOrSampleFixture(testMethod, SampleRootPath.class);
 
         switch (loadSamples.source()) {
             case FILE_SYSTEM:
@@ -108,16 +112,48 @@ public class JUnitPersistenceUtils {
         }
     }
 
-    private static Optional<SampleRootPath> loadSampleRootPathFromTestOrSampleFixture(Method testMethod) {
-        SampleRootPath sampleRootPath = testMethod.getDeclaringClass().getAnnotation(SampleRootPath.class);
+    /**
+     * Loads the annotation annotationType, if it can be found. The annotation is searched in the following places:
+     * <ul>
+     *     <li>testMethod</li>
+     *     <li>class that declares testMethod</li>
+     *     <li>method {@link SamplerFixture#defineSamplers()} if testMethod is associated with a {@link SamplerFixture}</li>
+     *     <li>class that implements {@link SamplerFixture} if testMethod is associated with a {@link SamplerFixture}</li>
+     * </ul>
+     * The annotation is searched in the sequence as shown in the list above. The first found annotation will be used.
+     * A testMethod is associated with a {@link SamplerFixture} if the method itself, or the class that declares the method,
+     * is annotated with {@link UseSamplerFixture}.
+     *
+     * @param testMethod a method from a test case
+     * @param annotationType the searched annotation
+     * @param <T> the type of the annotation
+     * @return an {@link Optional} that may contain the annotation, if it could be found.
+     */
+    private static <T extends Annotation> Optional<T> loadAnnotationFromTestOrSampleFixture(Method testMethod, Class<T> annotationType) {
+        Optional<T> annotationFromTest = loadAnnotationFromMethodOrDeclaringClass(testMethod, annotationType);
 
-        if (sampleRootPath != null) {
-            return Optional.of(sampleRootPath);
+        if (annotationFromTest.isPresent()) {
+            return annotationFromTest;
         }
 
         return JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod)
-                .map(Object::getClass)
-                .map(fixtureClass -> fixtureClass.getAnnotation(SampleRootPath.class));
+                .flatMap(samplerFixture -> loadAnnotationFromMethodOrDeclaringClass(getDefineSamplersMethod(samplerFixture), annotationType));
+    }
+
+    public static <T extends Annotation> Optional<T> loadAnnotationFromMethodOrDeclaringClass(Method method, Class<T> annotationType) {
+        T annotationFromMethod = method.getDeclaredAnnotation(annotationType);
+
+        if (annotationFromMethod != null) {
+            return Optional.of(annotationFromMethod);
+        }
+
+        T annotationFromClass = method.getDeclaringClass().getAnnotation(annotationType);
+
+        if (annotationFromClass != null) {
+            return Optional.of(annotationFromClass);
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -173,8 +209,9 @@ public class JUnitPersistenceUtils {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
+        applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
 
-        Optional<SampleRootPath> sampleRootPath = loadSampleRootPathFromTestOrSampleFixture(testMethod);
+        Optional<SampleRootPath> sampleRootPath = loadAnnotationFromTestOrSampleFixture(testMethod, SampleRootPath.class);
         final Path fileName = createPathForFilesystem(sampleRootPath, saveSamples.value(), testMethod);
 
         return persistentSampleManagerBuilder.buildWithFile(fileName);
@@ -204,6 +241,13 @@ public class JUnitPersistenceUtils {
         // 2. Load serializers from testMethod. Serializers from testMethod override the ones from the TestFixture.
         applyAnnotatedJsonSerializers(testMethod, persistentSampleManagerBuilder);
         applyAnnotatedJsonDeserializers(testMethod, persistentSampleManagerBuilder);
+    }
+
+    private static void applyCharsetFromTestCaseOrTestFixture(Method testMethod, JsonSourceManager.Builder persistentSampleManagerBuilder) {
+        loadAnnotationFromTestOrSampleFixture(testMethod, UseCharset.class)
+                .map(UseCharset::value)
+                .map(Charset::forName)
+                .ifPresent(persistentSampleManagerBuilder::withCharset);
     }
 
     private static Method getDefineSamplersMethod(final SamplerFixture samplerFixture) {
