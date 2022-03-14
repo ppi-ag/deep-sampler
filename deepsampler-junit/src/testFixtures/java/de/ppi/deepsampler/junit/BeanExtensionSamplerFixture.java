@@ -25,6 +25,8 @@ public class BeanExtensionSamplerFixture implements SamplerFixture {
     public void defineSamplers() {
         PersistentSample.of(testServiceSampler.getCat()).hasId("CatStub");
         PersistentSample.of(testServiceSampler.getOptionalCatsName()).hasId("getOptionalCatsName");
+        PersistentSample.of(testServiceSampler.getOptionalCat()).hasId("getOptionalCat");
+        PersistentSample.of(testServiceSampler.getOptionalGenericCat()).hasId("getOptionalGenericCat");
     }
 
 

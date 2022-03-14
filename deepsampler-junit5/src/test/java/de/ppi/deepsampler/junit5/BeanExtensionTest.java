@@ -116,4 +116,86 @@ class BeanExtensionTest {
                 .isPresent()
                 .hasValue(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
     }
+
+    @Test
+    @Order(4)
+    @SaveSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalEmptyCanBeRecorded() throws IOException {
+        // GIVEN
+        testService.setCatsName(null);
+
+        // WHEN
+        // Call the method that should be recorded
+        testService.getOptionalCatsName();
+
+        // THEN
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_SAVED_FILE_INCLUDING_ROOT_PATH);
+    }
+
+    @Test
+    @Order(5)
+    @LoadSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalEmptyCanBeLoaded() {
+        // GIVEN
+        testService.setCatsName("This name should be overridden by the stub");
+
+        assertThat(testService.getOptionalCatsName()).isEmpty();
+    }
+
+    @Test
+    @Order(6)
+    @SaveSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalObjectCanBeRecorded() throws IOException {
+        // GIVEN
+        testService.setCatsName(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
+
+        // WHEN
+        // Call the method that should be recorded
+        testService.getOptionalCat();
+
+        // THEN
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_SAVED_FILE_INCLUDING_ROOT_PATH);
+    }
+
+    @Test
+    @Order(7)
+    @LoadSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalObjectCanBeLoaded() {
+        // GIVEN
+        testService.setCatsName("This name should be overridden by the stub");
+
+        assertThat(testService.getOptionalCat())
+                .isPresent()
+                .map(Cat::getName)
+                .hasValue(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
+    }
+
+    @Test
+    @Order(8)
+    @SaveSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalGenericObjectCanBeRecorded() throws IOException {
+        // GIVEN
+        testService.setCatsName(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
+
+        // WHEN
+        // Call the method that should be recorded
+        testService.getOptionalGenericCat();
+
+        // THEN
+        assertThatFileDoesNotExistOrOtherwiseDeleteIt(EXPECTED_SAVED_FILE_INCLUDING_ROOT_PATH);
+    }
+
+    @Test
+    @Order(9)
+    @LoadSamples(OPTIONAL_VALUE_SAMPLE_FILE)
+    void samplerWithOptionalGenericObjectCanBeLoaded() {
+        // GIVEN
+        testService.setCatsName("This name should be overridden by the stub");
+
+        assertThat(testService.getOptionalGenericCat())
+                .isPresent()
+                .map(GenericCat::getPrey)
+                .map(Dog::getName)
+                .hasValue(CATS_NAME_AS_IT_SHOULD_BE_RECORDED);
+    }
 }

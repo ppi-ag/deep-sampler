@@ -29,7 +29,21 @@ public class TestService {
     }
 
     public Optional<String> getOptionalCatsName() {
-        return Optional.of(catsName);
+        return Optional.ofNullable(catsName);
+    }
+
+    public Optional<Cat> getOptionalCat() {
+        return Optional.of(new Cat(catsName));
+    }
+
+    public Optional<GenericCat<Dog>> getOptionalGenericCat() {
+        GenericCat<Dog> genericCat = new GenericCat<>();
+        Dog dog = new Dog();
+        dog.setName(catsName);
+
+        genericCat.setPrey(dog);
+
+        return Optional.of(genericCat);
     }
 
     public void setDefaultInstant(Instant defaultInstant) {
