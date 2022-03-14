@@ -275,4 +275,8 @@ public class TestService {
     public RetentionPolicy getEnumWithDefaultConstructor() {
         return RetentionPolicy.CLASS;
     }
+
+    public Optional<String> getOptionalValue() {
+        return Optional.of("Some optional value");
+    }
 }

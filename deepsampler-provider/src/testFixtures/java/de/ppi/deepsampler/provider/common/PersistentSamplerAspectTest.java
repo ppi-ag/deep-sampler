@@ -406,6 +406,26 @@ public abstract class PersistentSamplerAspectTest {
         assertEquals(2, getTestService().getMapOfIntegers().get(1));
     }
 
+    @Test
+    public void optionalValueCanBeRecordedAndLoaded(Path tempFile) {
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getOptionalValue()).hasId("getOptionalValue");
+
+        getTestService().getOptionalValue();
+
+        final PersistentSampleManager source = save(tempFile);
+
+        clearSampleRepositoryWithAssertion();
+
+        PersistentSample.of(testServiceSampler.getOptionalValue()).hasId("getOptionalValue");
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertThat(getTestService().getOptionalValue())
+                .isPresent()
+                .hasValue("Some optional value");
+    }
+
 
     @Test
     public void callsWithNotMatchingParametersAreRoutedToOriginalMethod(Path tempFile) {

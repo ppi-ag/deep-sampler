@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":deepsampler-persistence"))
     implementation(project(":deepsampler-persistence-json"))
     implementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation("org.assertj:assertj-core:3.21.0")
     testImplementation(testFixtures(project(":deepsampler-junit")))
     testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
     testImplementation(project(":deepsampler-provider-guice"))

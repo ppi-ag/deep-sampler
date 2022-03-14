@@ -134,19 +134,33 @@ public class ReflectionTools {
 
 
     /**
-     * Returns the {@link Class} behind type.
+     * If type is a {@link ParameterizedType} the raw type, that a {@link ParameterizedType} contains, is returned.
+     * If type is a simple {@link Class}, type itself is cast to {@link Class} and returned.
      *
      * @param type The type for which the Class is wanted.
      * @param <T>  The type of the Class
-     * @return If type is a {@link ParameterizedType}, the raw Class is returned, otherwise a casted version of type.
+     * @return If type is a {@link ParameterizedType}, the raw Class is returned, otherwise a cast version of type.
      */
     @SuppressWarnings("unchecked")
-    public static <T> Class<T> getClass(Type type) {
+    public static <T> Class<T> getRawClass(Type type) {
         if (type instanceof ParameterizedType) {
             return (Class<T>) ((ParameterizedType) type).getRawType();
         }
 
         return (Class<T>) type;
+    }
+
+    /**
+     * Casts type to a {@link ParameterizedType} if type is a {@link ParameterizedType}. Otherwise, null is returned.
+     * @param type A {@link Type} that is expected to be a {@link ParameterizedType}
+     * @return returns a cast type or null if type is not a {@link ParameterizedType}.
+     */
+    public static ParameterizedType getParameterizedType(Type type) {
+        if (type instanceof ParameterizedType) {
+            return (ParameterizedType) type;
+        }
+
+        return null;
     }
 
 
@@ -214,8 +228,8 @@ public class ReflectionTools {
             return array;
         }
 
-        if (getClass(componentType).isArray()) {
-            return getRootComponentType(getClass(componentType).getComponentType());
+        if (getRawClass(componentType).isArray()) {
+            return getRootComponentType(getRawClass(componentType).getComponentType());
         }
 
         return componentType;

@@ -214,7 +214,7 @@ public class PersistentSampleManager {
         }
         for (int i = 0; i < parameterPersistentBeans.size(); ++i) {
             final ParameterizedType parameterType = parameterTypes[i] instanceof ParameterizedType ? (ParameterizedType) parameterTypes[i] : null;
-            final Class<?> parameterClass = ReflectionTools.getClass(parameterTypes[i]);
+            final Class<?> parameterClass = ReflectionTools.getRawClass(parameterTypes[i]);
             final Object persistentBean = parameterPersistentBeans.get(i);
 
             params.add(unwrapValue(parameterClass, parameterType, persistentBean));

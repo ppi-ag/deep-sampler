@@ -37,7 +37,7 @@ public class MapPrimitiveKeyExtension extends StandardBeanConverterExtension {
 
     @Override
     public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
-        return Map.class.isAssignableFrom(ReflectionTools.getClass(beanClass))
+        return Map.class.isAssignableFrom(ReflectionTools.getRawClass(beanClass))
                 && beanType.getActualTypeArguments().length == 2
                 && ReflectionTools.hasPrimitiveTypeParameters(beanType);
     }

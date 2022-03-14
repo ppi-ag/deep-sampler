@@ -136,8 +136,8 @@ class ReflectionToolsTest {
         ParameterizedType type = (ParameterizedType) getGenericReturnType("getStringCollection");
         Class<?> someClass = String.class;
 
-        assertNotNull(ReflectionTools.getClass(type));
-        assertNotNull(ReflectionTools.getClass(someClass));
+        assertNotNull(ReflectionTools.getRawClass(type));
+        assertNotNull(ReflectionTools.getRawClass(someClass));
     }
 
     @Test

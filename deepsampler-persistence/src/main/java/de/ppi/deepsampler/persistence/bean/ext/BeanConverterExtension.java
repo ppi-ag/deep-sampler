@@ -90,14 +90,16 @@ public interface BeanConverterExtension {
      * persistence api, to the original object.
      * <p>
      * It is also possible to deserialize other types then {@link PersistentBean} if the underlying persistence api is fully
-     * capable of deserializing this type. I.E. {@link java.util.List}s can be deserialized by Jackson (the default JSON persistence api)
-     * but the elements of the list might be generic {@link PersistentBean}s. The {@link CollectionExtension} would leave it to
-     * Jackson to deserialize the List, but it would iterate over that List to revert the {@link PersistentBean}s inside of that list.
+     * capable of deserializing this type.
+     * <p>
+     * revert() is not called, if the persisted value is null. In that case, null will be returned as the deserialized value
+     * without calling an extension. If null needs to be converted, the value must be encapsulated in a
+     * {@link de.ppi.deepsampler.persistence.bean.DefaultPersistentBean}.
      *
      * @param persistentBean          the generic bean
-     * @param targetClass             the {@link Class} of the type that will created from the persistentBean.
-     * @param targetType              the {@link ParameterizedType}  fo the type that will be created from persistentBean, This parameter can only be supplied
-     *                                if the type is actually a generic type. If this is not the case, beanType is null.
+     * @param targetClass             the {@link Class} of the type that will be created from the persistentBean.
+     * @param targetType              the {@link ParameterizedType}  for the type that will be created from persistentBean, This parameter can only be supplied
+     *                                if the type is actually a generic type. If this is not the case, targetType is null.
      * @param persistentBeanConverter the current {@link PersistentBeanConverter} that may be used to revert sub objects of persistentBean.
      * @param <T>                     type of the original bean
      * @return original bean
