@@ -32,7 +32,9 @@ public class CollectionExtension extends StandardBeanConverterExtension {
 
     @Override
     public boolean isProcessable(Class<?> beanClass, ParameterizedType beanType) {
-        return Collection.class.isAssignableFrom(beanClass);
+        return Collection.class.isAssignableFrom(beanClass)
+            && beanType != null
+            && beanType.getActualTypeArguments().length == 1;
     }
 
     /**
@@ -49,7 +51,7 @@ public class CollectionExtension extends StandardBeanConverterExtension {
 
 
     @Override
-    public Object convert(Object originalBean, ParameterizedType beanType, PersistentBeanConverter persistentBeanConverter) {
+    public Object convert(Object originalBean, ParameterizedType parameterizedType, PersistentBeanConverter persistentBeanConverter) {
         if (!(originalBean instanceof Collection)) {
             throw new PersistenceException("The type %s is not a Collection but we tried to apply the %s on it.",
                     originalBean.getClass().getName(),
@@ -75,13 +77,7 @@ public class CollectionExtension extends StandardBeanConverterExtension {
             }
         }
 
-        ParameterizedType entryType;
-
-        if (beanType.getActualTypeArguments()[0] instanceof ParameterizedType) {
-            entryType = (ParameterizedType) beanType.getActualTypeArguments()[0];
-        } else {
-            entryType = null;
-        }
+        Type entryType = parameterizedType != null ? parameterizedType.getActualTypeArguments()[0] : null;
 
         ((Collection<?>) originalBean).stream()
                 .map(entry -> persistentBeanConverter.convert(entry, entryType))

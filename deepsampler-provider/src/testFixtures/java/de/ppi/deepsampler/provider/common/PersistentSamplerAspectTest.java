@@ -205,6 +205,24 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
+    public void customListOfTestBeansReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getCustomListOfTestBeans());
+
+        getTestService().getCustomListOfTestBeans();
+        final PersistentSampleManager source = save(tempFile);
+
+        clearSampleRepositoryWithAssertion();
+
+        PersistentSample.of(testServiceSampler.getCustomListOfTestBeans());
+        source.load();
+
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        assertEquals(1, getTestService().getCustomListOfTestBeans().size());
+        assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getCustomListOfTestBeans().get(0).getValue());
+    }
+
+    @Test
     public void listOfStringsReturnValueCanBeRecordedAndLoaded(Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getListOfStrings());
