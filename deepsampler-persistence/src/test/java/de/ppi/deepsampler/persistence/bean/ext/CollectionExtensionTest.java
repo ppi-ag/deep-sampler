@@ -69,7 +69,10 @@ class CollectionExtensionTest {
         Class<?> listClass = list.getClass();
         ParameterizedType listType = (ParameterizedType) listClass.getGenericSuperclass();
 
-        assertThrows(PersistenceException.class, () -> extension.skip(listClass, listType));
+        final PersistenceException expectedException = assertThrows(PersistenceException.class, () -> extension.skip(listClass, listType));
+        assertEquals("We cannot determine the generic type parameter of java.util.AbstractList<E> because the " +
+                "actualTypeArgument is E. Instead, we need a java.lang.Class. This can be achieved e.g. by retrieving " +
+                "the type from Class::getMethod()::getGenericReturnType()", expectedException.getMessage());
     }
 
     @Test
@@ -79,7 +82,9 @@ class CollectionExtensionTest {
         Date now = new Date();
 
         // THEN
-        assertThrows(PersistenceException.class, () -> extension.convert(now, null, null));
+        final PersistenceException expectedException = assertThrows(PersistenceException.class, () -> extension.convert(now, null, null));
+        assertEquals("The type java.util.Date is not a Collection but we tried to apply the " +
+                "de.ppi.deepsampler.persistence.bean.ext.CollectionExtension on it.", expectedException.getMessage());
     }
 
     @Test
@@ -103,7 +108,7 @@ class CollectionExtensionTest {
 
     @Test
     void shouldConvertLinkedListAndReturnLinkedList() throws NoSuchMethodException {
-        // GIVEN
+        // ✋ GIVEN
         PersistentBeanConverter converter = new PersistentBeanConverter();
         converter.addExtension(new CollectionExtension());
         converter.addExtension(new JavaTimeExtension());
@@ -114,7 +119,10 @@ class CollectionExtensionTest {
         List<Date> list = new LinkedList<>();
         list.add(new Date());
 
+        // 🧪 WHEN
         List<Date> result = converter.convert(list, returnType);
+
+        // 🔬 THEN
         assertNotNull(result);
         assertTrue(result instanceof LinkedList);
         assertEquals(1, result.size());
@@ -173,7 +181,7 @@ class CollectionExtensionTest {
 
     @Test
     void shouldConvertRecursiveArrayList() throws NoSuchMethodException {
-        // GIVEN
+        // ✋ GIVEN
         PersistentBeanConverter converter = new PersistentBeanConverter();
         converter.addExtension(new CollectionExtension());
         converter.addExtension(new JavaTimeExtension());
@@ -183,12 +191,35 @@ class CollectionExtensionTest {
 
         List<List<Date>> list = new TestService().getRecursiveList();
 
+        // 🧪 WHEN
         List<List<Date>> result = converter.convert(list, returnType);
+
+        // 🔬 THEN
         assertNotNull(result);
         assertEquals(1, result.size());
         assertNotNull(result.get(0));
         assertEquals(1, result.get(0).size());
         assertNotNull(result.get(0).get(0));
+    }
+
+
+    @Test
+    void convertDoesNotAcceptCustomListWithoutGenerics() {
+        // GIVEN
+        PersistentBeanConverter converter = new PersistentBeanConverter();
+        converter.addExtension(new CollectionExtension());
+
+        CustomCollectionWithoutGenericParameter customCollection = new TestService().getCustomCollectionWithoutGenericParameter();
+
+        // 🧪 WHEN
+        PersistenceException expectedException = assertThrows(PersistenceException.class, () -> converter.convert(customCollection, null));
+
+        // 🔬 THEN
+        assertEquals("CollectionExtension is only able to serialize subtypes of Collections, that declare exactly one generic type parameter. " +
+                        "The type parameter is necessary to detect the type of the objects inside of the Collection. " +
+                        "de.ppi.deepsampler.persistence.bean.ext.CollectionExtensionTest$CustomCollectionWithoutGenericParameter " +
+                        "does not have any generic type parameters.",
+                expectedException.getMessage());
     }
 
     @Test
@@ -276,12 +307,16 @@ class CollectionExtensionTest {
         Method method = TestService.class.getMethod("getWrongList");
         ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
 
-        WrongList<String, String> wrongList = new WrongList<>();
+        ListWithTooManyGenericParameters<String, String> listWithTooManyGenericParameters = new ListWithTooManyGenericParameters<>();
 
-        List<Date> result = converter.convert(wrongList, returnType);
+        List<Date> result = converter.convert(listWithTooManyGenericParameters, returnType);
 
         // THEN
-        assertThrows(PersistenceException.class, () -> converter.revert(result, WrongList.class, returnType));
+        PersistenceException expectedException = assertThrows(PersistenceException.class, () -> converter.revert(result, ListWithTooManyGenericParameters.class, returnType));
+        assertEquals("CollectionExtension is only able to serialize subtypes of Collections, that declare exactly one generic type parameter. " +
+                        "The type parameter is necessary to detect the type of the objects inside of the Collection. " +
+                        "de.ppi.deepsampler.persistence.bean.ext.CollectionExtensionTest$ListWithTooManyGenericParameters declares 2 type parameters.",
+                expectedException.getMessage());
     }
 
 
@@ -313,12 +348,19 @@ class CollectionExtensionTest {
             return outerList;
         }
 
-        public WrongList<String, String> getWrongList() {
-            return new WrongList<>();
+        public ListWithTooManyGenericParameters<String, String> getWrongList() {
+            return new ListWithTooManyGenericParameters<>();
         }
 
+        public CustomCollectionWithoutGenericParameter getCustomCollectionWithoutGenericParameter() {
+            return new CustomCollectionWithoutGenericParameter();
+        }
     }
 
-    private static class WrongList<T, R> extends ArrayList<T> {
+    private static class ListWithTooManyGenericParameters<T, R> extends ArrayList<T> {
+    }
+
+    public static class CustomCollectionWithoutGenericParameter extends ArrayList<String> {
+
     }
 }
