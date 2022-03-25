@@ -93,7 +93,7 @@ public class ReflectionTools {
      *
      * @param type                      The generic class that should be checked.
      * @param numberOfParametersToCheck The number of the first generic parameters that should be checked.
-     * @return true if cls has generic type parameters that are wrapper types.
+     * @return true if type has generic type parameters that are wrapper types.
      */
     public static boolean hasPrimitiveTypeParameters(Type type, int numberOfParametersToCheck) {
         if (!(type instanceof ParameterizedType)) {
