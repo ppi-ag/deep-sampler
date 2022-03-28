@@ -44,6 +44,7 @@ import java.lang.reflect.Type;
  * your implementation of {@link #isProcessable(Class, ParameterizedType)} will return true. This is done by implementing
  * {@link #skip(Class, ParameterizedType)} So you can exclude some types from being processed by the {@link PersistentBeanConverter}.
  * </p>
+ * See also {@link StandardBeanConverterExtension} which is a simplified implementation of this interface.
  */
 public interface BeanConverterExtension {
 

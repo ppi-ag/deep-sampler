@@ -119,16 +119,21 @@ public class CollectionExtension extends StandardBeanConverterExtension {
     private Type getCollectionsEntryType(Class<?> originalBeanClass, ParameterizedType parameterizedType) {
         if (parameterizedType == null) {
             throw new PersistenceException("%s is only able to serialize subtypes of Collections, that declare exactly one generic type parameter. " +
+                    "%s does not have any generic type parameters. " +
                     "The type parameter is necessary to detect the type of the objects inside of the Collection. " +
-                    "%s does not have any generic type parameters.",
-                    getClass().getSimpleName(), originalBeanClass.getName());
+                    "%s's can be used to tell DeepSampler, how to de/serialize beans, that cannot be serialized by DeepSampler out of the box.",
+                    getClass().getSimpleName(), originalBeanClass.getName(), BeanConverterExtension.class.getName());
         }
 
         if (parameterizedType.getActualTypeArguments().length != 1) {
             throw new PersistenceException("%s is only able to serialize subtypes of Collections, that declare exactly one generic type parameter. " +
+                    "%s declares %d type parameters. " +
                     "The type parameter is necessary to detect the type of the objects inside of the Collection. " +
-                    "%s declares %d type parameters.",
-                    getClass().getSimpleName(), originalBeanClass.getName(), parameterizedType.getActualTypeArguments().length);
+                    "%s's can be used to tell DeepSampler, how to de/serialize beans, that cannot be serialized by DeepSampler out of the box.",
+                    getClass().getSimpleName(),
+                    originalBeanClass.getName(),
+                    parameterizedType.getActualTypeArguments().length,
+                    BeanConverterExtension.class.getName());
         }
 
         return parameterizedType.getActualTypeArguments()[0];

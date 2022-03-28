@@ -26,11 +26,22 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 
 import static de.ppi.deepsampler.core.api.FixedQuantity.ONCE;
-import static de.ppi.deepsampler.core.api.Matchers.*;
+import static de.ppi.deepsampler.core.api.Matchers.any;
+import static de.ppi.deepsampler.core.api.Matchers.anyInt;
+import static de.ppi.deepsampler.core.api.Matchers.anyString;
+import static de.ppi.deepsampler.core.api.Matchers.equalTo;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
-import static org.junit.jupiter.api.Assertions.*;
-
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This TestClass must be be used to test all aop-provider in order to ensure that all providers would support the same
@@ -202,6 +213,21 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertEquals(1, getTestService().getListOfTestBeans().size());
         assertEquals(TestService.HARD_CODED_RETURN_VALUE, getTestService().getListOfTestBeans().get(0).getValue());
+    }
+
+    @Test
+    public void customListWithoutGenericsIsNotAllowed(Path tempFile) {
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.getCustomListOfTestBeans());
+
+        getTestService().getCustomListOfTestBeans();
+        final PersistenceException expectedException = assertThrows(PersistenceException.class, () -> save(tempFile));
+
+        assertEquals("CollectionExtension is only able to serialize subtypes of Collections, that declare exactly one generic type parameter. " +
+                "de.ppi.deepsampler.provider.common.CustomList does not have any generic type parameters. The type parameter is necessary to detect " +
+                "the type of the objects inside of the Collection. de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension's can be used to " +
+                "tell DeepSampler, how to de/serialize beans, that cannot be serialized by DeepSampler out of the box.", expectedException.getMessage());
+
     }
 
 

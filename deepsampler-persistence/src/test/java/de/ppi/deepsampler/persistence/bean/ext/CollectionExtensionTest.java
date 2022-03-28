@@ -228,9 +228,10 @@ class CollectionExtensionTest {
 
         // 🔬 THEN
         assertEquals("CollectionExtension is only able to serialize subtypes of Collections, that declare exactly one generic type parameter. " +
-                        "The type parameter is necessary to detect the type of the objects inside of the Collection. " +
-                        "de.ppi.deepsampler.persistence.bean.ext.CollectionExtensionTest$CustomCollectionWithoutGenericParameter " +
-                        "does not have any generic type parameters.",
+                        "de.ppi.deepsampler.persistence.bean.ext.CollectionExtensionTest$CustomCollectionWithoutGenericParameter does not have any " +
+                        "generic type parameters. The type parameter is necessary to detect the type of the objects inside of the Collection. " +
+                        "de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension's can be used to tell DeepSampler, how to de/serialize beans, " +
+                        "that cannot be serialized by DeepSampler out of the box.",
                 expectedException.getMessage());
     }
 
@@ -326,8 +327,10 @@ class CollectionExtensionTest {
         // THEN
         PersistenceException expectedException = assertThrows(PersistenceException.class, () -> converter.revert(result, ListWithTooManyGenericParameters.class, returnType));
         assertEquals("CollectionExtension is only able to serialize subtypes of Collections, that declare exactly one generic type parameter. " +
+                        "de.ppi.deepsampler.persistence.bean.ext.CollectionExtensionTest$ListWithTooManyGenericParameters declares 2 type parameters. " +
                         "The type parameter is necessary to detect the type of the objects inside of the Collection. " +
-                        "de.ppi.deepsampler.persistence.bean.ext.CollectionExtensionTest$ListWithTooManyGenericParameters declares 2 type parameters.",
+                        "de.ppi.deepsampler.persistence.bean.ext.BeanConverterExtension's can be used to tell DeepSampler, how to de/serialize beans, that " +
+                        "cannot be serialized by DeepSampler out of the box.",
                 expectedException.getMessage());
     }
 
