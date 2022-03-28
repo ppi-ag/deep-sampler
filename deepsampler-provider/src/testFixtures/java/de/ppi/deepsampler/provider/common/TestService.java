@@ -156,6 +156,12 @@ public class TestService {
         return Arrays.asList(new TestBean(HARD_CODED_RETURN_VALUE));
     }
 
+    public CustomList getCustomListOfTestBeans() {
+        CustomList customList = new CustomList();
+        customList.add(new TestBean(HARD_CODED_RETURN_VALUE));
+        return customList;
+    }
+
     public List<String> getListOfStrings() {
         // Usually it would be better to use Collections.singletonList() for Lists with only one entry, but
         // we are unable to deserialize Collections.SingletonList since this is a private inner class.
