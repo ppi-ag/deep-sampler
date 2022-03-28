@@ -11,9 +11,21 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CollectionExtensionTest {
 
@@ -205,7 +217,7 @@ class CollectionExtensionTest {
 
     @Test
     void convertDoesNotAcceptCustomListWithoutGenerics() {
-        // GIVEN
+        // ✋ GIVEN
         PersistentBeanConverter converter = new PersistentBeanConverter();
         converter.addExtension(new CollectionExtension());
 

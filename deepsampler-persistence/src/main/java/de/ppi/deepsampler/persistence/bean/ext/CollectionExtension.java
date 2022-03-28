@@ -9,8 +9,16 @@ import de.ppi.deepsampler.persistence.bean.PersistentBeanConverter;
 import de.ppi.deepsampler.persistence.bean.ReflectionTools;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A {@link BeanConverterExtension} that is able to convert {@link Collection}s from the original objects to the generic persistent
