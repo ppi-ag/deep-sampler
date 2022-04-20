@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("java:S5786") // The public modifier is necessary, because we try to instantiate an inner class from an external package.
 public class JsonSourceManagerFactoryTest {
 
     @Mock
