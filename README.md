@@ -267,12 +267,12 @@ done roughly in three steps:
       is an example for a `SourceManager` that writes JSON files. 
    2. Implement a [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java) that 
       can be used to create and configure the new `SourceManager` using annotations in test-classes.
-   3. Define two annotation that can be set on test-methods to start loading and saving samples. [@LoadSamples](deepsampler-junit-json/src/main/java/de/ppi/deepsampler/junit/json/LoadSamples.java)
-      and [@SaveSamples](deepsampler-junit-json/src/main/java/de/ppi/deepsampler/junit/json/SaveSamples.java) are examples that are
+   3. Define two annotations that can be set on test-methods to start loading and saving samples. [@LoadSamples](deepsampler-junit-json/src/main/java/de/ppi/deepsampler/junit/json/LoadSamples.java#L32)
+      and [@SaveSamples](deepsampler-junit-json/src/main/java/de/ppi/deepsampler/junit/json/SaveSamples.java#L32) are examples that are
       used for JSON-samples. These annotations must itself be annotated with the meta-annotations [@UseSourceManagerForLoading](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForLoading.java)
       and respectively [@UseSourceManagerForSaving](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForSaving.java) to
       tell DeepSampler, that these annotations are commands for loading and saving samples. Both meta-annotations bind the `SourceManagerFactory` 
-      the persistence-process.
+      to the persistence-process.
 
 
 
