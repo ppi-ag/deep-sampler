@@ -37,7 +37,7 @@ public @interface UseJsonDeserializer {
      *
      * @return The class of the concrete {@link com.fasterxml.jackson.databind.JsonDeserializer}
      */
-    // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
+    @SuppressWarnings("java:S1452") // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
     Class<? extends JsonDeserializer<?>> deserializer();
 
     /**

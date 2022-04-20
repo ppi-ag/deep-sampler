@@ -25,5 +25,6 @@ public @interface UseSourceManagerForSaving {
      * that will save the samples.
      * @return A {@link SourceManagerFactory}
      */
+    @SuppressWarnings("java:S1452") // The generic wildcard is necessary because we want to allow all kinds of SourceManagers
     Class<? extends SourceManagerFactory<? extends SourceManager>> value();
 }

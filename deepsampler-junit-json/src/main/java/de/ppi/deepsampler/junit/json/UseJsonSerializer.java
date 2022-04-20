@@ -37,7 +37,7 @@ public @interface UseJsonSerializer {
      *
      * @return the concrete class of the {@link com.fasterxml.jackson.databind.JsonSerializer}
      */
-    // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
+    @SuppressWarnings("java:S1452") // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
     Class<? extends JsonSerializer<?>> serializer();
 
     /**
@@ -45,6 +45,6 @@ public @interface UseJsonSerializer {
      *
      * @return The {@link Class} for which the serializer should be used.
      */
-    // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
+    @SuppressWarnings("java:S1452") // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
     Class<?> forType();
 }

@@ -127,7 +127,7 @@ public class JUnitSamplerUtils {
      * @param testInstance the object in which the sampler should be injected.
      * @param field        the field that should be populated with a new Sampler.
      */
-    // Ignore warnings regarding field access via reflection
+    @SuppressWarnings("java:S3011") // Ignore warnings regarding field access via reflection
     public static void assignNewSamplerToField(final Object testInstance, final Field field) {
         final Object sampler = Sampler.prepare(field.getType());
         try {
@@ -195,6 +195,7 @@ public class JUnitSamplerUtils {
         return Optional.empty();
     }
 
+    @SuppressWarnings("unchecked")
     private static<T extends Annotation> Optional<T> scanForMetaAnnotations(final Annotation annotation, final Class<T> metaAnnotation, final List<Annotation> scannedAnnotation) {
         if (annotation.annotationType().equals(metaAnnotation)) {
             return (Optional<T>) Optional.of(annotation);
