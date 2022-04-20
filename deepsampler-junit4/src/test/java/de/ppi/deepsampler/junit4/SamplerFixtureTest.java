@@ -7,9 +7,9 @@ package de.ppi.deepsampler.junit4;
 
 import de.ppi.deepsampler.junit.FileSource;
 import de.ppi.deepsampler.junit.GetSomeStringTestSampleFixture;
-import de.ppi.deepsampler.junit.LoadSamples;
 import de.ppi.deepsampler.junit.TestSampleFixture;
 import de.ppi.deepsampler.junit.UseSamplerFixture;
+import de.ppi.deepsampler.junit.json.LoadSamples;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;

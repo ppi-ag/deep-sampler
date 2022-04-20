@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 import java.nio.charset.Charset;
 
 /**
- * Defines the charset, that is used while reading and writing JSON.
+ * Defines the charset, that is used while reading and writing samples.
  *
  * If no charset is set explicitly, {@link Charset#defaultCharset()} is used, to define the default.
  *

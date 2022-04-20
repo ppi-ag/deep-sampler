@@ -80,7 +80,7 @@ public class PersistentSampleManager {
 
         if (SampleRepository.getInstance().isEmpty()) {
             throw new PersistenceException("No Samples from the file could be matched to predefined sampled methods. " +
-                    "Did you define sampled methods using Sample.of() in your test?");
+                    "Did you define sampled methods using PersistentSample.of() in your test?");
         }
     }
 

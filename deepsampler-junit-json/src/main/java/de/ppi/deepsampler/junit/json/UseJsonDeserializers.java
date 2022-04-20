@@ -3,7 +3,7 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.junit;
+package de.ppi.deepsampler.junit.json;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

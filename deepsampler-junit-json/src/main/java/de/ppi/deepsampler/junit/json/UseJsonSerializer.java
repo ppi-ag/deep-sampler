@@ -3,11 +3,15 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.junit;
+package de.ppi.deepsampler.junit.json;
 
 import com.fasterxml.jackson.databind.JsonSerializer;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * This annotation can be used to register a {@link JsonSerializer} for the underlying Jackson JSON parser.
@@ -16,7 +20,7 @@ import java.lang.annotation.*;
  * <ul>
  *     <li>a test method</li>
  *     <li>the class that declares the test method</li>
- *     <li>the method {@link SamplerFixture#defineSamplers()}</li>
+ *     <li>the method {@link de.ppi.deepsampler.junit.SamplerFixture#defineSamplers()}</li>
  *     <li>the class that defines the method defineSamplers</li>
  * </ul>
  *
@@ -33,7 +37,7 @@ public @interface UseJsonSerializer {
      *
      * @return the concrete class of the {@link com.fasterxml.jackson.databind.JsonSerializer}
      */
-    @SuppressWarnings("java:S1452") // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
+    // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
     Class<? extends JsonSerializer<?>> serializer();
 
     /**
@@ -41,5 +45,6 @@ public @interface UseJsonSerializer {
      *
      * @return The {@link Class} for which the serializer should be used.
      */
+    // The generic wildcard is necessary because we want to allow all kinds of JsonSerializers here.
     Class<?> forType();
 }

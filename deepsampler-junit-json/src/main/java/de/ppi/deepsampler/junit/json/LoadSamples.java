@@ -3,7 +3,11 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.junit;
+package de.ppi.deepsampler.junit.json;
+
+import de.ppi.deepsampler.junit.AnnotationConstants;
+import de.ppi.deepsampler.junit.FileSource;
+import de.ppi.deepsampler.junit.UseSourceManagerForLoading;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,11 +24,12 @@ import java.lang.annotation.Target;
  * full qualified name of the test class and the test method.
  *
  * <p>
- * This annotation must be used in combination with @{@link UseSamplerFixture}.
+ * This annotation must be used in combination with @{@link de.ppi.deepsampler.junit.UseSamplerFixture}.
  * <p>
  * It is possible to register some extensions to customize the deserialization using the annotations @{@link UseJsonDeserializer}
- * and @{@link UseBeanConverterExtension}.
+ * and @{@link de.ppi.deepsampler.junit.UseBeanConverterExtension}.
  */
+@UseSourceManagerForLoading(JsonSourceManagerFactory.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface LoadSamples {
@@ -36,10 +41,10 @@ public @interface LoadSamples {
      * <p>
      * The root path of relative filenames for source
      *  <ul>
-     *      <li>{@link FileSource#FILE_SYSTEM} is by default './'. It can be changed, using the annotation {@link SampleRootPath}.</li>
+     *      <li>{@link FileSource#FILE_SYSTEM} is by default './'. It can be changed, using the annotation {@link de.ppi.deepsampler.junit.SampleRootPath}.</li>
      *      <li>{@link FileSource#CLASSPATH} is the classpath itself. value() will be interpreted exactly as it is described by
      *         {@link ClassLoader#getResource(String)}. Since the ClassLoader is retrieved from the current test class, value()
-     *         can also be defined relative to the test class. The annotation {@link SampleRootPath} is ignored.</li>
+     *         can also be defined relative to the test class. The annotation {@link de.ppi.deepsampler.junit.SampleRootPath} is ignored.</li>
      *  * </ul>
      *
      * @return the name of the sample JSON file.

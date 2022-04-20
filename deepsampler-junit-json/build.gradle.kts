@@ -2,6 +2,7 @@
  * Copyright 2022 PPI AG (Hamburg, Germany)
  * This program is made available under the terms of the MIT License.
  */
+
 plugins {
     id("com.vanniktech.maven.publish")
 }
@@ -9,13 +10,13 @@ plugins {
 dependencies {
     implementation(project(":deepsampler-core"))
     implementation(project(":deepsampler-junit"))
-    implementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testImplementation("org.assertj:assertj-core:3.21.0")
-    testImplementation(testFixtures(project(":deepsampler-junit")))
-    testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
-    testImplementation(project(":deepsampler-provider-guice"))
-    testImplementation(project(":deepsampler-junit-json"))
-    testImplementation("org.assertj:assertj-core:3.21.0")
+    implementation(project(":deepsampler-persistence-json"))
+    implementation(project(":deepsampler-persistence"))
 
-    testImplementation(files("./src/test/tmp"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
+
+    testImplementation(project(":deepsampler-junit5"))
+    testImplementation(testFixtures(project(":deepsampler-junit")))
+    testImplementation("org.assertj:assertj-core:3.21.0")
+    testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
 }

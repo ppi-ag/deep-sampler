@@ -3,7 +3,10 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.junit;
+package de.ppi.deepsampler.junit.json;
+
+import de.ppi.deepsampler.junit.AnnotationConstants;
+import de.ppi.deepsampler.junit.UseSourceManagerForSaving;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -18,16 +21,17 @@ import java.lang.annotation.Target;
  * the test class and test method. In most cases this will suffice, however you can change the path in detail:
  * <ul>
  *     <li>rootPath: The root path for relative packagePaths is by default './'. It can be changed, using the annotation
- *  *     {@link SampleRootPath}.</li>
+ *  *     {@link de.ppi.deepsampler.junit.SampleRootPath}.</li>
  *     <li>value(): The concrete name of the JSON-file. If omitted, the name of the test class, including it's package,
  *     and the test method is used.</li>
  * </ul>
  * <p>
- * This annotation must be used in combination with @{@link UseSamplerFixture}.
+ * This annotation must be used in combination with @{@link de.ppi.deepsampler.junit.UseSamplerFixture}.
  * <p>
  * It is possible to register customisations of the serialization-process using the annotations
- * {@link UseJsonSerializer} and @{@link UseBeanConverterExtension}.
+ * {@link UseJsonSerializer} and @{@link de.ppi.deepsampler.junit.UseBeanConverterExtension}.
  */
+@UseSourceManagerForSaving(JsonSourceManagerFactory.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface SaveSamples {

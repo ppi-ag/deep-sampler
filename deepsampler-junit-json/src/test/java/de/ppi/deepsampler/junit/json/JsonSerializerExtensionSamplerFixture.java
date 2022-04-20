@@ -3,9 +3,11 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.junit;
+package de.ppi.deepsampler.junit.json;
 
 import de.ppi.deepsampler.core.api.PersistentSample;
+import de.ppi.deepsampler.junit.PrepareSampler;
+import de.ppi.deepsampler.junit.SamplerFixture;
 
 import java.time.Instant;
 

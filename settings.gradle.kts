@@ -12,5 +12,6 @@ include ("deepsampler-provider",
 	"deepsampler-persistence",
 	"deepsampler-persistence-json",
 	"deepsampler-junit",
+	"deepsampler-junit-json",
 	"deepsampler-junit4",
 	"deepsampler-junit5")
