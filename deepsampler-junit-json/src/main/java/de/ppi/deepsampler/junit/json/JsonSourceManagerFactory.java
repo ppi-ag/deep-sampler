@@ -57,13 +57,13 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
         final Optional<SampleRootPath> rootPath = JUnitSamplerUtils.loadAnnotationFromTestOrSampleFixture(testMethod, SampleRootPath.class);
 
         switch (loadSamples.source()) {
-            case FILE_SYSTEM:
-                final Path file = createPathForFilesystem(rootPath, loadSamples.value(), testMethod);
-                return persistentSampleManagerBuilder.buildWithFile(file);
             case CLASSPATH:
-            default:
                 final String classPathResource = createPathForClasspath(loadSamples, testMethod);
                 return persistentSampleManagerBuilder.buildWithClassPathResource(classPathResource, testMethod.getDeclaringClass());
+            case FILE_SYSTEM:
+            default:
+                final Path file = createPathForFilesystem(rootPath, loadSamples.value(), testMethod);
+                return persistentSampleManagerBuilder.buildWithFile(file);
         }
     }
 
@@ -189,6 +189,8 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
                 .forEach(deserializerAnnotation -> addDeserializer(deserializerAnnotation, persistentSampleManagerBuilder));
     }
 
+    @SuppressWarnings("unchecked") // The unchecked type conversion is necessary, because the types are read from annotations and annotations
+    // can't use concrete generics.
     private <T> void addSerializer(final UseJsonSerializer useJsonSerializer, final JsonSourceManager.Builder persistentSampleManagerBuilder) {
         final Class<? extends JsonSerializer<T>> serializerClass = (Class<? extends JsonSerializer<T>>) useJsonSerializer.serializer();
         final Class<T> typeToSerialize = (Class<T>) useJsonSerializer.forType();
@@ -200,6 +202,8 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
         persistentSampleManagerBuilder.addSerializer(typeToSerialize, jsonSerializer);
     }
 
+    @SuppressWarnings("unchecked") // The unchecked type conversion is necessary, because the types are read from annotations and annotations
+    // can't use concrete generics.
     private <T> void addDeserializer(final UseJsonDeserializer useJsonDeserializer, final JsonSourceManager.Builder persistentSampleManagerBuilder) {
         final Class<? extends JsonDeserializer<T>> deserializerClass = (Class<? extends JsonDeserializer<T>>) useJsonDeserializer.deserializer();
         final Class<T> typeToDeserialize = (Class<T>) useJsonDeserializer.forType();
