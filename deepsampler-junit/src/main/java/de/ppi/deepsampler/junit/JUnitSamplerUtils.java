@@ -166,6 +166,15 @@ public class JUnitSamplerUtils {
                 .flatMap(samplerFixture -> loadAnnotationFromMethodOrDeclaringClass(getDefineSamplersMethod(samplerFixture), annotationType));
     }
 
+    /**
+     * Loads the annotation annotationType from method, or from it's declaring class. If both places are annotated with annotationType, the one on the
+     * method wins.
+     *
+     * @param method the method on which annotationType is searched.
+     * @param annotationType the type of the requested annotation.
+     * @param <T> The type of the requested annotation.
+     * @return the annotation, if it could be found. Otherwise, Optional.empty() is returned.
+     */
     public static <T extends Annotation> Optional<T> loadAnnotationFromMethodOrDeclaringClass(final Method method, final Class<T> annotationType) {
         final T annotationFromMethod = method.getDeclaredAnnotation(annotationType);
 
@@ -182,6 +191,16 @@ public class JUnitSamplerUtils {
         return Optional.empty();
     }
 
+    /**
+     * Searches recursively through all annotations of method. If an annotation can be found, that is itself annotated with metaAnnotation, metaAnnotation
+     * is returned. "Recursively" means, that meta-annotations of meta-annotations will be scanned.
+     * The first found metaAnnotation will be returned.
+     *
+     * @param method all annotations of method will be searched.
+     * @param metaAnnotation the type of the meta-annotation, that is requested.
+     * @param <T> the type of metaAnnotation
+     * @return The meta-annotation will be returned of it could be found. Otherwise, Optional.empty() is returned.
+     */
     public static <T extends Annotation> Optional<T> getMetaAnnotation(final Method method, final Class<T> metaAnnotation) {
         Optional<T> foundAnnotation;
         for (final Annotation annotation : method.getAnnotations()) {
@@ -211,6 +230,14 @@ public class JUnitSamplerUtils {
         return Optional.empty();
     }
 
+    /**
+     * Returns the {@link Method} of samplerFixture, that defines the samplers. This is just a utility, that prevents
+     * the usage of a String containing the name of the method in various places in the code.
+     *
+     * @param samplerFixture an instance of a {@link SamplerFixture}
+     * @return The {@link Method} defineSamplers. If this method cannot be found, a harsh implementation error has occurred, because
+     * the method is part of the interface {@link SamplerFixture}
+     */
     public static Method getDefineSamplersMethod(final SamplerFixture samplerFixture) {
         try {
             return samplerFixture.getClass().getMethod("defineSamplers");
