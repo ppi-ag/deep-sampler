@@ -5,7 +5,13 @@
 
 package de.ppi.deepsampler.junit4;
 
-import de.ppi.deepsampler.junit.*;
+import de.ppi.deepsampler.junit.FileSource;
+import de.ppi.deepsampler.junit.GetSomeStringTestSampleFixture;
+import de.ppi.deepsampler.junit.SampleRootPath;
+import de.ppi.deepsampler.junit.TestSampleFixture;
+import de.ppi.deepsampler.junit.UseSamplerFixture;
+import de.ppi.deepsampler.junit.json.LoadSamples;
+import de.ppi.deepsampler.junit.json.SaveSamples;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,7 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static de.ppi.deepsampler.junit.JUnitTestUtility.*;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedInt;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertTestBeanHasStubbedString;
+import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
 import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

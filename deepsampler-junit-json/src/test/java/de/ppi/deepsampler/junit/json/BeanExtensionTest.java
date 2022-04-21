@@ -3,14 +3,24 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.junit5;
+package de.ppi.deepsampler.junit.json;
 
 
 import com.google.inject.Guice;
 import de.ppi.deepsampler.core.api.Sampler;
-import de.ppi.deepsampler.junit.*;
-import de.ppi.deepsampler.persistence.bean.ext.OptionalExtension;
-import org.junit.jupiter.api.*;
+import de.ppi.deepsampler.junit.Cat;
+import de.ppi.deepsampler.junit.Dog;
+import de.ppi.deepsampler.junit.GenericCat;
+import de.ppi.deepsampler.junit.SampleRootPath;
+import de.ppi.deepsampler.junit.TestModule;
+import de.ppi.deepsampler.junit.TestService;
+import de.ppi.deepsampler.junit.UseSamplerFixture;
+import de.ppi.deepsampler.junit5.DeepSamplerExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.inject.Inject;
@@ -19,9 +29,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static de.ppi.deepsampler.junit.JUnitTestUtility.assertThatFileDoesNotExistOrOtherwiseDeleteIt;
-import static org.junit.jupiter.api.Assertions.*;
-
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(DeepSamplerExtension.class)
 @UseSamplerFixture(BeanExtensionSamplerFixture.class)
@@ -35,7 +45,7 @@ class BeanExtensionTest {
 
 
     public static final String CATS_NAME_AS_IT_SHOULD_BE_RECORDED = "Cats name that should be recorded and written to the json file";
-    public static final String CATS_NAME_FOR_CROSS_CHECK = "This name is unstubbed";
+    public static final String CATS_NAME_FOR_CROSS_CHECK = "This name is not stubbed";
 
 
     @Inject

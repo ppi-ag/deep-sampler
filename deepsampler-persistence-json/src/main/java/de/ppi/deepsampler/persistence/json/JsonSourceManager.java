@@ -83,7 +83,7 @@ public class JsonSourceManager implements SourceManager {
          * @param <T> The type, which will be serialized by jsonSerializer.
          * @return This {@link Builder} for a fluent-api.
          */
-        public <T> Builder addSerializer(final Class<T> typeToSerialize, final JsonSerializer<T>jsonSerializer) {
+        public <T> Builder addSerializer(final Class<T> typeToSerialize, final JsonSerializer<T> jsonSerializer) {
             serializerList.add(new SerializationExtension<>(typeToSerialize, jsonSerializer));
             return this;
         }

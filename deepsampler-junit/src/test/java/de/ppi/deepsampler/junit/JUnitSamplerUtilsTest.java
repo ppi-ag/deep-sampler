@@ -14,7 +14,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JUnitSamplerUtilsTest {
 
@@ -58,7 +61,7 @@ class JUnitSamplerUtilsTest {
     @Test
     void samplerFixtureFromTestMethodCanBeLoaded() throws NoSuchMethodException {
         // WHEN
-        Optional<SamplerFixture> loadedFixture = JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(Example.class.getMethod("useSamplerFixture"));
+        final Optional<SamplerFixture> loadedFixture = JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(Example.class.getMethod("useSamplerFixture"));
 
         // THEN
         assertTrue(loadedFixture.isPresent());
@@ -67,8 +70,8 @@ class JUnitSamplerUtilsTest {
     @Test
     void samplerFixtureWithoutDefaultConstructorCannotBeLoaded() throws NoSuchMethodException {
         // WHEN
-        Method brokenMethod = Example.class.getMethod("useBrokenSamplerFixture");
-        JUnitPreparationException expectedException = assertThrows(JUnitPreparationException.class, () -> JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(brokenMethod));
+        final Method brokenMethod = Example.class.getMethod("useBrokenSamplerFixture");
+        final JUnitPreparationException expectedException = assertThrows(JUnitPreparationException.class, () -> JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(brokenMethod));
 
         // THEN
         assertEquals("The SamplerFixture de.ppi.deepsampler.junit.JUnitSamplerUtilsTest$SamplerFixtureWithoutDefaultConstructor " +
@@ -81,7 +84,6 @@ class JUnitSamplerUtilsTest {
         return left.getName().compareTo(right.getName());
     }
 
-    @SuppressWarnings("unused")
     private static class TestBean {
 
         @PrepareSampler
@@ -90,14 +92,13 @@ class JUnitSamplerUtilsTest {
         private final String aRandomStringField = "SomeRandomString";
     }
 
-    @SuppressWarnings("unused")
     private static class SubTestBean extends JUnitSamplerUtilsTest.TestBean {
         private final int aRandomIntField = 42;
     }
 
     private static class Example {
 
-        @UseSamplerFixture(JsonSerializerExtensionSamplerFixture.class)
+        @UseSamplerFixture(ExampleSamplerFixture.class)
         public void useSamplerFixture() {
             // nothing to do here because we only want to test loading the SamplerFixture.
         }
@@ -110,10 +111,19 @@ class JUnitSamplerUtilsTest {
         }
     }
 
+    public static class ExampleSamplerFixture implements SamplerFixture {
+
+        @Override
+        public void defineSamplers() {
+            // Nothing to do here, because we only want to test if a SamplerFixture can be found and loaded
+        }
+    }
+
     private static class SamplerFixtureWithoutDefaultConstructor implements SamplerFixture {
 
-        public SamplerFixtureWithoutDefaultConstructor(String someParameter) {
+        public SamplerFixtureWithoutDefaultConstructor(final String someParameter) {
             // nothing to do here, we just want to test, that an Exception is thrown because this SamplerFixture doesn't have a
+            // default constructor
         }
 
 

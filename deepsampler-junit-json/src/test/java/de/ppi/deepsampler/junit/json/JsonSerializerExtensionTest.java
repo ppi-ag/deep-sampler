@@ -3,13 +3,20 @@
  * This program is made available under the terms of the MIT License.
  */
 
-package de.ppi.deepsampler.junit5;
+package de.ppi.deepsampler.junit.json;
 
 
 import com.google.inject.Guice;
 import de.ppi.deepsampler.core.api.Sampler;
-import de.ppi.deepsampler.junit.*;
-import org.junit.jupiter.api.*;
+import de.ppi.deepsampler.junit.SampleRootPath;
+import de.ppi.deepsampler.junit.TestModule;
+import de.ppi.deepsampler.junit.UseSamplerFixture;
+import de.ppi.deepsampler.junit5.DeepSamplerExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.inject.Inject;
@@ -30,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class JsonSerializerExtensionTest {
 
-    public static final String SAVED_SAMPLER_FILE = "/de/ppi/deepsampler/junit5/samplerCanBeSavedUsingAJsonExtension.json";
+    public static final String SAVED_SAMPLER_FILE = "/de/ppi/deepsampler/junit/json/samplerCanBeSavedUsingAJsonExtension.json";
     public static final Path EXPECTED_SAVED_SAMPLER = Paths.get("./src/test/tmp/").resolve(SAVED_SAMPLER_FILE);
 
     private static final Instant STUBBED_INSTANT = LocalDateTime.of(2021, 10, 15, 17, 45).toInstant(ZoneOffset.UTC);
