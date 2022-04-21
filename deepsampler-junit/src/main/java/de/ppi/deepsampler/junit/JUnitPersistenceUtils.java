@@ -94,10 +94,11 @@ public class JUnitPersistenceUtils {
 
     private static void applyBeanExtensionsFromTestCaseAndTestFixture(final Method testMethod, final PersistentSampleManager persistentSampleManager) {
         // 1. Apply BeanConverter from TestFixture...
-        JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod).map(JUnitSamplerUtils::getDefineSamplersMethod)
+        JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod)
+                .map(JUnitSamplerUtils::getDefineSamplersMethod)
                 .ifPresent(samplerFixtureMethod -> applyAnnotatedBeanConverterExtension(samplerFixtureMethod, persistentSampleManager));
 
-        // 2. apply BeanConverters from testMethod. the ones from the tetMethod override the ones from the TestFixture.
+        // 2. apply BeanConverters from testMethod. the ones from the testMethod override the ones from the TestFixture.
         applyAnnotatedBeanConverterExtension(testMethod, persistentSampleManager);
     }
 
