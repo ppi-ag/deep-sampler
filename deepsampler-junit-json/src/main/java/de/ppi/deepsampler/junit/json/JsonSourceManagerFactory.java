@@ -105,14 +105,13 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
 
 
     private void applyJsonSerializersFromTestCaseAndTestFixture(final Method testMethod, final JsonSourceManager.Builder persistentSampleManagerBuilder) {
-        // 1. Load serializers from SamplerFixture
-        JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod).map(JUnitSamplerUtils::getDefineSamplersMethod)
+        JUnitSamplerUtils.loadSamplerFixtureFromMethodOrDeclaringClass(testMethod)
+                .map(JUnitSamplerUtils::getDefineSamplersMethod)
                 .ifPresent(samplerFixtureMethod -> {
                     applyAnnotatedJsonSerializers(samplerFixtureMethod, persistentSampleManagerBuilder);
                     applyAnnotatedJsonDeserializers(samplerFixtureMethod, persistentSampleManagerBuilder);
                 });
 
-        // 2. Load serializers from testMethod. Serializers from testMethod override the ones from the TestFixture.
         applyAnnotatedJsonSerializers(testMethod, persistentSampleManagerBuilder);
         applyAnnotatedJsonDeserializers(testMethod, persistentSampleManagerBuilder);
     }
@@ -140,7 +139,9 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
      * on the classpath, see {@link #createPathForClasspath(LoadSamples, Method)}.
      */
     Path createPathForFilesystem(final Optional<SampleRootPath> sampleRootPath, final String file, final Method testMethod) {
-        final Path path = sampleRootPath.map(a -> Paths.get(a.value())).orElse(Paths.get(DEFAULT_ROOT_PATH));
+        final Path path = sampleRootPath
+                .map(a -> Paths.get(a.value()))
+                .orElse(Paths.get(DEFAULT_ROOT_PATH));
 
         if (file.equals(AnnotationConstants.DEFAULT_VALUE_MUST_BE_CALCULATED)) {
             return path.resolve(testMethod.getDeclaringClass().getPackage().getName().replace(".", "/"))
@@ -151,16 +152,14 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
     }
 
     /**
-     * <p>
      * Creates a Path that is used to load a sample file from the classpath. The path is based on two elements:
      * <p>
      * [packagePath][fileName]
      * <p>
      * If any of these two are missing, a default value will be used.
      *
-     * @param loadSamples provides the packagePath and the fileName. If packagePath is not supplied, the package of
-     *                    testMethod is used. If fileName is not supplied, the name of testMethod and it's declaring
-     *                    class is used.
+     * @param loadSamples provides the fileName. If the fileName is not supplied, the name of testMethod, and it's declaring
+     *                    class (including package) is used.
      * @param testMethod  the method that runs the current test. It is used to provide default values for path elements.
      * @return a path that can be used to load a sample file from the classpath.
      */
