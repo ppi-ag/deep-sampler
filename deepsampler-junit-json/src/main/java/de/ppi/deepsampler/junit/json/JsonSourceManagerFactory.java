@@ -13,6 +13,8 @@ import de.ppi.deepsampler.junit.JUnitSamplerUtils;
 import de.ppi.deepsampler.junit.SampleRootPath;
 import de.ppi.deepsampler.junit.SourceManagerFactory;
 import de.ppi.deepsampler.junit.UseCharset;
+import de.ppi.deepsampler.junit.UseSourceManagerForLoading;
+import de.ppi.deepsampler.junit.UseSourceManagerForSaving;
 import de.ppi.deepsampler.persistence.json.JsonSourceManager;
 
 import java.lang.reflect.Method;
@@ -51,6 +53,16 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
         final LoadSamples loadSamples = testMethod.getDeclaredAnnotation(LoadSamples.class);
 
+        if (loadSamples == null) {
+            throw new InvalidConfigException("The %s is used without the annotation %s by the method %s. The method is supposedly " +
+                    "annotated with an annotation that itself is annotated with %s, which falsely binds to %s",
+                    JsonSourceManagerFactory.class,
+                    LoadSamples.class,
+                    testMethod,
+                    UseSourceManagerForLoading.class,
+                    JsonSourceManagerFactory.class);
+        }
+
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
         applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
 
@@ -71,6 +83,16 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
     public JsonSourceManager createSourceManagerToSaveSamples(final Method testMethod) {
         final JsonSourceManager.Builder persistentSampleManagerBuilder = JsonSourceManager.builder();
         final SaveSamples saveSamples = testMethod.getDeclaredAnnotation(SaveSamples.class);
+
+        if (saveSamples == null) {
+            throw new InvalidConfigException("The %s is used without the annotation %s by the method %s. The method is supposedly " +
+                    "annotated with an annotation that itself is annotated with %s, which falsely binds to %s",
+                    JsonSourceManagerFactory.class,
+                    SaveSamples.class,
+                    testMethod,
+                    UseSourceManagerForSaving.class,
+                    JsonSourceManagerFactory.class);
+        }
 
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
         applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
