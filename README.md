@@ -266,7 +266,9 @@ The following line would make all Samples available across all Threads:
 ```
 
 ## Authoring custom persistence extensions
-The format, in which samplers are recorded, is by default JSON. However, you can change the format by writing your own persistence-module. Let's say we wanted to create a persistence layer that is capable of writing YAML. Then we would have to implement a model like this:
+The format, in which samplers are recorded, is by default JSON. However, you can change the format by writing your own 
+persistence-module. Let's say we wanted to create a persistence layer that is capable of writing YAML. Then we would 
+have to implement a model like this:
 ```mermaid
   graph TD;
       A["MyTest#myTestMethod()"]-- Annotated by -->B["@SaveYamlSamples"]
@@ -276,17 +278,38 @@ The format, in which samplers are recorded, is by default JSON. However, you can
       A-- records samples with -->E;
       E-- writes -->F["sample.yaml"];
 ```
-   * `MyTest#myTestMethod()` is an example for a test-method that is supposed to record a sample-file in YAML-format (or any other format, depending on your extension)
-   * `@SaveYamlSamples` is a custom annotation that is used as a command to tell DeepSampler, that samples should be recorded. This annotation may be named freely and it may have all kinds of properties, that can be used by the custom extension to configure the recording.
-   *  [@UseSourceManagerForSaving](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForSaving.java) is a meta-annotation that tells DeepSampler, that the annotated annotation is a command for saving samples.
-   * `YamlSourceManagerFactory` is referenced by `@UseSourceManagerForsaving` and it is used to create and configure a `SourceManager`. It implements the interface [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java). The configuration should be done using custom annotations. There is a convenience-method that is able to load annotations from various places, like the test-method itself, or a `SamplerFixture`: [JUnitSamplerUtils#loadAnnotationFromTestOrSampleFixture](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/JUnitSamplerUtils.java#L158) 
-   * `YamlSourceManager` is the class that is finally able to write the YAML-file. It implements the interface [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java). This class is probably the most complex class to implement, since it needs to translate the [ExecutionInformation](deepsampler-core/src/main/java/de/ppi/deepsampler/core/model/ExecutionInformation.java) to a persistable format. `ExecutionInformation`s contain all data that is collected during the execution of stubbed methods.
+   * `MyTest#myTestMethod()` is an example for a test-method that is supposed to record a sample-file in YAML-format 
+      (or any other format, depending on your extension)
+   * `@SaveYamlSamples` is a custom annotation that is used as a command to tell DeepSampler, that samples should be 
+      recorded. This annotation may be named freely, and it may have all kinds of properties, that can be used by the 
+      custom extension to configure the recording.
+   * [@UseSourceManagerForSaving](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForSaving.java) 
+     is a meta-annotation that tells DeepSampler, that the annotated annotation is a command for saving samples.
+   * `YamlSourceManagerFactory` is referenced by `@UseSourceManagerForsaving` and it is used to create and configure a 
+     `SourceManager`. It implements the interface 
+     [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java). 
+     The configuration should be done using custom annotations. There is a convenience-method that is able to load 
+     annotations from various places, like the test-method itself, or a `SamplerFixture`: 
+     [JUnitSamplerUtils#loadAnnotationFromTestOrSampleFixture](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/JUnitSamplerUtils.java#L158) 
+   * `YamlSourceManager` is the class that is finally able to write the YAML-file. It implements the interface 
+      [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java). This 
+      class is probably the most complex class to implement, since it needs to translate the 
+      [ExecutionInformation](deepsampler-core/src/main/java/de/ppi/deepsampler/core/model/ExecutionInformation.java) to 
+      a persistable format. `ExecutionInformation`s contain all data that is collected during the execution of stubbed methods.
 
-Loading samples is implemeted very similar. The mentioned interfaces define methods for loading and saving samples. The annotation, that commands DeepSampler to load samples, is marked by the meta annotation [@UseSourceManagerForLoading](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForLoading.java)
+Loading samples is implemented very similar. The mentioned interfaces define methods for loading and saving samples. 
+The annotation, that commands DeepSampler to load samples, is marked by the meta annotation 
+[@UseSourceManagerForLoading](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForLoading.java)
 
-We recomment to place the extension in two modules:
-   1. `persistence-module`: This module contains all code that is related to saving and loading samples independent of JUnit. It should be possible to use the persistence without annotaions or JUnit. The [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java)-implementation and all it's utilities belong to this module.
-   2. `junit-configuraiton-modul`: A module that contains a code that is necessary to use the `SourceManager` in JUnit-tests together with annotation-based-configuration. The custom-annotations like `@SaveYamlSamples` and the [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java)-implementation belong to this module.
+We recommend placing the extension in two modules:
+   1. `persistence-module`: This module contains all code that is related to saving and loading samples independent of 
+      JUnit. It should be possible to use the persistence without annotations or JUnit. 
+      The [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java)
+      -implementation and all it's utilities belong to this module.
+   2. `junit-configuraiton-modul`: A module that contains all code, that is necessary to use the `SourceManager` in 
+      JUnit-tests together with annotation-based-configuration. The custom-annotations like `@SaveYamlSamples` and 
+      the [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java)
+      -implementation belong to this module.
   
 
 # License
