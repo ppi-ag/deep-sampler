@@ -1,6 +1,6 @@
 <img src="/docs/assets/logo.svg?raw=true" alt="DeepSampler" width="40%"/>
 
-Version 2.0.0 - For older versions see [1.1.0](https://github.com/ppi-ag/deep-sampler/tree/%F0%9F%93%9A-maintenance-v1.1.0)
+Version 2.1.0 - For older versions see [2.0.0](https://github.com/ppi-ag/deep-sampler/tree/%F0%9F%93%9A-maintenance-v2.0.0), [1.1.0](https://github.com/ppi-ag/deep-sampler/tree/%F0%9F%93%9A-maintenance-v1.1.0)
 
 ![Build & Test](https://github.com/ppi-ag/deep-sampler/workflows/Build%20&%20Test/badge.svg) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=coverage)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=bugs)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=code_smells)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ppi-ag_deep-sampler&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=ppi-ag_deep-sampler)
 
@@ -49,14 +49,21 @@ We use Maven to build the example. So, as a first step, we add the following dep
 <dependency>
    <groupId>de.ppi</groupId>
    <artifactId>deepsampler-junit5</artifactId>
-   <version>2.0.0</version>
+   <version>2.1.0</version>
    <scope>test</scope>
 </dependency>
 
 <dependency>
    <groupId>de.ppi</groupId>
    <artifactId>deepsampler-provider-guice</artifactId>
-   <version>2.0.0</version>
+   <version>2.1.0</version>
+   <scope>test</scope>
+</dependency>
+
+<dependency>
+   <groupId>de.ppi</groupId>
+   <artifactId>deepsampler-junit-json</artifactId>
+   <version>2.1.0</version>
    <scope>test</scope>
 </dependency>
 ```
@@ -259,22 +266,51 @@ The following line would make all Samples available across all Threads:
 ```
 
 ## Authoring custom persistence extensions
-If you don't want to use JSON to save samples, you might want to write your own persistence extension. This can be 
-done roughly in three steps:
+The format, in which samplers are recorded, is by default JSON. However, you can change the format by writing your own 
+persistence-module. Let's say we wanted to create a persistence layer that is capable of writing YAML. Then we would 
+have to implement a model like this:
+```mermaid
+  graph TD;
+      A["MyTest#myTestMethod()"]-- Annotated by -->B["@SaveYamlSamples"]
+      B-- Annotated by -->C["@UseSourceManagerForSaving"];
+      C-- creates -->D[YamlSourceManagerFactory];
+      D-- configures -->E[YamlSourceManager]
+      A-- records samples with -->E;
+      E-- writes -->F["sample.yaml"];
+```
+   * `MyTest#myTestMethod()` is an example for a test-method that is supposed to record a sample-file in YAML-format 
+      (or any other format, depending on your extension)
+   * `@SaveYamlSamples` is a custom annotation that is used as a command to tell DeepSampler, that samples should be 
+      recorded. This annotation may be named freely, and it may have all kinds of properties, that can be used by the 
+      custom extension to configure the recording.
+   * [@UseSourceManagerForSaving](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForSaving.java) 
+     is a meta-annotation that tells DeepSampler, that the annotated annotation is a command for saving samples.
+   * `YamlSourceManagerFactory` is referenced by `@UseSourceManagerForsaving` and it is used to create and configure a 
+     `SourceManager`. It implements the interface 
+     [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java). 
+     The configuration should be done using custom annotations. There is a convenience-method that is able to load 
+     annotations from various places, like the test-method itself, or a `SamplerFixture`: 
+     [JUnitSamplerUtils#loadAnnotationFromTestOrSampleFixture](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/JUnitSamplerUtils.java#L158) 
+   * `YamlSourceManager` is the class that is finally able to write the YAML-file. It implements the interface 
+      [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java). This 
+      class is probably the most complex class to implement, since it needs to translate the 
+      [ExecutionInformation](deepsampler-core/src/main/java/de/ppi/deepsampler/core/model/ExecutionInformation.java) to 
+      a persistable format. `ExecutionInformation`s contain all data that is collected during the execution of stubbed methods.
 
-   1. Implement a [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java). `SourceManager`s are used to write the recorded execution data into an arbitrary
-      persistence format. The [JsonSourceManager](deepsampler-persistence-json/src/main/java/de/ppi/deepsampler/persistence/json/JsonSourceManager.java)
-      is an example for a `SourceManager` that writes JSON files. 
-   2. Implement a [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java) that 
-      can be used to create and configure the new `SourceManager` using annotations in test-classes.
-   3. Define two annotations that can be set on test-methods to start loading and saving samples. [@LoadSamples](deepsampler-junit-json/src/main/java/de/ppi/deepsampler/junit/json/LoadSamples.java#L32)
-      and [@SaveSamples](deepsampler-junit-json/src/main/java/de/ppi/deepsampler/junit/json/SaveSamples.java#L34) are examples that are
-      used for JSON-samples. These annotations must itself be annotated with the meta-annotations [@UseSourceManagerForLoading](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForLoading.java)
-      and respectively [@UseSourceManagerForSaving](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForSaving.java) to
-      tell DeepSampler, that these annotations are commands for loading and saving samples. Both meta-annotations bind the `SourceManagerFactory` 
-      to the persistence-process.
+Loading samples is implemented very similar. The mentioned interfaces define methods for loading and saving samples. 
+The annotation, that commands DeepSampler to load samples, is marked by the meta annotation 
+[@UseSourceManagerForLoading](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/UseSourceManagerForLoading.java)
 
-
+We recommend placing the extension in two modules:
+   1. `persistence-module`: This module contains all code that is related to saving and loading samples independent of 
+      JUnit. It should be possible to use the persistence without annotations or JUnit. 
+      The [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java)
+      -implementation and all it's utilities belong to this module.
+   2. `junit-configuraiton-modul`: A module that contains all code, that is necessary to use the `SourceManager` in 
+      JUnit-tests together with annotation-based-configuration. The custom-annotations like `@SaveYamlSamples` and 
+      the [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java)
+      -implementation belong to this module.
+  
 
 # License
 DeepSampler is made available under the terms of the __MIT License__ (see [LICENSE.md](./LICENSE.md)).
