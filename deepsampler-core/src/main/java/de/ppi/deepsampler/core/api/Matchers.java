@@ -81,6 +81,15 @@ public class Matchers {
     }
 
     /**
+     * Accepts any long as parameter.
+     * @return a matcher that accepts any long parameter
+     */
+    public static long anyLong() {
+        SampleRepository.getInstance().addCurrentParameterMatchers(parameter -> true);
+        return 42L;
+    }
+
+    /**
      * Accepts any double as parameter.
      * @return a matcher that accepts any double parameter
      */

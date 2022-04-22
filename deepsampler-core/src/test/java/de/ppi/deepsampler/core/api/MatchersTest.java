@@ -5,19 +5,34 @@
 
 package de.ppi.deepsampler.core.api;
 
+import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.InvalidMatcherConfigException;
 import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
-import de.ppi.deepsampler.core.error.InvalidConfigException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Objects;
 
-import static de.ppi.deepsampler.core.api.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static de.ppi.deepsampler.core.api.Matchers.EqualsMatcher;
+import static de.ppi.deepsampler.core.api.Matchers.any;
+import static de.ppi.deepsampler.core.api.Matchers.anyBoolean;
+import static de.ppi.deepsampler.core.api.Matchers.anyByte;
+import static de.ppi.deepsampler.core.api.Matchers.anyChar;
+import static de.ppi.deepsampler.core.api.Matchers.anyDouble;
+import static de.ppi.deepsampler.core.api.Matchers.anyFloat;
+import static de.ppi.deepsampler.core.api.Matchers.anyInt;
+import static de.ppi.deepsampler.core.api.Matchers.anyLong;
+import static de.ppi.deepsampler.core.api.Matchers.anyShort;
+import static de.ppi.deepsampler.core.api.Matchers.anyString;
+import static de.ppi.deepsampler.core.api.Matchers.equalTo;
+import static de.ppi.deepsampler.core.api.Matchers.sameAs;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MatchersTest {
 
@@ -77,6 +92,9 @@ class MatchersTest {
         assertAnyParameterMayAppear(0, 3.1415f, 3f);
 
         Sample.of(testServiceSampler.echoInt(anyInt())).is(42);
+        assertAnyParameterMayAppear(0, 1, 2);
+
+        Sample.of(testServiceSampler.echoLong(anyLong())).is(42L);
         assertAnyParameterMayAppear(0, 1, 2);
 
         Sample.of(testServiceSampler.echoShort(anyShort())).is((short) 1);
@@ -254,6 +272,10 @@ class MatchersTest {
             return someInt;
         }
 
+        long echoLong(final long someLong) {
+            return someLong;
+        }
+
         double echoDouble(final double someDouble) {
             return someDouble;
         }
@@ -274,7 +296,7 @@ class MatchersTest {
             return someByte;
         }
 
-        String echoString(String string) {
+        String echoString(final String string) {
             return string;
         }
 
@@ -300,10 +322,10 @@ class MatchersTest {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Bean bean = (Bean) o;
+            final Bean bean = (Bean) o;
             return someInt == bean.someInt &&
                     Objects.equals(someString, bean.someString);
         }
@@ -320,7 +342,7 @@ class MatchersTest {
 
     static class BeanWithInheritedEquals extends Bean {
 
-        BeanWithInheritedEquals(String someString, int someInt) {
+        BeanWithInheritedEquals(final String someString, final int someInt) {
             super(someString, someInt);
         }
     }
