@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 public class NoMatchingParametersFoundException extends BaseException {
 
-    public NoMatchingParametersFoundException(SampledMethod unmatchedMethod, Object[] args) {
+    public NoMatchingParametersFoundException(final SampledMethod unmatchedMethod, final Object[] args) {
         super("The method %s should be stubbed, but it has been called with unexpected parameters: %s" +
                         "Either the SampleDefinition (e.g. %s) defines wrong parameters, " +
                         "or the tested compound has changed.",
@@ -30,21 +30,38 @@ public class NoMatchingParametersFoundException extends BaseException {
                 formatExampleSampler(unmatchedMethod));
     }
 
-    public NoMatchingParametersFoundException(List<SampleDefinition> sampleDefinitions) {
-        super("The method %s should be stubbed, but it has been called with unexpected parameters: %s" +
+    public NoMatchingParametersFoundException(final List<SampleDefinition> unresolvedSampleDefinitions) {
+        super("The method %s shall be stubbed, but it has been called with unexpected parameters: %s" +
                         "Either the SampleDefinition (e.g. %s) defines wrong parameters, " +
-                        "or the tested compound has changed.\"" +
-                        "There are %d further issues.",
-                sampleDefinitions.get(0).getSampledMethod().getMethod().toString(),
-                formatArgs(sampleDefinitions.get(0).getParameterValues().toArray()),
-                formatExampleSampler(sampleDefinitions.get(0).getSampledMethod()),
-                sampleDefinitions.size() - 1);
+                        "or the tested compound has changed. " +
+                        "%s",
+                unresolvedSampleDefinitions.get(0).getSampledMethod().getMethod().toString(),
+                formatArgs(unresolvedSampleDefinitions.get(0).getParameterValues().toArray()),
+                formatExampleSampler(unresolvedSampleDefinitions.get(0).getSampledMethod()),
+                formatNumberOfUnexpectedMethodCalls(unresolvedSampleDefinitions));
     }
 
-    private static String formatArgs(Object[] args) {
-        StringBuilder argsFormatted = new StringBuilder("\n");
+    /**
+     * A great number of method calls with unmatched parameters can often be found, if a compound has been changed. To
+     * give developers a feeling of how many refactoring work needs to be done, the number ob further unresolved
+     * {@link SampleDefinition}s is added to an Exception-message.
+     *
+     * @param unresolvedSampleDefinitions List of {@link SampleDefinition}s, which have unmatched parameters.
+     * @return A formatted message containing the count of unresolved method-calls.
+     */
+    private static String formatNumberOfUnexpectedMethodCalls(final List<SampleDefinition> unresolvedSampleDefinitions) {
+        final int rest = unresolvedSampleDefinitions.size() - 1;
+        switch (rest) {
+            case 0 : return "";
+            case 1 : return "There is one further method call with unmatched parameters.";
+            default: return "There are " + rest + " further method calls with unmatched parameters";
+        }
+    }
 
-        for (Object arg : args) {
+    private static String formatArgs(final Object[] args) {
+        final StringBuilder argsFormatted = new StringBuilder("\n");
+
+        for (final Object arg : args) {
             argsFormatted.append("\t");
             argsFormatted.append(arg != null ? arg.toString() : "null");
             argsFormatted.append("\n");
@@ -53,14 +70,14 @@ public class NoMatchingParametersFoundException extends BaseException {
         return argsFormatted.toString();
     }
 
-    private static String formatExampleSampler(SampledMethod unmatchedMethod) {
+    private static String formatExampleSampler(final SampledMethod unmatchedMethod) {
         return String.format("Sampler.of(%s#%s(%s))",
                 unmatchedMethod.getTarget().getSimpleName(),
                 unmatchedMethod.getMethod().getName(),
                 formatParameters(unmatchedMethod)) ;
     }
 
-    private static String formatParameters(SampledMethod unmatchedMethod) {
+    private static String formatParameters(final SampledMethod unmatchedMethod) {
         return Arrays.stream(unmatchedMethod.getMethod().getParameterTypes())
                 .map(Class::getSimpleName)
                 .collect(Collectors.joining(", "));
