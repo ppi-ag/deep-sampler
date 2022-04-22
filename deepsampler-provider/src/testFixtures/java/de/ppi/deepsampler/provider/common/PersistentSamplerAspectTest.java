@@ -774,7 +774,9 @@ public abstract class PersistentSamplerAspectTest {
         assertThatExceptionOfType(InvalidConfigException.class)
                 .isThrownBy(() -> testService.echoParameter(new TestBeanWithoutEquals()))
                 .withMessage("The class de.ppi.deepsampler.provider.common.TestBeanWithoutEquals must implement equals() " +
-                        "if you want to use an de.ppi.deepsampler.core.api.Matchers$EqualsMatcher");
+                        "if you want to use an de.ppi.deepsampler.core.api.Matchers$EqualsMatcher. Alternatively, you " +
+                        "can define a custom matcher, that does not use equals(). This can be done with " +
+                        "Matchers.matcher(...), or PersistentMatchers.anyRecorded(PersistentMatcher<T>)");
     }
 
     @Test
