@@ -30,7 +30,7 @@ public class MatcherTools {
         }
 
         try {
-            Method equals = object.getClass().getMethod("equals", Object.class);
+            final Method equals = object.getClass().getMethod("equals", Object.class);
 
             if (equals.getDeclaringClass().equals(Object.class)) {
                 complainAboutMissingEqualsMethod(object);
@@ -40,8 +40,10 @@ public class MatcherTools {
         }
     }
 
-    private static void complainAboutMissingEqualsMethod(Object object) {
-        throw new InvalidConfigException("The class %s must implement equals() if you want to use an %s",
+    private static void complainAboutMissingEqualsMethod(final Object object) {
+        throw new InvalidConfigException("The class %s must implement equals() if you want to use an %s. Alternatively, you can " +
+                "define a custom matcher, that does not use equals(). This can be done with Matchers.matcher(...), " +
+                "or PersistentMatchers.anyRecorded(PersistentMatcher<T>)",
                 object.getClass().getName(),
                 Matchers.EqualsMatcher.class.getName());
     }
