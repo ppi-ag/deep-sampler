@@ -19,7 +19,7 @@ import de.ppi.deepsampler.persistence.model.PersistentMethodCall;
 import de.ppi.deepsampler.persistence.model.PersistentModel;
 import de.ppi.deepsampler.persistence.model.PersistentParameter;
 import de.ppi.deepsampler.persistence.model.PersistentSampleMethod;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -113,7 +113,8 @@ class PersistentSampleManagerTest {
         final PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.call(anyRecorded((a, b) -> a.someString.equals(b.someString)), anyRecorded(Objects::equals))).hasId("SampleId");
+        PersistentSample.of(testServiceSampler.call(anyRecorded((a, b) -> a.someString.equals(b.someString)), anyRecorded(Objects::equals)))
+                .hasId("SampleId");
 
         // WHEN
         persistentSampleManager.load();
@@ -123,6 +124,7 @@ class PersistentSampleManagerTest {
 
         assertFalse(SampleRepository.getInstance().isEmpty());
 
+        assertEquals(1, SampleRepository.getInstance().getSamples().size());
         assertEquals("SampleId", actualCall.getSampleId());
         assertEquals(TestService.class.getDeclaredMethod("call", TestBean.class, Integer.class), actualCall.getSampledMethod().getMethod());
         assertEquals(TestService.class, actualCall.getSampledMethod().getTarget());
@@ -316,7 +318,7 @@ class PersistentSampleManagerTest {
         assertFalse(SampleRepository.getInstance().getSamples().get(0).getParameterMatcherAs(1, Integer.class).matches(2));
     }
 
-    @AfterEach
+    @BeforeEach
     void clean() {
         SampleRepository.getInstance().clear();
     }
