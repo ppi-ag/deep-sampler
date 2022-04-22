@@ -237,8 +237,6 @@ public class PersistentMatchers {
      */
     @SuppressWarnings("unchecked")
     public static <T> T combo(final T recordingMatcher, final PersistentMatcher<T> playingMatcher) {
-        Objects.requireNonNull(recordingMatcher, "recordingMatcher must not be null.");
-
         if (SampleRepository.getInstance().getCurrentParameterMatchers().isEmpty()) {
             throw new PersistenceException("It wasn't possible to retrieve the last ParameterMatcher. Did you passed a ParameterMatcher created with a static factory method in de.ppi.deepsampler.core.api.Matchers?");
         }
