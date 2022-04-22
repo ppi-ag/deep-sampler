@@ -12,7 +12,6 @@ import de.ppi.deepsampler.core.api.Sampler;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.NoMatchingParametersFoundException;
 import de.ppi.deepsampler.core.model.SampleRepository;
-import de.ppi.deepsampler.persistence.api.PersistentMatchers;
 import de.ppi.deepsampler.persistence.api.PersistentSampleManager;
 import de.ppi.deepsampler.persistence.api.PersistentSampler;
 import de.ppi.deepsampler.persistence.error.PersistenceException;
@@ -28,10 +27,11 @@ import java.time.LocalDateTime;
 
 import static de.ppi.deepsampler.core.api.FixedQuantity.ONCE;
 import static de.ppi.deepsampler.core.api.Matchers.any;
-import static de.ppi.deepsampler.core.api.Matchers.anyInt;
 import static de.ppi.deepsampler.core.api.Matchers.anyString;
 import static de.ppi.deepsampler.core.api.Matchers.equalTo;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecorded;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecordedInt;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecordedString;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -79,8 +79,8 @@ public abstract class PersistentSamplerAspectTest {
     @Test
     public void samplesCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.echoParameter(PersistentMatchers.anyRecordedString()));
-        PersistentSample.of(testServiceSampler.echoParameter(PersistentMatchers.anyRecorded(TestBean.class)));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString()));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecorded(TestBean.class)));
 
         getTestService().echoParameter(VALUE_A);
         getTestService().echoParameter(TEST_BEAN_A);
@@ -89,8 +89,8 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.echoParameter(PersistentMatchers.anyRecordedString()));
-        PersistentSample.of(testServiceSampler.echoParameter(PersistentMatchers.anyRecorded(TestBean.class)));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString()));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecorded(TestBean.class)));
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -105,7 +105,7 @@ public abstract class PersistentSamplerAspectTest {
     @Test
     public void voidMethodsCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyInt());
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyRecordedInt());
 
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
@@ -114,7 +114,7 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyInt());
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyRecordedInt());
         source.load();
 
         getTestService().noReturnValue(2);
@@ -160,7 +160,7 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // WHEN
-        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(anyRecorded()));
         source.load();
 
         // THEN
@@ -189,7 +189,7 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // WHEN
-        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(anyRecorded(RecTestBean.class)));
         source.load();
 
         // THEN
@@ -469,7 +469,7 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.getRandom(VALUE_A));
+        PersistentSample.of(testServiceSampler.getRandom(anyRecordedString()));
         Sample.of(testServiceSampler.getRandom(anyString())).callsOriginalMethod();
         source.load();
 
@@ -488,22 +488,21 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.echoParameter("ABC")).hasId("MY WRONG ECHO PARAMS");
-        assertThrows(PersistenceException.class,
-                source::load);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId("MY WRONG ECHO PARAMS");
+        assertThrows(PersistenceException.class, source::load);
     }
 
     @Test
     public void manualIdSetForRecordingAndLoadingCorrectDef(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId(MY_ECHO_PARAMS);
 
         getTestService().echoParameter("ABC");
         final PersistentSampleManager source = save(tempFile);
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId(MY_ECHO_PARAMS);
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -522,7 +521,7 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.forVerification(testServiceSampler).noReturnValue(2);
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyRecordedInt());
         PersistentSample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
         source.load();
         getTestService().noReturnValue(2);
@@ -554,7 +553,7 @@ public abstract class PersistentSamplerAspectTest {
     public void enumInParameterCanBeRecordedAndLoaded(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(any(Ship.class)));
+        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(anyRecorded(Ship.class)));
 
         getTestService().getShipsRegistrationFromEnum(Ship.ENTERPRISE);
 
@@ -563,7 +562,7 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // 🧪 WHEN
-        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(any(Ship.class)));
+        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(anyRecorded(Ship.class)));
         source.load();
         // 🔬 THEN
         assertThrows(NoMatchingParametersFoundException.class, ()-> getTestService().getShipsRegistrationFromEnum(Ship.DEFIANT));
@@ -683,7 +682,7 @@ public abstract class PersistentSamplerAspectTest {
     void testPersistentMatcherLoadAllButAcceptOnlyA(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.echoParameter(anyString())).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId(MY_ECHO_PARAMS);
 
         getTestService().echoParameter("ABC");
 
@@ -733,7 +732,8 @@ public abstract class PersistentSamplerAspectTest {
     void testPersistentMatcherSecondArgument(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyRecordedString(), anyRecordedString(), anyRecordedString()))
+                .hasId(MY_ECHO_PARAMS);
 
         getTestService().methodWithThreeParametersReturningLast(BLOCK, "B", "R1");
         getTestService().methodWithThreeParametersReturningLast(BLOCK, "C", "R3");
@@ -741,7 +741,8 @@ public abstract class PersistentSamplerAspectTest {
         final PersistentSampleManager source = save(tempFile);
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo(BLOCK), anyRecorded((f, s) -> f.equals("B")), anyRecorded((f, s) -> true))).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo(BLOCK), anyRecorded((f, s) -> f.equals("B")), anyRecorded((f, s) -> true)))
+                .hasId(MY_ECHO_PARAMS);
         source.load();
 
         // WHEN
@@ -781,14 +782,14 @@ public abstract class PersistentSamplerAspectTest {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
+        PersistentSample.of(testServiceSampler.getRandomByteArray(anyRecordedInt()));
 
         final byte[] expectedArray = getTestService().getRandomByteArray(42);
 
         final PersistentSampleManager source = save(tempFile);
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
+        PersistentSample.of(testServiceSampler.getRandomByteArray(anyRecordedInt()));
 
         source.load();
 
