@@ -206,12 +206,13 @@ can save and load Samples from JSON-files.
 In order to save Samples in a JSON-file, we __first__ need to define which methods should be stubbed and which methods should be recorded.
 This is - again - done using `SamplerFixture`s. In contrast to the example above, we now need to define the Sampler slightly different:
 ```
-     👇                                                              👇
-PersistentSample.of(personDaoSampler.loadPerson(Matchers.anyInt()))     ;
+     👇                                                              👇               👇
+PersistentSample.of(personDaoSampler.loadPerson(PersistentMatchers.anyRecordedInt()))   ;
 ```
 
 Persistent Samples are defined using `PersistentSample` and we don't need to define a concrete Sample using `is()` anymore, since this value
-will be provided by the JSON-File.
+will be provided by the JSON-File. Additionally, we can now use special parameter matchers for persistent samples. These new matchers honor the fact, that
+we now want to match any parameters that have been recorded, instead of explicitlty hard-coded parameter values.
 __Second__ we need to tell DeepSampler to record all Data, that flows through the stubbed methods. This is simply done by adding the annotation
 `@SaveSamples` to the test method. 
 
