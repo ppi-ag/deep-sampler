@@ -235,7 +235,7 @@ public class PersistentMatchers {
      * @param <T>              type to compare/match
      * @return always returns null
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     public static <T> T combo(final T recordingMatcher, final PersistentMatcher<T> playingMatcher) {
         if (SampleRepository.getInstance().getCurrentParameterMatchers().isEmpty()) {
             throw new PersistenceException("It wasn't possible to retrieve the last ParameterMatcher. Did you passed a ParameterMatcher created with a static factory method in de.ppi.deepsampler.core.api.Matchers?");

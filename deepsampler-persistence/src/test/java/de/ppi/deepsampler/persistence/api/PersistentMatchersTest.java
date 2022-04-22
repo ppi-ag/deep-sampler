@@ -79,7 +79,9 @@ class PersistentMatchersTest {
 
         final ComboMatcher<BeanWithoutEquals> matcher = (ComboMatcher<BeanWithoutEquals>) parameter.get(0);
 
-        assertThrows(InvalidConfigException.class, () -> matcher.getPersistentMatcher().matches(new BeanWithoutEquals(), new BeanWithoutEquals()));
+        final PersistentMatcher<BeanWithoutEquals> persistentMatcher = matcher.getPersistentMatcher();
+        final BeanWithoutEquals beanWithoutEquals = new BeanWithoutEquals();
+        assertThrows(InvalidConfigException.class, () -> persistentMatcher.matches(beanWithoutEquals, beanWithoutEquals));
     }
 
 
