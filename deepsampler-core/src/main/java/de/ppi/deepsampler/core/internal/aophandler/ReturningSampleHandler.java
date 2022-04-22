@@ -5,7 +5,6 @@
 
 package de.ppi.deepsampler.core.internal.aophandler;
 
-import javassist.util.proxy.MethodHandler;
 import de.ppi.deepsampler.core.api.Matchers;
 import de.ppi.deepsampler.core.error.InvalidConfigException;
 import de.ppi.deepsampler.core.error.InvalidMatcherConfigException;
@@ -13,6 +12,7 @@ import de.ppi.deepsampler.core.model.ParameterMatcher;
 import de.ppi.deepsampler.core.model.SampleDefinition;
 import de.ppi.deepsampler.core.model.SampleRepository;
 import de.ppi.deepsampler.core.model.SampledMethod;
+import javassist.util.proxy.MethodHandler;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public abstract class ReturningSampleHandler implements MethodHandler {
 
     protected SampleDefinition createSampleDefinition(final Class<?> cls, final Method method, final Object[] args) {
-        List<ParameterMatcher<?>> parameterMatchers = collectMatchersForParameters(method, args);
+        final List<ParameterMatcher<?>> parameterMatchers = collectMatchersForParameters(method, args);
 
         final SampledMethod sampledMethod = new SampledMethod(cls, method);
         final SampleDefinition sampleDefinition = new SampleDefinition(sampledMethod);
@@ -54,6 +54,8 @@ public abstract class ReturningSampleHandler implements MethodHandler {
     private Object createEmptyPrimitive(final Class<?> cls) {
         if (cls.isAssignableFrom(int.class)) {
             return Integer.valueOf(0);
+        } else if (cls.isAssignableFrom(long.class)) {
+            return Long.valueOf(0);
         } else if (cls.isAssignableFrom(double.class)) {
             return Double.valueOf(0.0);
         } else if (cls.isAssignableFrom(float.class)) {
@@ -73,7 +75,7 @@ public abstract class ReturningSampleHandler implements MethodHandler {
         throw new InvalidConfigException("The unknown primitive '" + cls + "' appeared");
     }
 
-    private List<ParameterMatcher<?>> collectMatchersForParameters(Method method, Object[] parameters) {
+    private List<ParameterMatcher<?>> collectMatchersForParameters(final Method method, final Object[] parameters) {
         List<ParameterMatcher<?>> currentParameterMatchers = SampleRepository.getInstance().getCurrentParameterMatchers();
 
         SampleRepository.getInstance().clearCurrentParameterMatchers();

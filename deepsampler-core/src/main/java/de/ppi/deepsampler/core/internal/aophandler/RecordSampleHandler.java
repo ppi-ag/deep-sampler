@@ -12,10 +12,10 @@ import java.lang.reflect.Method;
 
 /**
  * A {@link javassist.util.proxy.MethodHandler} that taps into method calls and adds each method call as a {@link SampleDefinition}
- * to the {@link SampleRepository}. This is trick how DeepSampler is able to define the stubbed methods by calling the methods
+ * to the {@link SampleRepository}. This is a trick that enables DeepSampler to define the stubbed methods by calling the methods
  * that should be stubbed. (@see {@link de.ppi.deepsampler.core.api.Sampler}).
  *
- * Methods of the class {@link Object} are ignored. Otherwise strange effects might appear, e.g. if Object::finalize is
+ * Methods of the class {@link Object} are ignored. Otherwise, strange effects might appear, e.g. if Object::finalize is
  * called by the garbage collector.
  */
 public class RecordSampleHandler extends ReturningSampleHandler {

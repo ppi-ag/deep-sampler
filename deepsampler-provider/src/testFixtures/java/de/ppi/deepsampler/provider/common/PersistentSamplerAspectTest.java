@@ -27,9 +27,11 @@ import java.time.LocalDateTime;
 
 import static de.ppi.deepsampler.core.api.FixedQuantity.ONCE;
 import static de.ppi.deepsampler.core.api.Matchers.any;
-import static de.ppi.deepsampler.core.api.Matchers.anyInt;
 import static de.ppi.deepsampler.core.api.Matchers.anyString;
 import static de.ppi.deepsampler.core.api.Matchers.equalTo;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecorded;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecordedInt;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecordedString;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -75,10 +77,10 @@ public abstract class PersistentSamplerAspectTest {
 
 
     @Test
-    public void samplesCanBeRecordedAndLoaded(Path tempFile) {
+    public void samplesCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.echoParameter(VALUE_A));
-        PersistentSample.of(testServiceSampler.echoParameter(TEST_BEAN_A));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString()));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecorded(TestBean.class)));
 
         getTestService().echoParameter(VALUE_A);
         getTestService().echoParameter(TEST_BEAN_A);
@@ -87,21 +89,23 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.echoParameter(VALUE_A));
-        PersistentSample.of(testServiceSampler.echoParameter(TEST_BEAN_A));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString()));
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecorded(TestBean.class)));
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
         assertNotNull(getTestService().echoParameter(VALUE_A));
         assertNotNull(getTestService().echoParameter(TEST_BEAN_A));
         assertEquals(VALUE_A, getTestService().echoParameter(VALUE_A));
+
+        assertThrows(NoMatchingParametersFoundException.class, () -> getTestService().echoParameter(VALUE_B));
     }
 
 
     @Test
-    public void voidMethodsCanBeRecordedAndLoaded(Path tempFile) {
+    public void voidMethodsCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyInt());
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyRecordedInt());
 
         getTestService().noReturnValue(2);
         getTestService().noReturnValue(3);
@@ -110,7 +114,7 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyInt());
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyRecordedInt());
         source.load();
 
         getTestService().noReturnValue(2);
@@ -121,7 +125,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void nullSampleCanBeRecordedAndLoaded(Path tempFile) {
+    public void nullSampleCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getNull());
@@ -137,44 +141,44 @@ public abstract class PersistentSamplerAspectTest {
         source.load();
         assertFalse(SampleRepository.getInstance().isEmpty());
 
-        String actualValue = getTestService().getNull();
+        final String actualValue = getTestService().getNull();
 
         // THEN
         assertNull(actualValue);
     }
 
     @Test
-    public void sqlDateCanBeRecordedAndLoaded(Path tempFile) {
+    public void sqlDateCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
 
-        Date expectedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        final Date expectedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
 
         final PersistentSampleManager source = save(tempFile);
 
         clearSampleRepositoryWithAssertion();
 
         // WHEN
-        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(anyRecorded()));
         source.load();
 
         // THEN
         assertFalse(SampleRepository.getInstance().isEmpty());
 
-        Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        final Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
         assertEquals(expectedDate, stubbedDate);
 
         assertThat(tempFile).content().containsPattern("\"returnValue\" : \\[ \"java.sql.Date\", [0-9]+ \\]");
     }
 
     @Test
-    public void sqlDateCanBeRecordedAndLoadedWithBeanConverter(Path tempFile) {
+    public void sqlDateCanBeRecordedAndLoadedWithBeanConverter(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
 
-        Date expectedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        final Date expectedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
 
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder()
                 .buildWithFile(tempFile))
@@ -185,20 +189,20 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // WHEN
-        PersistentSample.of(testServiceSampler.testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C')));
+        PersistentSample.of(testServiceSampler.testRandomSqlDate(anyRecorded(RecTestBean.class)));
         source.load();
 
         // THEN
         assertFalse(SampleRepository.getInstance().isEmpty());
 
-        Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
+        final Date stubbedDate = getTestService().testRandomSqlDate(new RecTestBean(new RecTestBean(null, "A", 'C'), "B", 'C'));
         assertEquals(expectedDate.toString(), stubbedDate.toString());
 
         assertThat(tempFile).content().containsPattern("\"returnValue\" : \"[0-9]{2}.[0-9]{2}.[0-9]{4}");
     }
 
     @Test
-    public void listOfTestBeansReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void listOfTestBeansReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getListOfTestBeans());
 
@@ -216,7 +220,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void customListWithoutGenericsIsNotAllowed(Path tempFile) {
+    public void customListWithoutGenericsIsNotAllowed(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getCustomListOfTestBeans());
 
@@ -232,7 +236,7 @@ public abstract class PersistentSamplerAspectTest {
 
 
     @Test
-    public void listOfStringsReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void listOfStringsReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getListOfStrings());
 
@@ -249,7 +253,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void setOfStringsReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void setOfStringsReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getSetOfStrings());
 
@@ -267,7 +271,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void setOfTestBeansReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void setOfTestBeansReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getSetOfTestBeans());
@@ -292,7 +296,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void arrayOfTestBeansReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void arrayOfTestBeansReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getArrayOfTestBeans());
 
@@ -310,7 +314,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void arrayOfStringsReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void arrayOfStringsReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getArrayOfStrings());
 
@@ -328,7 +332,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    void multidimensionalArrayOfStringsCanBeRecordedAndLoaded(Path tempFile) {
+    void multidimensionalArrayOfStringsCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getArrayOfStrings2d());
 
@@ -343,7 +347,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        String[][] result = getTestService().getArrayOfStrings2d();
+        final String[][] result = getTestService().getArrayOfStrings2d();
 
         // THEN
         assertEquals(1, result.length);
@@ -352,7 +356,7 @@ public abstract class PersistentSamplerAspectTest {
 
 
     @Test
-    void multidimensionalArrayOfTestBeansCanBeRecordedAndLoaded(Path tempFile) {
+    void multidimensionalArrayOfTestBeansCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getArrayOfTestBeans3d());
 
@@ -367,7 +371,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        TestBean[][][] result = getTestService().getArrayOfTestBeans3d();
+        final TestBean[][][] result = getTestService().getArrayOfTestBeans3d();
 
         // THEN
         assertEquals(1, result.length);
@@ -377,7 +381,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void mapOfStringsReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void mapOfStringsReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getMapOfStrings());
 
@@ -395,7 +399,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void mapOfStringsToTestBeansReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void mapOfStringsToTestBeansReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getMapOfStringsToTestBeans());
 
@@ -411,12 +415,12 @@ public abstract class PersistentSamplerAspectTest {
         assertEquals(1, getTestService().getMapOfStringsToTestBeans().size());
         assertNotNull(getTestService().getMapOfStringsToTestBeans().get(TestService.HARD_CODED_RETURN_VALUE));
 
-        TestBean loadedTestBean = getTestService().getMapOfStringsToTestBeans().get(TestService.HARD_CODED_RETURN_VALUE);
+        final TestBean loadedTestBean = getTestService().getMapOfStringsToTestBeans().get(TestService.HARD_CODED_RETURN_VALUE);
         assertEquals(TestService.HARD_CODED_RETURN_VALUE, loadedTestBean.getValue());
     }
 
     @Test
-    public void mapOfIntegersReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void mapOfIntegersReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getMapOfIntegers());
 
@@ -434,7 +438,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void optionalValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void optionalValueCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getOptionalValue()).hasId("getOptionalValue");
 
@@ -455,17 +459,17 @@ public abstract class PersistentSamplerAspectTest {
 
 
     @Test
-    public void callsWithNotMatchingParametersAreRoutedToOriginalMethod(Path tempFile) {
+    public void callsWithNotMatchingParametersAreRoutedToOriginalMethod(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getRandom(VALUE_A));
 
-        String hopefullyRecordedValue = getTestService().getRandom(VALUE_A);
+        final String hopefullyRecordedValue = getTestService().getRandom(VALUE_A);
 
         final PersistentSampleManager source = save(tempFile);
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.getRandom(VALUE_A));
+        PersistentSample.of(testServiceSampler.getRandom(anyRecordedString()));
         Sample.of(testServiceSampler.getRandom(anyString())).callsOriginalMethod();
         source.load();
 
@@ -475,7 +479,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void manualIdSetForRecordingAndLoadingNoCorrectDef(Path tempFile) {
+    public void manualIdSetForRecordingAndLoadingNoCorrectDef(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
 
@@ -484,22 +488,21 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.echoParameter("ABC")).hasId("MY WRONG ECHO PARAMS");
-        assertThrows(PersistenceException.class,
-                source::load);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId("MY WRONG ECHO PARAMS");
+        assertThrows(PersistenceException.class, source::load);
     }
 
     @Test
-    public void manualIdSetForRecordingAndLoadingCorrectDef(Path tempFile) {
+    public void manualIdSetForRecordingAndLoadingCorrectDef(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId(MY_ECHO_PARAMS);
 
         getTestService().echoParameter("ABC");
         final PersistentSampleManager source = save(tempFile);
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.echoParameter("ABC")).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId(MY_ECHO_PARAMS);
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
@@ -507,7 +510,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void manualIdSetForRecordingAndLoadingCorrectDefVoidMethod(Path tempFile) {
+    public void manualIdSetForRecordingAndLoadingCorrectDefVoidMethod(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.forVerification(testServiceSampler).noReturnValue(2);
         PersistentSample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
@@ -518,7 +521,7 @@ public abstract class PersistentSamplerAspectTest {
 
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.forVerification(testServiceSampler).noReturnValue(2);
+        PersistentSample.forVerification(testServiceSampler).noReturnValue(anyRecordedInt());
         PersistentSample.setIdToLastMethodCall(NO_RETURN_VALUE_SAMPLE_ID);
         source.load();
         getTestService().noReturnValue(2);
@@ -529,7 +532,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void localDateTimeCanBeRecordedAndLoaded(Path tempFile) {
+    public void localDateTimeCanBeRecordedAndLoaded(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.testLocalDateTime());
 
@@ -547,10 +550,10 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void enumInParameterCanBeRecordedAndLoaded(Path tempFile) {
+    public void enumInParameterCanBeRecordedAndLoaded(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(any(Ship.class)));
+        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(anyRecorded(Ship.class)));
 
         getTestService().getShipsRegistrationFromEnum(Ship.ENTERPRISE);
 
@@ -559,17 +562,17 @@ public abstract class PersistentSamplerAspectTest {
         clearSampleRepositoryWithAssertion();
 
         // 🧪 WHEN
-        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(any(Ship.class)));
+        PersistentSample.of(testServiceSampler.getShipsRegistrationFromEnum(anyRecorded(Ship.class)));
         source.load();
         // 🔬 THEN
         assertThrows(NoMatchingParametersFoundException.class, ()-> getTestService().getShipsRegistrationFromEnum(Ship.DEFIANT));
-        String actualRegistration = getTestService().getShipsRegistrationFromEnum(Ship.ENTERPRISE);
+        final String actualRegistration = getTestService().getShipsRegistrationFromEnum(Ship.ENTERPRISE);
         assertEquals(Ship.ENTERPRISE.getRegistration(), actualRegistration);
     }
 
 
     @Test
-    public void enumInReturnValueCanBeRecordedAndLoaded(Path tempFile) {
+    public void enumInReturnValueCanBeRecordedAndLoaded(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getShipEnum());
@@ -590,7 +593,7 @@ public abstract class PersistentSamplerAspectTest {
         final Ship notShip = Ship.DEFIANT;
         getTestService().setShipEnum(notShip);
 
-        Ship actualShip = getTestService().getShipEnum();
+        final Ship actualShip = getTestService().getShipEnum();
 
         // 🔬 THEN
         assertEquals(recordedShip, actualShip);
@@ -598,7 +601,7 @@ public abstract class PersistentSamplerAspectTest {
 
 
     @Test
-    public void enumInBeanCanBeRecordedAndLoaded(Path tempFile) {
+    public void enumInBeanCanBeRecordedAndLoaded(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getBeanWithShipEnum());
@@ -619,7 +622,7 @@ public abstract class PersistentSamplerAspectTest {
         final Ship notShip = Ship.DEFIANT;
         getTestService().setShipEnum(notShip);
 
-        TestBeanWithEnum actualBeanWithShipEnum = getTestService().getBeanWithShipEnum();
+        final TestBeanWithEnum actualBeanWithShipEnum = getTestService().getBeanWithShipEnum();
 
         // 🔬 THEN
         assertEquals(recordedShip, actualBeanWithShipEnum.getShip());
@@ -627,7 +630,7 @@ public abstract class PersistentSamplerAspectTest {
 
 
     @Test
-    public void enumWithDefaultConstructorCanBeRecordedAndLoaded(Path tempFile) {
+    public void enumWithDefaultConstructorCanBeRecordedAndLoaded(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getEnumWithDefaultConstructor());
@@ -642,7 +645,7 @@ public abstract class PersistentSamplerAspectTest {
         PersistentSample.of(testServiceSampler.getEnumWithDefaultConstructor());
         source.load();
 
-        RetentionPolicy actualEnum = getTestService().getEnumWithDefaultConstructor();
+        final RetentionPolicy actualEnum = getTestService().getEnumWithDefaultConstructor();
 
         // 🔬 THEN
         assertEquals(RetentionPolicy.CLASS, actualEnum);
@@ -650,7 +653,7 @@ public abstract class PersistentSamplerAspectTest {
 
 
     @Test
-    void testComboMatcherLoadAllButAcceptOnlyA(Path tempFile) {
+    void testComboMatcherLoadAllButAcceptOnlyA(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.echoParameter(anyString())).hasId(MY_ECHO_PARAMS);
@@ -666,8 +669,8 @@ public abstract class PersistentSamplerAspectTest {
 
         // 🧪 WHEN
         final TestService testService = getTestService();
-        String result = testService.echoParameter("A");
-        String secondCallResult = testService.echoParameter("A");
+        final String result = testService.echoParameter("A");
+        final String secondCallResult = testService.echoParameter("A");
 
         // 🔬 THEN
         assertEquals("ABC", result);
@@ -676,7 +679,33 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    void testComboMatcherSecondArgument(Path tempFile) {
+    void testPersistentMatcherLoadAllButAcceptOnlyA(final Path tempFile) {
+        // 👉 GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.echoParameter(anyRecordedString())).hasId(MY_ECHO_PARAMS);
+
+        getTestService().echoParameter("ABC");
+
+        final PersistentSampleManager source = save(tempFile);
+        clearSampleRepositoryWithAssertion();
+
+        PersistentSample.of(testServiceSampler.echoParameter((String) anyRecorded((f, s) -> f.equals("A")))).hasId(MY_ECHO_PARAMS);
+
+        source.load();
+
+        // 🧪 WHEN
+        final TestService testService = getTestService();
+        final String result = testService.echoParameter("A");
+        final String secondCallResult = testService.echoParameter("A");
+
+        // 🔬 THEN
+        assertEquals("ABC", result);
+        assertEquals("ABC", secondCallResult);
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter("B"));
+    }
+
+    @Test
+    void testComboMatcherSecondArgument(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
@@ -692,7 +721,7 @@ public abstract class PersistentSamplerAspectTest {
 
         // WHEN
         final TestService testService = getTestService();
-        String result = testService.methodWithThreeParametersReturningLast(BLOCK, "B", "ABC2");
+        final String result = testService.methodWithThreeParametersReturningLast(BLOCK, "B", "ABC2");
 
         // THEN
         assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast(BLOCK, "C", "ABC1"));
@@ -700,7 +729,33 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void equalsMatcherComplainsWhenParameterHasNoEqualsMethod(Path tempFile) {
+    void testPersistentMatcherSecondArgument(final Path tempFile) {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyRecordedString(), anyRecordedString(), anyRecordedString()))
+                .hasId(MY_ECHO_PARAMS);
+
+        getTestService().methodWithThreeParametersReturningLast(BLOCK, "B", "R1");
+        getTestService().methodWithThreeParametersReturningLast(BLOCK, "C", "R3");
+
+        final PersistentSampleManager source = save(tempFile);
+        clearSampleRepositoryWithAssertion();
+
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo(BLOCK), anyRecorded((f, s) -> f.equals("B")), anyRecorded((f, s) -> true)))
+                .hasId(MY_ECHO_PARAMS);
+        source.load();
+
+        // WHEN
+        final TestService testService = getTestService();
+        final String result = testService.methodWithThreeParametersReturningLast(BLOCK, "B", "ABC2");
+
+        // THEN
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast(BLOCK, "C", "ABC1"));
+        assertEquals("R1", result);
+    }
+
+    @Test
+    public void equalsMatcherComplainsWhenParameterHasNoEqualsMethod(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.echoParameter(any(TestBeanWithoutEquals.class)));
@@ -723,28 +778,28 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void byteArrayCanBeRecordedAndLoaded(Path tempFile) {
+    public void byteArrayCanBeRecordedAndLoaded(final Path tempFile) {
         Sampler.clear();
 
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
-        PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
+        PersistentSample.of(testServiceSampler.getRandomByteArray(anyRecordedInt()));
 
-        byte[] expectedArray = getTestService().getRandomByteArray(42);
+        final byte[] expectedArray = getTestService().getRandomByteArray(42);
 
         final PersistentSampleManager source = save(tempFile);
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.getRandomByteArray(anyInt()));
+        PersistentSample.of(testServiceSampler.getRandomByteArray(anyRecordedInt()));
 
         source.load();
 
         assertFalse(SampleRepository.getInstance().isEmpty());
-        byte[] valueStubbedMethod = getTestService().getRandomByteArray(42);
+        final byte[] valueStubbedMethod = getTestService().getRandomByteArray(42);
         assertArrayEquals(expectedArray, valueStubbedMethod);
     }
 
     @Test
-    public void mixPureJavaApiAndPersistenceApi(Path tempFile) {
+    public void mixPureJavaApiAndPersistenceApi(final Path tempFile) {
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.testLocalDateTime());
 
@@ -765,7 +820,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void interfaceImplementationCanBeRecordedAndLoaded(Path tempFile) {
+    public void interfaceImplementationCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getConcreteDogObject());
@@ -786,7 +841,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        Animal actualDog = getTestService().getConcreteDogObject();
+        final Animal actualDog = getTestService().getConcreteDogObject();
 
         // THEN
         assertNotNull(actualDog);
@@ -796,7 +851,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void subclassFromAConcreteClassCanBeRecordedAndLoaded(Path tempFile) {
+    public void subclassFromAConcreteClassCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getSubClassOfDog());
@@ -816,7 +871,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        Dog actualBeagle = getTestService().getSubClassOfDog();
+        final Dog actualBeagle = getTestService().getSubClassOfDog();
 
         // THEN
 
@@ -826,7 +881,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void subclassFromAnAbstractClassCanBeRecordedAndLoaded(Path tempFile) {
+    public void subclassFromAnAbstractClassCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getSubClassOfAbstractDog());
@@ -846,7 +901,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        AbstractDog actualLabrador = getTestService().getSubClassOfAbstractDog();
+        final AbstractDog actualLabrador = getTestService().getSubClassOfAbstractDog();
 
         // THEN
 
@@ -857,7 +912,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void polymorphicInnerClassCanBeRecordedAndLoaded(Path tempFile) {
+    public void polymorphicInnerClassCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getInternalClassThatExtendsAbstractDog());
@@ -877,7 +932,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        AbstractDog actualInternalDog = getTestService().getInternalClassThatExtendsAbstractDog();
+        final AbstractDog actualInternalDog = getTestService().getInternalClassThatExtendsAbstractDog();
 
         // THEN
 
@@ -888,7 +943,7 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
-    public void subClassWithReferencedObjectCanBeRecordedAndLoaded(Path tempFile) {
+    public void subClassWithReferencedObjectCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getCatWithMouse());
@@ -908,7 +963,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        Animal actualCatWithMouse = getTestService().getCatWithMouse();
+        final Animal actualCatWithMouse = getTestService().getCatWithMouse();
 
         // THEN
 
@@ -917,14 +972,14 @@ public abstract class PersistentSamplerAspectTest {
         assertThat(actualCatWithMouse).isInstanceOf(HunterCat.class);
         assertEquals("Tom", actualCatWithMouse.getName());
 
-        HunterCat actualHunterCat = (HunterCat) actualCatWithMouse;
+        final HunterCat actualHunterCat = (HunterCat) actualCatWithMouse;
 
         assertThat(actualHunterCat.getFood()).isInstanceOf(Mouse.class);
         assertThat(actualHunterCat.getFood().getName()).isEqualTo("Jerry");
     }
 
     @Test
-    public void genericReferencedClassCanBeRecordedAndLoaded(Path tempFile) {
+    public void genericReferencedClassCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getGenericSubClass());
@@ -944,7 +999,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        Dog expectedGenericType = getTestService().getGenericSubClass();
+        final Dog expectedGenericType = getTestService().getGenericSubClass();
 
         // THEN
 
@@ -953,14 +1008,14 @@ public abstract class PersistentSamplerAspectTest {
         assertThat(expectedGenericType).isInstanceOf(GenericBeagle.class);
         assertEquals("GreedyPorthos", expectedGenericType.getName());
 
-        GenericBeagle<?> actualGenericBeagle = (GenericBeagle<?>) expectedGenericType;
+        final GenericBeagle<?> actualGenericBeagle = (GenericBeagle<?>) expectedGenericType;
 
         assertThat(actualGenericBeagle.getFood()).isInstanceOf(Cheese.class);
         assertThat(((Cheese) actualGenericBeagle.getFood()).getName()).isEqualTo("Cheddar");
     }
 
     @Test
-    public void genericClassCanBeRecordedAndLoaded(Path tempFile) {
+    public void genericClassCanBeRecordedAndLoaded(final Path tempFile) {
         // GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
         PersistentSample.of(testServiceSampler.getGenericClass());
@@ -980,7 +1035,7 @@ public abstract class PersistentSamplerAspectTest {
         assertFalse(SampleRepository.getInstance().isEmpty());
 
         // WHEN
-        GenericBeagle<Cheese> expectedGenericType = getTestService().getGenericClass();
+        final GenericBeagle<Cheese> expectedGenericType = getTestService().getGenericClass();
 
         // THEN
         assertEquals("GenericPorthos", expectedGenericType.getName());
@@ -996,7 +1051,7 @@ public abstract class PersistentSamplerAspectTest {
         PersistentSample.of(testServiceSampler.getConcreteDogObject());
 
         final String samplerFile = "/polymorphicSampleWithMissingConcreteClassThrowsError.json";
-        JsonSourceManager jsonSourceManager = JsonSourceManager.builder().buildWithClassPathResource(samplerFile, this.getClass());
+        final JsonSourceManager jsonSourceManager = JsonSourceManager.builder().buildWithClassPathResource(samplerFile, this.getClass());
         final PersistentSampleManager source = PersistentSampler.source(jsonSourceManager);
 
         // WHEN
@@ -1013,7 +1068,7 @@ public abstract class PersistentSamplerAspectTest {
         assertTrue(SampleRepository.getInstance().isEmpty());
     }
 
-    private PersistentSampleManager save(Path pathToFile) {
+    private PersistentSampleManager save(final Path pathToFile) {
         final PersistentSampleManager source = PersistentSampler.source(JsonSourceManager.builder().buildWithFile(pathToFile));
         source.recordSamples();
         return source;

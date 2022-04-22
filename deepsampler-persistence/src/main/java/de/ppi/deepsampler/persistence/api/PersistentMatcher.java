@@ -20,6 +20,7 @@ package de.ppi.deepsampler.persistence.api;
  * @param <T> type to compare
  * @author Rico Schrage
  */
+@FunctionalInterface
 public interface PersistentMatcher<T> {
     /**
      * Compares two values in an arbitrary way with each other.
