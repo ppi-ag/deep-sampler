@@ -80,17 +80,17 @@ public class SampleDefinition {
         return isMarkedForPersistence;
     }
 
-    public void setMarkedForPersistence(boolean markedForPersistence) {
+    public void setMarkedForPersistence(final boolean markedForPersistence) {
         isMarkedForPersistence = markedForPersistence;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SampleDefinition that = (SampleDefinition) o;
+        final SampleDefinition that = (SampleDefinition) o;
         //Only these three fields should be compared to identify a SampleDefinition.
-        //A method should only be sampled once and is identified by signature independent from its return value!
+        //A method should only be sampled once and is identified by signature independent of its return value!
         //Comparing also 'returnValueSupplier' leads to inconsistent behavior during
         //definition of two SampleDefinitions with same SampleMethod (and args) but different returnValues.
         return Objects.equals(sampledMethod.getMethod(), that.sampledMethod.getMethod()) &&
