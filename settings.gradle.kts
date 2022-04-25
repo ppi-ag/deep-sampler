@@ -28,7 +28,7 @@ dependencyResolutionManagement {
 			alias("spring-test").to("org.springframework:spring-test:5.2.8.RELEASE")
 
 			// Test
-			alias("awaitility").to("org.awaitility:awaitility:4.0.3")
+			alias("awaitility").to("org.awaitility:awaitility:4.2.0")
 			alias("junit-jupiter-api").to("org.junit.jupiter:junit-jupiter-api:5.6.0")
 			alias("junit-v4").to("junit:junit:4.13")
 			alias("assertj").to("org.assertj:assertj-core:3.21.0")
