@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 
 			alias("spring-aop").to("org.springframework:spring-aop:5.2.8.RELEASE")
 			alias("spring-context").to("org.springframework:spring-context:5.2.8.RELEASE")
-			alias("spring-test").to("org.springframework:spring-test:5.2.8.RELEASE")
+			alias("spring-test").to("org.springframework:spring-test:5.3.19")
 
 			// Test
 			alias("awaitility").to("org.awaitility:awaitility:4.0.3")
