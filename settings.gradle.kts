@@ -20,7 +20,7 @@ dependencyResolutionManagement {
 			alias("jackson-module-parameter-names").to("com.fasterxml.jackson.module:jackson-module-parameter-names:2.11.0")
 			alias("jackson-datatype-jsr310").to("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.0")
 
-			alias("aspectj-rt").to("org.aspectj:aspectjrt:1.9.6")
+			alias("aspectj-rt").to("org.aspectj:aspectjrt:1.9.9")
 			alias("aspectj-weaver").to("org.aspectj:aspectjweaver:1.9.6")
 
 			alias("spring-aop").to("org.springframework:spring-aop:5.3.19")
