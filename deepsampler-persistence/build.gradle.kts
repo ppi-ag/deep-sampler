@@ -8,5 +8,5 @@ plugins {
 
 dependencies {
     implementation(project(":deepsampler-core"))
-    implementation("org.objenesis:objenesis:3.1")
+    implementation(libs.objenesis)
 }

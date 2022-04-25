@@ -12,8 +12,8 @@ dependencies {
     testFixturesImplementation(project(":deepsampler-core"))
     testFixturesImplementation(project(":deepsampler-persistence"))
     testFixturesImplementation(project(":deepsampler-persistence-json"))
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testFixturesImplementation("org.assertj:assertj-core:3.21.0")
+    testFixturesImplementation(libs.junit.jupiter.api)
+    testFixturesImplementation(libs.assertj)
 }
 
 
