@@ -16,7 +16,7 @@ dependencyResolutionManagement {
 			alias("objenesis").to("org.objenesis:objenesis:3.1")
 			alias("guice").to("com.google.inject:guice:4.0")
 
-			alias("jackson-databind").to("com.fasterxml.jackson.core:jackson-databind:2.11.0")
+			alias("jackson-databind").to("com.fasterxml.jackson.core:jackson-databind:2.13.2.2")
 			alias("jackson-module-parameter-names").to("com.fasterxml.jackson.module:jackson-module-parameter-names:2.11.0")
 			alias("jackson-datatype-jsr310").to("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.0")
 
