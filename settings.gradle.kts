@@ -14,7 +14,7 @@ dependencyResolutionManagement {
 
 			alias("javassist").to("org.javassist:javassist:3.27.0-GA")
 			alias("objenesis").to("org.objenesis:objenesis:3.1")
-			alias("guice").to("com.google.inject:guice:4.0")
+			alias("guice").to("com.google.inject:guice:5.1.0")
 
 			alias("jackson-databind").to("com.fasterxml.jackson.core:jackson-databind:2.13.2.2")
 			alias("jackson-module-parameter-names").to("com.fasterxml.jackson.module:jackson-module-parameter-names:2.11.0")
