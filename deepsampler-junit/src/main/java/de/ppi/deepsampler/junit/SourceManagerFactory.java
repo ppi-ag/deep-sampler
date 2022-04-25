@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  *
  * A concrete {@link SourceManagerFactory} may use custom annotations to configure the {@link SourceManager}. These custom
  * annotations may sit on test methods, classes, or {@link SamplerFixture}s. The method
- * {@link JUnitSamplerUtils#loadAnnotationFromTestOrSampleFixture(Method, Class)} simplifies loading these annotations.
+ * {@link JUnitSamplerUtils#loadAnnotationFromTestOrSamplerFixture(Method, Class)} simplifies loading these annotations.
  *
  * @param <T>
  */

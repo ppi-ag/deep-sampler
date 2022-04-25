@@ -155,7 +155,7 @@ public class JUnitSamplerUtils {
      * @param <T>            the type of the annotation
      * @return an {@link Optional} that may contain the annotation, if it could be found.
      */
-    public static <T extends Annotation> Optional<T> loadAnnotationFromTestOrSampleFixture(final Method testMethod, final Class<T> annotationType) {
+    public static <T extends Annotation> Optional<T> loadAnnotationFromTestOrSamplerFixture(final Method testMethod, final Class<T> annotationType) {
         final Optional<T> annotationFromTest = loadAnnotationFromMethodOrDeclaringClass(testMethod, annotationType);
 
         if (annotationFromTest.isPresent()) {

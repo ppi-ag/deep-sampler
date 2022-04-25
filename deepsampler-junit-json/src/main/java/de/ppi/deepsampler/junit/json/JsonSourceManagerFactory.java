@@ -66,7 +66,7 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
         applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
 
-        final Optional<SampleRootPath> rootPath = JUnitSamplerUtils.loadAnnotationFromTestOrSampleFixture(testMethod, SampleRootPath.class);
+        final Optional<SampleRootPath> rootPath = JUnitSamplerUtils.loadAnnotationFromTestOrSamplerFixture(testMethod, SampleRootPath.class);
 
         switch (loadSamples.source()) {
             case CLASSPATH:
@@ -97,7 +97,7 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
         applyJsonSerializersFromTestCaseAndTestFixture(testMethod, persistentSampleManagerBuilder);
         applyCharsetFromTestCaseOrTestFixture(testMethod, persistentSampleManagerBuilder);
 
-        final Optional<SampleRootPath> sampleRootPath = JUnitSamplerUtils.loadAnnotationFromTestOrSampleFixture(testMethod, SampleRootPath.class);
+        final Optional<SampleRootPath> sampleRootPath = JUnitSamplerUtils.loadAnnotationFromTestOrSamplerFixture(testMethod, SampleRootPath.class);
         final Path fileName = createPathForFilesystem(sampleRootPath, saveSamples.value(), testMethod);
 
         return persistentSampleManagerBuilder.buildWithFile(fileName);
@@ -117,7 +117,7 @@ public class JsonSourceManagerFactory implements SourceManagerFactory<JsonSource
     }
 
     private void applyCharsetFromTestCaseOrTestFixture(final Method testMethod, final JsonSourceManager.Builder persistentSampleManagerBuilder) {
-        JUnitSamplerUtils.loadAnnotationFromTestOrSampleFixture(testMethod, UseCharset.class)
+        JUnitSamplerUtils.loadAnnotationFromTestOrSamplerFixture(testMethod, UseCharset.class)
                 .map(UseCharset::value)
                 .map(Charset::forName)
                 .ifPresent(persistentSampleManagerBuilder::withCharset);
