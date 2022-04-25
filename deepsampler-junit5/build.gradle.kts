@@ -9,13 +9,14 @@ plugins {
 dependencies {
     implementation(project(":deepsampler-core"))
     implementation(project(":deepsampler-junit"))
-    implementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testImplementation("org.assertj:assertj-core:3.21.0")
+    implementation(libs.junit.jupiter.api)
+
     testImplementation(testFixtures(project(":deepsampler-junit")))
-    testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
     testImplementation(project(":deepsampler-provider-guice"))
     testImplementation(project(":deepsampler-junit-json"))
-    testImplementation("org.assertj:assertj-core:3.21.0")
+    testImplementation(libs.assertj)
+    testImplementation(libs.guice)
+    testImplementation(libs.assertj)
 
     testImplementation(files("./src/test/tmp"))
 }

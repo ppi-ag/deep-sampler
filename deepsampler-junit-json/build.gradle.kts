@@ -13,10 +13,10 @@ dependencies {
     implementation(project(":deepsampler-persistence-json"))
     implementation(project(":deepsampler-persistence"))
 
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
+    implementation(libs.jackson.databind)
 
     testImplementation(project(":deepsampler-junit5"))
     testImplementation(testFixtures(project(":deepsampler-junit")))
-    testImplementation("org.assertj:assertj-core:3.21.0")
-    testImplementation(group = "com.google.inject", name = "guice", version = "4.0")
+    testImplementation(libs.assertj)
+    testImplementation(libs.guice)
 }

@@ -10,7 +10,7 @@ dependencies {
     implementation(project(":deepsampler-core"))
     implementation(project(":deepsampler-persistence"))
 
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-parameter-names:2.11.0")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.0")
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.module.parameter.names)
+    implementation(libs.jackson.datatype.jsr310)
 }

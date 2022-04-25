@@ -14,9 +14,9 @@ dependencies {
 
     testFixturesImplementation(project(":deepsampler-core"))
     testFixturesImplementation(project(":deepsampler-persistence"))
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testFixturesImplementation(group = "com.google.inject", name = "guice", version = "4.0")
+    testFixturesImplementation(libs.junit.jupiter.api)
+    testFixturesImplementation(libs.guice)
     testFixturesImplementation(project(":deepsampler-provider-guice"))
-    testImplementation("org.assertj:assertj-core:3.21.0")
+    testImplementation(libs.assertj)
 
 }
