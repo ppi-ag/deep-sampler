@@ -307,7 +307,7 @@ We recommend placing the extension in two modules:
       JUnit. It should be possible to use the persistence without annotations or JUnit. 
       The [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java)
       -implementation and all it's utilities belong to this module.
-   2. `junit-configuraiton-modul`: A module that contains all code, that is necessary to use the `SourceManager` in 
+   2. `junit-configuration-modul`: A module that contains all code, that is necessary to use the `SourceManager` in 
       JUnit-tests together with annotation-based-configuration. The custom-annotations like `@SaveYamlSamples` and 
       the [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java)
       -implementation belong to this module.
