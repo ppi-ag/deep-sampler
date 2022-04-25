@@ -224,6 +224,32 @@ public class PersistentMatchers {
     /**
      * Allows adding separate matchers for loading and recording of samples.
      * <p>
+     * <ul>
+     *     <li>Recording: The parameters, that are passed to a method during recording, are matched using recordingMatcher. A method-call is recorded only,
+     *     if recordMatcher returns true for all parameters.</li>
+     *     <li>Testing: The parameters, that actually appear during testing, are matched against recorded parameters using a custom {@link PersistentMatcher}.
+     *     This is especially useful, if the parameter objects do not override {@link Object#equals(Object)}. The {@link PersistentMatcher} can be used
+     *     to replace the equals() in these cases. The {@link PersistentMatcher} may conveniently be defined as a lambda or a method reference. </li>
+     * </ul>
+     * <p>
+     * Please notice: The basic idea of persistent samples is, that the parameters, with which a stubbed method is
+     * called during a test, are compared to previously recorded parameters. So usually the playingMatcher is used
+     * to compare the expected parameters from the sample-file with the actual parameters during test.
+     * This method allows to change this behavior. We recommend using this method only after careful considerations.
+     *
+     * @param recordingMatcher this macher will be used during recording of samples.
+     * @param playingMatcher   this matcher will be used during replay.
+     * @param <T>              type to compare/match
+     * @return always returns null
+     */
+    public static <T> T combo(final ParameterMatcher<T> recordingMatcher, final PersistentMatcher<T> playingMatcher) {
+        SampleRepository.getInstance().setCurrentParameterMatchers(new ComboMatcher<>(recordingMatcher, playingMatcher));
+        return null;
+    }
+
+    /**
+     * Allows adding separate matchers for loading and recording of samples.
+     * <p>
      * Please notice: The basic idea of persistent samples is, that the parameters, with which a stubbed method is
      * called during a test, are compared to previously recorded parameters. So usually the playingMatcher is used
      * to compare the expected parameters from the sample-file with the actual parameters during test.
