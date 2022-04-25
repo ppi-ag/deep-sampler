@@ -21,7 +21,7 @@ dependencyResolutionManagement {
 			alias("jackson-datatype-jsr310").to("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
 
 			alias("aspectj-rt").to("org.aspectj:aspectjrt:1.9.6")
-			alias("aspectj-weaver").to("org.aspectj:aspectjweaver:1.9.6")
+			alias("aspectj-weaver").to("org.aspectj:aspectjweaver:1.9.9.1")
 
 			alias("spring-aop").to("org.springframework:spring-aop:5.3.19")
 			alias("spring-context").to("org.springframework:spring-context:5.3.19")
