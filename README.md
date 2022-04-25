@@ -291,7 +291,7 @@ have to implement a model like this:
      [SourceManagerFactory](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/SourceManagerFactory.java). 
      The configuration should be done using custom annotations. There is a convenience-method that is able to load 
      annotations from various places, like the test-method itself, or a `SamplerFixture`: 
-     [JUnitSamplerUtils#loadAnnotationFromTestOrSampleFixture](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/JUnitSamplerUtils.java#L158) 
+     [JUnitSamplerUtils#loadAnnotationFromTestOrSamplerFixture](deepsampler-junit/src/main/java/de/ppi/deepsampler/junit/JUnitSamplerUtils.java#L158) 
    * `YamlSourceManager` is the class that is finally able to write the YAML-file. It implements the interface 
       [SourceManager](deepsampler-persistence/src/main/java/de/ppi/deepsampler/persistence/api/SourceManager.java). This 
       class is probably the most complex class to implement, since it needs to translate the 
