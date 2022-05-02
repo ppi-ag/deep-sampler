@@ -34,6 +34,7 @@ import static de.ppi.deepsampler.core.api.Matchers.equalTo;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecorded;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.equalsMatcher;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.match;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.sameMatcher;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,7 +46,7 @@ import static org.mockito.Mockito.when;
 class PersistentSampleManagerTest {
 
     @Test
-    void testLoadWithComboMatcher() throws NoSuchMethodException {
+    void comboMatcherLoadsRecordingMatcherFromSampleRepository() throws NoSuchMethodException {
         // GIVEN
         final SourceManager mockedSourceManager = mock(SourceManager.class);
         final PersistentModel mockedPersistentModel = mock(PersistentModel.class);
@@ -69,6 +70,49 @@ class PersistentSampleManagerTest {
 
         final PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
         PersistentSample.of(Sampler.prepare(TestService.class).call(combo(equalTo(new TestBean()), sameMatcher()),
+                equalTo(1))).hasId("SampleId");
+
+        // WHEN
+        persistentSampleManager.load();
+
+        // THEN
+        assertFalse(SampleRepository.getInstance().isEmpty());
+        final SampleDefinition expectedCall = new SampleDefinition(new SampledMethod(TestService.class, TestService.class.getDeclaredMethod("call", TestBean.class, Integer.class)));
+        expectedCall.setSampleId("SampleId");
+        expectedCall.setParameterValues(Arrays.asList(new TestBean(), 1));
+        assertEquals(expectedCall,
+                SampleRepository.getInstance().getSamples().get(0));
+
+        assertFalse(SampleRepository.getInstance().getSamples().get(0).getParameterMatcherAs(0, TestBean.class).matches(new TestBean()));
+        assertTrue(SampleRepository.getInstance().getSamples().get(0).getParameterMatcherAs(0, TestBean.class).matches(givenBean));
+    }
+
+    @Test
+    void testMatcherWithSeparateMatchersForRecordingAndPlaying() throws NoSuchMethodException {
+        // GIVEN
+        final SourceManager mockedSourceManager = mock(SourceManager.class);
+        final PersistentModel mockedPersistentModel = mock(PersistentModel.class);
+
+        when(mockedPersistentModel.getId()).thenReturn("ID");
+
+        final Map<PersistentSampleMethod, PersistentActualSample> sampleMap = new HashMap<>();
+        final PersistentSampleMethod mockedMethod = mock(PersistentSampleMethod.class);
+        final PersistentActualSample mockedSample = mock(PersistentActualSample.class);
+
+        final List<PersistentMethodCall> persistentMethodCallList = new ArrayList<>();
+        sampleMap.put(mockedMethod, mockedSample);
+
+        when(mockedMethod.getSampleMethodId()).thenReturn("SampleId");
+        when(mockedSample.getAllCalls()).thenReturn(persistentMethodCallList);
+        when(mockedPersistentModel.getSampleMethodToSampleMap()).thenReturn(sampleMap);
+        when(mockedSourceManager.load()).thenReturn(mockedPersistentModel);
+
+        final TestBean givenBean = new TestBean();
+        addMethodCall(persistentMethodCallList, Arrays.asList(givenBean, 1), true);
+
+        final PersistentSampleManager persistentSampleManager = new PersistentSampleManager(mockedSourceManager);
+
+        PersistentSample.of(Sampler.prepare(TestService.class).call(match(parameter -> true , sameMatcher()),
                 equalTo(1))).hasId("SampleId");
 
         // WHEN
