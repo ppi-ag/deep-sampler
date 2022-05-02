@@ -33,8 +33,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All parameters are accepted.</li>
-     *     <li>Testing: The parameters, that actually appear during testing, are matched against recorded parameters. {@link Object#equals(Object)} is used
-     *     to test if actual parameter objects match to recorded parameter objects.</li>
+     *     <li>Testing: The parameters, that are passed to the stubbed method during testing, are matched against recorded parameters.
+     *     {@link Object#equals(Object)} is used to match the parameter objects.</li>
      * </ul>
      * <p>
      * An Exception is thrown, if the parameter-object does not override {@link Object#equals(Object)}. In this case
@@ -71,8 +71,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All strings are accepted.</li>
-     *     <li>Testing: The strings, that actually appear during testing, are matched against recorded parameters. {@link Object#equals(Object)} is used
-     *     to test if actual parameter objects match to recorded parameter objects.</li>
+     *     <li>Testing: The Strings, that are passed to the stubbed method during testing, are matched against recorded Strings.
+     *     {@link Object#equals(Object)} is used to match the Strings.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded Strings.
@@ -87,7 +87,9 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All int parameters are accepted.</li>
-     *     <li>Testing: The ints, that actually appear during testing, are matched against recorded parameters.</li>
+     *     <li>Testing: The ints, that are passed to the stubbed method during testing, are matched against recorded ints.
+     *     {@link Object#equals(Object)} is used to match the ints.</li>
+     *     </li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded ints.
@@ -102,7 +104,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All long parameters are accepted.</li>
-     *     <li>Testing: The long parameters, that actually appear during testing, are matched against recorded parameters. </li>
+     *     <li>Testing: The longs, that are passed to the stubbed method during testing, are matched against recorded longs.
+     *     {@link Object#equals(Object)} is used to match the longs.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded long-values.
@@ -117,7 +120,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All double parameters are accepted.</li>
-     *     <li>Testing: The double parameters, that actually appear during testing, are matched against recorded parameters. </li>
+     *     <li>Testing: The double-values, that are passed to the stubbed method during testing, are matched against recorded doubles.
+     *     {@link Object#equals(Object)} is used to match the double-values.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded double-values.
@@ -132,7 +136,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All float parameters are accepted.</li>
-     *     <li>Testing: The float parameters, that actually appear during testing, are matched against recorded parameters. </li>
+     *     <li>Testing: The float-values, that are passed to the stubbed method during testing, are matched against recorded float-values.
+     *     {@link Object#equals(Object)} is used to match the float parameters.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded float-values.
@@ -147,7 +152,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All char parameters are accepted.</li>
-     *     <li>Testing: The char parameters, that actually appear during testing, are matched against recorded parameters. </li>
+     *     <li>Testing: The char parameters, that are passed to the stubbed method during testing, are matched against recorded chars.
+     *     {@link Object#equals(Object)} is used to match the chars.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded chars.
@@ -162,7 +168,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All boolean parameters are accepted.</li>
-     *     <li>Testing: The boolean parameters, that actually appear during testing, are matched against recorded parameters. </li>
+     *     <li>Testing: The booleans, that are passed to the stubbed method during testing, are matched against recorded booleans.
+     *     {@link Object#equals(Object)} is used to match the booleans.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded booleans.
@@ -177,7 +184,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All short parameters are accepted.</li>
-     *     <li>Testing: The short parameters, that actually appear during testing, are matched against recorded parameters. </li>
+     *     <li>Testing: The short-values, that are passed to the stubbed method during testing, are matched against recorded short-values.
+     *     {@link Object#equals(Object)} is used to match the short parameters.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded shorts.
@@ -192,7 +200,8 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All byte parameters are accepted.</li>
-     *     <li>Testing: The byte parameters, that actually appear during testing, are matched against recorded parameters. </li>
+     *     <li>Testing: The byte-values, that are passed to the stubbed method during testing, are matched against recorded bytes.
+     *     {@link Object#equals(Object)} is used to match the byte parameters.</li>
      * </ul>
      *
      * @return A Matcher, that accepts recorded bytes.
@@ -207,17 +216,43 @@ public class PersistentMatchers {
      *
      * <ul>
      *     <li>Recording: All parameters are accepted.</li>
-     *     <li>Testing: The parameters, that actually appear during testing, are matched against recorded parameters using a custom {@link PersistentMatcher}.
+     *     <li>Testing: The parameters, that are passed to the method during testing, are matched against recorded parameters using a custom {@link PersistentMatcher}.
      *     This is especially useful, if the parameter objects do not override {@link Object#equals(Object)}. The {@link PersistentMatcher} can be used
      *     to replace the equals() in these cases. The {@link PersistentMatcher} may conveniently be defined as a lambda or a method reference. </li>
      * </ul>
      *
-     * @param persistentMatcher A replacement for a missing {@link Object#equals(Object)}-method.
+     * @param persistentMatcher A replacement for a (possibly) missing {@link Object#equals(Object)}-method.
      * @param <T>               The type of the parameter that will be accepted
      * @return A matcher using the passed {@link PersistentMatcher}
      */
     public static <T> T anyRecorded(final PersistentMatcher<T> persistentMatcher) {
         SampleRepository.getInstance().addCurrentParameterMatchers(new ComboMatcher<>(parameter -> true, persistentMatcher));
+        return null;
+    }
+
+    /**
+     * Allows adding separate matchers for loading and recording of samples.
+     * <p>
+     * <ul>
+     *     <li>Recording: The parameters, that are passed to a method during recording, are matched using recordingMatcher. A method-call is recorded only,
+     *     if recordMatcher returns true for all parameters.</li>
+     *     <li>Testing: The parameters, that actually appear during testing, are matched against recorded parameters using a custom {@link PersistentMatcher}.
+     *     This is especially useful, if the parameter objects do not override {@link Object#equals(Object)}. The {@link PersistentMatcher} can be used
+     *     to replace the equals() in these cases. The {@link PersistentMatcher} may conveniently be defined as a lambda or a method reference. </li>
+     * </ul>
+     * <p>
+     * Please notice: The basic idea of persistent samples is, that the parameters, with which a stubbed method is
+     * called during a test, are compared to previously recorded parameters. So usually the playingMatcher is used
+     * to compare the expected parameters from the sample-file with the actual parameters during test.
+     * This method allows to change this behavior. We recommend using this method only after careful considerations.
+     *
+     * @param recordingMatcher this macher will be used during recording of samples.
+     * @param playingMatcher   this matcher will be used during replay.
+     * @param <T>              type to compare/match
+     * @return always returns null
+     */
+    public static <T> T match(final ParameterMatcher<T> recordingMatcher, final PersistentMatcher<T> playingMatcher) {
+        SampleRepository.getInstance().addCurrentParameterMatchers(new ComboMatcher<>(recordingMatcher, playingMatcher));
         return null;
     }
 
@@ -238,10 +273,11 @@ public class PersistentMatchers {
     @SuppressWarnings({"unchecked", "unused"})
     public static <T> T combo(final T recordingMatcher, final PersistentMatcher<T> playingMatcher) {
         if (SampleRepository.getInstance().getCurrentParameterMatchers().isEmpty()) {
-            throw new PersistenceException("It wasn't possible to retrieve the last ParameterMatcher. Did you passed a ParameterMatcher created with a static factory method in de.ppi.deepsampler.core.api.Matchers?");
+            throw new PersistenceException("It wasn't possible to retrieve the last ParameterMatcher. Did you passed a " +
+                    "ParameterMatcher created with a static factory method in de.ppi.deepsampler.core.api.Matchers?");
         }
-
-        SampleRepository.getInstance().setCurrentParameterMatchers(new ComboMatcher<>((ParameterMatcher<T>) SampleRepository.getInstance().getLastParameterMatcher(), playingMatcher));
+        final ParameterMatcher<T> lastMatcher = (ParameterMatcher<T>) SampleRepository.getInstance().getLastParameterMatcher();
+        SampleRepository.getInstance().setCurrentParameterMatchers(new ComboMatcher<>(lastMatcher, playingMatcher));
         return null;
     }
 

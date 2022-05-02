@@ -33,6 +33,7 @@ import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecorded;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecordedInt;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.anyRecordedString;
 import static de.ppi.deepsampler.persistence.api.PersistentMatchers.combo;
+import static de.ppi.deepsampler.persistence.api.PersistentMatchers.match;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -679,6 +680,32 @@ public abstract class PersistentSamplerAspectTest {
     }
 
     @Test
+    void testMatcherLoadAllButAcceptOnlyA(final Path tempFile) {
+        // 👉 GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.echoParameter(anyString())).hasId(MY_ECHO_PARAMS);
+
+        getTestService().echoParameter("ABC");
+
+        final PersistentSampleManager source = save(tempFile);
+        clearSampleRepositoryWithAssertion();
+
+        PersistentSample.of(testServiceSampler.echoParameter((String) match(parameter -> true, (f, s) -> f.equals("A")))).hasId(MY_ECHO_PARAMS);
+
+        source.load();
+
+        // 🧪 WHEN
+        final TestService testService = getTestService();
+        final String result = testService.echoParameter("A");
+        final String secondCallResult = testService.echoParameter("A");
+
+        // 🔬 THEN
+        assertEquals("ABC", result);
+        assertEquals("ABC", secondCallResult);
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.echoParameter("B"));
+    }
+
+    @Test
     void testPersistentMatcherLoadAllButAcceptOnlyA(final Path tempFile) {
         // 👉 GIVEN
         final TestService testServiceSampler = Sampler.prepare(TestService.class);
@@ -716,7 +743,37 @@ public abstract class PersistentSamplerAspectTest {
         final PersistentSampleManager source = save(tempFile);
         clearSampleRepositoryWithAssertion();
 
-        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo(BLOCK), combo(anyString(), (f, s) -> f.equals("B")), combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo(BLOCK),
+                combo(anyString(), (f, s) -> f.equals("B")),
+                combo(anyString(), (f, s) -> true))).hasId(MY_ECHO_PARAMS);
+
+        source.load();
+
+        // WHEN
+        final TestService testService = getTestService();
+        final String result = testService.methodWithThreeParametersReturningLast(BLOCK, "B", "ABC2");
+
+        // THEN
+        assertThrows(NoMatchingParametersFoundException.class, () -> testService.methodWithThreeParametersReturningLast(BLOCK, "C", "ABC1"));
+        assertEquals("R1", result);
+    }
+
+    @Test
+    void testCustomMatcherSecondArgument(final Path tempFile) {
+        // GIVEN
+        final TestService testServiceSampler = Sampler.prepare(TestService.class);
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(anyString(), anyString(), anyString())).hasId(MY_ECHO_PARAMS);
+
+        getTestService().methodWithThreeParametersReturningLast(BLOCK, "B", "R1");
+        getTestService().methodWithThreeParametersReturningLast(BLOCK, "C", "R3");
+
+        final PersistentSampleManager source = save(tempFile);
+        clearSampleRepositoryWithAssertion();
+
+        PersistentSample.of(testServiceSampler.methodWithThreeParametersReturningLast(equalTo(BLOCK),
+                match(p -> true, (f, s) -> f.equals("B")),
+                match(p -> true, (f, s) -> true))).hasId(MY_ECHO_PARAMS);
+
         source.load();
 
         // WHEN
