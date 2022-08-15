@@ -12,7 +12,7 @@ dependencyResolutionManagement {
 	versionCatalogs {
 		create("libs") {
 
-			alias("javassist").to("org.javassist:javassist:3.28.0-GA")
+			alias("javassist").to("org.javassist:javassist:3.29.1-GA")
 			alias("objenesis").to("org.objenesis:objenesis:3.2")
 			alias("guice").to("com.google.inject:guice:5.1.0")
 
