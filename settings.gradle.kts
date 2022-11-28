@@ -17,7 +17,7 @@ dependencyResolutionManagement {
 			alias("guice").to("com.google.inject:guice:5.1.0")
 
 			alias("jackson-databind").to("com.fasterxml.jackson.core:jackson-databind:2.13.2.2")
-			alias("jackson-module-parameter-names").to("com.fasterxml.jackson.module:jackson-module-parameter-names:2.13.2")
+			alias("jackson-module-parameter-names").to("com.fasterxml.jackson.module:jackson-module-parameter-names:2.14.1")
 			alias("jackson-datatype-jsr310").to("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
 
 			alias("aspectj-rt").to("org.aspectj:aspectjrt:1.9.6")
