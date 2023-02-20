@@ -24,7 +24,7 @@ dependencyResolutionManagement {
 			alias("aspectj-weaver").to("org.aspectj:aspectjweaver:1.9.9.1")
 
 			alias("spring-aop").to("org.springframework:spring-aop:5.3.19")
-			alias("spring-context").to("org.springframework:spring-context:5.3.19")
+			alias("spring-context").to("org.springframework:spring-context:6.0.5")
 			alias("spring-test").to("org.springframework:spring-test:5.3.19")
 
 			// Test
