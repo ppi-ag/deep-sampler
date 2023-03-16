@@ -6,9 +6,9 @@ Version 2.1.0 - For older versions see [2.0.0](https://github.com/ppi-ag/deep-sa
 
 # Build integration tests with JUnit and DeepSampler!
 
-DeepSampler is a stubbing tool for integration tests. It is designed to 
-   * __record testdata at runtime__. We call this testdata 🧪 __samples__. The recorded samples can be "replayed" by DeepSampler's stubs.
-   * stub methods, that are hidden behind long reference-chains 🐳 __deep__ inside the tested compound. 
+DeepSampler is an advanced testing library designed for large software components that require high-quality testing. Unlike traditional unit-testing, DeepSampler's __component-testing__ approach enables you to test several integrated classes within a component, ensuring proper integration while isolating the component from the larger application. With its powerful __features__, DeepSampler simplifies the process of 💉 __injecting stubs__ into isolated components and 🎥 __recording 🧪 stub data__ at runtime from real-life examples. 
+
+This library is perfect for developers who need to ensure their software is of the highest quality and is well-suited for a wide range of applications. Give DeepSampler a try and take your testing to the next level!
 
 Let's say, we wanted to test a compound consisting of numerous classes and somewhere deep inside the compound is one class, a DAO, that reads 
 data from a Database:
