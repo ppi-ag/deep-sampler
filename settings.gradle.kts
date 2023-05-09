@@ -23,13 +23,15 @@ dependencyResolutionManagement {
 			alias("aspectj-rt").to("org.aspectj:aspectjrt:1.9.6")
 			alias("aspectj-weaver").to("org.aspectj:aspectjweaver:1.9.9.1")
 
-			alias("spring-aop").to("org.springframework:spring-aop:6.0.8")
-			alias("spring-context").to("org.springframework:spring-context:5.3.19")
-			alias("spring-test").to("org.springframework:spring-test:5.3.19")
+			// Springs support for Java 8 ends with versions >= 6. Since some of our users
+			// still use java 8 we cannot move on to 6
+			alias("spring-aop").to("org.springframework:spring-aop:5.3.27")
+			alias("spring-context").to("org.springframework:spring-context:5.3.27")
+			alias("spring-test").to("org.springframework:spring-test:5.3.27")
 
 			// Test
 			alias("awaitility").to("org.awaitility:awaitility:4.0.3")
-			alias("junit-jupiter-api").to("org.junit.jupiter:junit-jupiter-api:5.6.0")
+			alias("junit-jupiter-api").to("org.junit.jupiter:junit-jupiter-api:5.9.2")
 			alias("junit-v4").to("junit:junit:4.13.2")
 			alias("assertj").to("org.assertj:assertj-core:3.22.0")
 		}
