@@ -21,7 +21,7 @@ dependencyResolutionManagement {
 			alias("jackson-datatype-jsr310").to("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.0")
 
 			alias("aspectj-rt").to("org.aspectj:aspectjrt:1.9.6")
-			alias("aspectj-weaver").to("org.aspectj:aspectjweaver:1.9.9.1")
+			alias("aspectj-weaver").to("org.aspectj:aspectjweaver:1.9.19")
 
 			// Springs support for Java 8 ends with versions >= 6. Since some of our users
 			// still use java 8 we cannot move on to 6
