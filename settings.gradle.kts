@@ -33,7 +33,7 @@ dependencyResolutionManagement {
 			alias("awaitility").to("org.awaitility:awaitility:4.0.3")
 			alias("junit-jupiter-api").to("org.junit.jupiter:junit-jupiter-api:5.9.2")
 			alias("junit-v4").to("junit:junit:4.13.2")
-			alias("assertj").to("org.assertj:assertj-core:3.22.0")
+			alias("assertj").to("org.assertj:assertj-core:3.24.2")
 		}
 	}
 }
